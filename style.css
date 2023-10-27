@@ -493,9 +493,13 @@ form > details > summary {
 .purple-red {
     background: linear-gradient(to bottom right, var(--red), var(--purple));
 }
+.column-fill {
+    margin: var(--space-xs-s);
+    @media screen and (min-width: 711px) {
+        margin: var(--space-s-m);
+    }
+}
 .profile {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
     border-radius: var(--space-3xs);
     background-color: var(--base);
     @media (prefers-color-scheme: dark) {
@@ -503,9 +507,17 @@ form > details > summary {
     }
     padding: var(--space-s);
     border: 1px solid var(--crust);
-    margin: 0 var(--space-xs-s);
+    margin: var(--space-xs-s);
     @media screen and (min-width: 711px) {
         margin: var(--space-s-m);
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+    }
+}
+.profile .name {
+    text-align: center;
+    @media screen and (min-width: 711px) {
+        text-align: left;
     }
 }
 .profile .avatar {

@@ -220,7 +220,7 @@ function cleanFormatHTML (str) {
  * @param  {bool} isFollowing - Are you following this user?
  */
 function postContentTemplate(id, username, name, avatar, url, date, content_html, postActions, isFollowing) { 
-    const avatarHTML = avatar ? `<img style="width: var(--space-l);height: var(--space-l);border-radius: 50%;" loading="lazy" src="${avatar}" />` : '';
+    const avatarHTML = avatar ? `<img style="align-self: center;width: var(--space-l);height: var(--space-l);border-radius: 50%;" loading="lazy" src="${avatar}" />` : '';
     return `
         <article class="post" data-id="${id}" style="display:block;">
             <section style="display:flex; flex-direction: column;">
@@ -228,13 +228,14 @@ function postContentTemplate(id, username, name, avatar, url, date, content_html
                     ${avatarHTML}
                     <div style="padding-left: var(--space-xs);">
                         <b>${name ? name : username}</b>${!isFollowing ? '&nbsp;<span class="label">Not following</span>' : ''}
-                        <br/><small><a href="/app/timeline?name=${username}">@${username}</a>: <a href="${url}">${date}</a></small>
+                        <br/><small><a href="/app/timeline?name=${username}">@${username}</a></small>
                     </div>
                     <div style="margin-left: auto;">
                     ${postActions}
                     </div>
                 </header>
-                <div class="content" style="flex-grow: 1;margin-bottom: var(--space-s);">${cleanFormatHTML(content_html)}</div>         
+                <div class="content" style="flex-grow: 1;margin-bottom: var(--space-s);">${cleanFormatHTML(content_html)}</div>  
+                <div><small><a href="${url}">${date}</a></small></div>       
     `;
 }
 
@@ -404,7 +405,7 @@ function postMenuBarTemplate(selected, name, includeMentions = true) {
         {
             template += `<a ${selected == 'mentions' ? "class='selected'" : ''} href="/app/mentions">Mentions</a></div>`;
         } else {
-            template += `</div>`;
+            template += `<a ${selected == 'photos' ? "class='selected'" : ''} href="/app/photos?name=${name}">Photos</a></div>`;
         }
         
         return template;
@@ -569,7 +570,6 @@ async function streamBookshelfLinks(ctx, controller) {
  * @param  {bool} openConvo - open the conversations
  */
 async function streamPosts(ctx, controller, posts, isConvo, includeReplies = true, includeActions = true, openConvo = false) {
-    const id = await ctx.request.url.searchParams.get('id');
     const access_token = await ctx.cookies.get('access_token');
     const user = await getMicroBlogLoggedInUser(access_token);
     
@@ -594,9 +594,14 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
     for(let i = 0; i < posts.length; i++) {  
         const post = posts[i];
 
+        console.log(post);
+
         if(!filterOut(contentFilters, post.content_html))
         {
-            const isFollowing = await isFollowingMicroBlogUser(post.author._microblog.username, access_token);
+            let isFollowing = await isFollowingMicroBlogUser(post.author._microblog.username, access_token);
+            if(post.author._microblog.username == await ctx.cookies.get('username')){
+                isFollowing = true;
+            }
             
             let tagCheck = '';
             if(user.is_premium) {       
@@ -706,24 +711,27 @@ async function streamUserProfile(ctx, controller, author, _microblog) {
     }
 
     controller.enqueue(`<div style="padding-bottom: var(--space-3xl)">
+        ${!_microblog.is_you ? 
+            `<details class="column-fill">
+                <summary style="margin-bottom:0;">Advanced</summary>
+                <div style="margin-top:var(--space-xs)">
+                <p>Learn about muting and blocking users here: <a target="_blank" href="https://help.micro.blog/t/muting-blocking-and-reporting-users/32">Micro.blog Help - Muting, blocking, and reporting users${externalLinkSVG()}</a></p>
+                ${_microblog.is_following ? `<form style="display:inline;" method="POST" action="/app/users/unfollow"><input type="hidden" name="id" value="${name}"/><button type="submit">Unfollow User</button></form>` : '' }
+                <form style="display:inline;" method="POST" action="/app/users/block"><input type="hidden" name="id" value="${name}"/><button type="submit">Block User</button></form>
+                <form style="display:inline;" method="POST" action="/app/users/mute"><input type="hidden" name="id" value="${name}"/><button type="submit">Mute User</button></form>
+                </div>
+            </details>` : ''}
         <div class="profile blue-purple" style="color:var(--base);">
             <div>
                 <p class="center"><img class="avatar" src="${author.avatar}" /></p>
-                ${_microblog.is_following && !_microblog.is_you ? 
-                    `<details>
-                        <summary>Advanced</summary>
-                        <form method="POST" action="/app/users/unfollow"><input type="hidden" name="id" value="${name}"/><button type="submit">Unfollow User</button></form>
-                        <form method="POST" action="/app/users/block"><input type="hidden" name="id" value="${name}"/><button type="submit">Block User</button></form>
-                        <form method="POST" action="/app/users/mute"><input type="hidden" name="id" value="${name}"/><button type="submit">Mute User</button></form>
-                    </details>` : ''}
                 ${!_microblog.is_following && !_microblog.is_you ? 
                     `<form method="POST">
                         <input type="hidden" name="type" value="follow-redirect"/><input type="hidden" name="id" value="${name}"/>
                         <button type="submit">Follow @${_microblog.username}</button></form>` : ''}
             </div>
             <div style="padding-left: var(--space-xs);">
-                <p class="name"><b>${author.name}</b></p>
-                <p class="pronouns">${_microblog.pronouns}</p>
+                <p class="name"><b>${author.name}</b> ${_microblog.pronouns}</p>
+                <p class="name"><a target="_blank" class="button" href="${author.url}">${author.url} ${externalLinkSVG()}</a></p>
                 <p class="blurb">${_microblog.bio}</p>
                 ${ _microblog.is_you && pins != '' ? '<b>My Micro.blog pins:</b><br/>' + pins : '' }
             </div>
@@ -1066,6 +1074,31 @@ await router.get("/app/conversations", async (ctx, next) => {
     return await next();
 });
 
+await router.get("/app/photos", async (ctx, next) => {
+    const cookies = await getCookies(ctx);
+    const name = await ctx.request.url.searchParams.get('name');
+
+    ctx.response.body = new ReadableStream({
+        async start(controller) {
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Photos"));  
+        
+            controller.enqueue(mainMenuTemplate(true, false));
+            await streamPinned(ctx, controller); 
+        
+            controller.enqueue(`<div class="posts">`);
+            const result = await getMicroBlogTimelinePhotos(name, cookies.access_token);
+            const posts = result.items;
+        
+            await streamUserProfile(ctx, controller, result.author, result._microblog);
+            controller.enqueue(postMenuBarTemplate('photos', name, false)); 
+            controller.enqueue(`<div id="photos">${posts.map(function(post){ return `<a href="/app/post?id=${post.id}"><img src="https://micro.blog/photos/400/${post.image}" loading="lazy"/></a>`; }).join('')}</div>`);
+            controller.enqueue(`</div>${endHTMLTemplate()}`); 
+            controller.close();
+        }
+    });
+    return await next();
+});
+
 await router.get("/app/mentions", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const last = await ctx.request.url.searchParams.get('last');
@@ -1259,8 +1292,6 @@ await router.get("/app/bookshelves", async (ctx, next) => {
                 const fetchingGoals = await microBlogGet('books/goals', cookies.access_token);
                 const goals = await fetchingGoals.json();
 
-                console.log(fetchingGoals, goals);
-
                 controller.enqueue(`<p><b>Yearly reading goals:</b></p>`);
                 controller.enqueue(goals.items.map(function (goal) { return `<p style="font-weight: 300;">${goal.title.replace("Reading ","")}: ${goal.content_text}</p>`}).join(' '))
                 controller.enqueue(`</div>`);
@@ -1338,8 +1369,7 @@ await router.get("/app/blog/posts", async (ctx, next) => {
             
             for(let i= 0; i < posts.items.length && i < 25; i++) {
                 const post = posts.items[i].properties;
-                console.log(post);
-                
+
                 const postActions = `<div class="actions">
                     <details style="border-radius: var(--space-3xs);color: var(--subtext-1);border: 1px solid var(--mantle);position: absolute;z-index: 5;background-color: var(--mantle);margin-left: -92px;">
                         <summary style="padding: var(--space-2xs); font-size: var(--step--1); margin: 0;">Actions</summary>
@@ -1481,12 +1511,12 @@ await router.get("/app/replies", async (ctx, next) => {
             controller.enqueue(mainMenuTemplate(true));
 
             controller.enqueue(`<div class="posts">`);
-            controller.enqueue(`<p class="center"><a class="button" href="https://micro.blog/account/replies">Manage replies on Micro.blog ${externalLinkSVG()}</a></p>`);
+            controller.enqueue(`<p class="center"><a target="_blank" class="button" href="https://micro.blog/account/replies">Manage replies on Micro.blog ${externalLinkSVG()}</a></p>`);
 
             const fetching = await microBlogGet('posts/replies?count=100', cookies.access_token);
             const replies = await fetching.json();
 
-            await streamPosts(ctx, controller, replies.items, false, false, false, false);
+            await streamPosts(ctx, controller, replies.items, false, false, true, false);
 
             controller.enqueue(`</div>${endHTMLTemplate()}`); 
             controller.close();
@@ -1647,8 +1677,6 @@ await router.post("/app/bookmarks/unbookmark", async (ctx) => {
 
     const fetching = await microBlogSimpleDelete(`posts/bookmarks/${id}`, access_token);
     const response = await fetching.json();
-
-    console.log(response);
 
     ctx.response.body = iFrameTemplate(`<form action="/app/bookmarks/bookmark" method="POST">
         <input type="hidden" name="id" value="${id}" />
@@ -1957,6 +1985,17 @@ async function  getMicroBlogConversation(id, access_token) {
 async function getMicroBlogTimeline(name, before_id, access_token) {
     const fetchURL = name ? `posts/${name}?count=${_mbItemCount}` : `posts/timeline?count=${_mbItemCount}`;
     const fetching = await microBlogGet(before_id ? `${fetchURL}&before_id=${before_id}` : fetchURL, access_token);
+    return await fetching.json();
+}
+
+/**
+ * Gets a micro.blog photo timeline for a user
+ * @param  {string} name  The name of the user
+ * @param  {string} access_token  An access token
+ * @return {object}      The json object returned from the micro.blog api
+ */
+async function getMicroBlogTimelinePhotos(name, access_token) {
+    const fetching = await microBlogGet(`posts/${name}/photos`, access_token);
     return await fetching.json();
 }
 
