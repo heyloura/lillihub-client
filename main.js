@@ -66,19 +66,21 @@ function endHTMLTemplate() {
 
 /**
  * Gets a styled iframe
- * @param  {string} body - The body of the src doc
+ * @param  {string} body - The body of the iframe
  */
 function iFrameTemplate(body) {
     const style = `
-        :root {--mantle: #eff1f5; --crust: #dce0e8; --text: #4c4f69; --green: #40a02b; --step--1: clamp(0.99rem, calc(0.99rem + 0.02vw), 1.00rem); }
-        @media (prefers-color-scheme: dark) {:root {color-scheme: dark;--mantle: #292c3c;--crust: #232634;--text: #c6d0f5; --green: #a6d189;}
-        body {padding:0; margin:0;color: var(--text);font-family: Seravek, Ubuntu, Calibri, source-sans-pro, sans-serif;font-size: var(--step--1);@media(prefers-color-scheme: dark) {background-color:var(--mantle);}}
+        :root {--mantle: #eff1f5; --crust: #dce0e8; --text: #4c4f69; --green: #40a02b;--space-3xs: clamp(0.31rem, calc(0.31rem + 0.00vw), 0.31rem); --step--1: clamp(0.99rem, calc(0.99rem + 0.02vw), 1.00rem); }
+        @media (prefers-color-scheme: dark) {:root {color-scheme: dark;--mantle: #292c3c;--crust: #232634;--text: #c6d0f5; --green: #a6d189;}}
+        body {padding:0; margin:0;color: var(--text);font-family: Seravek, Ubuntu, Calibri, source-sans-pro, sans-serif;font-size: var(--step--1);
+            @media(prefers-color-scheme: dark) {background-color:var(--mantle);}}
         span {display:block; text-align:center; width:100%;}
-        button {font-family: Seravek, Ubuntu, Calibri, source-sans-pro, sans-serif;font-size: var(--step--1);border:0; width: 100%; height: 40px; background-color:var(--mantle);color:var(--text);cursor:pointer;@media(prefers-color-scheme: dark) {background-color:var(--crust);}} 
+        button {font-family: Seravek, Ubuntu, Calibri, source-sans-pro, sans-serif;font-size: var(--step--1);border:0; width: 100%; height: 40px; background-color:var(--mantle);color:var(--text);cursor:pointer;
+            @media(prefers-color-scheme: dark) {background-color:var(--crust);}} 
         a { text-decoration: none; color: var(--text); }
         a:visited { text-decoration: none; color: var(--text); }
         form { margin: 0; padding: 0; }
-        .success {color: var(--green);border:1px solid var(--green);border-radius:var(--space-3xs);padding:0 var(--space-3xs);}
+        .success {color: var(--green);border:1px solid var(--green);border-radius:var(--space-3xs);padding:0 var(--space-3xs);margin:var(--space-3xs);}
     `; 
     return `<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${style}</style></head><body style="background-color: transparent !important;">${body}</body></html>`;
 }
@@ -250,32 +252,34 @@ function postContentTemplate(id, username, name, avatar, url, date, content_html
  * @param  {string} tags - A list of tag checkboxes for micro.blog premium users
  * @param  {bool} isPost - Is this a post?
  * @param  {string} bookPost - A string containing a book post contents for creating a new post
+ * @param  {int} bookShelfId - The id of the current bookshelf (if on bookshelf page)
  */
-function postActionTemplate(id, username, isPinned, _microblog, content_html, bookshelves, isFollowing, tags, isPost = true, bookPost = '') { 
+function postActionTemplate(id, username, isPinned, _microblog, content_html, bookshelves, isFollowing, tags, isPost = true, bookPost = '', bookShelfId = 0) { 
     let quote = content_html;
     const readerLink = content_html.split('post_archived_links');
     if(readerLink.length > 1) {
         quote = readerLink[0].substring(0, readerLink[0].length - 10);
     }
-    const bookshelfOptions = bookshelves.map(function (shelf) { return `<option value="${shelf.id}">Move to "${shelf.title}"</option>` }).join('');
+    const bookshelfOptions = bookshelves.map(function (shelf) { return `<label class="actionSelect"><input ${shelf.id == bookShelfId ? 'checked="checked"' : ''} name="bookshelfId" type="radio" value="${shelf.id}" />${shelf.title}</label>` }).join('');
 
-    const addBookAction = _microblog.isbn ? `<form method="POST" action="/app/bookshelves/addBook">
-                            <input type="hidden" name="bookAuthor" value="${_microblog.book_author}" />
-                            <input type="hidden" name="bookTitle" value="${_microblog.book_title}" />
-                            <input type="hidden" name="bookISBN" value="${_microblog.isbn}" />
-                            <details class="actionExpand"><summary class="actionExpandToggle">Add book</summary>
-                            <select style="width:220px;" name="bookshelfId">${bookshelfOptions}</select>
-                            <button type="submit">Add book</button>
-                            </details>
-                        </form>` : '';
+    const addBookAction = _microblog.isbn ? `<details class="actionExpand">
+                                <summary class="actionExpandToggle">Add book</summary>
+                                <form style="height: 100%;max-height: 300px;" method="POST" action="/app/bookshelves/addBook">
+                                    <input type="hidden" name="bookAuthor" value="${_microblog.book_author}" />
+                                    <input type="hidden" name="bookTitle" value="${_microblog.book_title}" />
+                                    <input type="hidden" name="bookISBN" value="${_microblog.isbn}" />
+                                    ${bookshelfOptions}
+                                    <button class="actionBtn" type="submit">Add book</button>
+                                </form>
+                            </details>` : '';
 
-    const moveBookAction = !isPost ? `<form method="POST" action="/app/bookshelves/moveBook">
-                                            <input type="hidden" name="bookId" value="${id}" />
-                                            <details class="actionExpand"><summary class="actionExpandToggle">Move book</summary>
-                                            <select style="width:220px;" name="bookshelfId">${bookshelfOptions}</select>
-                                            <button type="submit">Move book</button>
-                                            </details>
-                                        </form>` : '';
+    const moveBookAction = !isPost ? `<details class="actionExpand"><summary class="actionExpandToggle">Move book</summary>
+                                            <form style="height: 100%;max-height: 300px;" method="POST" action="/app/bookshelves/moveBook">
+                                                <input type="hidden" name="bookId" value="${id}" />
+                                                ${bookshelfOptions}
+                                                <button  class="actionBtn"type="submit">Move book</button>
+                                            </form>
+                                        </details>` : '';
 
     const followAction = !isFollowing && !_microblog.is_you && isPost && !_microblog.is_bookmark ? 
                 iFrameForm(`<form method="POST" action="/app/users/follow">
@@ -294,30 +298,32 @@ function postActionTemplate(id, username, isPinned, _microblog, content_html, bo
                         <button type="submit">${!_microblog.is_bookmark ? 'Bookmark' : 'Unbookmark'}</button>
                     </form>`) : '';
     
-    const taggingActions = _microblog.is_bookmark && tags && isPost ? `<form style="height: 100%;margin-bottom: var(--space-3xs);" method="POST" action="/app/bookmarks/manageTags">
-                                    <input type="hidden" name="id" value="${id}" />
+    const taggingActions = _microblog.is_bookmark && tags && isPost ? `<form style="height: 100%;margin-bottom: var(--space-3xs);" method="POST" action="/app/bookmarks/manageTags"> 
                                     <details class="actionExpand">
                                         <summary class="actionExpandToggle">Update Tags</summary>
+                                        <input type="hidden" name="id" value="${id}" />
                                         ${tags}
+                                        <label for="newTag">New tag</label>
+                                        <input style="width:140px;" type="text" id="newTag" name="newTag" />
                                         <button class="actionBtn" type="submit">Save Changes</button>
                                     </details>
                                 </form>` : '';
     
     const quotePostAction = isPost ? `<a target="_top" href="/app/blog/post?content=${encodeURIComponent(`<blockquote>${quote}</blockquote>`)}">Quote</a>` : '';
     
-    const viewPostAction = isPost ? `<a target="_top" href="/app/post?id=${id}">View post</a>` : '';
+    const viewPostAction = isPost && !_microblog.is_bookmark ? `<a target="_top" href="/app/post?id=${id}">View post</a>` : '';
 
     const bookPostAction = !isPost && bookPost ? `<a target="_top" href="/app/blog/post?content=${encodeURIComponent(bookPost)}">Create post</a>` : '';
 
-    const removeBookAction = !isPost ? iFrameForm(`<form method="POST" action="/app/bookshelves/removeBook">
-                                            <input type="hidden" name="bookshelfId" value="${id}" />
+    const removeBookAction = !isPost ? `<details class="actionExpand"><summary class="actionExpandToggle">Remove Book</summary>
+                                        <form style="height: 100%;max-height: 300px;" method="POST" action="/app/bookshelves/removeBook">
+                                            <input type="hidden" name="bookshelfId" value="${bookShelfId}" />
                                             <input type="hidden" name="bookId" value="${id}" />
-                                            <button type="submit">Remove</button>
-                                        </form>`) : '';
-
+                                            <button class="actionBtn"  type="submit">Remove</button>
+                                        </form></details>` : '';
     return `
         <div class="actions">
-            <details style="border-radius: var(--space-3xs);color: var(--subtext-1);border: 1px solid var(--mantle);position: absolute;z-index: 5;background-color: var(--mantle);margin-left: -92px;">
+            <details style="position:absolute;z-index:${id};border-radius: var(--space-3xs);color: var(--subtext-1);border: 1px solid var(--mantle);background-color: var(--mantle);margin-left: -92px;">
                 <summary style="padding: var(--space-2xs); font-size: var(--step--1); margin: 0;">Actions</summary>
                 <div style="padding: var(--space-2xs); width: 200px; margin-left: -129px; background-color: var(--mantle);">
                 ${followAction}
@@ -328,8 +334,8 @@ function postActionTemplate(id, username, isPinned, _microblog, content_html, bo
                 ${quotePostAction}
                 ${bookPostAction}
                 ${addBookAction}
-                ${moveBookAction}
                 ${removeBookAction}
+                ${moveBookAction}
                 </div>
             </details>
         </div>`;  
@@ -386,7 +392,7 @@ function replyTemplate(id, author, repliers, none = false) {
                 <div class="grow-wrap"><textarea name="content" onInput="growTextArea(this)"></textarea></div>
                 <button type="submit">Send Reply</button>
             </form> 
-            <iframe srcdoc='${iFrameTemplate()}' name="${id}" width="220" height="35"></iframe>
+            <iframe srcdoc='${iFrameTemplate('')}' name="${id}" width="220" height="35"></iframe>
         </details></div>`;
 }
 
@@ -593,12 +599,15 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
     for(let i = 0; i < posts.length; i++) {  
         const post = posts[i];
 
-        console.log(post);
-
         if(!filterOut(contentFilters, post.content_html))
         {
             let isFollowing = await isFollowingMicroBlogUser(post.author._microblog.username, access_token);
             if(post.author._microblog.username == await ctx.cookies.get('username')){
+                isFollowing = true;
+            }
+            if(post._microblog.is_bookmark) {
+                // don't show the following button on a bookmark. Since
+                // people can bookmark websites and not just users posts.
                 isFollowing = true;
             }
             
@@ -606,12 +615,15 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
             if(user.is_premium) {       
                 const currentTags = post.tags != undefined ? post.tags.split(', ') : [];
                 tagCheck = tags.map(function (tag) { 
-                        return `<label style="display:block;text-align:left;"><input type="checkbox" ${currentTags.includes(tag) ? 'checked="checked"' : ''} value="${tag}">${tag}</label>` 
+                        return `<label style="display:block;text-align:left;"><input name="tags[]" type="checkbox" ${currentTags.includes(tag) ? 'checked="checked"' : ''} value="${tag}">${tag}</label>` 
                     }).join('');
             }
+
+            const post_content = post.tags ? `${post.content_html}<div><p style="color:var(--subtext-1)"><small>Tags: ${post.tags}</small></p></div>` : post.content_html;
             
             const postActions = includeActions ? postActionTemplate(post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck) : '';
-            controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post._microblog.date_relative, post.content_html, postActions, isFollowing));
+            controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post._microblog.date_relative, post_content, postActions, isFollowing));
+
 
             if(includeReplies) {
                 await streamComments(ctx, controller, post.id, openConvo, isConvo ? convo : null);
@@ -715,22 +727,22 @@ async function streamUserProfile(ctx, controller, author, _microblog) {
                 <summary style="margin-bottom:0;">Advanced</summary>
                 <div style="margin-top:var(--space-xs)">
                 <p>Learn about muting and blocking users here: <a target="_blank" href="https://help.micro.blog/t/muting-blocking-and-reporting-users/32">Micro.blog Help - Muting, blocking, and reporting users${externalLinkSVG()}</a></p>
-                ${_microblog.is_following ? `<form style="display:inline;" method="POST" action="/app/users/unfollow"><input type="hidden" name="id" value="${name}"/><button type="submit">Unfollow User</button></form>` : '' }
-                <form style="display:inline;" method="POST" action="/app/users/block"><input type="hidden" name="id" value="${name}"/><button type="submit">Block User</button></form>
-                <form style="display:inline;" method="POST" action="/app/users/mute"><input type="hidden" name="id" value="${name}"/><button type="submit">Mute User</button></form>
+                ${_microblog.is_following ? `<form style="display:inline;" method="POST" action="/app/users/unfollow"><input type="hidden" name="username" value="${name}"/><button type="submit">Unfollow User</button></form>` : '' }
+                <form style="display:inline;" method="POST" action="/app/users/block"><input type="hidden" name="username" value="${name}"/><button type="submit">Block User</button></form>
+                <form style="display:inline;" method="POST" action="/app/users/mute"><input type="hidden" name="username" value="${name}"/><button type="submit">Mute User</button></form>
                 </div>
             </details>` : ''}
         <div class="profile blue-purple" style="color:var(--base);">
             <div>
                 <p class="center"><img class="avatar" src="${author.avatar}" /></p>
-                ${!_microblog.is_following && !_microblog.is_you ? 
-                    `<form method="POST">
-                        <input type="hidden" name="type" value="follow-redirect"/><input type="hidden" name="id" value="${name}"/>
-                        <button type="submit">Follow @${_microblog.username}</button></form>` : ''}
+                ${!_microblog.is_following && !_microblog.is_you ? iFrameForm(`<form method="POST" action="/app/users/follow">
+                        <input type="hidden" name="username" value="${name}" />
+                        <button type="submit">Follow @${_microblog.username}</button>
+                    </form>`) : ''}
             </div>
             <div style="padding-left: var(--space-xs);">
                 <p class="name"><b>${author.name}</b> ${_microblog.pronouns}</p>
-                <p class="name"><a target="_blank" class="button" href="${author.url}">${author.url} ${externalLinkSVG()}</a></p>
+                <p class="name"><a style="color:var(--crust);" target="_blank" href="${author.url}">${author.url} ${externalLinkSVG()}</a></p>
                 <p class="blurb">${_microblog.bio}</p>
                 ${ _microblog.is_you && pins != '' ? '<b>My Micro.blog pins:</b><br/>' + pins : '' }
             </div>
@@ -738,7 +750,7 @@ async function streamUserProfile(ctx, controller, author, _microblog) {
 }
 
 /**
- * Streams a profile section for a user
+ * Streams a timeline or conversations page for a user
  * @param  {object} ctx - The request context
  * @param  {object} controller - The controller of the readable stream     
  * @param  {bool} conversations - Shows timeline conversations
@@ -796,7 +808,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
 }
 
 /**
- * Streams a profile section for a user
+ * Streams a manage users page for a user
  * @param  {object} ctx - The request context
  * @param  {object} controller - The controller of the readable stream     
  * @param  {string} type - The page type
@@ -850,7 +862,8 @@ async function streamAccountSwitch(ctx, controller, destination, url) {
 
     if(config.destination.length > 1) {
         controller.enqueue(`
-            <details>
+            <details class="screen-width">
+
                 <summary>Viewing posts from: <b>${destination}</b></summary>
                 <div style="margin-top:var(--space-3xs);">
                     <p>Switch to: ${destinationBtns}</p>
@@ -1090,7 +1103,7 @@ await router.get("/app/photos", async (ctx, next) => {
         
             await streamUserProfile(ctx, controller, result.author, result._microblog);
             controller.enqueue(postMenuBarTemplate('photos', name, false)); 
-            controller.enqueue(`<div id="photos">${posts.map(function(post){ return `<a href="/app/post?id=${post.id}"><img src="https://micro.blog/photos/400/${post.image}" loading="lazy"/></a>`; }).join('')}</div>`);
+            controller.enqueue(`<div class="screen-width" id="photos">${posts.map(function(post){ return `<a href="/app/post?id=${post.id}"><img src="https://micro.blog/photos/400/${post.image}" loading="lazy"/></a>`; }).join('')}</div>`);
             controller.enqueue(`</div>${endHTMLTemplate()}`); 
             controller.close();
         }
@@ -1247,11 +1260,13 @@ await router.get("/app/bookmarks", async (ctx, next) => {
             }
 
             controller.enqueue(`<div class="posts">`);
-            controller.enqueue(`<div style="margin-bottom: var(--space-m);display:block;" class="profile">
-                                    <form method="POST" action="/app/bookmarks/new">
-                                        <label>Add Bookmark:<br/><br/><input type="url" name="url" /></label>
-                                        <button type="submit">Add Bookmark</button>
-                                    <form></div>`);
+            if(!id) {
+                controller.enqueue(`<div style="margin-bottom: var(--space-m);display:block;" class="profile">
+                    <form method="POST" action="/app/bookmarks/new">
+                        <label>Add Bookmark:<br/><br/><input type="url" name="url" /></label>
+                        <button type="submit">Add Bookmark</button>
+                    </form></div>`);
+            }
 
             const fetching = await microBlogGet(id ? `posts/bookmarks?tag=${id}` : 'posts/bookmarks', cookies.access_token);
             const bookmarks = await fetching.json();
@@ -1280,13 +1295,13 @@ await router.get("/app/bookshelves", async (ctx, next) => {
             if(!id) {
                 // Show the goals and recent book posts when a bookshelf is not selected.
                 controller.enqueue(`<div class="posts">`);
-                controller.enqueue(`<div style="color:var(--base);margin-bottom: var(--space-m);display:block;" class="profile purple-red">
-                                        <details><summary>Add new bookshelf</summary>
-                                        <form method="POST" action="/app/bookshelves/addBookshelf">
-                                            <label>Bookshelf Name:<br/><br/><input type="text" name="name"/></label>
-                                            <button type="submit">Add Bookshelf</button>
-                                        <form>
-                                        </details>`);
+                controller.enqueue(`<details class="screen-width"><summary>Add new bookshelf</summary>
+                    <form method="POST" action="/app/bookshelves/addBookshelf">
+                        <label>Bookshelf Name:<br/><br/><input type="text" name="name"/></label>
+                        <button type="submit">Add Bookshelf</button>
+                    </form>
+                    </details>
+                    <div style="color:var(--base);margin-bottom: var(--space-m);display:block;" class="profile purple-red">`);
                 
                 const fetchingGoals = await microBlogGet('books/goals', cookies.access_token);
                 const goals = await fetchingGoals.json();
@@ -1305,28 +1320,23 @@ await router.get("/app/bookshelves", async (ctx, next) => {
                 const fetchingBooks = await microBlogGet(`books/bookshelves/${id}`, cookies.access_token);
                 const books = await fetchingBooks.json();
 
-                controller.enqueue(`<div class="switch-field">
-                    <a class="selected" href="${'/app/bookshelves?id=' + id}">${books.title.replace("Micro.blog - ", '')}</a>
-                    <a target="_blank" href="https://micro.blog/account/bookshelves/${id}?edit=1">Micro.blog ${externalLinkSVG()}</a>
-                </div>`);
-
                 if(books.items.length == 0) {
                     controller.enqueue(`<p style="margin:var(--space-s-m);">No books here yet.</p>`);
                 }
                 for(let i=0; i<books.items.length; i++) {
                     const book = books.items[i];
                     const newPost = `${books.title.replace("Micro.blog - ", '')}: [${book.title}](${book.url}) by ${book.authors.map(u => u.name).join(', ')} 📚`;
-                    const actions = postActionTemplate(book.id, null, false, {}, '', bookshelves.items, false, '', false, newPost);
+                    const actions = postActionTemplate(book.id, null, false, {}, '', bookshelves.items, false, '', false, newPost, id);
                     controller.enqueue(`
                         <article class="post" data-id="${book.id}" style="display:block;">
                             <section style="display:flex; flex-direction: column;">
                                 <header style="display:flex; flex-direction: row;">
                                     <div><img style="width: 128px" loading="lazy" src="${book.image}"></div>
-                                    <div style="margin-left:var(--space-xs);">
-                                        ${actions}
+                                    <div style="margin-left:var(--space-xs);margin-right: 100px;">             
                                         <p><b><a href="${book.url}">${book.title}</a></b></p>
                                         <p>By: ${book.authors.map(u => u.name).join(', ')}</p>
-                                    </div>                   
+                                    </div>
+                                    <div style="margin-left: auto;">${actions}</div>                   
                                 </header> `);
                     controller.enqueue(`</section></article>`); 
                 }
@@ -1356,13 +1366,12 @@ await router.get("/app/blog/posts", async (ctx, next) => {
             await streamAccountSwitch(ctx, controller, account ? account.uid : '', '/app/blog/posts');
             
             controller.enqueue(`<div class="switch-field">
-                    <a ${status ? '' : 'class="selected"'} href="/app/blog/posts${destination ? '?destination=' + encodeURIComponent(account.uid) : ''}">Recent 25 Posts</a>
-                    <a ${status ? 'class="selected"' : ''} href="/app/blog/posts?status=draft${destination ? '&destination=' + encodeURIComponent(account.uid) : ''}">Drafts</a>
+                    <a ${status ? '' : 'class="selected"'} href="/app/blog/posts${destination ? '?destination=' + encodeURIComponent(account.uid) : ''}">Recent Posts</a>
+                    <a ${status ? 'class="selected"' : ''} href="/app/blog/posts?status=draft${destination ? '&destination=' + encodeURIComponent(account.uid) : ''}">Recent Drafts</a>
                 </div>`);
 
             const fetching = await microBlogGet(`micropub?q=source${account ? '&mp-destination=' + account.uid : ''}`, cookies.access_token);
             const posts = await fetching.json();
-            
             const postStatus = status ? "draft" : "published";
             posts.items = posts.items.filter(p => p.properties["post-status"][0] == postStatus);
             
@@ -1374,18 +1383,18 @@ await router.get("/app/blog/posts", async (ctx, next) => {
                         <summary style="padding: var(--space-2xs); font-size: var(--step--1); margin: 0;">Actions</summary>
                         <div style="padding: var(--space-2xs); width: 200px; margin-left: -129px; background-color: var(--mantle);">
                             <a target="_top" href="/app/blog/post?id=${encodeURIComponent(post.url[0])}&destination=${encodeURIComponent(account.uid)}">Edit post</a>
-                            <form method="POST" action="/blog/post/delete">
-                                <input type="hidden" name="destination" value="${account ? account.uid : ''}" />
-                                <input type="hidden" name="url" value="${post.url[0]}" />
-                                <details style="text-align: center;">
-                                    <summary>Delete</summary>
-                                    <button style="margin-left:var(--space-3xs);display:inline;width:inherit;" type="submit">Confirm Delete</button>
-                                </details>
-                            </form>
+                            <details class="actionExpand">
+                                <summary class="actionExpandToggle">Delete</summary>
+                                <form style="height: 100%;max-height: 300px;" method="POST" action="/blog/post/delete">
+                                    <input type="hidden" name="destination" value="${account ? account.uid : ''}" />
+                                    <input type="hidden" name="url" value="${post.url[0]}" />
+                                    <button class="actionBtn" type="submit">Confirm Delete</button>
+                                </form>
+                            </details>
                         </div>
                     </details>
                 </div>`;
-                controller.enqueue(postContentTemplate(post.uid, cookies.username, cookies.name, cookies.avatar, post.url[0], post.published[0], marky(post.content[0]), postActions, false));
+                controller.enqueue(postContentTemplate(post.uid, cookies.username, cookies.name, cookies.avatar, post.url[0], post.published[0], marky(post.content[0]), postActions, true));
                 controller.enqueue(`<p style="color:var(--subtext-1)"><small>${post.category.length > 0 ? post.category.join(', ') : 'No categories assigned.'}</small></p>`); 
                 controller.enqueue(`</section></article>`);
             }
@@ -1429,11 +1438,14 @@ await router.get("/app/blog/media", async (ctx, next) => {
                     <p>Upload an image file. Files over 3 MB will be compressed.</p>
                     <input id="media" name="media" type="file" accept="image/*" onchange="handleImageUpload(event);" style="width:220px" />
                     <input type="hidden" name="destination" value="${account ? account.uid : ''}"/>
+                    <input type="hidden" id="redirect" name="redirect" value="true"/>
                     <button id="submitBtn" type="submit">Upload</button>
                     <span style="display:none;animation: spin 2s linear infinite;" id="progress">🐢</span>
                 </form>
                 <script>
                     document.getElementById('submitBtn').style.display = 'none';
+                    let elem = document.getElementById('redirect');
+                    elem.parentNode.removeChild(elem);
                 </script>
                 </div>`);
 
@@ -1695,6 +1707,7 @@ await router.post("/app/bookmarks/new", async (ctx) => {
 
     const postingContent = await microBlogPostForm('micropub', formBody, access_token);
     const results = await postingContent;
+
     ctx.response.redirect('/app/bookmarks');
 });
 
@@ -1704,7 +1717,8 @@ await router.post("/app/bookmarks/manageTags", async (ctx) => {
     const value = await body.value;
     const tags = value.getAll('tags[]') ? value.getAll('tags[]') : [];
     const newTag = value.get('newTag');
-    const selectedTag = value.get('selectedTag');
+    const id = value.get('id');
+    //const selectedTag = value.get('selectedTag');
 
     if(newTag) {
         tags.push(newTag);
@@ -1716,8 +1730,8 @@ await router.post("/app/bookmarks/manageTags", async (ctx) => {
     const fetching = await microBlogPostForm(`posts/bookmarks/${id}`, formBody, access_token);
     const response = await fetching.json();
 
-    const returnURL = selectedTag ? '/app/bookmarks?id=' + selectedTag : '/app/bookmarks';
-    ctx.response.redirect(returnURL);
+    //const returnURL = selectedTag ? '/app/bookmarks?id=' + selectedTag : '/app/bookmarks';
+    ctx.response.redirect('/app/bookmarks');
 });
 
 await router.post("/app/replies/add", async (ctx) => {
@@ -1826,7 +1840,11 @@ await router.post("/blog/upload", async (ctx) => {
         const fileFetched = await fetchingFileUpload.json();
 
         fileURL = fileFetched.url;
-        ctx.response.body = fileURL;
+        if(data.fields.redirect) {
+            ctx.response.redirect("/app/blog/media?destination=" + data.fields.destination);
+        } else {
+            ctx.response.body = fileURL;
+        }
     }
 });
 
@@ -2173,7 +2191,7 @@ async function microBlogGet(endpoint, access_token) {
  * @return {object}                 The response object
  */
 async function microBlogPostForm(endpoint, formBody, access_token = null, accept = null){
-    return await basicPostForm(`https://micro.blog/${endpoint}`, formBody, access_token);
+    return await basicPostForm(`https://micro.blog/${endpoint}`, formBody, access_token, accept);
 }
 
 /**

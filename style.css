@@ -211,7 +211,7 @@ details form label {
     font-weight: 300;
     padding-bottom: 0;
 }
-input, select, input[type="color"] {
+input[type="text"],input[type="url"], select, input[type="color"] {
     width: 100%;
 }
 input, select, textarea, input[type="color"] {
@@ -514,6 +514,13 @@ form > details > summary {
         grid-template-columns: 1fr 2fr;
     }
 }
+.screen-width
+{
+    margin: var(--space-xs-s);
+    @media screen and (min-width: 711px) {
+        margin: var(--space-s-m);
+    } 
+}
 .profile .name {
     text-align: center;
     @media screen and (min-width: 711px) {
@@ -659,6 +666,7 @@ dialog::backdrop {
 .actionBtn {margin: var(--space-xs) auto;}
 .actionExpand {margin-bottom:var(--space-3xs);padding-left:var(--space-xs);max-height:300px;overflow:auto;background-color:var(--crust);}
 .actionExpandToggle {margin:0;height: 40px;line-height: 40px;font-size: var(--step--1);}
+.actionSelect {text-align: left;margin-bottom:var(--space-3xs);display:block;font-size: var(--step--1);}
 blockquote {
     border-left: 5px solid var(--crust);
     margin-left: var(--space-m);

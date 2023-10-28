@@ -1,5 +1,5 @@
 
-`deno run --allow-net --allow-read  main.js`
+`deno run --allow-env --allow-net --allow-read  main.js`
 
 # FAQ
 
