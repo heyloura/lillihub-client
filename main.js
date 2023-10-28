@@ -624,6 +624,7 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
             const postActions = includeActions ? postActionTemplate(post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck) : '';
             controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post._microblog.date_relative, post_content, postActions, isFollowing));
 
+
             if(includeReplies) {
                 await streamComments(ctx, controller, post.id, openConvo, isConvo ? convo : null);
             }
@@ -862,6 +863,7 @@ async function streamAccountSwitch(ctx, controller, destination, url) {
     if(config.destination.length > 1) {
         controller.enqueue(`
             <details class="screen-width">
+
                 <summary>Viewing posts from: <b>${destination}</b></summary>
                 <div style="margin-top:var(--space-3xs);">
                     <p>Switch to: ${destinationBtns}</p>
@@ -1370,9 +1372,6 @@ await router.get("/app/blog/posts", async (ctx, next) => {
 
             const fetching = await microBlogGet(`micropub?q=source${account ? '&mp-destination=' + account.uid : ''}`, cookies.access_token);
             const posts = await fetching.json();
-
-            console.log(posts);
-            
             const postStatus = status ? "draft" : "published";
             posts.items = posts.items.filter(p => p.properties["post-status"][0] == postStatus);
             
@@ -1709,8 +1708,6 @@ await router.post("/app/bookmarks/new", async (ctx) => {
     const postingContent = await microBlogPostForm('micropub', formBody, access_token);
     const results = await postingContent;
 
-    console.log(results);
-
     ctx.response.redirect('/app/bookmarks');
 });
 
@@ -1791,12 +1788,8 @@ await router.post("/app/bookshelves/addBook", async (ctx) => {
     const bookTitle = value.get('bookTitle');
     const bookAuthor = value.get('bookAuthor');
 
-    console.log(bookshelfId, bookISBN, bookTitle, bookAuthor);
-
     const fetching = await microBlogSimplePost(`books?bookshelf_id=${bookshelfId}&isbn=${bookISBN}&title=${bookTitle}&author=${bookAuthor}`, access_token);
     const response = await fetching.json();
-
-    console.log(response);
 
     ctx.response.redirect("/app/bookshelves?id=" + bookshelfId);
 });
@@ -2172,8 +2165,6 @@ async function basicPostForm(endpoint, formBody, access_token = null, accept = n
     if(access_token != null) {
         fetchMethod.headers['Authorization'] = 'Bearer ' + access_token;
     }
-
-    console.log(fetchMethod);
 
     const res = await fetch(endpoint, fetchMethod);
     if (!res.ok) {
