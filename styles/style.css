@@ -140,7 +140,7 @@ header nav {
     position: fixed; 
     top: 0;    
     width: 100%;
-    z-index: 10;
+    z-index: 999999999;
     @media (prefers-color-scheme: dark) {
         background-color: var(--mantle);
     } 
@@ -397,6 +397,9 @@ form > details > summary {
         padding: 0 0 var(--space-s) 0;
     }
 }
+.categories::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
 .categories li {
     flex: 0 0 auto;
     border: 1px solid var(--crust);
@@ -420,11 +423,6 @@ form > details > summary {
     padding: var(--space-3xs);
     color: var(--text);
 }
-@media screen and (max-width: 711px){
-    ::-webkit-scrollbar {
-        -webkit-appearance: none;
-    }
-}
 .discover {
     display: flex;
     flex-wrap: nowrap;
@@ -435,12 +433,14 @@ form > details > summary {
     columns: 2;
     -webkit-columns: 2;
     -moz-columns: 2;
-
     @media screen and (min-width: 711px) {
         display: block;
         column-gap: 0;
         padding: 0 0 var(--space-s) 0;
     }
+}
+.discover::-webkit-scrollbar {
+    -webkit-appearance: none;
 }
 .discover li {
     flex: 0 0 auto;
@@ -649,7 +649,10 @@ dialog::backdrop {
     line-height: 40px;
     text-align: center;
     font-size: var(--step--1);
-    background-color: var(--crust);
+    background-color: var(--base);
+    @media (prefers-color-scheme: dark) {
+        background-color: var(--crust);
+    }
     font-weight: 400;
     margin-bottom: var(--space-3xs);
 }
@@ -658,13 +661,16 @@ dialog::backdrop {
     line-height: 40px;
     text-align: center;
     font-size: var(--step--1);
-    background-color: var(--crust);
+    background-color: var(--base);
+    @media (prefers-color-scheme: dark) {
+        background-color: var(--crust);
+    }
     font-weight: 400;
 }
 .actions details a { text-decoration: none; color: var(--text); }
 .actions details a:visited { text-decoration: none; color: var(--text); }
 .actionBtn {margin: var(--space-xs) auto;}
-.actionExpand {margin-bottom:var(--space-3xs);padding-left:var(--space-xs);max-height:300px;overflow:auto;background-color:var(--crust);}
+.actionExpand {margin-bottom:var(--space-3xs);max-height:300px;overflow:auto;background-color:var(--crust);}
 .actionExpandToggle {margin:0;height: 40px;line-height: 40px;font-size: var(--step--1);}
 .actionSelect {text-align: left;margin-bottom:var(--space-3xs);display:block;font-size: var(--step--1);}
 blockquote {
@@ -673,3 +679,28 @@ blockquote {
     padding-left: var(--space-2xs);
 }
 .label {border:1px solid var(--subtext-1);border-radius:var(--space-3xs);padding:2px;color:var(--subtext-1);font-size:var(--step--2);}
+.swipeItem {
+    scroll-snap-type: x mandatory; 
+    scroll-padding-inline-start: var(--space-xs);
+}
+.swipeItem img {
+    width: auto;
+    max-width: 300px;
+    flex: 0 0 auto; 
+    margin-right: var(--space-xs);
+    @media screen and (min-width: 711px) {
+        max-width: 580px;
+    }
+}
+.overage {
+    color: var(--red);
+}
+.photoSwipe {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    list-style: none;
+    padding: 0 var(--space-xs-s) var(--space-xs) 0; 
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 0;
+}
