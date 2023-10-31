@@ -11,7 +11,11 @@ const router = new Router();
 const _appURL = Deno.env.get("APP_URL");
 const _colors = ['var(--yellowgreen)','var(--green)','var(--greenblue)','var(--blue)','var(--bluepurple)','var(--purple)','var(--purplered)','var(--red)','var(--redorange)','var(--orange)','var(--orangeyellow)','var(--yellow)'];
 const _mbItemCount = 60;
-const _style = await Deno.readTextFile("style.css");
+const _favicon = new Uint8Array(await Deno.readFile("favicon.ico"));
+const _style = await Deno.readTextFile("styles/style.css");
+const _easyMDEJS = await Deno.readTextFile("scripts/easymde.min.js");
+const _easyMDECSS = await Deno.readTextFile("styles/easymde.min.css");
+const _compressor = await Deno.readTextFile("scripts/compressor.min.js");
 
 // --------------------------------------------------------------------------------------
 // Templates
@@ -42,6 +46,7 @@ function beginHTMLTemplate(avatar, username, title) {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="Lillihub - An unoffical Micro.blog client">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
         <title>Lillihub</title>
         <style>${getCommonCSS()}"</style>
         <noscript><style>.jsonly { display: none }</style></noscript>
@@ -117,7 +122,7 @@ function mainMenuTemplate(loggedIn = true, endSidebar = true) {
             <li class="red-orange discover-li-wide"><small>Lillihub:</small>
                 <p class="margin-3xs"><a class="margin-bottom-3xs" href="/app/settings">Settings</a></p>
             </li>
-            <li class="purple-red noShift"><a href="/"><img src="https://lukzvfwtcukheapdgprx.supabase.co/storage/v1/object/public/Testing/frog-1-01.svg" /></a></li>
+            <li class="purple-red noShift"><a href="/">${logoSVG()}</a></li>
         </ul>
         ${endSidebar ? '</aside>' : ''}
     ` : '</aside>';
@@ -134,7 +139,7 @@ function discoverMenuTemplate(loggedIn = true, endSidebar = false) {
             <li class="blue-purple"><a href="/app/timeline?name=monday">Monday</a></li>
             <li class="green-blue"><a href="/app/timeline?name=challenges">Community Challenges</a></li>
             <li class="yellow-green"><a href="/app/timeline?name=news">News</a></li>
-            <li class="orange-yellow noShift" style="padding: 0;"><img src="https://lukzvfwtcukheapdgprx.supabase.co/storage/v1/object/public/Testing/frog-1-01.svg" /></li>
+            <li class="orange-yellow noShift" style="padding: 0;">${logoSVG()}</li>
         </ul>
         ${endSidebar ? '</aside>' : ''}
     ` : '</aside>';
@@ -148,6 +153,7 @@ function discoverMenuTemplate(loggedIn = true, endSidebar = false) {
 function cleanFormatHTML (str) {
     function resize (html) {
         const images = html.querySelectorAll("img");
+        const parents = [];
         for (let i = 0; i < images.length; i++) {
             const image = images[i];
             if(image.getAttribute('width') == undefined || image.getAttribute('width') == '' || image.getAttribute('width') == '1' || parseInt(image.getAttribute('width')) > 190 ) 
@@ -161,6 +167,37 @@ function cleanFormatHTML (str) {
             }
             if(image.getAttribute('src') != null && image.getAttribute('src').includes('cdn.micro.blog')){
                 image.setAttribute('src', image.getAttribute('src').replace("1000x", "700x"));
+            }
+            if(images.length > 1) 
+            {
+                let parent;
+                if (image.parentNode.nodeName.toLowerCase() == "a"){
+                    parent = image.parentNode.parentNode;               
+                } else {
+                    parent = image.parentNode;
+                }
+                parents.push(parent);
+
+                try {
+                    parent.classList.add('class', 'swipeItem');
+                } catch {
+                    // continue on without messing with the images
+                }
+            }
+        }
+        //let's assemble the swipeable images
+        if(parents.length > 0) {
+            try {
+                const container = html.createElement("div");
+                container.classList.add('photoSwipe');
+                for(let i = 0; i < parents.length; i++)
+                {
+                    parents[i].parentNode.removeChild(parents[i]);
+                    container.appendChild(parents[i]);
+                }
+                html.appendChild(container);    
+            } catch {
+                // continue on without messing with the images
             }
         }
         const videos = html.querySelectorAll("video");
@@ -436,7 +473,7 @@ function compressImageClientFunctionTemplate(success) {
                     success(result) {
                         console.log('another compress size: ' + result.size /1024 /1024 + ' MB');
                         formData.append("media", result, result.name);
-                        fetch('/blog/upload', { method: "POST", body: formData })
+                        fetch('/app/blog/upload', { method: "POST", body: formData })
                             .then(response => console.log(response.status) || response)
                             .then(response => response.text())
                             .then(body => ${success});
@@ -444,7 +481,7 @@ function compressImageClientFunctionTemplate(success) {
                 });
             } else {
                 formData.append("media", result, result.name);
-                fetch('/blog/upload', { method: "POST", body: formData })
+                fetch('/app/blog/upload', { method: "POST", body: formData })
                     .then(response => console.log(response.status) || response)
                     .then(response => response.text())
                     .then(body => ${success});
@@ -466,7 +503,7 @@ function compressImageClientFunctionTemplate(success) {
  * @param  {bool} selected - Should this list item be highlighted?
  * @param  {int} i - The iteration number.     
  */
-async function streamSubMenuItem(controller, image, text, route, selected, i) {
+function streamSubMenuItem(controller, image, text, route, selected, i) {
     const imageHTML = image ? `<img style="border-radius: 50%; width: var(--space-m); vertical-align: middle;" src="${image}"/>` : '';
     controller.enqueue(`<li style="border: 1px solid ${_colors[i % 12]}; ${selected ? 'background-color:' + _colors[i % 12] + ';' : ''}">
             <a style="${selected ? 'color:var(--base);' : ''}" href="${route}">${imageHTML} ${text}</a>
@@ -918,9 +955,9 @@ async function createOrEditPostPage(access_token, title, content, destination, s
     }
 
     return `
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/compressorjs@1.2.1/dist/compressor.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css"/>
-        <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+        <script>${_compressor}</script>
+        <style>${_easyMDECSS}</style>
+        <script>${_easyMDEJS}</script>
         <form action="/app/blog/post" method="POST" enctype="multipart/form-data">
             <input name="url" type="hidden" value="${id}" />
             <label>
@@ -933,7 +970,49 @@ async function createOrEditPostPage(access_token, title, content, destination, s
                 const easymde = new EasyMDE({
                     element: document.getElementById('content'),
                     uploadImage: true,
-                    spellChecker: false,
+                    spellChecker: true,
+                    status: ["autosave", "lines", "words", "cursor", {
+                        className: "keystrokes",
+                        defaultValue: (el) => {
+                            //el.setAttribute('data-keystrokes', 0);
+                        },
+                        onUpdate: (el) => {
+                            const keystrokes = Number(el.getAttribute('data-keystrokes'));
+                            const content = easymde.value() || '';
+                            const images = content.split('![');
+                            let text = images[0];
+                            
+                            if(images.length > 1) {
+                                for(let i = 0; i<images.length; i = i + 2) {
+                                    let subchunks = images[i + 1].split(')');
+                                    subchunks[0] = '';
+                                    text += subchunks.join('');
+                                }
+                            }
+
+                            const chunks = text.split('](');
+                            let count = chunks[0].replace('[','').length;
+                            if(chunks.length > 1) {
+                                for(let i = 1; i < chunks.length; i++) {
+                                    let subchunks = chunks[i].replace('[','').split(')');
+                                    if(subchunks.length > 1) {
+                                        count += subchunks[1].length;
+                                    }
+                                }
+                            } else {
+                                count = text.length;
+                            }
+
+                            console.log(content);
+                            el.innerHTML = 'characters: ' + count + '/300';
+                            if(count > 300) {
+                                el.classList.add('overage');
+                            }
+                            else {
+                                el.classList.remove('overage');
+                            }
+                        },
+                    }],
                     imageUploadFunction: async (image, onSuccess, onError) => {
                         let formData = new FormData();
                         formData.append("destination", "${destination}");  
@@ -1417,7 +1496,7 @@ await router.get("/app/blog/media", async (ctx, next) => {
             const account = await getMicroBlogDestination(destination, cookies.access_token);
 
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'My Media'));  
-            controller.enqueue(`<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/compressorjs@1.2.1/dist/compressor.min.js"></script>`);    
+            controller.enqueue(`<script>${_compressor}</script>`);    
             controller.enqueue(`<script>
             async function handleImageUpload(event) {
                 document.getElementById('progress').style.display = 'inline-block';
@@ -1434,7 +1513,7 @@ await router.get("/app/blog/media", async (ctx, next) => {
             await streamAccountSwitch(ctx, controller, account ? account.uid : '', '/app/blog/media');
             controller.enqueue(`
                 <div class="profile" style="color:var(--text);font-weight:300;display:block;background-color:var(--mantle);">
-                <form id="uploadForm" action="/blog/upload" method="POST" enctype="multipart/form-data">
+                <form id="uploadForm" action="/app/blog/upload" method="POST" enctype="multipart/form-data">
                     <p>Upload an image file. Files over 3 MB will be compressed.</p>
                     <input id="media" name="media" type="file" accept="image/*" onchange="handleImageUpload(event);" style="width:220px" />
                     <input type="hidden" name="destination" value="${account ? account.uid : ''}"/>
@@ -1456,7 +1535,7 @@ await router.get("/app/blog/media", async (ctx, next) => {
                 ${i.poster ? `<video controls="controls" playsinline="playsinline" src="${i.url}" preload="none"></video>` : `<img src="${i.url}"/>`}
                 <div class="switch-field">
                     <a class="clear" href="/app/blog/post?content=${encodeURIComponent('![]('+i.url+')')}${account ? '&destination=' + account.uid : ''}">Create Post</a>
-                    <form method="POST" action="/blog/media/delete">
+                    <form method="POST" action="/app/blog/media/delete">
                         <input type="hidden" name="destination" value="${account ? account.uid : ''}" />
                         <input type="hidden" name="url" value="${i.url}" />
                         <details style="text-align: center;">
@@ -1562,12 +1641,17 @@ await router.post("/app/users/follow", async (ctx) => {
     const username = value.get('username');
 
     const fetching = await microBlogSimplePost(`users/follow?username=${username}`, access_token);
-    const response = await fetching.json();
-
-    ctx.response.body = iFrameTemplate(`<form action="/app/users/unfollow" method="POST">
-        <input type="hidden" name="username" value="${username}" />
-        <button type="submit">Unfollow</button>
-    </form>`); 
+    const response = await fetching.text();
+    try {
+        JSON.parse(response);
+        ctx.response.body = iFrameTemplate(`<form action="/app/users/unfollow" method="POST">
+            <input type="hidden" name="username" value="${username}" />
+            <button type="submit">Unfollow</button>
+        </form>`); 
+    }
+    catch {
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    }
 });
 
 await router.post("/app/users/unfollow", async (ctx) => {
@@ -1576,12 +1660,18 @@ await router.post("/app/users/unfollow", async (ctx) => {
     const value = await body.value;
     const username = value.get('username');
     const fetching = await microBlogSimplePost(`users/unfollow?username=${username}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.body = iFrameTemplate(`<form action="/app/users/follow" method="POST">
-        <input type="hidden" name="username" value="${username}" />
-        <button type="submit">follow</button>
-    </form>`); 
+    try {
+        JSON.parse(response);
+        ctx.response.body = iFrameTemplate(`<form action="/app/users/follow" method="POST">
+            <input type="hidden" name="username" value="${username}" />
+            <button type="submit">follow</button>
+        </form>`); 
+    }
+    catch {
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    }
 });
 
 await router.post("/app/users/block", async (ctx) => {
@@ -1590,9 +1680,16 @@ await router.post("/app/users/block", async (ctx) => {
     const value = await body.value;
     const username = value.get('username');
     const fetching = await microBlogSimplePost(`users/block?username=${username}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.redirect("/app/timeline?name=" + username);
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/timeline?name=" + username);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    }  
 });
 
 await router.post("/app/users/mute", async (ctx) => {
@@ -1601,9 +1698,16 @@ await router.post("/app/users/mute", async (ctx) => {
     const value = await body.value;
     const username = value.get('username');
     const fetching = await microBlogSimplePost(`users/mute?username=${username}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.redirect("/app/timeline?name=" + username);
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/timeline?name=" + username);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/users/unblock", async (ctx) => {
@@ -1613,9 +1717,16 @@ await router.post("/app/users/unblock", async (ctx) => {
     const username = value.get('username');
 
     const fetching = await microBlogSimpleDelete(`users/block?username=${username}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.redirect("/app/timeline?name=" + username);
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/timeline?name=" + username);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/users/unmute", async (ctx) => {
@@ -1625,9 +1736,16 @@ await router.post("/app/users/unmute", async (ctx) => {
     const username = value.get('username');
 
     const fetching = await microBlogSimpleDelete(`users/mute?username=${username}`, access_token);
-    let response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.redirect("/app/timeline?name=" + username);
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/timeline?name=" + username);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/pinPost", async (ctx) => {
@@ -1672,12 +1790,18 @@ await router.post("/app/bookmarks/bookmark", async (ctx) => {
     const id = value.get('id');
 
     const fetching = await microBlogSimplePost(`posts/bookmarks?id=${id}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.body = iFrameTemplate(`<form action="/app/bookmarks/unbookmark" method="POST">
-        <input type="hidden" name="id" value="${id}" />
-        <button type="submit">Unbookmark</button>
-    </form>`); 
+    try {
+        JSON.parse(response);
+        ctx.response.body = iFrameTemplate(`<form action="/app/bookmarks/unbookmark" method="POST">
+            <input type="hidden" name="id" value="${id}" />
+            <button type="submit">Unbookmark</button>
+        </form>`); 
+    }
+    catch {
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/bookmarks/unbookmark", async (ctx) => {
@@ -1687,12 +1811,18 @@ await router.post("/app/bookmarks/unbookmark", async (ctx) => {
     const id = value.get('id');
 
     const fetching = await microBlogSimpleDelete(`posts/bookmarks/${id}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.body = iFrameTemplate(`<form action="/app/bookmarks/bookmark" method="POST">
-        <input type="hidden" name="id" value="${id}" />
-        <button type="submit">Bookmark</button>
-    </form>`); 
+    try {
+        JSON.parse(response);
+        ctx.response.body = iFrameTemplate(`<form action="/app/bookmarks/bookmark" method="POST">
+            <input type="hidden" name="id" value="${id}" />
+            <button type="submit">Bookmark</button>
+        </form>`); 
+    }
+    catch {
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/bookmarks/new", async (ctx) => {
@@ -1706,9 +1836,16 @@ await router.post("/app/bookmarks/new", async (ctx) => {
     formBody.append("bookmark-of", url);
 
     const postingContent = await microBlogPostForm('micropub', formBody, access_token);
-    const results = await postingContent;
+    const response = await postingContent.text();
 
-    ctx.response.redirect('/app/bookmarks');
+    try {
+        JSON.parse(response);
+        ctx.response.redirect('/app/bookmarks');
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/bookmarks/manageTags", async (ctx) => {
@@ -1718,7 +1855,6 @@ await router.post("/app/bookmarks/manageTags", async (ctx) => {
     const tags = value.getAll('tags[]') ? value.getAll('tags[]') : [];
     const newTag = value.get('newTag');
     const id = value.get('id');
-    //const selectedTag = value.get('selectedTag');
 
     if(newTag) {
         tags.push(newTag);
@@ -1728,10 +1864,16 @@ await router.post("/app/bookmarks/manageTags", async (ctx) => {
         formBody.append("tags", tags.join(','));
     
     const fetching = await microBlogPostForm(`posts/bookmarks/${id}`, formBody, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    //const returnURL = selectedTag ? '/app/bookmarks?id=' + selectedTag : '/app/bookmarks';
-    ctx.response.redirect('/app/bookmarks');
+    try {
+        JSON.parse(response);
+        ctx.response.redirect('/app/bookmarks');
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/replies/add", async (ctx) => {
@@ -1747,9 +1889,15 @@ await router.post("/app/replies/add", async (ctx) => {
         content = replies + ' ' + content;
 
         const fetching = await microBlogSimplePost(`posts/reply?id=${id}&content=${encodeURIComponent(content)}`, access_token);
-        const response = await fetching.json();
+        const response = await fetching.text();
 
-        ctx.response.body = iFrameTemplate('<small class="success">Reply sent.</small>');
+        try {
+            JSON.parse(response);
+            ctx.response.body = iFrameTemplate('<small class="success">Reply sent.</small>'); 
+        }
+        catch {
+            ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        }    
     }
 });
 
@@ -1761,9 +1909,16 @@ await router.post("/app/bookshelves/removeBook", async (ctx) => {
     const bookshelfId = value.get('bookshelfId');
 
     const fetching = await microBlogSimpleDelete(`books/bookshelves/${bookshelfId}/remove/${bookId}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.redirect("/app/bookshelves?id=" + bookshelfId);
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/bookshelves?id=" + bookshelfId);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/bookshelves/moveBook", async (ctx) => {
@@ -1774,9 +1929,16 @@ await router.post("/app/bookshelves/moveBook", async (ctx) => {
     const bookshelfId = value.get('bookshelfId');
 
     const fetching = await microBlogSimplePost(`books/bookshelves/${bookshelfId}/assign?book_id=${bookId}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.redirect("/app/bookshelves?id=" + bookshelfId);
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/bookshelves?id=" + bookshelfId);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
 
 await router.post("/app/bookshelves/addBook", async (ctx) => {
@@ -1789,9 +1951,16 @@ await router.post("/app/bookshelves/addBook", async (ctx) => {
     const bookAuthor = value.get('bookAuthor');
 
     const fetching = await microBlogSimplePost(`books?bookshelf_id=${bookshelfId}&isbn=${bookISBN}&title=${bookTitle}&author=${bookAuthor}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.redirect("/app/bookshelves?id=" + bookshelfId);
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/bookshelves?id=" + bookshelfId);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
 });
     
 await router.post("/app/bookshelves/addBookshelf", async (ctx) => {
@@ -1801,15 +1970,22 @@ await router.post("/app/bookshelves/addBookshelf", async (ctx) => {
     const name = value.get('name');
 
     const fetching = await microBlogSimplePost(`books/bookshelves?name=${name}`, access_token);
-    const response = await fetching.json();
+    const response = await fetching.text();
 
-    ctx.response.redirect("/app/bookshelves");
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/bookshelves");
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    }
 });
     
 
 
 // STILL NEEDS FIXING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-await router.post("/blog/upload", async (ctx) => {
+await router.post("/app/blog/upload", async (ctx) => {
     const cookies = await getCookies(ctx);
     const body = ctx.request.body({ type: 'form-data' });
     const data = await body.value.read({ maxSize: Number.MAX_SAFE_INTEGER });
@@ -1848,7 +2024,7 @@ await router.post("/blog/upload", async (ctx) => {
     }
 });
 
-await router.post("/blog/delete", async (ctx) => {
+await router.post("/app/blog/delete", async (ctx) => {
     const cookies = await getCookies(ctx);
     const body = ctx.request.body({ type: 'form' })
     const value = await body.value
@@ -1863,11 +2039,19 @@ await router.post("/blog/delete", async (ctx) => {
     }
     
     const fetchingDelete = await microBlogPostForm('micropub', formBody, cookies.access_token);
-    const result = await fetchingDelete;
-    ctx.response.redirect("/app/blog/posts?destination=" + destination);
+    const response = await fetchingDelete.text();
+
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/blog/posts?destination=" + destination);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    }
 });
 
-await router.post("/blog/media/delete", async (ctx) => {
+await router.post("/app/blog/media/delete", async (ctx) => {
     const cookies = await getCookies(ctx);
     const body = ctx.request.body({ type: 'form' })
     const value = await body.value
@@ -1886,8 +2070,16 @@ await router.post("/blog/media/delete", async (ctx) => {
     const mediaEndpoint = endpointFetched["media-endpoint"];
 
     const fetchingDelete = await basicPostForm(mediaEndpoint, formBody, cookies.access_token);
-    const result = await fetchingDelete;
-    ctx.response.redirect("/app/blog/media?destination=" + destination);
+    const response = await fetchingDelete.text();
+
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/blog/media?destination=" + destination);
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    }
 });
 await router.post("/app/blog/post", async (ctx) => {
     const cookies = await getCookies(ctx);
@@ -1934,7 +2126,7 @@ await router.post("/app/blog/post", async (ctx) => {
         }
 
         const postingContent = await microBlogPostForm('micropub', formBody, cookies.access_token);
-        const results = await postingContent;
+        await postingContent;
     } else {
         const content = {
                 action: "update",
@@ -1958,11 +2150,10 @@ await router.post("/app/blog/post", async (ctx) => {
             body: JSON.stringify(content)
         });
 
-        const results = await postingContent;
+        await postingContent;
     }
     ctx.response.redirect("/app/blog/posts?destination=" + data.fields.destination);
 });
-
 
 // --------------------------------------------------------------------------------------
 // Micro.blog API Access Helpers
@@ -2256,7 +2447,6 @@ function getCommonJS() {
     `;
     return minify(Language.JS, script);
 }
-
 function getCommonCSS() {
     return minify(Language.CSS, _style);
 }
@@ -2283,16 +2473,31 @@ function externalLinkSVG() {
     </svg>
     `;
 }
+function logoSVG() {
+    return `
+        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300.000000 297.000000" preserveAspectRatio="xMidYMid meet"> <metadata> Created by potrace 1.10, written by Peter Selinger 2001-2011 </metadata> <g transform="translate(0.000000,297.000000) scale(0.050000,-0.050000)" fill="var(--base)" stroke="none"> <path d="M3300 5350 c-14 -16 -37 -30 -51 -30 -47 0 -134 -209 -122 -294 28 -198 54 -352 63 -365 21 -34 42 -376 24 -394 -15 -15 -114 38 -115 61 0 30 -179 136 -208 125 -14 -5 -33 -106 -48 -246 -17 -167 -33 -241 -54 -253 -16 -9 -42 -47 -58 -84 -21 -50 -37 -65 -65 -57 -36 9 -170 -10 -376 -54 -55 -12 -140 -29 -190 -38 -313 -60 -623 -165 -770 -262 -44 -29 -93 -57 -108 -62 -44 -14 -306 -258 -387 -359 -204 -256 -158 -434 89 -343 252 94 401 111 796 95 204 -8 402 -14 440 -14 66 1 67 1 17 -15 -30 -9 -65 -24 -79 -32 -15 -10 -19 -7 -10 8 19 30 -6 28 -67 -6 -27 -14 -60 -23 -73 -18 -13 5 -86 -31 -163 -80 -76 -49 -168 -104 -203 -122 -78 -40 -249 -168 -259 -193 -3 -10 -19 -18 -35 -18 -16 0 -34 -13 -41 -30 -6 -17 -23 -30 -38 -30 -14 0 -71 -43 -126 -95 -55 -52 -129 -123 -166 -157 -37 -35 -89 -92 -115 -127 -26 -35 -68 -72 -94 -82 -61 -23 -98 -91 -61 -113 14 -9 48 -59 73 -111 45 -90 225 -255 279 -255 12 0 82 -29 156 -64 179 -85 598 -231 785 -273 341 -78 1589 -26 1842 77 166 67 241 95 323 120 41 13 121 55 177 93 186 128 305 -27 256 -336 -49 -311 175 -127 260 213 13 55 37 145 52 200 38 136 80 390 74 444 -5 40 145 264 197 297 75 46 181 426 172 612 -7 136 -92 321 -180 392 -38 30 -49 76 -81 335 -20 165 -45 321 -55 348 -25 65 -36 145 -45 317 -10 202 -72 265 -146 150 -20 -30 -56 -71 -81 -91 -25 -20 -45 -50 -45 -65 0 -16 -8 -29 -17 -29 -22 0 0 118 67 350 29 99 55 189 58 200 48 167 56 457 15 578 -113 333 -548 248 -674 -131 -61 -183 -253 -154 -352 53 -106 223 -366 370 -457 260z m177 -68 c79 -41 203 -156 203 -189 0 -145 163 -260 340 -239 107 12 141 52 190 221 32 112 185 225 303 225 228 0 278 -299 140 -835 -124 -481 -107 -578 71 -396 137 138 128 141 142 -44 6 -85 25 -213 41 -285 108 -466 112 -858 11 -891 -63 -20 -84 14 -61 98 27 99 -17 139 -84 76 -82 -77 -103 -22 -35 90 51 83 19 121 -56 67 -77 -55 -133 -60 -126 -10 11 73 75 140 144 150 175 26 198 580 25 580 -156 0 -215 -138 -152 -358 19 -70 -51 -47 -314 101 -181 101 -439 196 -439 162 0 -5 -13 1 -29 14 -62 52 -386 62 -571 18 -23 -5 -29 9 -24 65 6 63 -1 75 -56 102 -127 61 -213 -3 -188 -139 8 -41 14 -79 13 -85 -2 -25 75 -154 113 -188 56 -51 58 -152 3 -152 -46 0 -81 56 -81 129 0 39 -10 51 -42 51 -36 0 -41 -10 -34 -69 4 -37 3 -67 -3 -66 -20 3 -91 -31 -125 -60 -32 -28 -33 -26 -11 21 14 28 31 47 38 42 8 -5 14 7 12 27 -1 19 4 62 12 95 7 33 5 73 -5 88 -21 33 -85 15 -81 -23 7 -54 -2 -115 -17 -115 -9 0 -18 32 -21 71 -5 82 69 249 111 249 37 0 60 70 76 222 7 71 19 159 27 197 l14 69 81 -73 c94 -85 176 -121 233 -103 45 14 39 113 -47 720 -30 217 -12 284 100 359 85 58 67 57 159 11z m-361 -1407 c5 -63 0 -75 -33 -75 -50 0 -81 71 -65 151 10 54 93 -10 98 -76z m1651 -123 c34 -145 -46 -383 -107 -320 -43 44 -42 326 1 369 55 55 85 42 106 -49z m-947 -15 c136 -37 747 -320 770 -357 5 -8 -4 -27 -22 -41 -125 -104 -110 -295 21 -271 45 8 51 4 41 -28 -21 -67 26 -125 92 -115 51 7 58 2 58 -44 0 -70 34 -101 112 -101 86 0 175 101 163 184 -12 84 27 67 93 -40 97 -160 92 -441 -14 -684 -42 -95 -208 -320 -237 -320 -9 0 -23 1 -30 2 -32 4 -47 -63 -23 -100 19 -32 19 -65 -2 -166 -14 -69 -30 -148 -34 -176 -11 -73 -66 -272 -112 -410 -22 -66 -44 -140 -50 -164 -15 -64 -66 -76 -66 -15 0 27 9 49 20 49 32 0 23 181 -14 279 -40 106 -51 118 -154 170 l-77 40 -42 -52 c-44 -54 -190 -137 -240 -137 -16 0 -86 -27 -157 -60 -161 -76 -305 -112 -496 -128 -82 -6 -273 -22 -424 -34 -295 -25 -1044 3 -1116 42 -20 11 -85 33 -143 48 -139 38 -319 101 -457 160 -60 26 -146 62 -190 81 -208 89 -388 283 -308 333 14 8 27 29 30 46 9 65 210 274 418 435 33 25 69 56 80 69 68 77 442 302 465 280 5 -6 -9 -58 -31 -116 -54 -137 -62 -217 -27 -272 19 -29 163 -14 163 17 0 54 392 300 425 267 6 -6 -17 -67 -51 -135 -120 -239 -105 -483 51 -838 57 -129 108 -71 122 140 13 205 187 431 406 528 l87 39 46 -53 c25 -29 104 -169 175 -311 152 -304 175 -315 253 -128 60 140 92 625 47 708 -50 93 123 85 305 -13 85 -46 99 -49 125 -22 34 33 -88 337 -158 394 -18 15 -28 35 -23 44 24 37 -182 89 -355 88 l-175 0 0 68 c0 146 -217 495 -294 472 -20 -6 -7 5 29 24 60 32 67 32 101 0 57 -51 176 -44 191 12 23 85 13 135 -37 179 -28 24 -65 66 -84 94 l-33 51 55 -36 c54 -36 57 -35 94 5 84 90 346 98 638 19z m-1154 -26 c-36 -64 -6 -166 56 -192 32 -13 58 -31 58 -40 0 -17 -305 -6 -365 13 -54 17 -44 -60 16 -125 102 -110 119 -175 91 -345 -33 -195 32 -179 -633 -156 -610 22 -884 -5 -1018 -99 -103 -71 -103 45 0 186 207 284 540 510 897 608 537 147 933 213 898 150z m71 -332 c186 -57 348 -296 351 -517 2 -123 18 -136 121 -102 217 71 414 -14 524 -227 55 -107 52 -128 -13 -93 -203 109 -439 74 -374 -54 41 -80 54 -262 34 -458 -31 -303 -76 -368 -141 -202 -111 284 -269 505 -346 483 -284 -81 -543 -380 -530 -611 4 -65 0 -118 -8 -118 -8 0 -15 17 -15 39 0 21 -19 70 -41 109 -84 142 -39 547 78 710 153 212 -140 181 -471 -49 -134 -93 -150 -93 -123 1 81 280 354 483 607 452 61 -8 86 -42 31 -42 -75 0 -29 -26 61 -35 52 -5 77 0 69 13 -7 11 -27 14 -46 7 -26 -10 -23 2 13 53 120 168 117 561 -5 636 -14 9 -4 20 27 28 28 8 53 15 57 16 4 1 67 -16 140 -39z"></path> <path d="M4395 5006 c-30 -40 -55 -85 -55 -100 0 -30 55 -146 69 -146 105 0 201 181 143 270 -45 69 -92 62 -157 -24z m125 -43 c0 -8 -11 -26 -24 -39 -19 -19 -18 -24 1 -24 14 0 20 -9 13 -20 -8 -13 -26 -13 -53 2 -22 11 -35 26 -29 33 6 6 3 22 -8 35 -15 18 -4 24 40 26 33 1 60 -5 60 -13z"></path> <path d="M3405 5027 c-17 -7 -25 -57 -25 -148 0 -173 79 -245 172 -157 74 69 49 278 -33 278 -20 0 -42 9 -49 20 -13 21 -26 23 -65 7z m135 -207 c0 -11 -10 -20 -21 -20 -12 0 -15 -10 -7 -23 8 -13 3 -19 -14 -13 -47 16 -46 76 1 76 22 0 41 -9 41 -20z"></path> <path d="M3740 4529 c-25 -64 13 -133 70 -125 27 4 42 24 46 62 13 106 -81 157 -116 63z"></path> <path d="M3932 4509 c-20 -79 8 -113 68 -83 57 29 77 91 37 116 -50 32 -92 19 -105 -33z"></path> <path d="M3427 4368 c-22 -55 60 -136 175 -175 263 -88 856 -11 906 118 24 64 -49 99 -82 40 -82 -146 -856 -147 -922 -1 -26 57 -60 65 -77 18z"></path> <path d="M3720 2761 c0 -11 38 -29 85 -41 121 -31 189 -60 266 -112 78 -53 110 -33 43 26 -70 63 -394 168 -394 127z"></path></g></svg>
+    `;
+}
 
 // --------------------------------------------------------------------------------------
 // Configure and start the HTTP server
 // --------------------------------------------------------------------------------------
-const app = new Application({ logErrors: true });
+const app = new Application({ logErrors: false });
 app.use(oakCors());
 
 /**
  * Middleware - redirect to login page if the cookie with the access_token is missing.
  */
+app.use(async (ctx, next) => {
+    if (ctx.request.url.pathname !== "/favicon.ico") {
+        await next();
+    } else
+    {
+        ctx.response.body = _favicon;
+        ctx.response.type = "image/x-icon";
+    }
+});
+
 app.use(async (ctx, next) => {
     const cookies = await getCookies(ctx);
   if(ctx.request.url.pathname === '/' || ctx.request.url.pathname === '/app/login' || ctx.request.url.pathname.includes('/app/auth')) {
@@ -2311,7 +2516,7 @@ app.addEventListener(
   "error",
   (e) => {
       if(e.message != '' && e.message != 'response already completed' && e.message != 'broken pipe: broken pipe') {
-        //console.log(`Caught error: ${e.message}`, e) 
+        console.log(`Caught error: ${e.message}`, e) 
       }
     },
 );
