@@ -116,7 +116,7 @@ function mainMenuTemplate(loggedIn = true, endSidebar = true) {
                 <p class="margin-3xs"><a href="/app/bookshelves">Bookshelves</a></p>
             </li>
             <li class="orange-yellow discover-li-wide"><small>Manage MB:</small>
-                <p class="margin-3xs"><a class="margin-bottom-3xs" href="/app/following">Following</a></p>
+                <p class="margin-3xs"><a class="margin-bottom-3xs" href="/app/users/following">Following</a></p>
                 <p class="margin-3xs"><a href="/app/replies">Replies</a></p>
             </li>
             <li class="red-orange discover-li-wide"><small>Lillihub:</small>
@@ -172,12 +172,11 @@ function cleanFormatHTML (str) {
             {
                 let parent;
                 if (image.parentNode.nodeName.toLowerCase() == "a"){
-                    parent = image.parentNode.parentNode;               
+                    parent = image.parentNode;              
                 } else {
-                    parent = image.parentNode;
+                    parent = image;
                 }
                 parents.push(parent);
-
                 try {
                     parent.classList.add('class', 'swipeItem');
                 } catch {
@@ -189,13 +188,18 @@ function cleanFormatHTML (str) {
         if(parents.length > 0) {
             try {
                 const container = html.createElement("div");
+                const notice = html.createElement("p");
+                notice.innerHTML = `Swipe to view ${parents.length} photos`;
+                notice.classList.add('notice');
                 container.classList.add('photoSwipe');
+                container.setAttribute('style',`grid-template-columns: repeat(${parents.length}, 100%);`)
                 for(let i = 0; i < parents.length; i++)
                 {
                     parents[i].parentNode.removeChild(parents[i]);
                     container.appendChild(parents[i]);
                 }
                 html.appendChild(container);    
+                html.appendChild(notice);  
             } catch {
                 // continue on without messing with the images
             }
@@ -858,9 +862,9 @@ async function streamManageUsersPage(ctx, controller, type, title) {
     controller.enqueue(mainMenuTemplate(true, true));
     controller.enqueue(`<div class="posts">`);
     controller.enqueue(`<div class="switch-field">
-        <a ${type == 'following' ? 'class="selected"' : ''} href="/app/following">Following</a>
-        <a ${type == 'muting' ? 'class="selected"' : ''} href="/app/muted">Muted</a>
-        <a ${type == 'blocking' ? 'class="selected"' : ''} href="/app/blocked">Blocked</a></div>`);
+        <a ${type == 'following' ? 'class="selected"' : ''} href="/app/users/following">Following</a>
+        <a ${type == 'muting' ? 'class="selected"' : ''} href="/app/users/muted">Muted</a>
+        <a ${type == 'blocking' ? 'class="selected"' : ''} href="/app/users/blocked">Blocked</a></div>`);
     const fetching = await microBlogGet(type == 'following' ? `users/following/${cookies.username}` : `users/${type}`, cookies.access_token);
     const items = await fetching.json();
 
@@ -869,14 +873,14 @@ async function streamManageUsersPage(ctx, controller, type, title) {
         if(type == 'following') {
             const fetchingPosts = await microBlogGet('posts/' + item.username, cookies.access_token);
             const posts = await fetchingPosts.json();
-            controller.enqueue(postContentTemplate(item.id, item.username, item.name, item.avatar, item.url, `last post was ${posts.items[0]._microblog.date_relative}`, posts._microblog.bio, '', false));
+            controller.enqueue(postContentTemplate(item.id, item.username, item.name, item.avatar, item.url, `last post was ${posts.items[0]._microblog.date_relative}`, posts._microblog.bio, '', true));
         } else {
-            controller.enqueue(postContentTemplate(item.id, item.username, item.username, undefined, undefined, undefined, undefined, '', false));
+            controller.enqueue(postContentTemplate(item.id, item.username, item.username, undefined, undefined, undefined, undefined, '', true));
         }
         controller.enqueue(`</section></article>`);
     }
     if(items.length == 0) {
-        controller.enqueue(`<p>You are not ${type} any users.</p>`);
+        controller.enqueue(`<p class="screen-width">You are not ${type} any users.</p>`);
     }
     controller.enqueue(`</div>${endHTMLTemplate()}`);  
     controller.close();
@@ -1136,7 +1140,7 @@ await router.get("/app/settings", async (ctx, next) => {
                         <div class="grow-wrap"><textarea name="exclude" onInput="growTextArea(this)">${contentFilters.join(', ')}</textarea></div>
                         <button type="submit">Save content filter list</button>
                     </form>
-                    <iframe srcdoc='${iFrameTemplate()}' name="excludeStatus" width="220" height="35"></iframe> 
+                    <iframe srcdoc='${iFrameTemplate('')}' name="excludeStatus" width="220" height="35"></iframe> 
                 </div>
             <div>
         ${endHTMLTemplate()} 
@@ -1145,14 +1149,12 @@ await router.get("/app/settings", async (ctx, next) => {
     return await next();
 });
 
-await router.get("/app/timeline", async (ctx, next) => {
+await router.get("/app/timeline", async (ctx, next) => {   
     ctx.response.body = new ReadableStream({
         async start(controller) {
             await streamTimelineOrConversations(ctx, controller);
         }
     });
-    
-    ctx.response.headers = {"content-type": "text/html", "x-content-type-options": "nosniff" };
     return await next();
 });
 
@@ -1164,6 +1166,7 @@ await router.get("/app/conversations", async (ctx, next) => {
     });
     return await next();
 });
+
 
 await router.get("/app/photos", async (ctx, next) => {
     const cookies = await getCookies(ctx);
@@ -1302,7 +1305,7 @@ await router.get("/app/users/following", async (ctx, next) => {
     return await next();
 });
 
-await router.get("/app/muted", async (ctx, next) => {
+await router.get("/app/users/muted", async (ctx, next) => {
     ctx.response.body = new ReadableStream({
         async start(controller) {
             await streamManageUsersPage(ctx, controller, "muting", "Muted"); 
@@ -1313,7 +1316,7 @@ await router.get("/app/muted", async (ctx, next) => {
     return await next();
 });
 
-await router.get("/app/blocked", async (ctx, next) => {
+await router.get("/app/users/blocked", async (ctx, next) => {
     ctx.response.body = new ReadableStream({
         async start(controller) {
             await streamManageUsersPage(ctx, controller, "blocking", "Blocked"); 
@@ -1530,21 +1533,30 @@ await router.get("/app/blog/media", async (ctx, next) => {
 
             const media = await getMicroBlogMedia(account, cookies.access_token);
             controller.enqueue(`<section class="posts" id="photos">`);
-            
-            controller.enqueue(media.items.map(i => `<div>
-                ${i.poster ? `<video controls="controls" playsinline="playsinline" src="${i.url}" preload="none"></video>` : `<img src="${i.url}"/>`}
-                <div class="switch-field">
-                    <a class="clear" href="/app/blog/post?content=${encodeURIComponent('![]('+i.url+')')}${account ? '&destination=' + account.uid : ''}">Create Post</a>
-                    <form method="POST" action="/app/blog/media/delete">
-                        <input type="hidden" name="destination" value="${account ? account.uid : ''}" />
-                        <input type="hidden" name="url" value="${i.url}" />
-                        <details style="text-align: center;">
-                            <summary style="cursor:pointer;display:inline;">▶ Delete</summary>
-                            <button style="margin-left:var(--space-3xs);display:inline;width:inherit;" type="submit">Confirm Delete</button>
-                        </details>
-                    </form>
-                </div></div>`).join(''));
-
+            controller.enqueue(media.items.map(i => postContentTemplate(i.url, 
+                cookies.username, 
+                i.published.split('T')[0], 
+                '', 
+                i.url, 
+                i.url.split('/')[i.url.split('/').length - 1], 
+                i.poster ? `<video controls="controls" playsinline="playsinline" src="${i.url}" preload="none"></video>` : `<img src="${i.url}"/>`, 
+                `<div class="actions">
+                    <details style="border-radius: var(--space-3xs);color: var(--subtext-1);border: 1px solid var(--mantle);position: absolute;z-index: 5;background-color: var(--mantle);margin-left: -92px;">
+                        <summary style="padding: var(--space-2xs); font-size: var(--step--1); margin: 0;">Actions</summary>
+                        <div style="padding: var(--space-2xs); width: 200px; margin-left: -129px; background-color: var(--mantle);">
+                            <a class="clear" href="/app/blog/post?content=${encodeURIComponent('![]('+i.url+')')}${account ? '&destination=' + account.uid : ''}">Create Post</a>
+                            <details class="actionExpand">
+                                <summary class="actionExpandToggle">Delete</summary>
+                                <form method="POST" action="/app/blog/media/delete">
+                                <input type="hidden" name="destination" value="${account ? account.uid : ''}" />
+                                <input type="hidden" name="url" value="${i.url}" />
+                                <button type="submit">Confirm Delete</button>
+                            </form>
+                            </details>
+                        </div>
+                    </details>
+                </div>`, 
+                true) + '</section></article>').join(''));
             controller.enqueue(`</div>${endHTMLTemplate()}`); 
             controller.close();
         }
@@ -1981,10 +1993,7 @@ await router.post("/app/bookshelves/addBookshelf", async (ctx) => {
         //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
     }
 });
-    
 
-
-// STILL NEEDS FIXING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 await router.post("/app/blog/upload", async (ctx) => {
     const cookies = await getCookies(ctx);
     const body = ctx.request.body({ type: 'form-data' });
@@ -2423,8 +2432,8 @@ async function microBlogSimpleDelete(endpoint, access_token = null){
  */
 function filterOut(contentFilters, content_html) {
     if(contentFilters.length > 0) {
-        const words = content_html != undefined ? content_html.toLowerCase().split(' ') : [];
-        return contentFilters.some(filter => filter.trim() != '' && words.includes(filter));
+        const words = content_html != undefined ? content_html.toLowerCase().replace('.', '').replace(',', '').replace(':', '').replace(';', '').split(' ') : [];
+        return contentFilters.some(filter => filter.trim() != '' && words.includes(filter.trim()));
     }
     return false;
 }
