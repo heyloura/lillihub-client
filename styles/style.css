@@ -251,6 +251,11 @@ font-weight: bold;
 a.selected {
     color: var(--blue) !important;
 }
+#photos img, #photos video {
+    width: 100% !important;
+    height: auto !important;
+    margin-bottom: var(--space-3xs);
+}
 .grow-wrap {
     display: grid;
     margin: var(--space-xs) 0;
@@ -528,8 +533,8 @@ form > details > summary {
     }
 }
 .profile .avatar {
-    width: var(--space-3xl);
-    height: var(--space-3xl);
+    width: var(--space-3xl) !important;
+    height: var(--space-3xl) !important;
     border-radius: 50%;
     border: 1px solid var(--crust);
 }
@@ -564,7 +569,7 @@ a.button {
 .center {
     text-align:center;
 }
-#photos {
+/* #photos {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     margin-top: var(--space-s-m);
@@ -574,23 +579,23 @@ a.button {
         margin-right: var(--space-s-m);
         grid-template-columns: repeat(2, 1fr);             
     }
-}
-#photos div  {
+} */
+/* #photos div  {
      border: 1px solid var(--crust);
      border-radius: var(--space-3xs);
      padding: var(--space-3xs);
-}
+} */
 #photos img, #photos video {
     width: 100% !important;
     height: auto !important;
     margin-bottom: var(--space-3xs);
 }
-#photos .switch-field {
+/* #photos .switch-field {
     margin: 0;
     border: 0;
     border-radius: 0;
     padding: 0;
-}
+} */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -689,18 +694,36 @@ blockquote {
     flex: 0 0 auto; 
     margin-right: var(--space-xs);
     @media screen and (min-width: 711px) {
-        max-width: 580px;
+        max-width: 450px;
     }
 }
 .overage {
     color: var(--red);
 }
 .photoSwipe {
-    display: flex;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(2, 100%);
+    grid-template-rows: minmax(150px, 1fr);
+    overflow-x: auto;
+    @media screen and (min-width: 711px) {
+        max-width: 450px;
+    }
+    -webkit-overflow-scrolling: touch;
+    /* display: flex;
     flex-wrap: nowrap;
+    gap: 10px;
     overflow-x: auto;
     list-style: none;
     padding: 0 var(--space-xs-s) var(--space-xs) 0; 
     -webkit-overflow-scrolling: touch;
     margin-bottom: 0;
+    @media screen and (min-width: 711px) {
+        max-width: 450px;
+    } */
+}
+.notice {
+    text-align: center;
+    font-size: var(--step--1);
+    color: var(--subtext-1);
 }
