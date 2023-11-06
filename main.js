@@ -108,19 +108,19 @@ function mainMenuTemplate(loggedIn = true, endSidebar = true) {
         <ul class="discover">
             <li class="blue-purple"><a href="/app/blog/post">New Post</a></li>
             <li class="green-blue discover-li-wide"><small>My Blog:</small>
-                <p class="margin-3xs"><a class="margin-bottom-3xs" href="/app/blog/posts">Posts</a></p>
-                <p class="margin-3xs"><a href="/app/blog/media">Media</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/blog/posts">Posts</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a href="/app/blog/media">Media</a></p>
             </li>
             <li class="yellow-green discover-li-wide"><small>My Stuff:</small>
-                <p class="margin-3xs"><a class="margin-bottom-3xs" href="/app/bookmarks">Bookmarks</a></p>
-                <p class="margin-3xs"><a href="/app/bookshelves">Bookshelves</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/bookmarks">Bookmarks</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a href="/app/bookshelves">Bookshelves</a></p>
             </li>
             <li class="orange-yellow discover-li-wide"><small>Manage MB:</small>
-                <p class="margin-3xs"><a class="margin-bottom-3xs" href="/app/users/following">Following</a></p>
-                <p class="margin-3xs"><a href="/app/replies">Replies</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/users/following">Following</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a href="/app/replies">Replies</a></p>
             </li>
             <li class="red-orange discover-li-wide"><small>Lillihub:</small>
-                <p class="margin-3xs"><a class="margin-bottom-3xs" href="/app/settings">Settings</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/settings">Settings</a></p>
             </li>
             <li class="purple-red noShift"><a href="/">${logoSVG()}</a></li>
         </ul>
@@ -239,6 +239,14 @@ function cleanFormatHTML (str) {
             code.innerHTML = code.innerHTML.replaceAll('<','&lt;').replaceAll('>','&gt;');
         }
 	}
+
+    function escapeCharacters(html) {
+        const paras = html.querySelectorAll("p");
+        for (let i = 0; i < paras.length; i++) {
+            const para = paras[i];
+            para.innerHTML = para.innerHTML.replaceAll('&amp;nbsp;',' ');
+        }
+	}
     
     const cleaned = ammonia.clean(str);
     const parser = new DOMParser();
@@ -246,6 +254,7 @@ function cleanFormatHTML (str) {
     resize(doc);
     microBlogLinks(doc);
     escapeCodeBlocks(doc);
+    escapeCharacters(doc)
 	return doc.toString();
 }
 
@@ -277,7 +286,7 @@ function postContentTemplate(id, username, name, avatar, url, date, content_html
                     </div>
                 </header>
                 <div class="content" style="flex-grow: 1;margin-bottom: var(--space-s);">${cleanFormatHTML(content_html)}</div>  
-                <div><small><a href="${url}">${date}</a></small></div>       
+                ${url && date? `<div><small><a href="${url}">${date}</a></small></div>` : ''} 
     `;
 }
 
@@ -659,10 +668,9 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
                         return `<label style="display:block;text-align:left;"><input name="tags[]" type="checkbox" ${currentTags.includes(tag) ? 'checked="checked"' : ''} value="${tag}">${tag}</label>` 
                     }).join('');
             }
-
             const post_content = post.tags ? `${post.content_html}<div><p style="color:var(--subtext-1)"><small>Tags: ${post.tags}</small></p></div>` : post.content_html;
             
-            const postActions = includeActions ? postActionTemplate(post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck) : '';
+            const postActions = includeActions ? postActionTemplate(post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0) : '';
             controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post._microblog.date_relative, post_content, postActions, isFollowing));
 
 
@@ -762,24 +770,36 @@ async function streamUserProfile(ctx, controller, author, _microblog) {
         pins = responsePins.map(function (pin) { return pin.is_unlocked ? `<img loading="lazy" width="30" height="30" src="${pin.icon}" alt="${pin.title}" title="${pin.title}" />` : '' }).join('');
     }
 
+    // figure out if user is blocked or muted
+    const fetchMuting = await microBlogGet('users/muting', access_token);
+    const muting = await fetchMuting.json();
+    const isMuted = muting.filter(m => m.username == name).length > 0;
+    const fetchBlocked = await microBlogGet('users/blocking', access_token);
+    const blocked = await fetchBlocked.json();
+    const isBlocked = blocked.filter(m => m.username == name).length > 0;
+
     controller.enqueue(`<div style="padding-bottom: var(--space-3xl)">
         ${!_microblog.is_you ? 
             `<details class="column-fill">
                 <summary style="margin-bottom:0;">Advanced</summary>
                 <div style="margin-top:var(--space-xs)">
                 <p>Learn about muting and blocking users here: <a target="_blank" href="https://help.micro.blog/t/muting-blocking-and-reporting-users/32">Micro.blog Help - Muting, blocking, and reporting users${externalLinkSVG()}</a></p>
-                ${_microblog.is_following ? `<form style="display:inline;" method="POST" action="/app/users/unfollow"><input type="hidden" name="username" value="${name}"/><button type="submit">Unfollow User</button></form>` : '' }
-                <form style="display:inline;" method="POST" action="/app/users/block"><input type="hidden" name="username" value="${name}"/><button type="submit">Block User</button></form>
-                <form style="display:inline;" method="POST" action="/app/users/mute"><input type="hidden" name="username" value="${name}"/><button type="submit">Mute User</button></form>
+                ${_microblog.is_following ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unfollow"><input type="hidden" name="username" value="${name}"/><button type="submit">Unfollow User</button></form>`) : '' }
+                ${!isBlocked ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/block"><input type="hidden" name="username" value="${name}"/><button type="submit">Block User</button></form>`) : iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unblock"><input type="hidden" name="username" value="${name}"/><button type="submit">Unblock User</button></form>`)}
+                ${!isMuted ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/mute"><input type="hidden" name="username" value="${name}"/><button type="submit">Mute User</button></form>`) : iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unmute"><input type="hidden" name="username" value="${name}"/><button type="submit">Unmute User</button></form>`)}
                 </div>
             </details>` : ''}
         <div class="profile blue-purple" style="color:var(--base);">
             <div>
                 <p class="center"><img class="avatar" src="${author.avatar}" /></p>
+                <div style="margin: 0 auto;display: block;width:300px;text-align: center;">
                 ${!_microblog.is_following && !_microblog.is_you ? iFrameForm(`<form method="POST" action="/app/users/follow">
                         <input type="hidden" name="username" value="${name}" />
                         <button type="submit">Follow @${_microblog.username}</button>
                     </form>`) : ''}
+                ${isMuted ? '<br/><br/><b>User is muted.</b>' : ''}
+                ${isBlocked ? '<br/><br/><b>User is blocked.</b>' : ''}
+                </div>
             </div>
             <div style="padding-left: var(--space-xs);">
                 <p class="name"><b>${author.name}</b> ${_microblog.pronouns}</p>
@@ -812,8 +832,13 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     }  
 
     controller.enqueue(`<div class="posts">`);
+
+    console.log(name, last, cookies.access_token);
+
     const result = await getMicroBlogTimeline(name, last, cookies.access_token);
     const posts = result.items;
+
+    console.log(posts);
 
     if (name) {
         await streamUserProfile(ctx, controller, result.author, result._microblog);
@@ -868,6 +893,10 @@ async function streamManageUsersPage(ctx, controller, type, title) {
     const fetching = await microBlogGet(type == 'following' ? `users/following/${cookies.username}` : `users/${type}`, cookies.access_token);
     const items = await fetching.json();
 
+    if(type != 'following') {
+        controller.enqueue(`<p style="text-align:center">To unmute or unblock a user go to their profile page.</p>`);
+    } 
+
     for(let i=0; i<items.length; i++){
         const item = items[i];
         if(type == 'following') {
@@ -875,7 +904,7 @@ async function streamManageUsersPage(ctx, controller, type, title) {
             const posts = await fetchingPosts.json();
             controller.enqueue(postContentTemplate(item.id, item.username, item.name, item.avatar, item.url, `last post was ${posts.items[0]._microblog.date_relative}`, posts._microblog.bio, '', true));
         } else {
-            controller.enqueue(postContentTemplate(item.id, item.username, item.username, undefined, undefined, undefined, undefined, '', true));
+            controller.enqueue(postContentTemplate(item.id, item.username, item.username, undefined, undefined, undefined, '', '', true));
         }
         controller.enqueue(`</section></article>`);
     }
@@ -988,7 +1017,7 @@ async function createOrEditPostPage(access_token, title, content, destination, s
                             
                             if(images.length > 1) {
                                 for(let i = 0; i<images.length; i = i + 2) {
-                                    let subchunks = images[i + 1].split(')');
+                                    let subchunks = images[i + 1] ? images[i + 1].split(')') : [];
                                     subchunks[0] = '';
                                     text += subchunks.join('');
                                 }
@@ -1185,7 +1214,11 @@ await router.get("/app/photos", async (ctx, next) => {
         
             await streamUserProfile(ctx, controller, result.author, result._microblog);
             controller.enqueue(postMenuBarTemplate('photos', name, false)); 
-            controller.enqueue(`<div class="screen-width" id="photos">${posts.map(function(post){ return `<a href="/app/post?id=${post.id}"><img src="https://micro.blog/photos/400/${post.image}" loading="lazy"/></a>`; }).join('')}</div>`);
+            if(posts.length > 0) {
+                controller.enqueue(`<div class="screen-width" id="photos">${posts.map(function(post){ return `<a href="/app/post?id=${post.id}"><img src="https://micro.blog/photos/400/${post.image}" loading="lazy"/></a>`; }).join('')}</div>`);
+            } else {
+                controller.enqueue(`<div class="screen-width"><p style="text-align:center">No photos shared.</p></div>`); 
+            }
             controller.enqueue(`</div>${endHTMLTemplate()}`); 
             controller.close();
         }
@@ -1467,7 +1500,7 @@ await router.get("/app/blog/posts", async (ctx, next) => {
                             <a target="_top" href="/app/blog/post?id=${encodeURIComponent(post.url[0])}&destination=${encodeURIComponent(account.uid)}">Edit post</a>
                             <details class="actionExpand">
                                 <summary class="actionExpandToggle">Delete</summary>
-                                <form style="height: 100%;max-height: 300px;" method="POST" action="/blog/post/delete">
+                                <form style="height: 100%;max-height: 300px;" method="POST" action="/app/blog/delete">
                                     <input type="hidden" name="destination" value="${account ? account.uid : ''}" />
                                     <input type="hidden" name="url" value="${post.url[0]}" />
                                     <button class="actionBtn" type="submit">Confirm Delete</button>
@@ -1696,11 +1729,13 @@ await router.post("/app/users/block", async (ctx) => {
 
     try {
         JSON.parse(response);
-        ctx.response.redirect("/app/timeline?name=" + username);
+        ctx.response.body = iFrameTemplate(`<form action="/app/users/unblock" method="POST">
+            <input type="hidden" name="username" value="${username}" />
+            <button type="submit">Unblock</button>
+        </form>`); 
     }
     catch {
-        //TO-DO....
-        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
     }  
 });
 
@@ -1714,11 +1749,13 @@ await router.post("/app/users/mute", async (ctx) => {
 
     try {
         JSON.parse(response);
-        ctx.response.redirect("/app/timeline?name=" + username);
+        ctx.response.body = iFrameTemplate(`<form action="/app/users/unmute" method="POST">
+            <input type="hidden" name="username" value="${username}" />
+            <button type="submit">Unmute</button>
+        </form>`); 
     }
     catch {
-        //TO-DO....
-        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
     } 
 });
 
@@ -1733,11 +1770,13 @@ await router.post("/app/users/unblock", async (ctx) => {
 
     try {
         JSON.parse(response);
-        ctx.response.redirect("/app/timeline?name=" + username);
+        ctx.response.body = iFrameTemplate(`<form action="/app/users/block" method="POST">
+            <input type="hidden" name="username" value="${username}" />
+            <button type="submit">Block</button>
+        </form>`); 
     }
     catch {
-        //TO-DO....
-        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
     } 
 });
 
@@ -1752,11 +1791,13 @@ await router.post("/app/users/unmute", async (ctx) => {
 
     try {
         JSON.parse(response);
-        ctx.response.redirect("/app/timeline?name=" + username);
+        ctx.response.body = iFrameTemplate(`<form action="/app/users/mute" method="POST">
+            <input type="hidden" name="username" value="${username}" />
+            <button type="submit">Mute</button>
+        </form>`); 
     }
     catch {
-        //TO-DO....
-        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
     } 
 });
 
@@ -1849,15 +1890,7 @@ await router.post("/app/bookmarks/new", async (ctx) => {
 
     const postingContent = await microBlogPostForm('micropub', formBody, access_token);
     const response = await postingContent.text();
-
-    try {
-        JSON.parse(response);
-        ctx.response.redirect('/app/bookmarks');
-    }
-    catch {
-        //TO-DO....
-        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
-    } 
+    ctx.response.redirect('/app/bookmarks');
 });
 
 await router.post("/app/bookmarks/manageTags", async (ctx) => {
@@ -2047,17 +2080,8 @@ await router.post("/app/blog/delete", async (ctx) => {
         formData.append("mp-destination", destination);
     }
     
-    const fetchingDelete = await microBlogPostForm('micropub', formBody, cookies.access_token);
-    const response = await fetchingDelete.text();
-
-    try {
-        JSON.parse(response);
-        ctx.response.redirect("/app/blog/posts?destination=" + destination);
-    }
-    catch {
-        //TO-DO....
-        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
-    }
+    const fetchingDelete = await microBlogPostForm('micropub', formData, cookies.access_token);
+    ctx.response.redirect("/app/blog/posts?destination=" + destination);
 });
 
 await router.post("/app/blog/media/delete", async (ctx) => {
@@ -2078,17 +2102,9 @@ await router.post("/app/blog/media/delete", async (ctx) => {
     const endpointFetched = await fetchingMediaEndpoint.json();
     const mediaEndpoint = endpointFetched["media-endpoint"];
 
-    const fetchingDelete = await basicPostForm(mediaEndpoint, formBody, cookies.access_token);
+    const fetchingDelete = await basicPostForm(mediaEndpoint, formData, cookies.access_token);
     const response = await fetchingDelete.text();
-
-    try {
-        JSON.parse(response);
-        ctx.response.redirect("/app/blog/media?destination=" + destination);
-    }
-    catch {
-        //TO-DO....
-        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
-    }
+    ctx.response.redirect("/app/blog/media?destination=" + destination);
 });
 await router.post("/app/blog/post", async (ctx) => {
     const cookies = await getCookies(ctx);
@@ -2143,7 +2159,8 @@ await router.post("/app/blog/post", async (ctx) => {
                 replace: {
                     content: [data.fields.content],
                     name: [data.fields.title],
-                    category: categories
+                    category: categories, 
+                    "post-status": data.fields.status == 'draft' ? ['draft'] : ['published']
                 }
             };
         if(data.fields.destination) {
@@ -2432,7 +2449,14 @@ async function microBlogSimpleDelete(endpoint, access_token = null){
  */
 function filterOut(contentFilters, content_html) {
     if(contentFilters.length > 0) {
-        const words = content_html != undefined ? content_html.toLowerCase().replace('.', '').replace(',', '').replace(':', '').replace(';', '').split(' ') : [];
+        const words = content_html != undefined ? content_html.toLowerCase()
+            .replace('.', ' ')
+            .replace(',', ' ')
+            .replace(':', ' ')
+            .replace(';', ' ')
+            .replace('>', ' ')
+            .replace('<', ' ')
+            .split(' ') : [];
         return contentFilters.some(filter => filter.trim() != '' && words.includes(filter.trim()));
     }
     return false;
@@ -2525,7 +2549,7 @@ app.addEventListener(
   "error",
   (e) => {
       if(e.message != '' && e.message != 'response already completed' && e.message != 'broken pipe: broken pipe') {
-        console.log(`Caught error: ${e.message}`, e) 
+        console.log(`Caught error: ${e.message}`) 
       }
     },
 );

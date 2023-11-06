@@ -688,42 +688,38 @@ blockquote {
     scroll-snap-type: x mandatory; 
     scroll-padding-inline-start: var(--space-xs);
 }
-.swipeItem img {
-    width: auto;
-    max-width: 300px;
-    flex: 0 0 auto; 
-    margin-right: var(--space-xs);
-    @media screen and (min-width: 711px) {
-        max-width: 450px;
-    }
-}
 .overage {
     color: var(--red);
 }
 .photoSwipe {
     display: grid;
     grid-gap: 10px;
-    grid-template-columns: repeat(2, 100%);
     grid-template-rows: minmax(150px, 1fr);
     overflow-x: auto;
     @media screen and (min-width: 711px) {
-        max-width: 450px;
+        display:block;
+        overflow-x: hidden;
     }
     -webkit-overflow-scrolling: touch;
-    /* display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    overflow-x: auto;
-    list-style: none;
-    padding: 0 var(--space-xs-s) var(--space-xs) 0; 
-    -webkit-overflow-scrolling: touch;
-    margin-bottom: 0;
-    @media screen and (min-width: 711px) {
-        max-width: 450px;
-    } */
 }
 .notice {
     text-align: center;
     font-size: var(--step--1);
     color: var(--subtext-1);
+    @media screen and (min-width: 711px) {
+        display:none;
+    }
+}
+.editor-preview-side img {
+    width: 100%;
+}
+.swipeItem img {
+    width: auto;
+    max-width: 350px;
+    flex: 0 0 auto; 
+    margin-right: var(--space-xs);
+    @media screen and (min-width: 711px) {
+        max-width: 580px;
+        width: 100%;
+    }
 }
