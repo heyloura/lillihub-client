@@ -1031,8 +1031,6 @@ async function createOrEditPostPage(access_token, title, content, destination, s
                             } else {
                                 count = text.length;
                             }
-
-                            console.log(content);
                             el.innerHTML = 'characters: ' + count + '/300';
                             if(count > 300) {
                                 el.classList.add('overage');
@@ -1069,18 +1067,27 @@ async function createOrEditPostPage(access_token, title, content, destination, s
 
 await router.get("/", async (ctx, next) => {
     const cookies = await getCookies(ctx);
-  if(cookies.access_token) {
-    ctx.response.redirect('/app/timeline');
-  }
-  ctx.response.body = `
-    ${beginHTMLTemplate()}
-    </aside>
-    <div class="posts" style="padding:var(--space-3xs);">
-      <h1>Basic Marketing Page</h1>
-      <a class="button" href="/app/login">Login using Micro.blog</a>  
-    </div>
-    ${endHTMLTemplate()}
-  `;
+    const marketingPage = await fetch('https://heyloura.com/lillihub/');
+    const html = await marketingPage.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html);
+    const body = doc.querySelector('main').toString();
+
+    ctx.response.body = `
+        ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Lillihub')}
+        </aside>
+        <style>.u-grid{display:block;}svg{filter: invert(84%) sepia(11%) saturate(978%) hue-rotate(69deg) brightness(89%) contrast(92%);}
+        img{box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;}
+        li span {text-align:center;} 
+        li span img, h3 {margin-bottom: var(--space-xl) !important;}
+        h3 {border-top: 1px solid var(--crust);padding-top: var(--space-xl) !important;}
+        b {display:block;}</style>
+        <div class="posts" style="padding:var(--space-3xs);">
+            ${body}
+        </div>
+        ${endHTMLTemplate()}
+    `;
+
   return await next();
 });
 
@@ -1098,8 +1105,8 @@ await router.get("/app/login", async (ctx, next) => {
         <h1>Log in using Micro.blog</h1>
         <form action="https://micro.blog/indieauth/auth" method="get">
             <label>
-            Your <b>username</b>.micro.blog website or your custom domain if you have one.
-            <br/><input type="url" name="me" placeholder="https://username.micro.blog" required/>
+            Your https://username.micro.blog website or your custom domain if you have one.
+            <br/><br/><input type="url" name="me" value="https://" required/>
             </label>
             <input type="hidden" name="client_id" value="${_appURL}"/>
             <input type="hidden" name="redirect_uri" value="${_appURL}/app/auth"/>
@@ -1107,7 +1114,7 @@ await router.get("/app/login", async (ctx, next) => {
             <input type="hidden" name="scope" value="create"/>
             <input type="hidden" name="response_type" value="code"/>
             <button type="submit" class="signIn">Sign In</button>
-        </form>   
+        </form> 
         </div>
         ${endHTMLTemplate()}
     `;
