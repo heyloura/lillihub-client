@@ -833,12 +833,8 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
 
     controller.enqueue(`<div class="posts">`);
 
-    console.log(name, last, cookies.access_token);
-
     const result = await getMicroBlogTimeline(name, last, cookies.access_token);
     const posts = result.items;
-
-    console.log(posts);
 
     if (name) {
         await streamUserProfile(ctx, controller, result.author, result._microblog);
@@ -2515,7 +2511,7 @@ function logoSVG() {
 // --------------------------------------------------------------------------------------
 // Configure and start the HTTP server
 // --------------------------------------------------------------------------------------
-const app = new Application({ logErrors: false });
+const app = new Application({ logErrors: true });
 app.use(oakCors());
 
 /**
