@@ -73,10 +73,12 @@ html
     min-height:100%;
     box-sizing: border-box;
     background: linear-gradient(to bottom,#FFFFFF, #eff1f5); 
-    @media (prefers-color-scheme: dark) {
-        background: linear-gradient(to bottom, #303446, #292c3c); 
-    } 
 }
+@media (prefers-color-scheme: dark) {
+    html {
+        background: linear-gradient(to bottom, #303446, #292c3c); 
+    }
+} 
 body {
     height:100%;
     font-family: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
@@ -101,7 +103,9 @@ a:visited {
 }           
 .show-lg {
     display: none;
-    @media screen and (min-width: 711px) {
+}
+@media screen and (min-width: 711px) {
+    .show-lg {
         display: inline-block;
     }
 }
@@ -113,11 +117,13 @@ a:visited {
     display: grid;
     gap: var(--grid-gutter);
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    @media screen and (min-width: 711px) {
+    grid-gap: 1rem;     
+}
+@media screen and (min-width: 711px) {
+    .u-grid {
         grid-template-columns: 240px 1fr;
         padding-inline: var(--grid-gutter);
     }
-    grid-gap: 1rem;     
 }
 .header-nav {
     display: grid;
@@ -125,7 +131,6 @@ a:visited {
     grid-auto-columns: 1fr;
     text-align: center;
 }
-
 header nav {
     height: var(--space-xl);
     background-color: var(--base); 
@@ -141,11 +146,15 @@ header nav {
     top: 0;    
     width: 100%;
     z-index: 999999999;
-    @media (prefers-color-scheme: dark) {
+}
+@media (prefers-color-scheme: dark) {
+    header nav {
         background-color: var(--mantle);
-    } 
-    @media screen and (min-width: 711px)
-    {
+    }
+} 
+@media screen and (min-width: 711px)
+{
+    header nav {
         border-radius: var(--space-3xs);
         padding: 0 var(--space-s);
         max-width: var(--grid-max-width);
@@ -165,8 +174,10 @@ header nav svg {
 header nav a {
     color: var(--text);
     text-decoration: none;
-    @media screen and (min-width: 711px)
-    {
+}
+@media screen and (min-width: 711px)
+{
+    header nav a {
         border-right: 1px solid var(--crust);
     }
 }
@@ -178,15 +189,17 @@ header nav a:visited {
 }
 button, .button {
     background-color: var(--base);
-    @media (prefers-color-scheme: dark) {
-        background-color: var(--mantle);
-    }
     color: var(--text);
     border: 1px solid var(--text);
     box-shadow: var(--crust) 0 1px 1px 0;
     min-height: var(--space-m-l);
     font-size: var(--step--2);
     border-radius: var(--space-3xs);
+}
+@media (prefers-color-scheme: dark) {
+    button, .button {
+        background-color: var(--mantle);
+    }  
 }
 button:active, .button:active {
     transform:translateY(2px);
@@ -218,11 +231,13 @@ input, select, textarea, input[type="color"] {
     background: var(--crust);
     border: 1px solid black;
     border-radius: var(--space-3xs);
-    @media (prefers-color-scheme: dark) {
+    padding: 0.5em;
+}
+@media (prefers-color-scheme: dark) {
+    input, select, textarea, input[type="color"] {
         background: var(--crust);
         border: 1px solid black;
     }
-    padding: 0.5em;
 }
 input[type="checkbox"]{
     width: initial;
@@ -283,8 +298,10 @@ a.selected {
     overflow: hidden;
     margin-bottom: var(--space-xs-s);
     padding: 0 var(--space-xs-s);   
-    @media screen and (min-width: 711px)
-    {
+}
+@media screen and (min-width: 711px)
+{
+    .switch-field {
         padding: 0;   
         margin: var(--space-s-m);
     }
@@ -300,9 +317,11 @@ a.selected {
 .switch-field a.clear {
     background: white;
     font-size: var(--step--1);
-    @media (prefers-color-scheme: dark) {
+}
+@media (prefers-color-scheme: dark) {
+    .switch-field a.clear  {
         background: var(--crust);
-    }
+    } 
 }
 .switch-field a:visited {
     color: var(--text);
@@ -315,7 +334,9 @@ a.selected {
 }
 form > details > summary {
     border-radius: var(--space-3xs);
-    @media (prefers-color-scheme: dark) {
+}
+@media (prefers-color-scheme: dark) {
+    form > details > summary {
         background-color: var(--crust);
     }
 }
@@ -324,23 +345,25 @@ form > details > summary {
     max-width: 580px;
     border-radius: var(--space-3xs);
 }
-.form {
-    @media screen and (min-width: 711px) {
+@media screen and (min-width: 711px) {
+    .form {
         margin: var(--space-s-m);
-    }     
-}
+    }
+} 
 .posts article {
     display: grid;
     grid-template-columns: var(--space-l-xl) 1fr;
     border-bottom: 1px solid var(--crust);       
     margin-bottom: var(--space-xs);
     padding: var(--space-xs-s);
-    padding-bottom: var(--space-s);
-    @media screen and (min-width: 711px) {
+    padding-bottom: var(--space-s);    
+}
+@media screen and (min-width: 711px) {
+    .posts article {
         margin: var(--space-s-m);
         padding-bottom: var(--space-xs-s);
-    }     
-}
+    }
+} 
 .comments header img {
     border-radius: 50%;
     width: var(--space-m);
@@ -380,11 +403,13 @@ form > details > summary {
 .comment {
     color: var(--subtext2);
     background: var(--base);
-    @media (prefers-color-scheme: dark) {
-        background: var(--mantle);
-    }
     padding: var(--space-2xs);
     margin: var(--space-2xs);
+}
+@media (prefers-color-scheme: dark) {
+    .comment {
+        background: var(--mantle);
+    }
 }
 .comment p {
     margin-top: var(--space-3xs);
@@ -397,7 +422,9 @@ form > details > summary {
     padding: 0 var(--space-xs-s) var(--space-xs) var(--space-xs-s); 
     -webkit-overflow-scrolling: touch;
     margin-bottom: 0;
-    @media screen and (min-width: 711px) {
+}
+@media screen and (min-width: 711px) {
+    .categories {
         display: block;
         padding: 0 0 var(--space-s) 0;
     }
@@ -414,7 +441,9 @@ form > details > summary {
     font-weight: 400;
     min-height: var(--space-l);
     min-width: var(--space-l);
-    @media screen and (min-width: 711px) {
+}
+@media screen and (min-width: 711px) {
+    .categories li {
         margin-bottom: var(--space-2xs);
         margin-right: 0;
         border-radius: var(--space-3xs);
@@ -438,9 +467,13 @@ form > details > summary {
     columns: 2;
     -webkit-columns: 2;
     -moz-columns: 2;
-    @media screen and (min-width: 711px) {
-        display: block;
-        column-gap: 0;
+}
+@media screen and (min-width: 711px) {
+    .discover {
+        /* display: block;
+        column-gap: 0; */
+        display: inline-grid;
+        grid-template-columns: 50% 50%;
         padding: 0 0 var(--space-s) 0;
     }
 }
@@ -459,10 +492,14 @@ form > details > summary {
     padding-left: var(--space-xs);
     font-weight: 500;
     font-size: var(--step--1);
-    @media (prefers-color-scheme: dark) {
+}
+@media (prefers-color-scheme: dark) {
+    .discover li {
         border: 1px solid var(--base);
     }
-    @media screen and (min-width: 711px) {
+}
+@media screen and (min-width: 711px) {
+    .discover li {
         display: block;
         width: 100%;
         border-radius: var(--space-3xs);
@@ -471,7 +508,9 @@ form > details > summary {
 .discover a {
     color: #fff;
     text-shadow: 1px 1px var(--space-3xs) var(--subtext-1);
-    @media (prefers-color-scheme: dark) {
+}
+@media (prefers-color-scheme: dark) {
+    .discover a {
         color: var(--crust);
         text-shadow: none;
     }
@@ -500,20 +539,26 @@ form > details > summary {
 }
 .column-fill {
     margin: var(--space-xs-s);
-    @media screen and (min-width: 711px) {
+}
+@media screen and (min-width: 711px) {
+    .column-fill {
         margin: var(--space-s-m);
     }
 }
 .profile {
     border-radius: var(--space-3xs);
     background-color: var(--base);
-    @media (prefers-color-scheme: dark) {
-        background-color: var(--mantle);
-    }
     padding: var(--space-s);
     border: 1px solid var(--crust);
     margin: var(--space-xs-s);
-    @media screen and (min-width: 711px) {
+}
+@media (prefers-color-scheme: dark) {
+    .profile {
+        background-color: var(--mantle);
+    }
+}
+@media screen and (min-width: 711px) {
+    .profile {
         margin: var(--space-s-m);
         display: grid;
         grid-template-columns: 1fr 2fr;
@@ -522,15 +567,19 @@ form > details > summary {
 .screen-width
 {
     margin: var(--space-xs-s);
-    @media screen and (min-width: 711px) {
-        margin: var(--space-s-m);
-    } 
 }
+@media screen and (min-width: 711px) {
+    .screen-width {
+        margin: var(--space-s-m);
+    }
+} 
 .profile .name {
     text-align: center;
-    @media screen and (min-width: 711px) {
+}
+@media screen and (min-width: 711px) {
+    .profile .name {
         text-align: left;
-    }
+    } 
 }
 .profile .avatar {
     width: var(--space-3xl) !important;
@@ -569,33 +618,11 @@ a.button {
 .center {
     text-align:center;
 }
-/* #photos {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    margin-top: var(--space-s-m);
-    grid-gap: var(--space-2xs-xs);
-    @media screen and (min-width: 711px) {
-        margin-left: var(--space-s-m);
-        margin-right: var(--space-s-m);
-        grid-template-columns: repeat(2, 1fr);             
-    }
-} */
-/* #photos div  {
-     border: 1px solid var(--crust);
-     border-radius: var(--space-3xs);
-     padding: var(--space-3xs);
-} */
 #photos img, #photos video {
     width: 100% !important;
     height: auto !important;
     margin-bottom: var(--space-3xs);
 }
-/* #photos .switch-field {
-    margin: 0;
-    border: 0;
-    border-radius: 0;
-    padding: 0;
-} */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -610,7 +637,9 @@ a.button {
     padding-top: var(--space-s) !important;
     color: #fff;
     text-shadow: 1px 1px var(--space-3xs) var(--subtext-1);
-    @media (prefers-color-scheme: dark) {
+}
+@media (prefers-color-scheme: dark) {
+    .discover-li-wide  {
         color: var(--crust); 
         text-shadow: none;
     }
@@ -637,8 +666,8 @@ a.button {
     background-color: var(--crust);
     color: var(--text) !important;
 }
-.CodeMirror {
-    @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
+    .CodeMirror  {
         background-color: var(--crust);
     }
 }
@@ -655,11 +684,13 @@ dialog::backdrop {
     text-align: center;
     font-size: var(--step--1);
     background-color: var(--base);
-    @media (prefers-color-scheme: dark) {
-        background-color: var(--crust);
-    }
     font-weight: 400;
     margin-bottom: var(--space-3xs);
+}
+@media (prefers-color-scheme: dark) {
+    .actions details form, .actions details span, .actions details a, .actions details .actionBtn  {
+        background-color: var(--crust);
+    }
 }
 .actions details details summary {
     height: 40px;
@@ -667,10 +698,12 @@ dialog::backdrop {
     text-align: center;
     font-size: var(--step--1);
     background-color: var(--base);
-    @media (prefers-color-scheme: dark) {
+    font-weight: 400;
+}
+@media (prefers-color-scheme: dark) {
+    .actions details details summary {
         background-color: var(--crust);
     }
-    font-weight: 400;
 }
 .actions details a { text-decoration: none; color: var(--text); }
 .actions details a:visited { text-decoration: none; color: var(--text); }
@@ -696,17 +729,21 @@ blockquote {
     grid-gap: 10px;
     grid-template-rows: minmax(150px, 1fr);
     overflow-x: auto;
-    @media screen and (min-width: 711px) {
+    -webkit-overflow-scrolling: touch;
+}
+@media screen and (min-width: 711px) {
+    .photoSwipe {
         display:block;
         overflow-x: hidden;
     }
-    -webkit-overflow-scrolling: touch;
 }
 .notice {
     text-align: center;
     font-size: var(--step--1);
     color: var(--subtext-1);
-    @media screen and (min-width: 711px) {
+}
+@media screen and (min-width: 711px) {
+    .notice {
         display:none;
     }
 }
@@ -718,7 +755,9 @@ blockquote {
     max-width: 350px;
     flex: 0 0 auto; 
     margin-right: var(--space-xs);
-    @media screen and (min-width: 711px) {
+}
+@media screen and (min-width: 711px) {
+    .swipeItem img {
         max-width: 580px;
         width: 100%;
     }
