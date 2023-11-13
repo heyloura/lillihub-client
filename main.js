@@ -85,7 +85,7 @@ function iFrameTemplate(body) {
         a { text-decoration: none; color: var(--text); }
         a:visited { text-decoration: none; color: var(--text); }
         form { margin: 0; padding: 0; }
-        .success {color: var(--green);border:1px solid var(--green);border-radius:var(--space-3xs);padding:0 var(--space-3xs);margin:var(--space-3xs);}
+        .success {color: var(--green);border-radius:var(--space-3xs);display: inline-block;margin:var(--space-3xs) 0;}
     `; 
     return `<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${style}</style></head><body style="background-color: transparent !important;">${body}</body></html>`;
 }
@@ -836,37 +836,42 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const result = await getMicroBlogTimeline(name, last, cookies.access_token);
     const posts = result.items;
 
-    if (name) {
-        await streamUserProfile(ctx, controller, result.author, result._microblog);
-        controller.enqueue(postMenuBarTemplate(conversations ? 'conversations' : 'posts', name, false)); 
+    if(!posts) {
+        controller.enqueue(`<p>No data returned from Micro.Blog</p>`); 
+        controller.close();
     } else {
-        controller.enqueue(postMenuBarTemplate(conversations ? 'conversations' : 'posts', name));
-    }
-    
-    if(conversations) {
-        const filtered = posts.filter(p => p._microblog != undefined && p._microblog.is_mention);
-        const roots = [];
-        for(let i = 0; i < filtered.length; i++ ){
-            const convo = await getMicroBlogConversation(filtered[i].id, cookies.access_token);
-            const rootId = convo.items[convo.items.length - 1].id;
-            if(!roots.includes(rootId)){
-                await streamPosts(ctx, controller, convo.items, true);
-                roots.push(rootId);
-            }    
+        if (name) {
+            await streamUserProfile(ctx, controller, result.author, result._microblog);
+            controller.enqueue(postMenuBarTemplate(conversations ? 'conversations' : 'posts', name, false)); 
+        } else {
+            controller.enqueue(postMenuBarTemplate(conversations ? 'conversations' : 'posts', name));
         }
-    }
-    else {
-        const filtered = posts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
-        await streamPosts(ctx, controller, filtered);
-    }
-
-    if(!name) {
-        //paging not implemented via M.B. API for the user timeline
-        await streamNextPageLink(ctx, controller, posts[posts.length - 1].id);
-    }
+        
+        if(conversations) {
+            const filtered = posts.filter(p => p._microblog != undefined && p._microblog.is_mention);
+            const roots = [];
+            for(let i = 0; i < filtered.length; i++ ){
+                const convo = await getMicroBlogConversation(filtered[i].id, cookies.access_token);
+                const rootId = convo.items[convo.items.length - 1].id;
+                if(!roots.includes(rootId)){
+                    await streamPosts(ctx, controller, convo.items, true);
+                    roots.push(rootId);
+                }    
+            }
+        }
+        else {
+            const filtered = posts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
+            await streamPosts(ctx, controller, filtered);
+        }
     
-    controller.enqueue(`</div>${endHTMLTemplate()}`); 
-    controller.close();
+        if(!name && posts[posts.length - 1]) {
+            //paging not implemented via M.B. API for the user timeline
+            await streamNextPageLink(ctx, controller, posts[posts.length - 1].id);
+        }
+        
+        controller.enqueue(`</div>${endHTMLTemplate()}`); 
+        controller.close();
+    }
 }
 
 /**
@@ -898,7 +903,9 @@ async function streamManageUsersPage(ctx, controller, type, title) {
         if(type == 'following') {
             const fetchingPosts = await microBlogGet('posts/' + item.username, cookies.access_token);
             const posts = await fetchingPosts.json();
-            controller.enqueue(postContentTemplate(item.id, item.username, item.name, item.avatar, item.url, `last post was ${posts.items[0]._microblog.date_relative}`, posts._microblog.bio, '', true));
+            if(posts && posts.items[0]) {
+                controller.enqueue(postContentTemplate(item.id, item.username, item.name, item.avatar, item.url, `last post was ${posts.items[0]._microblog ? posts.items[0]._microblog.date_relative : ''}`, posts._microblog ? posts._microblog.bio : '', '', true));
+            }
         } else {
             controller.enqueue(postContentTemplate(item.id, item.username, item.username, undefined, undefined, undefined, '', '', true));
         }
@@ -2221,8 +2228,14 @@ async function  getMicroBlogConversation(id, access_token) {
  */
 async function getMicroBlogTimeline(name, before_id, access_token) {
     const fetchURL = name ? `posts/${name}?count=${_mbItemCount}` : `posts/timeline?count=${_mbItemCount}`;
-    const fetching = await microBlogGet(before_id ? `${fetchURL}&before_id=${before_id}` : fetchURL, access_token);
-    return await fetching.json();
+    try {
+        const fetching = await microBlogGet(before_id ? `${fetchURL}&before_id=${before_id}` : fetchURL, access_token);
+        return await fetching.json();
+    } 
+    catch 
+    {
+        return undefined;
+    }   
 }
 
 /**
