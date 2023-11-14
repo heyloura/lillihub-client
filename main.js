@@ -936,7 +936,6 @@ async function streamAccountSwitch(ctx, controller, destination, url) {
     if(config.destination.length > 1) {
         controller.enqueue(`
             <details class="screen-width">
-
                 <summary>Viewing posts from: <b>${destination}</b></summary>
                 <div style="margin-top:var(--space-3xs);">
                     <p>Switch to: ${destinationBtns}</p>
@@ -1092,6 +1091,7 @@ await router.get("/", async (ctx, next) => {
         <div class="posts" style="padding:var(--space-3xs);">
             ${body}
         </div>
+        <script src="https://tinylytics.app/embed/5r2JkhATuM6jGxmbdcdV.js" defer></script>
         ${endHTMLTemplate()}
     `;
 
@@ -1123,6 +1123,7 @@ await router.get("/app/login", async (ctx, next) => {
             <button type="submit" class="signIn">Sign In</button>
         </form> 
         </div>
+        <script src="https://tinylytics.app/embed/5r2JkhATuM6jGxmbdcdV.js" defer></script>
         ${endHTMLTemplate()}
     `;
     return await next();
