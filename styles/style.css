@@ -72,11 +72,11 @@ html
 {
     min-height:100%;
     box-sizing: border-box;
-    background: linear-gradient(to bottom,#FFFFFF, #eff1f5); 
+    background: linear-gradient(to bottom,#FFFFFF, #fbfcfd); 
 }
 @media (prefers-color-scheme: dark) {
     html {
-        background: linear-gradient(to bottom, #303446, #292c3c); 
+        background: linear-gradient(to bottom, #303446, #393d53); 
     }
 } 
 body {
