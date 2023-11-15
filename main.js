@@ -45,7 +45,7 @@ function beginHTMLTemplate(avatar, username, title) {
         <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Lillihub - An unoffical Micro.blog client">
+        <meta name="description" content="Lillihub - A delightful Micro.blog client">
         <link rel="icon" type="image/x-icon" href="/favicon.ico">
         <title>Lillihub</title>
         <style>${getCommonCSS()}"</style>
@@ -748,7 +748,25 @@ async function streamNextPageLink(ctx, controller, lastId) {
         referer = referer + '?last=' + lastId;
     }
     
-    controller.enqueue(`<p class="center"><a href="${referer}">Next Page</a></p></section></div>`);
+    controller.enqueue(`<a href="${referer}">Next</a>`);
+}
+
+/**
+ * Streams a link to the previous page
+ * @param  {object} ctx -The request context
+ * @param  {object} controller - The controller of the readable stream     
+ * @param  {string} beforeId - The id of the first post on the page
+ */
+async function streamPreviousPageLink(ctx, controller, beforeId) {
+    let referer = await ctx.request.url.href;
+    
+    if(referer.indexOf('?') != -1) {
+        referer = referer.split('?')[0] + '?before=' + beforeId;
+    } else {
+        referer = referer + '?before=' + beforeId;
+    }
+    
+    controller.enqueue(`<a style="margin-right:var(--space-xs)" href="${referer}">Previous</a>`);
 }
 
 /**
@@ -820,6 +838,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const cookies = await getCookies(ctx);
     const name = await ctx.request.url.searchParams.get('name');
     const last = await ctx.request.url.searchParams.get('last');
+    const before = await ctx.request.url.searchParams.get('before');
     controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, conversations ? "Conversations" : name ? name : "Timeline"));  
 
     if(name && (name == "news" || name == "challenges" || name == "monday"))
@@ -864,10 +883,16 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
             await streamPosts(ctx, controller, filtered);
         }
     
+        //paging not implemented via M.B. API for the user timeline
+        controller.enqueue(`<p class="center">`);
+        if(!name && (last || before) && posts[0]) {
+            await streamPreviousPageLink(ctx, controller, posts[0].id);
+        }
         if(!name && posts[posts.length - 1]) {
-            //paging not implemented via M.B. API for the user timeline
             await streamNextPageLink(ctx, controller, posts[posts.length - 1].id);
         }
+        controller.enqueue(`</p></section></div>`);
+
         
         controller.enqueue(`</div>${endHTMLTemplate()}`); 
         controller.close();
@@ -2223,14 +2248,15 @@ async function  getMicroBlogConversation(id, access_token) {
 /**
  * Gets a micro.blog timeline
  * @param  {string} name  The name of the user, if undefined, get's the logged in users timeline.
- * @param  {string} before_id  The id of the post to start at for paging
+ * @param  {string} id  The id of the post for paging
  * @param  {string} access_token  An access token
+ * @param  {bool} since  Should this fetch posts since the id?
  * @return {object}      The json object returned from the micro.blog api
  */
-async function getMicroBlogTimeline(name, before_id, access_token) {
+async function getMicroBlogTimeline(name, id, access_token, since = false) {
     const fetchURL = name ? `posts/${name}?count=${_mbItemCount}` : `posts/timeline?count=${_mbItemCount}`;
     try {
-        const fetching = await microBlogGet(before_id ? `${fetchURL}&before_id=${before_id}` : fetchURL, access_token);
+        const fetching = await microBlogGet(id ? `${fetchURL}&${since ? 'since_id' : 'before_id'}=${id}` : fetchURL, access_token);
         return await fetching.json();
     } 
     catch 
@@ -2473,6 +2499,14 @@ function filterOut(contentFilters, content_html) {
             .replace(';', ' ')
             .replace('>', ' ')
             .replace('<', ' ')
+            .replace('!', ' ')
+            .replace('@', ' ')
+            .replace('#', ' ')
+            .replace('$', ' ')
+            .replace('%', ' ')
+            .replace('&', ' ')
+            .replace('*', ' ')
+            .replace('"', ' ')
             .split(' ') : [];
         return contentFilters.some(filter => filter.trim() != '' && words.includes(filter.trim()));
     }
