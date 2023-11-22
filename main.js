@@ -46,11 +46,17 @@ function beginHTMLTemplate(avatar, username, title) {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="Lillihub - A delightful Micro.blog client">
+        <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="icon" type="image/x-icon" href="/favicon.ico">
         <title>Lillihub</title>
+        <link rel="stylesheet" media="(prefers-color-scheme:light)" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/themes/light.css"/>
+        <link rel="stylesheet" media="(prefers-color-scheme:dark)" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/themes/dark.css" onload="document.documentElement.classList.add('sl-theme-dark');"/>
         <style>${getCommonCSS()}"</style>
         <noscript><style>.jsonly { display: none }</style></noscript>
         <script type="text/javascript">${getCommonJS()}</script>
+        <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/carousel-item/carousel-item.js"></script>
+        <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/carousel/carousel.js"></script>
+        <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/format-date/format-date.js"></script>
         </head>
         <body class="u-container">
         <header id="top">
@@ -149,8 +155,9 @@ function discoverMenuTemplate(loggedIn = true, endSidebar = false) {
  * Sanitizes an HTML string. Also removes height/width from large images,
  * updates micro.blog username links to relative link, escape code block characters.
  * @param  {string} str - an HTML string
+ * @param  {bool} showCarousel - Should multiple images be put in a carousel?
  */
-function cleanFormatHTML (str) {
+function cleanFormatHTML (str, showCarousel = true) {
     function resize (html) {
         const images = html.querySelectorAll("img");
         const parents = [];
@@ -168,7 +175,7 @@ function cleanFormatHTML (str) {
             if(image.getAttribute('src') != null && image.getAttribute('src').includes('cdn.micro.blog')){
                 image.setAttribute('src', image.getAttribute('src').replace("1000x", "700x"));
             }
-            if(images.length > 1) 
+            if(images.length > 1 && showCarousel) 
             {
                 let parent;
                 if (image.parentNode.nodeName.toLowerCase() == "a"){
@@ -177,29 +184,25 @@ function cleanFormatHTML (str) {
                     parent = image;
                 }
                 parents.push(parent);
-                try {
-                    parent.classList.add('class', 'swipeItem');
-                } catch {
-                    // continue on without messing with the images
-                }
             }
         }
         //let's assemble the swipeable images
         if(parents.length > 0) {
             try {
-                const container = html.createElement("div");
-                const notice = html.createElement("p");
-                notice.innerHTML = `Swipe to view ${parents.length} photos`;
-                notice.classList.add('notice');
-                container.classList.add('photoSwipe');
-                container.setAttribute('style',`grid-template-columns: repeat(${parents.length}, 100%);`)
+                const container = html.createElement('sl-carousel');
+                container.setAttribute('pagination','');
+                container.setAttribute('mouse-dragging','');
+                container.setAttribute('loop','');
+                container.setAttribute('style','--aspect-ratio: auto;');
+                container.setAttribute('class','aspect-ratio');
                 for(let i = 0; i < parents.length; i++)
                 {
                     parents[i].parentNode.removeChild(parents[i]);
-                    container.appendChild(parents[i]);
+                    const item = html.createElement('sl-carousel-item');
+                    item.appendChild(parents[i]);
+                    container.appendChild(item);
                 }
-                html.appendChild(container);    
-                html.appendChild(notice);  
+                html.appendChild(container);
             } catch {
                 // continue on without messing with the images
             }
@@ -269,8 +272,10 @@ function cleanFormatHTML (str) {
  * @param  {string} content_html - The content of the post
  * @param  {string} postActions - An HTML string of the post actions
  * @param  {bool} isFollowing - Are you following this user?
+ * @param  {string} dateDisp - The relative date display, if any
+ * @param  {bool} showCarousel - Should multiple images be put in a carousel?
  */
-function postContentTemplate(id, username, name, avatar, url, date, content_html, postActions, isFollowing) { 
+function postContentTemplate(id, username, name, avatar, url, date, content_html, postActions, isFollowing, dateDisp = '', showCarousel = true) { 
     const avatarHTML = avatar ? `<img style="align-self: center;width: var(--space-l);height: var(--space-l);border-radius: 50%;" loading="lazy" src="${avatar}" />` : '';
     return `
         <article class="post" data-id="${id}" style="display:block;">
@@ -285,8 +290,8 @@ function postContentTemplate(id, username, name, avatar, url, date, content_html
                     ${postActions}
                     </div>
                 </header>
-                <div class="content" style="flex-grow: 1;margin-bottom: var(--space-s);">${cleanFormatHTML(content_html)}</div>  
-                ${url && date? `<div><small><a href="${url}">${date}</a></small></div>` : ''} 
+                <div class="content" style="flex-grow: 1;margin-bottom: var(--space-s);">${cleanFormatHTML(content_html, showCarousel)}</div>  
+                ${url && date? `<div><small><a href="${url}"><sl-format-date month="long" day="numeric" year="numeric" hour="numeric" minute="numeric" hour-format="12" date="${date}">${dateDisp ? dateDisp : date}</sl-format-date></a></small></div>` : ''} 
     `;
 }
 
@@ -671,7 +676,7 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
             const post_content = post.tags ? `${post.content_html}<div><p style="color:var(--subtext-1)"><small>Tags: ${post.tags}</small></p></div>` : post.content_html;
             
             const postActions = includeActions ? postActionTemplate(post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0) : '';
-            controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post._microblog.date_relative, post_content, postActions, isFollowing));
+            controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post.date_published, post_content, postActions, isFollowing, post._microblog.date_relative));
 
 
             if(includeReplies) {
@@ -766,7 +771,7 @@ async function streamPreviousPageLink(ctx, controller, beforeId) {
         referer = referer + '?before=' + beforeId;
     }
     
-    controller.enqueue(`<a style="margin-right:var(--space-xs)" href="${referer}">Previous</a>`);
+    controller.enqueue(`<a style="margin-right:var(--space-3xl)" href="${referer}">Previous</a>`);
 }
 
 /**
@@ -1014,6 +1019,10 @@ async function createOrEditPostPage(access_token, title, content, destination, s
         }
     }
 
+    const emojiFetch = await microBlogGet('posts/discover', access_token);
+    const discover = await emojiFetch.json();
+    let emojiList = discover._microblog.tagmoji.map(function(tag){ return `<li>${tag.emoji} ${tag.title}</li>` }).join(' ');
+
     return `
         <script>${_compressor}</script>
         <style>${_easyMDECSS}</style>
@@ -1075,10 +1084,16 @@ async function createOrEditPostPage(access_token, title, content, destination, s
                         let formData = new FormData();
                         formData.append("destination", "${destination}");  
                         ${compressImageClientFunctionTemplate(`onSuccess(body)`)}
-                    },
+                    }
+                ]
                 });
                 </script>
             </div>
+            <details style="background-color:var(--mantle);font-size:var(--step--1)">
+                <summary style="background-color:var(--mantle);margin-bottom:0">Micro.blog tag list</summary>
+                <p>Use an emoji below in your text to tag your post for a Micro.blog tagmoji feed.</p>
+                <ul style="list-style:none;columns: 2;-webkit-columns: 2;-moz-columns: 2;">${emojiList}</ul>
+            </details>
             <p>Categories</p>
             <p>${categoriesList}</p>
             ${syndicateTo ? `<p>Crossposting</p><p>${syndicateTo}</p>` : ''}
@@ -1545,8 +1560,8 @@ await router.get("/app/blog/posts", async (ctx, next) => {
                         </div>
                     </details>
                 </div>`;
-                controller.enqueue(postContentTemplate(post.uid, cookies.username, cookies.name, cookies.avatar, post.url[0], post.published[0], marky(post.content[0]), postActions, true));
-                controller.enqueue(`<p style="color:var(--subtext-1)"><small>${post.category.length > 0 ? post.category.join(', ') : 'No categories assigned.'}</small></p>`); 
+                controller.enqueue(postContentTemplate(post.uid, cookies.username, cookies.name, cookies.avatar, post.url[0], post.published[0], post.name[0] ? `<h1>${post.name[0]}</h1>${marky(post.content[0])}` : marky(post.content[0]), postActions, true, post.published[0], false));
+                controller.enqueue(`<p style="color:var(--subtext-1)"><small>categories: ${post.category.length > 0 ? post.category.join(', ') : 'No categories assigned.'}</small></p>`); 
                 controller.enqueue(`</section></article>`);
             }
 
