@@ -1084,8 +1084,7 @@ async function createOrEditPostPage(access_token, title, content, destination, s
                         let formData = new FormData();
                         formData.append("destination", "${destination}");  
                         ${compressImageClientFunctionTemplate(`onSuccess(body)`)}
-                    }
-                ]
+                    },
                 });
                 </script>
             </div>
