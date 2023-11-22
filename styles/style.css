@@ -383,7 +383,8 @@ form > details > summary {
     text-decoration: none;
 }
 .posts {
-    margin-bottom: var(--space-3xl)
+    margin-bottom: var(--space-3xl);
+    max-width: 645px;
 }
 .content, .comment, .profile {
     overflow-wrap: anywhere;
@@ -724,41 +725,6 @@ blockquote {
 .overage {
     color: var(--red);
 }
-.photoSwipe {
-    display: grid;
-    grid-gap: 10px;
-    grid-template-rows: minmax(150px, 1fr);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-@media screen and (min-width: 711px) {
-    .photoSwipe {
-        display:block;
-        overflow-x: hidden;
-    }
-}
-.notice {
-    text-align: center;
-    font-size: var(--step--1);
-    color: var(--subtext-1);
-}
-@media screen and (min-width: 711px) {
-    .notice {
-        display:none;
-    }
-}
 .editor-preview-side img {
     width: 100%;
-}
-.swipeItem img {
-    width: auto;
-    max-width: 350px;
-    flex: 0 0 auto; 
-    margin-right: var(--space-xs);
-}
-@media screen and (min-width: 711px) {
-    .swipeItem img {
-        max-width: 580px;
-        width: 100%;
-    }
 }
