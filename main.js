@@ -25,8 +25,9 @@ const _compressor = await Deno.readTextFile("scripts/compressor.min.js");
  * @param  {string} avatar - The url where the avatar image is stored
  * @param  {string} username - The Micro.blog name of the user
  * @param  {string} title - The title of the HTML page
+ * @param  {bool} darkMode - Should the UI render as the dark theme?
  */
-function beginHTMLTemplate(avatar, username, title) {
+function beginHTMLTemplate(avatar, username, title, darkMode) {
     const loginHTML = `<div>
                     <a href="/app/login" alt="login">Log in</a>
                 </div>`;
@@ -41,7 +42,7 @@ function beginHTMLTemplate(avatar, username, title) {
                 </div>`;
 
     return `<!DOCTYPE html>
-        <html lang="en">
+        <html lang="en" ${darkMode ? 'dark="true"' : ''}>
         <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -78,30 +79,35 @@ function endHTMLTemplate() {
 /**
  * Gets a styled iframe
  * @param  {string} body - The body of the iframe
+ * @param {bool} darkmode - Should the iframe use darkmode?
  */
-function iFrameTemplate(body) {
+function iFrameTemplate(body, darkmode) {
     const style = `
         :root {--mantle: #eff1f5; --crust: #dce0e8; --text: #4c4f69; --green: #40a02b;--space-3xs: clamp(0.31rem, calc(0.31rem + 0.00vw), 0.31rem); --step--1: clamp(0.99rem, calc(0.99rem + 0.02vw), 1.00rem); }
         @media (prefers-color-scheme: dark) {:root {color-scheme: dark;--mantle: #292c3c;--crust: #232634;--text: #c6d0f5; --green: #a6d189;}}
+        html:not(.style-scope)[dark] {color-scheme: dark;--mantle: #292c3c;--crust: #232634;--text: #c6d0f5; --green: #a6d189;}
         body {padding:0; margin:0;color: var(--text);font-family: Seravek, Ubuntu, Calibri, source-sans-pro, sans-serif;font-size: var(--step--1);
             @media(prefers-color-scheme: dark) {background-color:var(--mantle);}}
+            html:not(.style-scope)[dark] body {background-color:var(--mantle);}
         span {display:block; text-align:center; width:100%;}
         button {font-family: Seravek, Ubuntu, Calibri, source-sans-pro, sans-serif;font-size: var(--step--1);border:0; width: 100%; height: 40px; background-color:var(--mantle);color:var(--text);cursor:pointer;
             @media(prefers-color-scheme: dark) {background-color:var(--crust);}} 
+            html:not(.style-scope)[dark] button {background-color:var(--crust);}
         a { text-decoration: none; color: var(--text); }
         a:visited { text-decoration: none; color: var(--text); }
         form { margin: 0; padding: 0; }
         .success {color: var(--green);border-radius:var(--space-3xs);display: inline-block;margin:var(--space-3xs) 0;}
     `; 
-    return `<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${style}</style></head><body style="background-color: transparent !important;">${body}</body></html>`;
+    return `<html lang="en" ${darkmode ? 'dark="true"' : ''}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${style}</style></head><body style="background-color: transparent !important;">${body}</body></html>`;
 }
 
 /**
  * Gets a styled iframe form
  * @param  {string} form  The form inside the iframe
+ * @param {bool} darkmode - Should the iframe use darkmode?
  */
-function iFrameForm(form) {
-    return `<iframe style="background-color:var(--mantle);" width="200" height="40" srcdoc='${iFrameTemplate(form)}'></iframe>`;
+function iFrameForm(form, darkmode) {
+    return `<iframe style="background-color:var(--mantle);" width="200" height="40" srcdoc='${iFrameTemplate(form, darkmode)}'></iframe>`;
 }
 
 /**
@@ -251,7 +257,11 @@ function cleanFormatHTML (str, showCarousel = true) {
         }
 	}
     
-    const cleaned = ammonia.clean(str);
+    const builder = new ammonia.AmmoniaBuilder();
+    builder.tags.add("video");
+    builder.tagAttributes.set("video", new Set(["src","width","height","controls","poster"]));
+    const cleaner = builder.build();
+    const cleaned = cleaner.clean(str);
     const parser = new DOMParser();
     const doc = parser.parseFromString(cleaned);
     resize(doc);
@@ -297,6 +307,7 @@ function postContentTemplate(id, username, name, avatar, url, date, content_html
 
 /**
  * Template for a posts button action bar
+ * @param {bool} darkmode - Is the UI overridden to darkmode?
  * @param  {string} id - The id of the post
  * @param  {string} username - The username of the post author
  * @param  {bool} isPinned - Is this post pinned?  
@@ -309,7 +320,7 @@ function postContentTemplate(id, username, name, avatar, url, date, content_html
  * @param  {string} bookPost - A string containing a book post contents for creating a new post
  * @param  {int} bookShelfId - The id of the current bookshelf (if on bookshelf page)
  */
-function postActionTemplate(id, username, isPinned, _microblog, content_html, bookshelves, isFollowing, tags, isPost = true, bookPost = '', bookShelfId = 0) { 
+function postActionTemplate(darkmode, id, username, isPinned, _microblog, content_html, bookshelves, isFollowing, tags, isPost = true, bookPost = '', bookShelfId = 0) { 
     let quote = content_html;
     const readerLink = content_html.split('post_archived_links');
     if(readerLink.length > 1) {
@@ -340,18 +351,18 @@ function postActionTemplate(id, username, isPinned, _microblog, content_html, bo
                 iFrameForm(`<form method="POST" action="/app/users/follow">
                         <input type="hidden" name="username" value="${username}" />
                         <button type="submit">Follow User</button>
-                    </form>`)
+                    </form>`, darkmode)
                 : '';
 
     const pinningActions = isPost && !_microblog.is_bookmark ? iFrameForm(`<form method="POST" action="/app/${!isPinned ? 'unpin' : 'pin'}Post">
                                     <input type="hidden" name="id" value="${id}" />
                                     <button type="submit">${isPinned ? 'Pin' : 'Unpin'} post</button>
-                                </form>`) : '';
+                                </form>`, darkmode) : '';
     
                                 const boomarkingActions = isPost ? iFrameForm(`<form method="POST" action="/app/bookmarks/${!_microblog.is_bookmark ? 'bookmark' : 'unbookmark'}">
                         <input type="hidden" name="id" value="${id}" />
                         <button type="submit">${!_microblog.is_bookmark ? 'Bookmark' : 'Unbookmark'}</button>
-                    </form>`) : '';
+                    </form>`, darkmode) : '';
     
     const taggingActions = _microblog.is_bookmark && tags && isPost ? `<form style="height: 100%;margin-bottom: var(--space-3xs);" method="POST" action="/app/bookmarks/manageTags"> 
                                     <details class="actionExpand">
@@ -398,11 +409,12 @@ function postActionTemplate(id, username, isPinned, _microblog, content_html, bo
 
 /**
  * Template for a comment
+ * @param {bool} darkmode - Is the UI overridden to darkmode?
  * @param  {object} comment - The comment object from micro.blog
  * @param  {array} repliers - An array of usernames that have commented on the post
  * @param  {array} contentFilters  An array of words to filter the reply content by  
  */
-function commentTemplate(comment, repliers, contentFilters) {
+function commentTemplate(darkmode, comment, repliers, contentFilters) {
     if(comment == null || comment == undefined || comment.content_html == null || comment.content_html == undefined){
         return '';
     }
@@ -421,19 +433,20 @@ function commentTemplate(comment, repliers, contentFilters) {
                 </div>
             </header>
             <div>${cleanFormatHTML(comment.content_html)}</div>
-            ${replyTemplate(comment.id, comment.author._microblog.username, repliers)}
+            ${replyTemplate(darkmode, comment.id, comment.author._microblog.username, repliers)}
         </div>
     `;
 }
 
 /**
  * Template for a reply
+ * @param  {bool} darkmode - Is the UI overridden to darkMode?
  * @param  {string} id - The id of the reply
  * @param  {string} author - The username of the reply author
  * @param  {array} repliers - An array of usernames that have commented on the post
  * @param  {bool} none - Indicates if there are replies on the post
  */
-function replyTemplate(id, author, repliers, none = false) {
+function replyTemplate(darkmode, id, author, repliers, none = false) {
     const repliersHTML = repliers.map(function (person) { 
             return `<label><input ${author == person ? 'checked="checked"' : '' } type="checkbox" name="replyingTo[]" value="${person}"/>@${person}</label>`
         }).join(' ');
@@ -447,7 +460,7 @@ function replyTemplate(id, author, repliers, none = false) {
                 <div class="grow-wrap"><textarea name="content" onInput="growTextArea(this)"></textarea></div>
                 <button type="submit">Send Reply</button>
             </form> 
-            <iframe srcdoc='${iFrameTemplate('')}' name="${id}" width="220" height="35"></iframe>
+            <iframe srcdoc='${iFrameTemplate('', darkmode)}' name="${id}" width="220" height="35"></iframe>
         </details></div>`;
 }
 
@@ -632,7 +645,7 @@ async function streamBookshelfLinks(ctx, controller) {
 async function streamPosts(ctx, controller, posts, isConvo, includeReplies = true, includeActions = true, openConvo = false) {
     const access_token = await ctx.cookies.get('access_token');
     const user = await getMicroBlogLoggedInUser(access_token);
-    
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
     const contentFilterCookie = await ctx.cookies.get('contentFilter');
     const contentFilters = contentFilterCookie == undefined ? [] : JSON.parse(contentFilterCookie);
 
@@ -675,7 +688,7 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
             }
             const post_content = post.tags ? `${post.content_html}<div><p style="color:var(--subtext-1)"><small>Tags: ${post.tags}</small></p></div>` : post.content_html;
             
-            const postActions = includeActions ? postActionTemplate(post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0) : '';
+            const postActions = includeActions ? postActionTemplate(darkmodeCookie, post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0) : '';
             controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post.date_published, post_content, postActions, isFollowing, post._microblog.date_relative));
 
 
@@ -701,8 +714,11 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
  */
 async function streamComments(ctx, controller, postid, open = false, convo = null) {
     const access_token = await ctx.cookies.get('access_token');
+    const commentLimit = (await ctx.cookies.get('limitComments')).replace('"','');
+    const limit = parseInt(commentLimit) ? parseInt(commentLimit) - 1 : 24;
     const contentFilterCookie = await ctx.cookies.get('contentFilter');
     const contentFilters = contentFilterCookie == undefined ? [] : JSON.parse(contentFilterCookie);
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     if(convo == null) {
         convo = (await getMicroBlogConversation(postid, access_token)).items;
@@ -728,13 +744,22 @@ async function streamComments(ctx, controller, postid, open = false, convo = nul
         controller.enqueue(`<div class="comments">
             <details ${open ? 'open' : ''}>
                 <summary>${avatars}<span class="comment-count">${comments.length} comments</span></summary>`);
-                for(let i = 0; i < comments.length; i++) {
-                    controller.enqueue(commentTemplate(comments[i], uniqueRepliers, contentFilters));
+                if(!open) {
+                    for(let i = 0; i <= limit && i < comments.length; i++) {
+                        controller.enqueue(commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters));
+                    }
+                    if(comments.length > limit + 1) {
+                        controller.enqueue(`<p style="text-align:center;"><a target="_top" href="/app/post?id=${postid}">View post to see all comments</a></p>`);
+                    }
+                } else {
+                    for(let i = 0; i < comments.length; i++) {
+                        controller.enqueue(commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters));
+                    }
                 }
-        controller.enqueue(replyTemplate(postid, author, uniqueRepliers, false));
+        controller.enqueue(replyTemplate(darkmodeCookie, postid, author, uniqueRepliers, false));
         controller.enqueue(`</details>`);
     } else {
-        controller.enqueue(replyTemplate(postid, author, uniqueRepliers, true));
+        controller.enqueue(replyTemplate(darkmodeCookie, postid, author, uniqueRepliers, true));
     }
 }
 
@@ -783,6 +808,7 @@ async function streamPreviousPageLink(ctx, controller, beforeId) {
  */
 async function streamUserProfile(ctx, controller, author, _microblog) {
     const access_token = await ctx.cookies.get('access_token'); 
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
     const username = await ctx.cookies.get('username');
     const name = await ctx.request.url.searchParams.get('name');
 
@@ -807,9 +833,9 @@ async function streamUserProfile(ctx, controller, author, _microblog) {
                 <summary style="margin-bottom:0;">Advanced</summary>
                 <div style="margin-top:var(--space-xs)">
                 <p>Learn about muting and blocking users here: <a target="_blank" href="https://help.micro.blog/t/muting-blocking-and-reporting-users/32">Micro.blog Help - Muting, blocking, and reporting users${externalLinkSVG()}</a></p>
-                ${_microblog.is_following ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unfollow"><input type="hidden" name="username" value="${name}"/><button type="submit">Unfollow User</button></form>`) : '' }
-                ${!isBlocked ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/block"><input type="hidden" name="username" value="${name}"/><button type="submit">Block User</button></form>`) : iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unblock"><input type="hidden" name="username" value="${name}"/><button type="submit">Unblock User</button></form>`)}
-                ${!isMuted ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/mute"><input type="hidden" name="username" value="${name}"/><button type="submit">Mute User</button></form>`) : iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unmute"><input type="hidden" name="username" value="${name}"/><button type="submit">Unmute User</button></form>`)}
+                ${_microblog.is_following ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unfollow"><input type="hidden" name="username" value="${name}"/><button type="submit">Unfollow User</button></form>`, darkmodeCookie) : '' }
+                ${!isBlocked ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/block"><input type="hidden" name="username" value="${name}"/><button type="submit">Block User</button></form>`, darkmodeCookie) : iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unblock"><input type="hidden" name="username" value="${name}"/><button type="submit">Unblock User</button></form>`, darkmodeCookie)}
+                ${!isMuted ? iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/mute"><input type="hidden" name="username" value="${name}"/><button type="submit">Mute User</button></form>`, darkmodeCookie) : iFrameForm(`<form style="display:inline;" method="POST" action="/app/users/unmute"><input type="hidden" name="username" value="${name}"/><button type="submit">Unmute User</button></form>`, darkmodeCookie)}
                 </div>
             </details>` : ''}
         <div class="profile blue-purple" style="color:var(--base);">
@@ -819,7 +845,7 @@ async function streamUserProfile(ctx, controller, author, _microblog) {
                 ${!_microblog.is_following && !_microblog.is_you ? iFrameForm(`<form method="POST" action="/app/users/follow">
                         <input type="hidden" name="username" value="${name}" />
                         <button type="submit">Follow @${_microblog.username}</button>
-                    </form>`) : ''}
+                    </form>`, darkmodeCookie) : ''}
                 ${isMuted ? '<br/><br/><b>User is muted.</b>' : ''}
                 ${isBlocked ? '<br/><br/><b>User is blocked.</b>' : ''}
                 </div>
@@ -844,7 +870,8 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const name = await ctx.request.url.searchParams.get('name');
     const last = await ctx.request.url.searchParams.get('last');
     const before = await ctx.request.url.searchParams.get('before');
-    controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, conversations ? "Conversations" : name ? name : "Timeline"));  
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
+    controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, conversations ? "Conversations" : name ? name : "Timeline", darkmodeCookie));  
 
     if(name && (name == "news" || name == "challenges" || name == "monday"))
     {
@@ -858,9 +885,9 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     controller.enqueue(`<div class="posts">`);
 
     const result = await getMicroBlogTimeline(name, last, cookies.access_token);
-    const posts = result.items;
+    const posts = result ? result.items : [];
 
-    if(!posts) {
+    if(!posts || posts.length == 0) {
         controller.enqueue(`<p>No data returned from Micro.Blog</p>`); 
         controller.close();
     } else {
@@ -913,8 +940,9 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
  */
 async function streamManageUsersPage(ctx, controller, type, title) {
     const cookies = await getCookies(ctx);
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
-    controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, title));  
+    controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, title, darkmodeCookie));  
     controller.enqueue(mainMenuTemplate(true, true));
     controller.enqueue(`<div class="posts">`);
     controller.enqueue(`<div class="switch-field">
@@ -1026,6 +1054,11 @@ async function createOrEditPostPage(access_token, title, content, destination, s
     return `
         <script>${_compressor}</script>
         <style>${_easyMDECSS}</style>
+        <style>
+        .CodeMirror {
+            color: var(--text) !important;
+        }
+        </style>
         <script>${_easyMDEJS}</script>
         <form action="/app/blog/post" method="POST" enctype="multipart/form-data">
             <input name="url" type="hidden" value="${id}" />
@@ -1117,9 +1150,10 @@ await router.get("/", async (ctx, next) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html);
     const body = doc.querySelector('main').toString();
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = `
-        ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Lillihub')}
+        ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Lillihub', darkmodeCookie)}
         </aside>
         <style>.u-grid{display:block;}svg{filter: invert(84%) sepia(11%) saturate(978%) hue-rotate(69deg) brightness(89%) contrast(92%);}
         img{box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;}
@@ -1205,21 +1239,44 @@ await router.get("/app/auth", async (ctx, next) => {
 await router.get("/app/settings", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const contentFilterCookie = await ctx.cookies.get('contentFilter');
+    const limitCookie = await ctx.cookies.get('limitComments');
     const contentFilters = contentFilterCookie == undefined ? [] : JSON.parse(contentFilterCookie);
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
   
     ctx.response.body = `
-        ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Settings')}
+        ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Settings', darkmodeCookie)}
         ${mainMenuTemplate()} 
             <div class="posts">
                 <div style="margin-bottom: var(--space-m);display:block;" class="profile">
-                    <h3>Content Filters</h3>
+                    <h3>Content filters</h3>
                     <p>A comma seperated list of terms that lillihub will use to exclude posts and comments from showing.</p>
                     <form method="POST" target="excludeStatus">
                         <input type="hidden" name="type" value="filter" />
                         <div class="grow-wrap"><textarea name="exclude" onInput="growTextArea(this)">${contentFilters.join(', ')}</textarea></div>
                         <button type="submit">Save content filter list</button>
                     </form>
-                    <iframe srcdoc='${iFrameTemplate('')}' name="excludeStatus" width="220" height="35"></iframe> 
+                    <iframe srcdoc='${iFrameTemplate('', darkmodeCookie)}' name="excludeStatus" width="220" height="35"></iframe> 
+                    
+                    <h3>Display comment limit</h3>
+                    <p>This is the number of comments that are allowed to show on the feeds. 
+                        This is to prevent large comment threads from slowing down the application.
+                        <br/><em><small>Note: An individual post view (Actions -> "View Post") still shows all comments.</small></em></p>
+                    <form method="POST" target="limitStatus">
+                        <input type="hidden" name="type" value="setLimit" />
+                        <input type="number" step="1" min="0" max="5000" name="limit" value="${limitCookie ? limitCookie : 25}" />
+                        <button type="submit">Save display comment limit</button>
+                    </form>
+                    <iframe srcdoc='${iFrameTemplate('', darkmodeCookie)}' name="limitStatus" width="220" height="35"></iframe> 
+
+                    <h3>Always dark theme</h3>
+                    <p>Have Lillihub use the dark theme. Overrides browser/system <em><small>prefers-color-scheme</small></em>.
+                    You will need to refresh the page to see the changes take effect.</p>
+                    <form method="POST" target="darkThemeStatus">
+                        <input type="hidden" name="type" value="darkmode" />
+                        <label><input type="checkbox" name="enableDarkMode" ${darkmodeCookie ? 'checked="checked"' : ''} /> Enable dark theme</label>
+                        <button type="submit">Save dark theme setting</button>
+                    </form>
+                    <iframe srcdoc='${iFrameTemplate('', darkmodeCookie)}' name="darkThemeStatus" width="220" height="35"></iframe> 
                 </div>
             <div>
         ${endHTMLTemplate()} 
@@ -1250,10 +1307,11 @@ await router.get("/app/conversations", async (ctx, next) => {
 await router.get("/app/photos", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const name = await ctx.request.url.searchParams.get('name');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Photos"));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Photos", darkmodeCookie));  
         
             controller.enqueue(mainMenuTemplate(true, false));
             await streamPinned(ctx, controller); 
@@ -1279,10 +1337,11 @@ await router.get("/app/photos", async (ctx, next) => {
 await router.get("/app/mentions", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const last = await ctx.request.url.searchParams.get('last');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Mentions"));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Mentions", darkmodeCookie));  
             controller.enqueue(mainMenuTemplate(true, false));
             await streamPinned(ctx, controller); 
             controller.enqueue(`<div class="posts">`);
@@ -1312,10 +1371,11 @@ await router.get("/app/mentions", async (ctx, next) => {
 
 await router.get("/app/discover", async (ctx, next) => {
     const cookies = await getCookies(ctx);
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Discover"));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Discover", darkmodeCookie));  
             controller.enqueue(discoverMenuTemplate());
             await streamDiscoverTags(ctx, controller);
             controller.enqueue(`<div class="posts">`);
@@ -1334,10 +1394,11 @@ await router.get("/app/discover", async (ctx, next) => {
 await router.get("/app/tag", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const tag = await ctx.request.url.searchParams.get('name');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Discover"));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Discover", darkmodeCookie));  
             controller.enqueue(discoverMenuTemplate());
             await streamDiscoverTags(ctx, controller);
             controller.enqueue(`<div class="posts">`);
@@ -1356,10 +1417,11 @@ await router.get("/app/tag", async (ctx, next) => {
 await router.get("/app/post", async (ctx, next) => {
     const id = await ctx.request.url.searchParams.get('id');
     const cookies = await getCookies(ctx);
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, `Post: ${id}`));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, `Post: ${id}`, darkmodeCookie));  
             controller.enqueue(mainMenuTemplate(true, false));
             await streamPinned(ctx, controller); 
 
@@ -1413,10 +1475,11 @@ await router.get("/app/users/blocked", async (ctx, next) => {
 await router.get("/app/bookmarks", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const id = await ctx.request.url.searchParams.get('id');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, id ? id : 'Bookmarks'));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, id ? id : 'Bookmarks', darkmodeCookie));  
             const user = await getMicroBlogLoggedInUser(cookies.access_token);
             
             controller.enqueue(mainMenuTemplate(true, !user.is_premium));
@@ -1450,10 +1513,11 @@ await router.get("/app/bookmarks", async (ctx, next) => {
 await router.get("/app/bookshelves", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const id = await ctx.request.url.searchParams.get('id');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'Bookshelves'));             
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'Bookshelves', darkmodeCookie));             
             controller.enqueue(mainMenuTemplate(true, false));
             await streamBookshelfLinks(ctx, controller);
 
@@ -1491,7 +1555,7 @@ await router.get("/app/bookshelves", async (ctx, next) => {
                 for(let i=0; i<books.items.length; i++) {
                     const book = books.items[i];
                     const newPost = `${books.title.replace("Micro.blog - ", '')}: [${book.title}](${book.url}) by ${book.authors.map(u => u.name).join(', ')} 📚`;
-                    const actions = postActionTemplate(book.id, null, false, {}, '', bookshelves.items, false, '', false, newPost, id);
+                    const actions = postActionTemplate(darkmodeCookie, book.id, null, false, {}, '', bookshelves.items, false, '', false, newPost, id);
                     controller.enqueue(`
                         <article class="post" data-id="${book.id}" style="display:block;">
                             <section style="display:flex; flex-direction: column;">
@@ -1520,17 +1584,18 @@ await router.get("/app/blog/posts", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const destination = await ctx.request.url.searchParams.get('destination');
     const status = await ctx.request.url.searchParams.get('status');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'My Blog'));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'My Blog', darkmodeCookie));  
             controller.enqueue(mainMenuTemplate(true));
             controller.enqueue(`<div class="posts">`);
 
             const account = await getMicroBlogDestination(destination, cookies.access_token);
             await streamAccountSwitch(ctx, controller, account ? account.uid : '', '/app/blog/posts');
             
-            controller.enqueue(`<div class="switch-field">
+            controller.enqueue(`<style>pre {overflow: auto;}</style><div class="switch-field">
                     <a ${status ? '' : 'class="selected"'} href="/app/blog/posts${destination ? '?destination=' + encodeURIComponent(account.uid) : ''}">Recent Posts</a>
                     <a ${status ? 'class="selected"' : ''} href="/app/blog/posts?status=draft${destination ? '&destination=' + encodeURIComponent(account.uid) : ''}">Recent Drafts</a>
                 </div>`);
@@ -1576,12 +1641,13 @@ await router.get("/app/blog/posts", async (ctx, next) => {
 await router.get("/app/blog/media", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const destination = await ctx.request.url.searchParams.get('destination');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             const account = await getMicroBlogDestination(destination, cookies.access_token);
 
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'My Media'));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'My Media', darkmodeCookie));  
             controller.enqueue(`<script>${_compressor}</script>`);    
             controller.enqueue(`<script>
             async function handleImageUpload(event) {
@@ -1654,12 +1720,13 @@ await router.get("/app/blog/post", async (ctx, next) => {
     const id = await ctx.request.url.searchParams.get('id');
     const destination = await ctx.request.url.searchParams.get('destination');
     const content = await ctx.request.url.searchParams.get('content');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             const account = await getMicroBlogDestination(destination, cookies.access_token);
 
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, id ? 'Edit Post' : 'Create Post'));              
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, id ? 'Edit Post' : 'Create Post', darkmodeCookie));              
             controller.enqueue(mainMenuTemplate(true));
             controller.enqueue(`<div class="posts">`);
             
@@ -1689,10 +1756,11 @@ await router.get("/app/blog/post", async (ctx, next) => {
 
 await router.get("/app/replies", async (ctx, next) => {
     const cookies = await getCookies(ctx);
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
-            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'Replies'));  
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'Replies', darkmodeCookie));  
             controller.enqueue(mainMenuTemplate(true));
 
             controller.enqueue(`<div class="posts">`);
@@ -1717,20 +1785,45 @@ await router.get("/app/replies", async (ctx, next) => {
 // POST Requests
 // --------------------------------------------------------------------------------------
 await router.post("/app/settings", async (ctx, next) => {
-    const body = ctx.request.body({ type: 'form' })
-    const exclude = (await body.value).get('exclude');
+    const body = ctx.request.body({ type: 'form' });
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const type = (await body.value).get('type');
 
-    const result = exclude.split(',').map(function (value) {
-        return value.toLowerCase().trim();
-    });
-        
-    ctx.cookies.set("contentFilter", JSON.stringify(result), { expires: new Date(Date.now() + 315600000000)}); // 10 years
-    ctx.response.body = iFrameTemplate('<small class="success">Saved filters.</small>'); 
+    if(type == "filter") {
+        const exclude = (await body.value).get('exclude');
+
+        const result = exclude.split(',').map(function (value) {
+            return value.toLowerCase().trim();
+        });
+            
+        ctx.cookies.set("contentFilter", JSON.stringify(result), { expires: new Date(Date.now() + 315600000000)}); // 10 years
+        ctx.response.body = iFrameTemplate('<small class="success">Saved filters.</small>', darkmodeCookie); 
+    } else if(type == "setLimit") {
+        const limit = (await body.value).get('limit');
+        const newLimit = parseInt(limit);
+        if(newLimit) {
+            ctx.cookies.set("limitComments", limit, { expires: new Date(Date.now() + 315600000000)}); // 10 years
+            ctx.response.body = iFrameTemplate('<small class="success">Saved limit.</small>', darkmodeCookie); 
+        } else {
+            ctx.response.body = iFrameTemplate('<small class="error">Failed.</small>', darkmodeCookie); 
+        }
+    } else if(type == "darkmode") {
+        const darkMode = (await body.value).get('enableDarkMode');
+        if(darkMode == "on"){
+            ctx.cookies.set("darkMode", true, { expires: new Date(Date.now() + 315600000000)}); // 10 years
+            ctx.response.body = iFrameTemplate('<small class="success">Saved preference.</small>', darkmodeCookie); 
+        } else {
+            ctx.cookies.set("darkMode", false, { expires: new Date(Date.now() + 315600000000)}); // 10 years
+            ctx.response.body = iFrameTemplate('<small class="success">Saved preference.</small>', darkmodeCookie); 
+        }
+    }
+
     return await next();
 });
 
 await router.post("/app/users/follow", async (ctx) => {
     const access_token = await ctx.cookies.get('access_token');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
     const body = ctx.request.body({ type: 'form' });
     const value = await body.value;
     const username = value.get('username');
@@ -1742,10 +1835,10 @@ await router.post("/app/users/follow", async (ctx) => {
         ctx.response.body = iFrameTemplate(`<form action="/app/users/unfollow" method="POST">
             <input type="hidden" name="username" value="${username}" />
             <button type="submit">Unfollow</button>
-        </form>`); 
+        </form>`, darkmodeCookie); 
     }
     catch {
-        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`, darkmodeCookie); 
     }
 });
 
@@ -1756,16 +1849,17 @@ await router.post("/app/users/unfollow", async (ctx) => {
     const username = value.get('username');
     const fetching = await microBlogSimplePost(`users/unfollow?username=${username}`, access_token);
     const response = await fetching.text();
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     try {
         JSON.parse(response);
         ctx.response.body = iFrameTemplate(`<form action="/app/users/follow" method="POST">
             <input type="hidden" name="username" value="${username}" />
             <button type="submit">follow</button>
-        </form>`); 
+        </form>`, darkmodeCookie); 
     }
     catch {
-        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`, darkmodeCookie); 
     }
 });
 
@@ -1776,16 +1870,17 @@ await router.post("/app/users/block", async (ctx) => {
     const username = value.get('username');
     const fetching = await microBlogSimplePost(`users/block?username=${username}`, access_token);
     const response = await fetching.text();
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     try {
         JSON.parse(response);
         ctx.response.body = iFrameTemplate(`<form action="/app/users/unblock" method="POST">
             <input type="hidden" name="username" value="${username}" />
             <button type="submit">Unblock</button>
-        </form>`); 
+        </form>`, darkmodeCookie); 
     }
     catch {
-        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`, darkmodeCookie); 
     }  
 });
 
@@ -1796,16 +1891,17 @@ await router.post("/app/users/mute", async (ctx) => {
     const username = value.get('username');
     const fetching = await microBlogSimplePost(`users/mute?username=${username}`, access_token);
     const response = await fetching.text();
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     try {
         JSON.parse(response);
         ctx.response.body = iFrameTemplate(`<form action="/app/users/unmute" method="POST">
             <input type="hidden" name="username" value="${username}" />
             <button type="submit">Unmute</button>
-        </form>`); 
+        </form>`, darkmodeCookie); 
     }
     catch {
-        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`, darkmodeCookie); 
     } 
 });
 
@@ -1835,7 +1931,7 @@ await router.post("/app/users/unmute", async (ctx) => {
     const body = ctx.request.body({ type: 'form' });
     const value = await body.value;
     const username = value.get('username');
-
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
     const fetching = await microBlogSimpleDelete(`users/mute?username=${username}`, access_token);
     const response = await fetching.text();
 
@@ -1844,15 +1940,16 @@ await router.post("/app/users/unmute", async (ctx) => {
         ctx.response.body = iFrameTemplate(`<form action="/app/users/mute" method="POST">
             <input type="hidden" name="username" value="${username}" />
             <button type="submit">Mute</button>
-        </form>`); 
+        </form>`, darkmodeCookie); 
     }
     catch {
-        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`, darkmodeCookie); 
     } 
 });
 
 await router.post("/app/pinPost", async (ctx) => {
     const body = ctx.request.body({ type: 'form' });
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
     const value = await body.value;
     const id = value.get('id');
     
@@ -1864,13 +1961,14 @@ await router.post("/app/pinPost", async (ctx) => {
     ctx.response.body = iFrameTemplate(`<form action="/app/unpinPost" method="POST">
         <input type="hidden" name="id" value="${id}" />
         <button type="submit">Unpin Post</button>
-    </form>`); 
+    </form>`, darkmodeCookie); 
 });
 
 await router.post("/app/unpinPost", async (ctx) => {
     const body = ctx.request.body({ type: 'form' });
     const value = await body.value;
     const id = value.get('id');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     let currentPins = await ctx.cookies.get('pinnedPosts');
     currentPins = currentPins == undefined ? [] : JSON.parse(currentPins);
@@ -1883,7 +1981,7 @@ await router.post("/app/unpinPost", async (ctx) => {
     ctx.response.body = iFrameTemplate(`<form action="/app/pinPost" method="POST">
         <input type="hidden" name="id" value="${id}" />
         <button type="submit">Pin Post</button>
-    </form>`); 
+    </form>`, darkmodeCookie); 
 });
 
 await router.post("/app/bookmarks/bookmark", async (ctx) => {
@@ -1891,7 +1989,7 @@ await router.post("/app/bookmarks/bookmark", async (ctx) => {
     const body = ctx.request.body({ type: 'form' });
     const value = await body.value;
     const id = value.get('id');
-
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
     const fetching = await microBlogSimplePost(`posts/bookmarks?id=${id}`, access_token);
     const response = await fetching.text();
 
@@ -1900,10 +1998,10 @@ await router.post("/app/bookmarks/bookmark", async (ctx) => {
         ctx.response.body = iFrameTemplate(`<form action="/app/bookmarks/unbookmark" method="POST">
             <input type="hidden" name="id" value="${id}" />
             <button type="submit">Unbookmark</button>
-        </form>`); 
+        </form>`, darkmodeCookie); 
     }
     catch {
-        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`, darkmodeCookie); 
     } 
 });
 
@@ -1912,7 +2010,7 @@ await router.post("/app/bookmarks/unbookmark", async (ctx) => {
     const body = ctx.request.body({ type: 'form' });
     const value = await body.value;
     const id = value.get('id');
-
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
     const fetching = await microBlogSimpleDelete(`posts/bookmarks/${id}`, access_token);
     const response = await fetching.text();
 
@@ -1921,10 +2019,10 @@ await router.post("/app/bookmarks/unbookmark", async (ctx) => {
         ctx.response.body = iFrameTemplate(`<form action="/app/bookmarks/bookmark" method="POST">
             <input type="hidden" name="id" value="${id}" />
             <button type="submit">Bookmark</button>
-        </form>`); 
+        </form>`,darkmodeCookie); 
     }
     catch {
-        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+        ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`,darkmodeCookie); 
     } 
 });
 
@@ -1978,6 +2076,7 @@ await router.post("/app/replies/add", async (ctx) => {
     const id = value.get('id');
     const replyingTo = value.getAll('replyingTo[]');
     let content = value.get('content');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     if(content != null && content != undefined && content != '' && content != 'null' && content != 'undefined') {
         const replies = replyingTo.map(function (reply, i) { return '@' + reply }).join(' ');
@@ -1988,10 +2087,10 @@ await router.post("/app/replies/add", async (ctx) => {
 
         try {
             JSON.parse(response);
-            ctx.response.body = iFrameTemplate('<small class="success">Reply sent.</small>'); 
+            ctx.response.body = iFrameTemplate('<small class="success">Reply sent.</small>', darkmodeCookie); 
         }
         catch {
-            ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+            ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`, darkmodeCookie); 
         }    
     }
 });
