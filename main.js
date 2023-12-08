@@ -8,8 +8,7 @@ await ammonia.init();
 
 
 const router = new Router();
-//const _appURL = Deno.env.get("APP_URL");
-const _appURL = 'https://sad-bee-43-b9nz44yyr5ta.deno.dev/';
+const _appURL = Deno.env.get("APP_URL");
 const _colors = ['var(--yellowgreen)','var(--green)','var(--greenblue)','var(--blue)','var(--bluepurple)','var(--purple)','var(--purplered)','var(--red)','var(--redorange)','var(--orange)','var(--orangeyellow)','var(--yellow)'];
 const _mbItemCount = 60;
 const _favicon = new Uint8Array(await Deno.readFile("favicon.ico"));
