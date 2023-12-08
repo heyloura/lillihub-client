@@ -714,7 +714,7 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
  */
 async function streamComments(ctx, controller, postid, open = false, convo = null) {
     const access_token = await ctx.cookies.get('access_token');
-    const commentLimit = (await ctx.cookies.get('limitComments')).replace('"','');
+    const commentLimit = (await ctx.cookies.get('limitComments'));
     const limit = parseInt(commentLimit) ? parseInt(commentLimit) - 1 : 24;
     const contentFilterCookie = await ctx.cookies.get('contentFilter');
     const contentFilters = contentFilterCookie == undefined ? [] : JSON.parse(contentFilterCookie);
