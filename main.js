@@ -1054,11 +1054,6 @@ async function createOrEditPostPage(access_token, title, content, destination, s
     return `
         <script>${_compressor}</script>
         <style>${_easyMDECSS}</style>
-        <style>
-        .CodeMirror {
-            color: var(--text) !important;
-        }
-        </style>
         <script>${_easyMDEJS}</script>
         <form action="/app/blog/post" method="POST" enctype="multipart/form-data">
             <input name="url" type="hidden" value="${id}" />

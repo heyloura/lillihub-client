@@ -731,7 +731,8 @@ html:not(.style-scope)[dark] .discover-li-wide  {
     }
 }
 html:not(.style-scope)[dark] .CodeMirror  {
-    background-color: var(--crust);
+    background-color: var(--text);
+    color: black !important;
 }
 .editor-preview-full img, .editor-preview-full video {
     max-width: 100%;
@@ -794,8 +795,4 @@ blockquote {
 }
 .editor-preview-side img {
     width: 100%;
-}
-.CodeMirror {
-    background: none;
-    color: var(--text) !important;
 }
