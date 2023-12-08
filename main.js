@@ -49,6 +49,11 @@ function beginHTMLTemplate(avatar, username, title, darkMode) {
         <meta name="description" content="Lillihub - A delightful Micro.blog client">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="apple-touch-icon" href="/lillihub-512.png">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="theme-color" content="#000000">
+        <meta name="apple-mobile-web-app-title" content="Lillihub">
+        <link rel="manifest" href="/manifest.webmanifest">
         <title>Lillihub</title>
         <link rel="stylesheet" media="(prefers-color-scheme:light)" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/themes/light.css"/>
         <link rel="stylesheet" media="(prefers-color-scheme:dark)" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/themes/dark.css" onload="document.documentElement.classList.add('sl-theme-dark');"/>
@@ -58,6 +63,7 @@ function beginHTMLTemplate(avatar, username, title, darkMode) {
         <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/carousel-item/carousel-item.js"></script>
         <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/carousel/carousel.js"></script>
         <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/format-date/format-date.js"></script>
+        <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
         </head>
         <body class="u-container">
         <header id="top">
@@ -2682,8 +2688,41 @@ app.use(oakCors());
  */
 app.use(async (ctx, next) => {
     if (ctx.request.url.pathname !== "/favicon.ico") {
-        await next();
-    } else
+        if(ctx.request.url.pathname == "/manifest.webmanifest") {
+            ctx.response.body = `{
+                "name": "Lillihub",
+                "short_name": "Lillihub",
+                "start_url": "/app/timeline",
+                "display": "standalone",
+                "theme_color": "#000000",
+                "background_color":"#000000",
+                "icons": [
+                  {
+                    "src": "lillihub-512.png",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                  }]
+              }`;
+            ctx.response.type = "text/json";
+        } else if(ctx.request.url.pathname == "/sw.js") {
+            ctx.response.body = `
+            self.addEventListener('install', function(event) {
+                event.waitUntil(self.skipWaiting());
+            });
+               
+            self.addEventListener('fetch', function(event) {
+
+            });`;
+            ctx.response.type = "text/javascript";
+        } else if(ctx.request.url.pathname == "/lillihub-512.png") {
+            ctx.response.body = new Uint8Array(await Deno.readFile("lillihub-512.png"));
+            ctx.response.type = "image/png";
+        } else  {
+            await next();
+        }
+    } 
+    else
     {
         ctx.response.body = _favicon;
         ctx.response.type = "image/x-icon";
