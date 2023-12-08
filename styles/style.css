@@ -64,6 +64,28 @@
         --purplered: #D19FBB;
     }
 }
+html:not(.style-scope)[dark] {
+    color-scheme: dark;
+    --text: #c6d0f5;
+    --subtext-1: #b5bfe2;
+    --overlay-2: #949cbb;
+    --overlay-1: #838ba7;
+    --base: #303446;
+    --mantle: #292c3c;
+    --crust: #232634;
+    --red: #e78284;
+    --redorange: #EB917D;
+    --orange: #ef9f76;
+    --orangeyellow: #EAB483;
+    --yellow: #e5c890;
+    --yellowgreen: #C6CD8D;
+    --green: #a6d189;
+    --greenblue: #99BEBC;
+    --blue: #8caaee;
+    --bluepurple: #A3B3F0;
+    --purple: #babbf1;
+    --purplered: #D19FBB;
+}
 * 
 {
     box-sizing: inherit;
@@ -79,6 +101,9 @@ html
         background: linear-gradient(to bottom, #303446, #393d53); 
     }
 } 
+html:not(.style-scope)[dark] {
+    background: linear-gradient(to bottom, #303446, #393d53); 
+}
 body {
     height:100%;
     font-family: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
@@ -152,6 +177,9 @@ header nav {
         background-color: var(--mantle);
     }
 } 
+html:not(.style-scope)[dark] header nav {
+    background-color: var(--mantle);   
+}
 @media screen and (min-width: 711px)
 {
     header nav {
@@ -201,6 +229,9 @@ button, .button {
         background-color: var(--mantle);
     }  
 }
+html:not(.style-scope)[dark] button, html:not(.style-scope)[dark] .button {
+    background-color: var(--mantle);
+}  
 button:active, .button:active {
     transform:translateY(2px);
     box-shadow: 0 0 0;
@@ -238,6 +269,10 @@ input, select, textarea, input[type="color"] {
         background: var(--crust);
         border: 1px solid black;
     }
+}
+html:not(.style-scope)[dark] input, html:not(.style-scope)[dark] select, html:not(.style-scope)[dark] textarea, html:not(.style-scope)[dark] input[type="color"] {
+    background: var(--crust);
+    border: 1px solid black;
 }
 input[type="checkbox"]{
     width: initial;
@@ -323,6 +358,9 @@ a.selected {
         background: var(--crust);
     } 
 }
+html:not(.style-scope)[dark] .switch-field a.clear {
+    background: var(--crust);
+}
 .switch-field a:visited {
     color: var(--text);
 }
@@ -339,6 +377,9 @@ form > details > summary {
     form > details > summary {
         background-color: var(--crust);
     }
+}
+html:not(.style-scope)[dark] form > details > summary {
+    background-color: var(--crust);
 }
 .post img, .post video {
     width: 100%;
@@ -411,6 +452,9 @@ form > details > summary {
     .comment {
         background: var(--mantle);
     }
+}
+html:not(.style-scope)[dark] .comment {
+    background: var(--mantle);
 }
 .comment p {
     margin-top: var(--space-3xs);
@@ -499,6 +543,9 @@ form > details > summary {
         border: 1px solid var(--base);
     }
 }
+html:not(.style-scope)[dark] .discover li {
+    border: 1px solid var(--base);
+}
 @media screen and (min-width: 711px) {
     .discover li {
         display: block;
@@ -515,6 +562,10 @@ form > details > summary {
         color: var(--crust);
         text-shadow: none;
     }
+}
+html:not(.style-scope)[dark] .discover a {
+    color: var(--crust);
+    text-shadow: none;
 }
 .noShift  {
     padding-top: 0 !important;
@@ -557,6 +608,9 @@ form > details > summary {
     .profile {
         background-color: var(--mantle);
     }
+}
+html:not(.style-scope)[dark] .profile {
+    background-color: var(--mantle);
 }
 @media screen and (min-width: 711px) {
     .profile {
@@ -645,6 +699,10 @@ a.button {
         text-shadow: none;
     }
 }
+html:not(.style-scope)[dark] .discover-li-wide  {
+    color: var(--crust); 
+    text-shadow: none;
+}
 .margin-3xs {
     margin: var(--space-3xs);
 }
@@ -672,6 +730,9 @@ a.button {
         background-color: var(--crust);
     }
 }
+html:not(.style-scope)[dark] .CodeMirror  {
+    background-color: var(--crust);
+}
 .editor-preview-full img, .editor-preview-full video {
     max-width: 100%;
 }
@@ -693,6 +754,9 @@ dialog::backdrop {
         background-color: var(--crust);
     }
 }
+html:not(.style-scope)[dark] .actions details form, html:not(.style-scope)[dark] .actions details span, html:not(.style-scope)[dark] .actions details a, html:not(.style-scope)[dark] .actions details .actionBtn  {
+    background-color: var(--crust);
+}
 .actions details details summary {
     height: 40px;
     line-height: 40px;
@@ -705,6 +769,9 @@ dialog::backdrop {
     .actions details details summary {
         background-color: var(--crust);
     }
+}
+html:not(.style-scope)[dark] .actions details details summary {
+    background-color: var(--crust);
 }
 .actions details a { text-decoration: none; color: var(--text); }
 .actions details a:visited { text-decoration: none; color: var(--text); }
@@ -727,4 +794,8 @@ blockquote {
 }
 .editor-preview-side img {
     width: 100%;
+}
+.CodeMirror {
+    background: none;
+    color: var(--text) !important;
 }
