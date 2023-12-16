@@ -301,10 +301,20 @@ font-weight: bold;
 a.selected {
     color: var(--blue) !important;
 }
-#photos img, #photos video {
-    width: 100% !important;
-    height: auto !important;
-    margin-bottom: var(--space-3xs);
+#photos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    grid-auto-rows: minmax(100px, auto);
+}
+@media screen and (min-width: 711px)
+{
+    #photos {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        grid-auto-rows: minmax(100px, auto);
+    }
 }
 .grow-wrap {
     display: grid;
@@ -615,8 +625,8 @@ html:not(.style-scope)[dark] .profile {
 @media screen and (min-width: 711px) {
     .profile {
         margin: var(--space-s-m);
-        display: grid;
-        grid-template-columns: 1fr 2fr;
+        /* display: grid;
+        grid-template-columns: 1fr 2fr; */
     }
 }
 .screen-width
@@ -795,4 +805,21 @@ blockquote {
 }
 .editor-preview-side img {
     width: 100%;
+}
+.comments details[open] {
+    position:relative
+}
+.comments details[open] > summary::after {
+    content: "Close comment thread";
+    color: var(--subtext-1);
+    font-size: var(--step--1);
+    position: absolute;
+    bottom: -1.5em;
+    right: 10px;
+}
+.comments > details[open] > div > div.comment > details > summary::after{
+    content: "";
+}
+.comments > details[open] > div > details > summary::after {
+    content: "";
 }

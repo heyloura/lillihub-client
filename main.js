@@ -419,8 +419,9 @@ function postActionTemplate(darkmode, id, username, isPinned, _microblog, conten
  * @param  {object} comment - The comment object from micro.blog
  * @param  {array} repliers - An array of usernames that have commented on the post
  * @param  {array} contentFilters  An array of words to filter the reply content by  
+ * @param {string} access_token - The micro.blog access token
  */
-function commentTemplate(darkmode, comment, repliers, contentFilters) {
+async function commentTemplate(darkmode, comment, repliers, contentFilters, access_token) {
     if(comment == null || comment == undefined || comment.content_html == null || comment.content_html == undefined){
         return '';
     }
@@ -428,9 +429,11 @@ function commentTemplate(darkmode, comment, repliers, contentFilters) {
     {
         return `<div class="comment"><p style="color: var(--overlay-1);">Reply was filtered out.</p></div>`
     }
+    
+    const isFollowing = await isFollowingMicroBlogUser(comment.author._microblog.username, access_token);
 
     return `
-        <div class="comment">
+        <div class="comment" ${isFollowing ? 'style="border: 1px solid var(--overlay-1)"':''}>
             <header style="display:flex; flex-direction: row;margin-bottom:var(--space-xs)">
                 <img loading="lazy" src="${comment.author.avatar}" />
                 <div style="flex-grow: 1">
@@ -697,7 +700,6 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
             const postActions = includeActions ? postActionTemplate(darkmodeCookie, post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0) : '';
             controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post.date_published, post_content, postActions, isFollowing, post._microblog.date_relative));
 
-
             if(includeReplies) {
                 await streamComments(ctx, controller, post.id, openConvo, isConvo ? convo : null);
             }
@@ -752,17 +754,17 @@ async function streamComments(ctx, controller, postid, open = false, convo = nul
                 <summary>${avatars}<span class="comment-count">${comments.length} comments</span></summary>`);
                 if(!open) {
                     for(let i = 0; i <= limit && i < comments.length; i++) {
-                        controller.enqueue(commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters));
-                    }
-                    if(comments.length > limit + 1) {
-                        controller.enqueue(`<p style="text-align:center;"><a target="_top" href="/app/post?id=${postid}">View post to see all comments</a></p>`);
+                        controller.enqueue(await commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters, access_token));
                     }
                 } else {
                     for(let i = 0; i < comments.length; i++) {
-                        controller.enqueue(commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters));
+                        controller.enqueue(await commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters, access_token));
                     }
                 }
         controller.enqueue(replyTemplate(darkmodeCookie, postid, author, uniqueRepliers, false));
+        if(!open && comments.length > limit + 1) {
+            controller.enqueue(`<p style="text-align:center;"><a target="_top" href="/app/post?id=${postid}">View post to see all comments</a></p>`);
+        }
         controller.enqueue(`</details>`);
     } else {
         controller.enqueue(replyTemplate(darkmodeCookie, postid, author, uniqueRepliers, true));
@@ -877,6 +879,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const last = await ctx.request.url.searchParams.get('last');
     const before = await ctx.request.url.searchParams.get('before');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+
     controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, conversations ? "Conversations" : name ? name : "Timeline", darkmodeCookie));  
 
     if(name && (name == "news" || name == "challenges" || name == "monday"))
@@ -891,7 +894,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     controller.enqueue(`<div class="posts">`);
 
     const result = await getMicroBlogTimeline(name, last, cookies.access_token);
-    const posts = result ? result.items : [];
+    let posts = result ? result.items : [];
 
     if(!posts || posts.length == 0) {
         controller.enqueue(`<p>No data returned from Micro.Blog</p>`); 
@@ -905,20 +908,62 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
         }
         
         if(conversations) {
-            const filtered = posts.filter(p => p._microblog != undefined && p._microblog.is_mention);
+            const kv = await Deno.openKv();
+            const user = await getMicroBlogLoggedInUser(cookies.access_token);
             const roots = [];
-            for(let i = 0; i < filtered.length; i++ ){
-                const convo = await getMicroBlogConversation(filtered[i].id, cookies.access_token);
-                const rootId = convo.items[convo.items.length - 1].id;
-                if(!roots.includes(rootId)){
-                    await streamPosts(ctx, controller, convo.items, true);
-                    roots.push(rootId);
-                }    
+            let seen = [];
+            let i = 0;
+            if(last) {
+                const result = await kv.get(["conversations", user.username]);
+                if(result && result.value) {
+                    seen = result.value;
+                }
+            }
+            while(roots.length < 20 && i < 5) {
+                let filtered = [];
+                if(i == 0) {
+                    filtered = posts.filter(p => p._microblog != undefined && p._microblog.is_mention);
+                }
+                else
+                {
+                    const secondFetch = await getMicroBlogTimeline(name, posts[posts.length - 1].id, cookies.access_token);
+                    const additionalPosts = secondFetch ? secondFetch.items : [];
+                    filtered = additionalPosts.filter(p => p._microblog != undefined && p._microblog.is_mention);
+                    posts = posts.concat(filtered);
+                }
+                i++;
+                
+                for(let i = 0; i < filtered.length; i++ ){
+                    const convo = await getMicroBlogConversation(filtered[i].id, cookies.access_token);
+                    const rootId = convo.items[convo.items.length - 1].id;
+                    if(!roots.includes(rootId) && !seen.includes(rootId)){
+                        await streamPosts(ctx, controller, convo.items, true);
+                        roots.push(rootId);
+                    }    
+                }
+            }
+
+            //Now save the list of root + seen ids
+            if(last) {
+                const result = await kv.set(["conversations", user.username], seen.concat(roots));
+            } else {
+                const result = await kv.set(["conversations", user.username], roots);
             }
         }
         else {
             const filtered = posts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
             await streamPosts(ctx, controller, filtered);
+            let i = 0;
+            let count = filtered.length; 
+            while(count < 20 && i < 5) {
+                i++;
+                const secondFetch = await getMicroBlogTimeline(name, posts[posts.length - 1].id, cookies.access_token);
+                const additionalPosts = secondFetch ? secondFetch.items : [];
+                const moreFiltered = additionalPosts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
+                posts = posts.concat(moreFiltered); 
+                await streamPosts(ctx, controller, moreFiltered);
+                count += moreFiltered.length;
+            }
         }
     
         //paging not implemented via M.B. API for the user timeline
@@ -1689,7 +1734,7 @@ await router.get("/app/blog/media", async (ctx, next) => {
                 '', 
                 i.url, 
                 i.url.split('/')[i.url.split('/').length - 1], 
-                i.poster ? `<video controls="controls" playsinline="playsinline" src="${i.url}" preload="none"></video>` : `<img src="${i.url}"/>`, 
+                i.poster ? `<video controls="controls" playsinline="playsinline" src="${i.url}" preload="none"></video><br/><small>${i.url}</small>` : `<img src="${i.url}"/><br/><small>${i.url}</small>`, 
                 `<div class="actions">
                     <details style="border-radius: var(--space-3xs);color: var(--subtext-1);border: 1px solid var(--mantle);position: absolute;z-index: 5;background-color: var(--mantle);margin-left: -92px;">
                         <summary style="padding: var(--space-2xs); font-size: var(--step--1); margin: 0;">Actions</summary>
@@ -2346,6 +2391,19 @@ async function getMicroBlogLoggedInUser(access_token) {
     const results = await fetching.json();
     return results;
 }
+
+/**
+ * Gets if there are new posts to see.
+ * @param  {int} id  The id of the first post seen this session
+ * @param  {string} access_token  An access token
+ * @return {object}      The json object returned from the micro.blog api
+ */
+async function  getMicroBlogCheckNewPosts(id, access_token) {
+    const fetching = await microBlogGet(`posts/check?since_id=${id}`, access_token);
+    const results = await fetching.json();
+    return results;
+}
+
 
 /**
  * Gets a micro.blog conversation
