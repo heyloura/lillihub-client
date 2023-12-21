@@ -10,7 +10,8 @@ await ammonia.init();
 const router = new Router();
 const _appURL = Deno.env.get("APP_URL");
 const _colors = ['var(--yellowgreen)','var(--green)','var(--greenblue)','var(--blue)','var(--bluepurple)','var(--purple)','var(--purplered)','var(--red)','var(--redorange)','var(--orange)','var(--orangeyellow)','var(--yellow)'];
-const _mbItemCount = 60;
+const _mbItemCount = 30;
+const _postCount = 10;
 const _favicon = new Uint8Array(await Deno.readFile("favicon.ico"));
 const _style = await Deno.readTextFile("styles/style.css");
 const _easyMDEJS = await Deno.readTextFile("scripts/easymde.min.js");
@@ -325,8 +326,10 @@ function postContentTemplate(id, username, name, avatar, url, date, content_html
  * @param  {bool} isPost - Is this a post?
  * @param  {string} bookPost - A string containing a book post contents for creating a new post
  * @param  {int} bookShelfId - The id of the current bookshelf (if on bookshelf page)
+ * @param  {object} previous - The previous post (if any)
+ * @param  {string} previousLocation - the previous location
  */
-function postActionTemplate(darkmode, id, username, isPinned, _microblog, content_html, bookshelves, isFollowing, tags, isPost = true, bookPost = '', bookShelfId = 0) { 
+function postActionTemplate(darkmode, id, username, isPinned, _microblog, content_html, bookshelves, isFollowing, tags, isPost = true, bookPost = '', bookShelfId = 0, previous = null, previousLocation = '') { 
     let quote = content_html;
     const readerLink = content_html.split('post_archived_links');
     if(readerLink.length > 1) {
@@ -384,6 +387,7 @@ function postActionTemplate(darkmode, id, username, isPinned, _microblog, conten
     const quotePostAction = isPost ? `<a target="_top" href="/app/blog/post?content=${encodeURIComponent(`<blockquote>${quote}</blockquote>`)}">Quote</a>` : '';
     
     const viewPostAction = isPost && !_microblog.is_bookmark ? `<a target="_top" href="/app/post?id=${id}">View post</a>` : '';
+    //const viewPostAction = isPost && !_microblog.is_bookmark ? `<a target="_top" href="/app/post?id=${id}${ previous ? `&back=${previous.id}` : ``}&location=${previousLocation}">View post</a>` : '';
 
     const bookPostAction = !isPost && bookPost ? `<a target="_top" href="/app/blog/post?content=${encodeURIComponent(bookPost)}">Create post</a>` : '';
 
@@ -419,9 +423,9 @@ function postActionTemplate(darkmode, id, username, isPinned, _microblog, conten
  * @param  {object} comment - The comment object from micro.blog
  * @param  {array} repliers - An array of usernames that have commented on the post
  * @param  {array} contentFilters  An array of words to filter the reply content by  
- * @param {string} access_token - The micro.blog access token
+ * @param {bool} isFollowing - Is this commentor someone you follow?
  */
-async function commentTemplate(darkmode, comment, repliers, contentFilters, access_token) {
+function commentTemplate(darkmode, comment, repliers, contentFilters, isFollowing) {
     if(comment == null || comment == undefined || comment.content_html == null || comment.content_html == undefined){
         return '';
     }
@@ -430,10 +434,8 @@ async function commentTemplate(darkmode, comment, repliers, contentFilters, acce
         return `<div class="comment"><p style="color: var(--overlay-1);">Reply was filtered out.</p></div>`
     }
     
-    const isFollowing = await isFollowingMicroBlogUser(comment.author._microblog.username, access_token);
-
     return `
-        <div class="comment" ${isFollowing ? 'style="border: 1px solid var(--overlay-1)"':''}>
+        <div id="${comment.id}" class="comment" ${isFollowing ? 'style="border: 1px solid var(--overlay-1)"':''}>
             <header style="display:flex; flex-direction: row;margin-bottom:var(--space-xs)">
                 <img loading="lazy" src="${comment.author.avatar}" />
                 <div style="flex-grow: 1">
@@ -650,8 +652,9 @@ async function streamBookshelfLinks(ctx, controller) {
  * @param  {bool} includeReplies - Include replies under the post
  * @param  {bool} includeActions - Include standard post actions
  * @param  {bool} openConvo - open the conversations
+ * @param  {object} previous - the previous post (if any)
  */
-async function streamPosts(ctx, controller, posts, isConvo, includeReplies = true, includeActions = true, openConvo = false) {
+async function streamPosts(ctx, controller, posts, isConvo, includeReplies = true, includeActions = true, openConvo = false, previous = null) {
     const access_token = await ctx.cookies.get('access_token');
     const user = await getMicroBlogLoggedInUser(access_token);
     const darkmodeCookie = await ctx.cookies.get('darkMode');
@@ -676,6 +679,10 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
     for(let i = 0; i < posts.length; i++) {  
         const post = posts[i];
 
+        if(!isConvo) {
+            previous = i == 0 ? post : posts[i-1];
+        }
+
         if(!filterOut(contentFilters, post.content_html))
         {
             let isFollowing = await isFollowingMicroBlogUser(post.author._microblog.username, access_token);
@@ -697,11 +704,11 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
             }
             const post_content = post.tags ? `${post.content_html}<div><p style="color:var(--subtext-1)"><small>Tags: ${post.tags}</small></p></div>` : post.content_html;
             
-            const postActions = includeActions ? postActionTemplate(darkmodeCookie, post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0) : '';
+            const postActions = includeActions ? postActionTemplate(darkmodeCookie, post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0, previous, (await ctx.request.url.href).includes('timeline') ? 'timeline' : 'conversations') : '';
             controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post.date_published, post_content, postActions, isFollowing, post._microblog.date_relative));
 
             if(includeReplies) {
-                await streamComments(ctx, controller, post.id, openConvo, isConvo ? convo : null);
+                await streamComments(ctx, controller, post.id, openConvo, isConvo ? convo : null, previous);
             }
         }
         else
@@ -719,14 +726,17 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
  * @param  {string} postid - The id of the post  
  * @param  {bool} open - Should the details toggle default to open?
  * @param  {array} convo - An array of conversation posts if already fetched.
+ * @param  {object} previous - The previous post
  */
-async function streamComments(ctx, controller, postid, open = false, convo = null) {
+async function streamComments(ctx, controller, postid, open = false, convo, previous) {
     const access_token = await ctx.cookies.get('access_token');
     const commentLimit = (await ctx.cookies.get('limitComments'));
     const limit = parseInt(commentLimit) ? parseInt(commentLimit) - 1 : 24;
     const contentFilterCookie = await ctx.cookies.get('contentFilter');
     const contentFilters = contentFilterCookie == undefined ? [] : JSON.parse(contentFilterCookie);
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const back = await ctx.request.url.searchParams.get('back');
+    const location = await ctx.request.url.searchParams.get('location');
 
     if(convo == null) {
         convo = (await getMicroBlogConversation(postid, access_token)).items;
@@ -742,6 +752,7 @@ async function streamComments(ctx, controller, postid, open = false, convo = nul
 
     // remove the original and any null comments
     let comments = convo.slice(0,-1);
+    //let returnId = 0;
 
     if(comments.length > 0) {
         const avatars = comments.map(function (comment, i) { return i < 3 && comment != null && comment.author != null ? '<img loading="lazy" src="' + comment.author.avatar + '"/>' : '' }).join('');
@@ -754,20 +765,32 @@ async function streamComments(ctx, controller, postid, open = false, convo = nul
                 <summary>${avatars}<span class="comment-count">${comments.length} comments</span></summary>`);
                 if(!open) {
                     for(let i = 0; i <= limit && i < comments.length; i++) {
-                        controller.enqueue(await commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters, access_token));
+                        const isFollowing = await isFollowingMicroBlogUser(comments[i].author._microblog.username, access_token);
+                        controller.enqueue(await commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters, isFollowing));
                     }
                 } else {
                     for(let i = 0; i < comments.length; i++) {
-                        controller.enqueue(await commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters, access_token));
+                        const isFollowing = await isFollowingMicroBlogUser(comments[i].author._microblog.username, access_token);
+                        controller.enqueue(await commentTemplate(darkmodeCookie, comments[i], uniqueRepliers, contentFilters, isFollowing));
                     }
                 }
         controller.enqueue(replyTemplate(darkmodeCookie, postid, author, uniqueRepliers, false));
         if(!open && comments.length > limit + 1) {
-            controller.enqueue(`<p style="text-align:center;"><a target="_top" href="/app/post?id=${postid}">View post to see all comments</a></p>`);
+            const href = await ctx.request.url.href;
+            const returnLocation = href.includes('timeline') ? 'timeline' : href.includes('conversations') ? 'conversations' : '';
+            if(returnLocation) {
+                controller.enqueue(`<p style="text-align:center;"><a target="_top" href="/app/post?id=${postid}${ previous ? `&back=${previous.id}` : ``}&location=${returnLocation}">View post to see all comments</a></p>`);
+            }
+        }
+        if(open && back) {
+            controller.enqueue(`<p style="text-align:center;"><a target="_top" href="/app/${location}?last=${back}&clear=true">Return to ${location}</a></p>`);
         }
         controller.enqueue(`</details>`);
     } else {
         controller.enqueue(replyTemplate(darkmodeCookie, postid, author, uniqueRepliers, true));
+        if(open && back) {
+            controller.enqueue(`<p style="text-align:center;"><a target="_top" href="/app/${location}?last=${back}&clear=true">Return to ${location}</a></p>`);
+        }
     }
 }
 
@@ -879,6 +902,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const last = await ctx.request.url.searchParams.get('last');
     const before = await ctx.request.url.searchParams.get('before');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const clear = await ctx.request.url.searchParams.get('clear');
 
     controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, conversations ? "Conversations" : name ? name : "Timeline", darkmodeCookie));  
 
@@ -893,7 +917,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
 
     controller.enqueue(`<div class="posts">`);
 
-    const result = await getMicroBlogTimeline(name, last, cookies.access_token);
+    const result = await getMicroBlogTimeline(name, last ? last : before ? before : null, cookies.access_token, before ? true : false);
     let posts = result ? result.items : [];
 
     if(!posts || posts.length == 0) {
@@ -913,13 +937,13 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
             const roots = [];
             let seen = [];
             let i = 0;
-            if(last) {
+            if(last && !clear) {
                 const result = await kv.get(["conversations", user.username]);
                 if(result && result.value) {
                     seen = result.value;
                 }
             }
-            while(roots.length < 20 && i < 5) {
+            while(roots.length < _postCount && i < 5) {
                 let filtered = [];
                 if(i == 0) {
                     filtered = posts.filter(p => p._microblog != undefined && p._microblog.is_mention);
@@ -937,17 +961,17 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
                     const convo = await getMicroBlogConversation(filtered[i].id, cookies.access_token);
                     const rootId = convo.items[convo.items.length - 1].id;
                     if(!roots.includes(rootId) && !seen.includes(rootId)){
-                        await streamPosts(ctx, controller, convo.items, true);
+                        await streamPosts(ctx, controller, convo.items, true, true, true, false, i == 0 ? filtered[0] : filtered[i-1],);
                         roots.push(rootId);
                     }    
                 }
             }
 
             //Now save the list of root + seen ids
-            if(last) {
-                const result = await kv.set(["conversations", user.username], seen.concat(roots));
+            if(last && !clear) {
+                await kv.set(["conversations", user.username], seen.concat(roots));
             } else {
-                const result = await kv.set(["conversations", user.username], roots);
+                await kv.set(["conversations", user.username], roots);
             }
         }
         else {
@@ -955,7 +979,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
             await streamPosts(ctx, controller, filtered);
             let i = 0;
             let count = filtered.length; 
-            while(count < 20 && i < 5) {
+            while(count < _postCount && i < 5) {
                 i++;
                 const secondFetch = await getMicroBlogTimeline(name, posts[posts.length - 1].id, cookies.access_token);
                 const additionalPosts = secondFetch ? secondFetch.items : [];
@@ -2469,7 +2493,7 @@ async function getMicroBlogDiscover(tag, access_token) {
 async function isFollowingMicroBlogUser(username, access_token) {
     const fetching = await microBlogGet(`users/is_following?username=${username}`, access_token);
     const result = await fetching.json();
-    return result.is_following && !result.is_you;
+    return result.is_following || result.is_you;
 }
 
 /**

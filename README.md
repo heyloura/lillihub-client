@@ -19,7 +19,7 @@ I hope people enjoy using the app as much as I did building it ❤️🐸
 
 
 # Running Locally
-You will need to have [Deno](https://deno.com/) installed and available on your `$PATH`. Then run the command `deno run --allow-env --allow-net --allow-read  main.js`. This will run the webserver on your `localhost`. There is no build step.
+You will need to have [Deno](https://deno.com/) installed and available on your `$PATH`. Then run the command `deno run --allow-env --allow-net --allow-read --unstable main.js`. This will run the webserver on your `localhost`. There is no build step.
 
 You will also need an `.env` file with the `APP_URL` pointing to your `localhost`. In my case it was
 `localhost:8080`

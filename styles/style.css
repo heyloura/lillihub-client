@@ -94,15 +94,15 @@ html
 {
     min-height:100%;
     box-sizing: border-box;
-    background: linear-gradient(to bottom,#FFFFFF, #fbfcfd); 
+    background: var(--base);
 }
 @media (prefers-color-scheme: dark) {
     html {
-        background: linear-gradient(to bottom, #303446, #393d53); 
+        background: #303446;
     }
 } 
 html:not(.style-scope)[dark] {
-    background: linear-gradient(to bottom, #303446, #393d53); 
+    background: #303446;
 }
 body {
     height:100%;
@@ -810,7 +810,7 @@ blockquote {
     position:relative
 }
 .comments details[open] > summary::after {
-    content: "Close comment thread";
+    content: "Close comments";
     color: var(--subtext-1);
     font-size: var(--step--1);
     position: absolute;
