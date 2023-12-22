@@ -1,6 +1,5 @@
 import { Application, Router } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
-import { Language, minify } from "https://deno.land/x/minifier@v1.1.0/mod.ts";
 import { DOMParser } from "https://esm.sh/linkedom";
 import { marky } from "https://deno.land/x/marky@v1.1.6/mod.ts";
 import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
@@ -65,29 +64,6 @@ function beginHTMLTemplate(avatar, username, title, darkMode) {
         <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/carousel/carousel.js"></script>
         <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/format-date/format-date.js"></script>
         <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
-        <script>
-        function collapse(el) {
-            el.removeAttribute("open");
-            el.classList.remove("closing");
-        }
-        function waitForScroll(el) {
-            el.classList.add("closing");
-            window.setTimeout(collapse, 500, el);
-        }
-        function toggleSummary(el, e) {
-            e.preventDefault();
-            var expanded = el.parentElement.getAttribute('aria-expanded');
-            var open = el.parentElement.hasAttribute("open");
-            if(!open) {
-                el.parentElement.setAttribute('aria-expanded', true);
-                el.parentElement.setAttribute('open','true'); 
-            } else { 
-                el.parentElement.setAttribute('aria-expanded', false); 
-                el.parentElement.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
-                window.setTimeout(waitForScroll, 0, el.parentElement);
-            }
-        }
-        </script>
         </head>
         <body class="u-container">
         <header id="top">
@@ -2876,7 +2852,7 @@ function filterOut(contentFilters, content_html) {
 // Resources
 // --------------------------------------------------------------------------------------
 function getCommonJS() {
-    const script = `
+    return `
         function growTextArea(el) {
             el.parentNode.dataset.replicatedValue = el.value;
         }
@@ -2887,11 +2863,31 @@ function getCommonJS() {
                     form.children[2].dataset.replicatedValue = ''; form.children[2].children[0].value = ''; 
                 }, 250);
         }
+        function collapse(el) {
+            el.removeAttribute("open");
+            el.classList.remove("closing");
+        }
+        function waitForScroll(el) {
+            el.classList.add("closing");
+            window.setTimeout(collapse, 500, el);
+        }
+        function toggleSummary(el, e) {
+            e.preventDefault();
+            var expanded = el.parentElement.getAttribute('aria-expanded');
+            var open = el.parentElement.hasAttribute("open");
+            if(!open) {
+                el.parentElement.setAttribute('aria-expanded', true);
+                el.parentElement.setAttribute('open','true'); 
+            } else { 
+                el.parentElement.setAttribute('aria-expanded', false); 
+                el.parentElement.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+                window.setTimeout(waitForScroll, 0, el.parentElement);
+            }
+        }
     `;
-    return minify(Language.JS, script);
 }
 function getCommonCSS() {
-    return minify(Language.CSS, _style);
+    return _style
 }
 function discoverSVG() {
     return `
