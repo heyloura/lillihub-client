@@ -65,6 +65,29 @@ function beginHTMLTemplate(avatar, username, title, darkMode) {
         <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/carousel/carousel.js"></script>
         <script async type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/components/format-date/format-date.js"></script>
         <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
+        <script>
+        function collapse(el) {
+            el.removeAttribute("open");
+            el.classList.remove("closing");
+        }
+        function waitForScroll(el) {
+            el.classList.add("closing");
+            window.setTimeout(collapse, 500, el);
+        }
+        function toggleSummary(el, e) {
+            e.preventDefault();
+            var expanded = el.parentElement.getAttribute('aria-expanded');
+            var open = el.parentElement.hasAttribute("open");
+            if(!open) {
+                el.parentElement.setAttribute('aria-expanded', true);
+                el.parentElement.setAttribute('open','true'); 
+            } else { 
+                el.parentElement.setAttribute('aria-expanded', false); 
+                el.parentElement.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+                window.setTimeout(waitForScroll, 0, el.parentElement);
+            }
+        }
+        </script>
         </head>
         <body class="u-container">
         <header id="top">
@@ -126,22 +149,29 @@ function mainMenuTemplate(loggedIn = true, endSidebar = true) {
     return loggedIn ? `
         <ul class="discover">
             <li class="blue-purple"><a href="/app/blog/post">New Post</a></li>
-            <li class="green-blue discover-li-wide"><small>My Blog:</small>
+            <li class="green-blue discover-li-wide"><small>Micro.blog:</small>
+                <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/timeline">Posts</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/conversations">Conversations</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a href="/app/mentions">Mentions</a></p>
+            </li>
+            <li class="yellow-green discover-li-wide"><small>My Blog:</small>
+                <!--<p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/blog/post">New Post</a></p>-->
                 <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/blog/posts">Posts</a></p>
                 <p style="margin-left:0;" class="margin-3xs"><a href="/app/blog/media">Media</a></p>
             </li>
-            <li class="yellow-green discover-li-wide"><small>My Stuff:</small>
+            <li class="orange-yellow discover-li-wide"><small>My Stuff:</small>
                 <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/bookmarks">Bookmarks</a></p>
                 <p style="margin-left:0;" class="margin-3xs"><a href="/app/bookshelves">Bookshelves</a></p>
             </li>
-            <li class="orange-yellow discover-li-wide"><small>Manage MB:</small>
+            <li class="red-orange discover-li-wide"><small>Manage MB:</small>
                 <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/users/following">Following</a></p>
                 <p style="margin-left:0;" class="margin-3xs"><a href="/app/replies">Replies</a></p>
             </li>
-            <li class="red-orange discover-li-wide"><small>Lillihub:</small>
+            <li class="purple-red discover-li-wide"><small>Lillihub:</small>
                 <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/settings">Settings</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a href="/">About</a></p>
             </li>
-            <li class="purple-red noShift"><a href="/">${logoSVG()}</a></li>
+            <li class="purple-red noShift logo"><a href="/">${logoSVG()}</a></li>
         </ul>
         ${endSidebar ? '</aside>' : ''}
     ` : '</aside>';
@@ -386,8 +416,7 @@ function postActionTemplate(darkmode, id, username, isPinned, _microblog, conten
     
     const quotePostAction = isPost ? `<a target="_top" href="/app/blog/post?content=${encodeURIComponent(`<blockquote>${quote}</blockquote>`)}">Quote</a>` : '';
     
-    const viewPostAction = isPost && !_microblog.is_bookmark ? `<a target="_top" href="/app/post?id=${id}">View post</a>` : '';
-    //const viewPostAction = isPost && !_microblog.is_bookmark ? `<a target="_top" href="/app/post?id=${id}${ previous ? `&back=${previous.id}` : ``}&location=${previousLocation}">View post</a>` : '';
+    const viewPostAction = isPost && !_microblog.is_bookmark ? `<a target="_top" href="/app/post?id=${id}${ previous ? `&back=${previous.id}` : ``}&location=${previousLocation}">View post</a>` : '';
 
     const bookPostAction = !isPost && bookPost ? `<a target="_top" href="/app/blog/post?content=${encodeURIComponent(bookPost)}">Create post</a>` : '';
 
@@ -653,8 +682,9 @@ async function streamBookshelfLinks(ctx, controller) {
  * @param  {bool} includeActions - Include standard post actions
  * @param  {bool} openConvo - open the conversations
  * @param  {object} previous - the previous post (if any)
+ * @param  {int} lastSeen - the timestamp of the last seen post
  */
-async function streamPosts(ctx, controller, posts, isConvo, includeReplies = true, includeActions = true, openConvo = false, previous = null) {
+async function streamPosts(ctx, controller, posts, isConvo, includeReplies = true, includeActions = true, openConvo = false, previous = null, lastSeen = 0) {
     const access_token = await ctx.cookies.get('access_token');
     const user = await getMicroBlogLoggedInUser(access_token);
     const darkmodeCookie = await ctx.cookies.get('darkMode');
@@ -703,8 +733,9 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
                     }).join('');
             }
             const post_content = post.tags ? `${post.content_html}<div><p style="color:var(--subtext-1)"><small>Tags: ${post.tags}</small></p></div>` : post.content_html;
-            
-            const postActions = includeActions ? postActionTemplate(darkmodeCookie, post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0, previous, (await ctx.request.url.href).includes('timeline') ? 'timeline' : 'conversations') : '';
+
+            const returnLocation = getReturnLocation(await ctx.request.url.href);
+            const postActions = includeActions ? postActionTemplate(darkmodeCookie, post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0, previous, returnLocation) : '';
             controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post.date_published, post_content, postActions, isFollowing, post._microblog.date_relative));
 
             if(includeReplies) {
@@ -716,7 +747,33 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
             controller.enqueue(`<article class="post" style="padding-top: 0; display:block;"><section style="color: var(--overlay-1);"><p>Content was filtered out.</p>`);
         }
         controller.enqueue('</section></article>');
+
+        if(lastSeen == -1) {
+            // This comes from the conversations page.
+            controller.enqueue('<p class="center"><span class="all-caught-up">All caught up on mentions 🎉</span></p>');
+        }
+        else if(lastSeen != 0 && post.id == lastSeen) 
+        {
+            controller.enqueue('<p class="center"><span class="all-caught-up">All caught up 🎉</span></p>');
+            lastSeen = 0;
+        }
     }
+}
+
+function getReturnLocation(href) {
+    if(href.includes('timeline')) {
+        return 'timeline';
+    }
+    if(href.includes('conversations')) {
+        return 'conversations';
+    }
+    if(href.includes('mentions')) {
+        return 'mentions';
+    }
+    if(href.includes('discover')) {
+        return 'discover';
+    }
+    return '';
 }
 
 /**
@@ -761,8 +818,8 @@ async function streamComments(ctx, controller, postid, open = false, convo, prev
         comments = comments.reverse();
 
         controller.enqueue(`<div class="comments">
-            <details ${open ? 'open' : ''}>
-                <summary>${avatars}<span class="comment-count">${comments.length} comments</span></summary>`);
+            <details aria-expanded=${open ? 'true' : 'false'} ${open ? 'open' : ''}>
+                <summary onclick="toggleSummary(this, event);">${avatars}<span class="comment-count">${comments.length} comments</span></summary>`);
                 if(!open) {
                     for(let i = 0; i <= limit && i < comments.length; i++) {
                         const isFollowing = await isFollowingMicroBlogUser(comments[i].author._microblog.username, access_token);
@@ -776,8 +833,7 @@ async function streamComments(ctx, controller, postid, open = false, convo, prev
                 }
         controller.enqueue(replyTemplate(darkmodeCookie, postid, author, uniqueRepliers, false));
         if(!open && comments.length > limit + 1) {
-            const href = await ctx.request.url.href;
-            const returnLocation = href.includes('timeline') ? 'timeline' : href.includes('conversations') ? 'conversations' : '';
+            const returnLocation = getReturnLocation(await ctx.request.url.href);
             if(returnLocation) {
                 controller.enqueue(`<p style="text-align:center;"><a target="_top" href="/app/post?id=${postid}${ previous ? `&back=${previous.id}` : ``}&location=${returnLocation}">View post to see all comments</a></p>`);
             }
@@ -892,6 +948,38 @@ async function streamUserProfile(ctx, controller, author, _microblog) {
 
 /**
  * Streams a timeline or conversations page for a user
+ * @param  {object} controller - The controller of the readable stream 
+ * @param  {int}    i - The current loop on this fetch    
+ * @param  {object} lastSeen - The tracking object for what has been seen by the user
+ * @param  {array}  filtered - The current set of filtered posts
+ */
+function findLastNewPost(controller, i, lastSeen, filtered) {
+    let lastNewPost = null;
+    let unseenPosts = null;
+
+    //check the first post. If it was before the last seen...
+    if(i == 0 && !lastSeen.marked && lastSeen.last && lastSeen.last > 0 && filtered[0] && filtered[0]._microblog && 
+        filtered[0]._microblog.date_timestamp < lastSeen.last)
+    {
+        //then all posts have been seen.
+        lastSeen.marked = true;
+        controller.enqueue('<p class="center"><span class="all-caught-up">All caught up</span></p>');
+    } 
+    if(!lastSeen.marked) {
+        unseenPosts = filtered.filter(p => p._microblog != undefined && lastSeen.last && lastSeen.last > 0 && 
+            p._microblog.date_timestamp >= lastSeen.last);
+        lastNewPost = unseenPosts && unseenPosts.length > 0 ? unseenPosts[unseenPosts.length - 1] : null;
+    }
+    if(lastNewPost && unseenPosts.length == filtered.length){
+        // all the post on the page a new. We need to check the next page to find the last one.
+        lastNewPost = null;
+    }
+
+    return lastNewPost;
+}
+
+/**
+ * Streams a timeline or conversations page for a user
  * @param  {object} ctx - The request context
  * @param  {object} controller - The controller of the readable stream     
  * @param  {bool} conversations - Shows timeline conversations
@@ -903,6 +991,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const before = await ctx.request.url.searchParams.get('before');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
     const clear = await ctx.request.url.searchParams.get('clear');
+    const location = getReturnLocation(await ctx.request.url.href);
 
     controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, conversations ? "Conversations" : name ? name : "Timeline", darkmodeCookie));  
 
@@ -917,11 +1006,27 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
 
     controller.enqueue(`<div class="posts">`);
 
+    const kv = await Deno.openKv();
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
     const result = await getMicroBlogTimeline(name, last ? last : before ? before : null, cookies.access_token, before ? true : false);
     let posts = result ? result.items : [];
+    const lastSeen = { now: Math.trunc(new Date().getTime()/1000), marked: true };
+    
+    const peek = await kv.get(["peek", user.username, location]);
+    if(peek && peek.value) {
+        if(!last && !before) {
+            lastSeen.now = Math.trunc(new Date().getTime()/1000);
+            lastSeen.last = peek.value.now ? peek.value.now : 0;
+            lastSeen.marked = false;
+        } else {
+            lastSeen.now = peek.value.now ? peek.value.now : Math.trunc(new Date().getTime()/1000);
+            lastSeen.last = peek.value.last ? peek.value.last : 0;
+            lastSeen.marked = peek.value.marked ? peek.value.marked : true;
+        }
+    }
 
     if(!posts || posts.length == 0) {
-        controller.enqueue(`<p>No data returned from Micro.Blog</p>`); 
+        controller.enqueue(`<p style="text-align:center">No data returned from Micro.Blog</p>`); 
         controller.close();
     } else {
         if (name) {
@@ -932,8 +1037,6 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
         }
         
         if(conversations) {
-            const kv = await Deno.openKv();
-            const user = await getMicroBlogLoggedInUser(cookies.access_token);
             const roots = [];
             let seen = [];
             let i = 0;
@@ -955,15 +1058,18 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
                     filtered = additionalPosts.filter(p => p._microblog != undefined && p._microblog.is_mention);
                     posts = posts.concat(filtered);
                 }
+                const lastNewPost = findLastNewPost(controller, i, lastSeen, filtered);
                 i++;
-                
                 for(let i = 0; i < filtered.length; i++ ){
                     const convo = await getMicroBlogConversation(filtered[i].id, cookies.access_token);
                     const rootId = convo.items[convo.items.length - 1].id;
                     if(!roots.includes(rootId) && !seen.includes(rootId)){
-                        await streamPosts(ctx, controller, convo.items, true, true, true, false, i == 0 ? filtered[0] : filtered[i-1],);
+                        await streamPosts(ctx, controller, convo.items, true, true, true, false, i == 0 ? filtered[0] : filtered[i-1], lastNewPost && !lastSeen.marked ? (lastNewPost.id == filtered[i].id ? -1 : 0) : 0);
                         roots.push(rootId);
                     }    
+                }
+                if(lastNewPost) {
+                    lastSeen.marked = true;
                 }
             }
 
@@ -975,21 +1081,32 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
             }
         }
         else {
-            const filtered = posts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
-            await streamPosts(ctx, controller, filtered);
+            let count = 0;
             let i = 0;
-            let count = filtered.length; 
-            while(count < _postCount && i < 5) {
+            while(count < _postCount && i < 5) {           
+                let filtered = [];
+                if(i == 0) {
+                    filtered = posts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
+                }
+                else
+                {
+                    const fetchPosts = await getMicroBlogTimeline(name, posts[posts.length - 1].id, cookies.access_token);
+                    const additionalPosts = fetchPosts ? fetchPosts.items : [];
+                    filtered = additionalPosts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
+                    posts = posts.concat(filtered);
+                }
+                const lastNewPost = findLastNewPost(controller, i, lastSeen, filtered);
                 i++;
-                const secondFetch = await getMicroBlogTimeline(name, posts[posts.length - 1].id, cookies.access_token);
-                const additionalPosts = secondFetch ? secondFetch.items : [];
-                const moreFiltered = additionalPosts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
-                posts = posts.concat(moreFiltered); 
-                await streamPosts(ctx, controller, moreFiltered);
-                count += moreFiltered.length;
+                await streamPosts(ctx, controller, filtered, false, true, true, false, null, lastNewPost && !lastSeen.marked ? lastNewPost.id : 0);
+                if(lastNewPost) {
+                    lastSeen.marked = true;
+                }
+                count += filtered.length;
             }
         }
     
+        await kv.set(["peek", user.username, location], lastSeen);
+
         //paging not implemented via M.B. API for the user timeline
         controller.enqueue(`<p class="center">`);
         if(!name && (last || before) && posts[0]) {
@@ -1407,6 +1524,8 @@ await router.get("/app/photos", async (ctx, next) => {
 await router.get("/app/mentions", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const last = await ctx.request.url.searchParams.get('last');
+    const before = await ctx.request.url.searchParams.get('before');
+    const clear = await ctx.request.url.searchParams.get('clear');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
 
     ctx.response.body = new ReadableStream({
@@ -1416,20 +1535,64 @@ await router.get("/app/mentions", async (ctx, next) => {
             await streamPinned(ctx, controller); 
             controller.enqueue(`<div class="posts">`);
             
-            const fetching = await microBlogGet(last ? `posts/mentions?before_id=${last}` : 'posts/mentions', cookies.access_token);
+            //
+            // Right now the M.b. API doesn't seem to support
+            // the count parameter on the mentions endpoint
+            // so I'm hardcoding the display to 15
+            //
+            let fetchURL = `posts/mentions`;
+            if(last) {
+                fetchURL = `${fetchURL}?before_id=${last}`;
+            }
+            if(before && !last) {
+                fetchURL = `${fetchURL}?since_id=${last}`;
+            }
+            const fetching = await microBlogGet(fetchURL, cookies.access_token);
             const results = await fetching.json();
             const posts = results.items;
+
             controller.enqueue(postMenuBarTemplate('mentions', null));  
 
+            const kv = await Deno.openKv();
+            const user = await getMicroBlogLoggedInUser(cookies.access_token);
+            let seen = [];
+            if(last && !clear) {
+                const result = await kv.get(['mentions', user.username]);
+                if(result && result.value) {
+                    seen = result.value;
+                }
+            }
+
             const roots = [];
-            for(let i = 0; i < posts.length; i++ ){
+            for(let i = 0; i < posts.length && i < 15; i++ ){
                 const convo = await getMicroBlogConversation(posts[i].id, cookies.access_token);
                 const rootId = convo.items[convo.items.length - 1].id;
-                if(!roots.includes(rootId)){
-                    await streamPosts(ctx, controller, convo.items, true);
+                if(!roots.includes(rootId) && !seen.includes(rootId)){
+                    await streamPosts(ctx, controller, convo.items, true, true, true, false, i == 0 ? posts[0] : posts[i-1]);
                     roots.push(rootId);
                 }    
             }      
+
+                //Now save the list of root + seen ids
+            if(last && !clear) {
+                await kv.set(['mentions', user.username], seen.concat(roots));
+            } else {
+                await kv.set(['mentions', user.username], roots);
+            }
+
+            controller.enqueue(`<p class="center">`);
+            if((last || before) && posts[0]) {
+                await streamPreviousPageLink(ctx, controller, posts[0].id);
+            }
+            if((posts.length > 15 && posts[14]) || posts[posts.length - 1] ) {
+                if(posts.length > 15) {
+                    await streamNextPageLink(ctx, controller, posts[14].id);
+                } else {
+                    await streamNextPageLink(ctx, controller, posts[posts.length - 1].id);
+                }
+            }
+            controller.enqueue(`</p>`);
+
             controller.enqueue(`</div>${endHTMLTemplate()}`); 
             controller.close();
         }
@@ -1751,7 +1914,7 @@ await router.get("/app/blog/media", async (ctx, next) => {
                 </div>`);
 
             const media = await getMicroBlogMedia(account, cookies.access_token);
-            controller.enqueue(`<section class="posts" id="photos">`);
+            controller.enqueue(`<section class="posts">`);
             controller.enqueue(media.items.map(i => postContentTemplate(i.url, 
                 cookies.username, 
                 i.published.split('T')[0], 
