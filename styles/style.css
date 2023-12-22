@@ -519,17 +519,13 @@ html:not(.style-scope)[dark] .comment {
     list-style: none;
     padding: 0 var(--space-xs-s) var(--space-xs) var(--space-xs-s);       
     -webkit-overflow-scrolling: touch;
-    columns: 2;
-    -webkit-columns: 2;
-    -moz-columns: 2;
 }
 @media screen and (min-width: 711px) {
     .discover {
-        /* display: block;
-        column-gap: 0; */
         display: inline-grid;
-        grid-template-columns: 50% 50%;
+        grid-template-columns: 100%;
         padding: 0 0 var(--space-s) 0;
+        width:100%;
     }
 }
 .discover::-webkit-scrollbar {
@@ -537,8 +533,8 @@ html:not(.style-scope)[dark] .comment {
 }
 .discover li {
     flex: 0 0 auto;
-    height: var(--space-3xl);
-    width: var(--space-3xl);
+    height: 8.25rem;
+    width: 8.25rem;
     border: 1px solid #ffffff;
     border-radius: var(--space-3xs);
     margin-right: var(--space-xs);
@@ -551,6 +547,13 @@ html:not(.style-scope)[dark] .comment {
 @media (prefers-color-scheme: dark) {
     .discover li {
         border: 1px solid var(--base);
+    }
+}
+@media screen and (min-width: 711px) {
+    .discover li {
+        padding: var(--space-xs);
+        height: auto;
+        width: 100%;
     }
 }
 html:not(.style-scope)[dark] .discover li {
@@ -625,8 +628,6 @@ html:not(.style-scope)[dark] .profile {
 @media screen and (min-width: 711px) {
     .profile {
         margin: var(--space-s-m);
-        /* display: grid;
-        grid-template-columns: 1fr 2fr; */
     }
 }
 .screen-width
@@ -636,6 +637,11 @@ html:not(.style-scope)[dark] .profile {
 @media screen and (min-width: 711px) {
     .screen-width {
         margin: var(--space-s-m);
+    }
+} 
+@media screen and (min-width: 711px) {
+    .logo {
+        display:none !important;
     }
 } 
 .profile .name {
@@ -822,4 +828,28 @@ blockquote {
 }
 .comments > details[open] > div > details > summary::after {
     content: "";
+}
+@keyframes open {
+    0% { opacity: 0 }
+    100% { opacity: 1 }
+  }
+  
+  /* closing animation */
+  @keyframes close {
+    0% { opacity: 1 }
+    100% { opacity: 0 }
+  }
+  
+  details[open] summary~* {
+    animation: open .5s
+  }
+  
+  /* closing class */
+  details.closing summary~* {
+    animation: close .5s
+  }
+.all-caught-up {
+    border: 1px solid var(--yellow);
+    padding: var(--space-3xs);
+    color: var(--yellow);
 }
