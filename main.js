@@ -1,6 +1,6 @@
 import { Application, Router } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
-import { Language, minify } from "https://deno.land/x/minifier/mod.ts";
+import { Language, minify } from "https://deno.land/x/minifier@v1.1.0/mod.ts";
 import { DOMParser } from "https://esm.sh/linkedom";
 import { marky } from "https://deno.land/x/marky@v1.1.6/mod.ts";
 import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
