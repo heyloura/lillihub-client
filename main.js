@@ -1308,27 +1308,165 @@ async function createOrEditPostPage(access_token, title, content, destination, s
 
 await router.get("/", async (ctx, next) => {
     const cookies = await getCookies(ctx);
-    const marketingPage = await fetch('https://heyloura.com/lillihub/');
-    const html = await marketingPage.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html);
-    const body = doc.querySelector('main').toString();
+    //const marketingPage = await fetch('https://heyloura.com/lillihub/');
+    //const html = await marketingPage.text();
+    //const parser = new DOMParser();
+    //const doc = parser.parseFromString(html);
+    //const body = doc.querySelector('main').toString();
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    console.log(darkmodeCookie);
+//
+    // ctx.response.body = `
+    //     ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Lillihub', darkmodeCookie)}
+    //     </aside>
+    //     <style>.u-grid{display:block;}svg{filter: invert(84%) sepia(11%) saturate(978%) hue-rotate(69deg) brightness(89%) contrast(92%);}
+    //     img{box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;}
+    //     li span {text-align:center;} 
+    //     li span img, h3 {margin-bottom: var(--space-xl) !important;}
+    //     h3 {border-top: 1px solid var(--crust);padding-top: var(--space-xl) !important;}
+    //     b {display:block;}</style>
+    //     <div class="posts" style="padding:var(--space-3xs);">
+    //         ${body}
+    //     </div>
+    //     <script src="https://tinylytics.app/embed/5r2JkhATuM6jGxmbdcdV.js" defer></script>
+    //     ${endHTMLTemplate()}
+    // `;
+
 
     ctx.response.body = `
-        ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Lillihub', darkmodeCookie)}
-        </aside>
-        <style>.u-grid{display:block;}svg{filter: invert(84%) sepia(11%) saturate(978%) hue-rotate(69deg) brightness(89%) contrast(92%);}
-        img{box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;}
-        li span {text-align:center;} 
-        li span img, h3 {margin-bottom: var(--space-xl) !important;}
-        h3 {border-top: 1px solid var(--crust);padding-top: var(--space-xl) !important;}
-        b {display:block;}</style>
-        <div class="posts" style="padding:var(--space-3xs);">
-            ${body}
-        </div>
-        <script src="https://tinylytics.app/embed/5r2JkhATuM6jGxmbdcdV.js" defer></script>
-        ${endHTMLTemplate()}
+    <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="description" content="Lillihub - A delightful Micro.blog client">
+                <meta name="apple-mobile-web-app-capable" content="yes">
+                <link rel="icon" type="image/x-icon" href="/favicon.ico">
+                <link rel="apple-touch-icon" href="/lillihub-512.png">
+                <meta name="apple-mobile-web-app-status-bar-style" content="black">
+                <meta name="theme-color" content="#000000">
+                <meta name="apple-mobile-web-app-title" content="Lillihub">
+                <link rel="manifest" href="/manifest.webmanifest">
+                <link rel="stylesheet" href="https://unpkg.com/mvp.css"> 
+                <title>Lillihub</title>
+                <style>
+                    hr { background-color: #000; }
+                    section aside {
+                        border: none;
+                        box-shadow: none;
+                    }
+                    
+                    section aside:hover {
+                        box-shadow: none;
+                    }
+                </style>
+            </head>
+            <body style="background-color:#f1e3c7;">
+            <header>
+                <nav>
+                    <a href="/">Lillihub</a>
+                    <ul>
+                        <li><a href="https://github.com/heyloura/lillihub-client">Code</a></li>
+                        <li><a href="https://heyloura.com/categories/lillihub/">Blog</a> (<a href="https://heyloura.com/categories/lillihub/feed.xml">RSS</a>)</li>
+                    </ul>
+                </nav>
+                <p><img alt="Logo" src="/lillihub-512.png" height="128"></p>
+                <h1>Lillihub</h1>
+                <p>A delightful Micro.blog web client built by <a href="https://heyloura.com">Loura</a></p>
+                <br>
+                <p><a href="/app/login"><b>Sign in here</b></a></p>
+                <p>Welcome to the pond 🐸</p>
+            </header>
+            <main>
+                <section>
+                    <header>
+                        <h2>Key Features:</h2>
+                        <p>Lillihub is a reimagined Micro.blog web client based on simplicity and ease of use. 
+                            Follow and interact with other micro.bloggers and fediverse users with inline replies 
+                            and a fully loaded comment thread. It fits to your device, respects your light/dark mode 
+                            preferences, and offers content moderation.
+                        </p>
+                    </header>
+                    <aside>
+                        <figure>
+                            <img alt="Screenshot showing comments under a post" src="https://heyloura.com/uploads/2023/screenshot-from-2023-11-05-07-23-02.png">
+                        </figure>
+                    </aside>
+                    <aside style="width:var(--width-card-medium)">
+                        <h3>Posts, conversations and mentions:</h3>
+                        <p>Lillihub splits the Micro.blog timeline into three sections. 
+                            Posts have all the posts from the people you follow in chronological order. 
+                            The conversations page finds all the @mentions happening among your following 
+                            and shows the post that started it. It's a great way to find new people to follow. 
+                            The mentions page is an easy way to find who @mentioned you specifically.</p>
+
+                        <p>Comments are now preloaded under each post. Lillihub also makes it easy to reply 
+                            inline and select who you want to reply to. The reply area auto expands as you write.</p>
+                    </aside>
+                    <aside>
+                        <figure>
+                            <img src="https://heyloura.com/uploads/2023/screenshot-from-2023-11-05-08-59-58.png">
+                        </figure>
+                    </aside>
+                    <aside style="width:var(--width-card-medium)">
+                        <h3>Create new posts:</h3>
+                        <p>Create new posts easily with a simple markdown editor that supports common formats, 
+                        drag+drop/copy images, and preview. You can even toggle full screen mode (desktop only) 
+                        and preview your post. Not ready to publish? Save it as a draft. Lillihub supports 
+                        syndication and assigning categories all in one place.</p>
+                    </aside>
+                    <aside>
+                        <figure>
+                            <img src="https://heyloura.com/uploads/2023/screenshot-from-2023-11-05-07-13-15.png">
+                        </figure>
+                    </aside>
+                    <aside style="width:var(--width-card-medium)">
+                        <h3>Pin interesting posts:</h3>
+                        <p>Find an interesting post that you want to follow up on, but don't want to bookmark? 
+                        Pin it! Then come back to it when you're ready to engage. 
+                        Pinned posts are on the sidebar (desktop/tablet) or navbar (mobile) for easy access.</p>
+                    </aside>
+                    <aside>
+                        <figure>
+                            <img src="https://heyloura.com/uploads/2023/screenshot-from-2023-11-05-09-03-38.png">
+                        </figure>
+                    </aside>
+                    <aside style="width:var(--width-card-medium)">
+                        <h3>Discover feed, emojitags and official Micro.Blog accounts:</h3>
+                        <p>The discover page lets you view the discover feed from Micro.blog. Along the side (desktop/tablet) 
+                        or navbar (mobile) you can access all the tagmoji feeds Micro.blog offers. 
+                        The navigation also calls attention to the official Micro.blog accounts for roll calls 
+                        (Monday), community challenges, and news.</p>
+                    </aside>
+                </section>
+                <hr/>
+                <section>
+                    <header>
+                        <h2>Other Features:</h2>
+                    </header>
+                    <ul>
+                        <li>View user profiles. Both micro.bloggers and fediverse</li>
+                        <li>Upload images and manage your blog media</li>
+                        <li>Unfollow/Block/Mute users</li>
+                        <li>Spot users you aren't following and start following with a button click.</li>
+                        <li>Set content filters to exclude words from posts and comments</li>
+                        <li>Manage your Micro.Blog bookshelves</li>
+                        <li>Add books directly from the bookmoji feed</li>
+                        <li>Manage your Micro.Blog bookmarks</li>
+                    </ul>
+                </section>
+                <hr/>
+                <section>
+                    <header><h2>FAQ's + Tips and Tricks</h2></header>
+                    <details open>
+                        <summary >Not seeing conversations?</summary>
+                        <div>Check to see if you have an adblocker, like 1blocker, installed. Some adblockers remove comments 
+                        from webpages and will remove them from Lillihub.</div>
+                    </details>
+                </section>
+            </main>
+        </body>
+        </html>
     `;
 
   return await next();
