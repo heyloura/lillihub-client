@@ -1307,32 +1307,6 @@ async function createOrEditPostPage(access_token, title, content, destination, s
 // --------------------------------------------------------------------------------------
 
 await router.get("/", async (ctx, next) => {
-    const cookies = await getCookies(ctx);
-    //const marketingPage = await fetch('https://heyloura.com/lillihub/');
-    //const html = await marketingPage.text();
-    //const parser = new DOMParser();
-    //const doc = parser.parseFromString(html);
-    //const body = doc.querySelector('main').toString();
-    const darkmodeCookie = await ctx.cookies.get('darkMode');
-    console.log(darkmodeCookie);
-//
-    // ctx.response.body = `
-    //     ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Lillihub', darkmodeCookie)}
-    //     </aside>
-    //     <style>.u-grid{display:block;}svg{filter: invert(84%) sepia(11%) saturate(978%) hue-rotate(69deg) brightness(89%) contrast(92%);}
-    //     img{box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;}
-    //     li span {text-align:center;} 
-    //     li span img, h3 {margin-bottom: var(--space-xl) !important;}
-    //     h3 {border-top: 1px solid var(--crust);padding-top: var(--space-xl) !important;}
-    //     b {display:block;}</style>
-    //     <div class="posts" style="padding:var(--space-3xs);">
-    //         ${body}
-    //     </div>
-    //     <script src="https://tinylytics.app/embed/5r2JkhATuM6jGxmbdcdV.js" defer></script>
-    //     ${endHTMLTemplate()}
-    // `;
-
-
     ctx.response.body = `
     <!DOCTYPE html>
         <html lang="en">
@@ -1465,6 +1439,7 @@ await router.get("/", async (ctx, next) => {
                     </details>
                 </section>
             </main>
+            <script src="https://tinylytics.app/embed/5r2JkhATuM6jGxmbdcdV.js" defer></script>
         </body>
         </html>
     `;
