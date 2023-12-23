@@ -849,7 +849,19 @@ blockquote {
     animation: close .5s
   }
 .all-caught-up {
+    border: 1px solid var(--orange);
+    padding: var(--space-3xs);
+    color: var(--orange);
+}
+html:not(.style-scope)[dark] .all-caught-up {
     border: 1px solid var(--yellow);
     padding: var(--space-3xs);
     color: var(--yellow);
+}
+@media (prefers-color-scheme: dark) {
+    .all-caught-up  {
+        border: 1px solid var(--yellow);
+        padding: var(--space-3xs);
+        color: var(--yellow);
+    }
 }

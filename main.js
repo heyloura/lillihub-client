@@ -928,24 +928,28 @@ async function streamUserProfile(ctx, controller, author, _microblog) {
  * @param  {int}    i - The current loop on this fetch    
  * @param  {object} lastSeen - The tracking object for what has been seen by the user
  * @param  {array}  filtered - The current set of filtered posts
+ * @param  {bool}  showMessage - Show the message
  */
-function findLastNewPost(controller, i, lastSeen, filtered) {
+function findLastNewPost(controller, i, lastSeen, filtered, showMessage) {
     let lastNewPost = null;
     let unseenPosts = null;
 
     //check the first post. If it was before the last seen...
     if(i == 0 && !lastSeen.marked && lastSeen.last && lastSeen.last > 0 && filtered[0] && filtered[0]._microblog && 
-        filtered[0]._microblog.date_timestamp < lastSeen.last)
+        filtered[0]._microblog.date_timestamp < lastSeen.last && showMessage)
     {
         //then all posts have been seen.
         lastSeen.marked = true;
         controller.enqueue('<p class="center"><span class="all-caught-up">All caught up</span></p>');
+        lastNewPost = {};
     } 
     if(!lastSeen.marked) {
         unseenPosts = filtered.filter(p => p._microblog != undefined && lastSeen.last && lastSeen.last > 0 && 
             p._microblog.date_timestamp >= lastSeen.last);
         lastNewPost = unseenPosts && unseenPosts.length > 0 ? unseenPosts[unseenPosts.length - 1] : null;
     }
+
+    
     if(lastNewPost && unseenPosts.length == filtered.length){
         // all the post on the page a new. We need to check the next page to find the last one.
         lastNewPost = null;
@@ -986,7 +990,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const user = await getMicroBlogLoggedInUser(cookies.access_token);
     const result = await getMicroBlogTimeline(name, last ? last : before ? before : null, cookies.access_token, before ? true : false);
     let posts = result ? result.items : [];
-    const lastSeen = { now: Math.trunc(new Date().getTime()/1000), marked: true };
+    const lastSeen = { };
     
     const peek = await kv.get(["peek", user.username, location]);
     if(peek && peek.value) {
@@ -995,9 +999,10 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
             lastSeen.last = peek.value.now ? peek.value.now : 0;
             lastSeen.marked = false;
         } else {
-            lastSeen.now = peek.value.now ? peek.value.now : Math.trunc(new Date().getTime()/1000);
-            lastSeen.last = peek.value.last ? peek.value.last : 0;
-            lastSeen.marked = peek.value.marked ? peek.value.marked : true;
+            // we have paged
+            lastSeen.now = peek.value.now;
+            lastSeen.last = peek.value.last;
+            lastSeen.marked = peek.value.marked;
         }
     }
 
@@ -1016,6 +1021,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
             const roots = [];
             let seen = [];
             let i = 0;
+            let marked = false;
             if(last && !clear) {
                 const result = await kv.get(["conversations", user.username]);
                 if(result && result.value) {
@@ -1034,7 +1040,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
                     filtered = additionalPosts.filter(p => p._microblog != undefined && p._microblog.is_mention);
                     posts = posts.concat(filtered);
                 }
-                const lastNewPost = findLastNewPost(controller, i, lastSeen, filtered);
+                const lastNewPost = findLastNewPost(controller, i, lastSeen, filtered, !name);
                 i++;
                 for(let i = 0; i < filtered.length; i++ ){
                     const convo = await getMicroBlogConversation(filtered[i].id, cookies.access_token);
@@ -1044,8 +1050,10 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
                         roots.push(rootId);
                     }    
                 }
-                if(lastNewPost) {
+                if(lastNewPost && !marked) {
                     lastSeen.marked = true;
+                    marked = true;
+                    await kv.set(["peek", user.username, location], lastSeen);
                 }
             }
 
@@ -1059,6 +1067,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
         else {
             let count = 0;
             let i = 0;
+            let marked = false;
             while(count < _postCount && i < 5) {           
                 let filtered = [];
                 if(i == 0) {
@@ -1071,18 +1080,21 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
                     filtered = additionalPosts.filter(p => p._microblog != undefined && !p._microblog.is_mention);
                     posts = posts.concat(filtered);
                 }
-                const lastNewPost = findLastNewPost(controller, i, lastSeen, filtered);
+                const lastNewPost = findLastNewPost(controller, i, lastSeen, filtered, !name);
                 i++;
                 await streamPosts(ctx, controller, filtered, false, true, true, false, null, lastNewPost && !lastSeen.marked ? lastNewPost.id : 0);
-                if(lastNewPost) {
+                if(lastNewPost && !marked) {
                     lastSeen.marked = true;
+                    marked = true;
+                    await kv.set(["peek", user.username, location], lastSeen);
                 }
                 count += filtered.length;
             }
         }
-    
-        await kv.set(["peek", user.username, location], lastSeen);
-
+        
+        if(!lastSeen.marked) {
+            await kv.set(["peek", user.username, location], lastSeen);
+        }
         //paging not implemented via M.B. API for the user timeline
         controller.enqueue(`<p class="center">`);
         if(!name && (last || before) && posts[0]) {
@@ -1338,7 +1350,7 @@ await router.get("/", async (ctx, next) => {
             <body style="background-color:#f1e3c7;">
             <header>
                 <nav>
-                    <a href="/">Lillihub</a>
+                    <a href="/app/timeline">Lillihub</a>
                     <ul>
                         <li><a href="https://github.com/heyloura/lillihub-client">Code</a></li>
                         <li><a href="https://heyloura.com/categories/lillihub/">Blog</a> (<a href="https://heyloura.com/categories/lillihub/feed.xml">RSS</a>)</li>
