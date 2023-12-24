@@ -950,7 +950,7 @@ function findLastNewPost(controller, i, lastSeen, filtered, showMessage) {
     }
 
     
-    if(lastNewPost && unseenPosts.length == filtered.length){
+    if(lastNewPost && unseenPosts && filtered && unseenPosts.length == filtered.length){
         // all the post on the page a new. We need to check the next page to find the last one.
         lastNewPost = null;
     }
