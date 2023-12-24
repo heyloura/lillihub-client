@@ -991,18 +991,20 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const result = await getMicroBlogTimeline(name, last ? last : before ? before : null, cookies.access_token, before ? true : false);
     let posts = result ? result.items : [];
     const lastSeen = { };
-    
-    const peek = await kv.get(["peek", user.username, location]);
-    if(peek && peek.value) {
-        if(!last && !before) {
-            lastSeen.now = Math.trunc(new Date().getTime()/1000);
-            lastSeen.last = peek.value.now ? peek.value.now : 0;
-            lastSeen.marked = false;
-        } else {
-            // we have paged
-            lastSeen.now = peek.value.now;
-            lastSeen.last = peek.value.last;
-            lastSeen.marked = peek.value.marked;
+
+    if(!name) {
+        const peek = await kv.get(["peek", user.username, location]);
+        if(peek && peek.value) {
+            if(!last && !before) {
+                lastSeen.now = Math.trunc(new Date().getTime()/1000);
+                lastSeen.last = peek.value.now ? peek.value.now : 0;
+                lastSeen.marked = false;
+            } else {
+                // we have paged
+                lastSeen.now = peek.value.now;
+                lastSeen.last = peek.value.last;
+                lastSeen.marked = peek.value.marked;
+            }
         }
     }
 
@@ -1050,7 +1052,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
                         roots.push(rootId);
                     }    
                 }
-                if(lastNewPost && !marked) {
+                if(lastNewPost && !marked && !name) {
                     lastSeen.marked = true;
                     marked = true;
                     await kv.set(["peek", user.username, location], lastSeen);
@@ -1083,7 +1085,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
                 const lastNewPost = findLastNewPost(controller, i, lastSeen, filtered, !name);
                 i++;
                 await streamPosts(ctx, controller, filtered, false, true, true, false, null, lastNewPost && !lastSeen.marked ? lastNewPost.id : 0);
-                if(lastNewPost && !marked) {
+                if(lastNewPost && !marked && !name) {
                     lastSeen.marked = true;
                     marked = true;
                     await kv.set(["peek", user.username, location], lastSeen);
@@ -1092,9 +1094,10 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
             }
         }
         
-        if(!lastSeen.marked) {
+        if(!lastSeen.marked && !name) {
             await kv.set(["peek", user.username, location], lastSeen);
         }
+        
         //paging not implemented via M.B. API for the user timeline
         controller.enqueue(`<p class="center">`);
         if(!name && (last || before) && posts[0]) {
