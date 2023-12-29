@@ -2634,6 +2634,8 @@ await router.post("/app/blog/post", async (ctx) => {
             for(let i=0; i<syndicate.length; i++){
                 formBody.append("mp-syndicate-to[]", syndicate[i]);
             }
+        } else {
+            formBody.append("mp-syndicate-to[]", "");
         }
 
         const postingContent = await microBlogPostForm('micropub', formBody, cookies.access_token);
