@@ -541,6 +541,7 @@ html:not(.style-scope)[dark] .comment {
         grid-template-columns: 100%;
         padding: 0 0 var(--space-s) 0;
         width:100%;
+        overflow-x: hidden;
     }
 }
 .discover::-webkit-scrollbar {
