@@ -1532,7 +1532,7 @@ await router.get("/app/settings", async (ctx, next) => {
     const contentFilterCookie = await ctx.cookies.get('contentFilter');
     const limitCookie = await ctx.cookies.get('limitComments');
     const contentFilters = contentFilterCookie == undefined ? [] : JSON.parse(contentFilterCookie);
-    const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');  
   
     ctx.response.body = `
         ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Settings', darkmodeCookie)}
@@ -2722,7 +2722,11 @@ async function getMicroBlogTimeline(name, id, access_token, since = false) {
     const fetchURL = name ? `posts/${name}?count=${_mbItemCount}` : `posts/timeline?count=${_mbItemCount}`;
     try {
         const fetching = await microBlogGet(id ? `${fetchURL}&${since ? 'since_id' : 'before_id'}=${id}` : fetchURL, access_token);
-        return await fetching.json();
+        const posts = await fetching.json();
+        posts.items.sort(function(a, b) { 
+            return b._microblog.date_timestamp - a._microblog.date_timestamp;
+        });
+        return posts;
     } 
     catch 
     {
@@ -2958,20 +2962,7 @@ async function microBlogSimpleDelete(endpoint, access_token = null){
 function filterOut(contentFilters, content_html) {
     if(contentFilters.length > 0) {
         const words = content_html != undefined ? content_html.toLowerCase()
-            .replace('.', ' ')
-            .replace(',', ' ')
-            .replace(':', ' ')
-            .replace(';', ' ')
-            .replace('>', ' ')
-            .replace('<', ' ')
-            .replace('!', ' ')
-            .replace('@', ' ')
-            .replace('#', ' ')
-            .replace('$', ' ')
-            .replace('%', ' ')
-            .replace('&', ' ')
-            .replace('*', ' ')
-            .replace('"', ' ')
+            .replace(/[^a-z0-9]/gmi, " ").replace(/\s+/g, " ")
             .split(' ') : [];
         return contentFilters.some(filter => filter.trim() != '' && words.includes(filter.trim()));
     }
