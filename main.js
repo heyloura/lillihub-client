@@ -1383,7 +1383,7 @@ async function createOrEditPostPage(access_token, title, content, destination, s
 
 await router.get("/", async (ctx, next) => {
     const uuid = crypto.randomUUID();
-    await ctx.cookies.set("state", uuid, { sameSite: 'lax', secure: _appURL.includes('localhost') ? false : true });
+    await ctx.cookies.set("state", uuid);
     ctx.response.body = `
     <!DOCTYPE html>
         <html lang="en">
