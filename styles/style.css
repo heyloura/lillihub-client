@@ -441,6 +441,7 @@ html:not(.style-scope)[dark] form > details > summary {
 .posts {
     margin-bottom: var(--space-3xl);
     background-color: #fff;
+    overflow: auto;
 }
 @media (prefers-color-scheme: dark) {
     .posts {
