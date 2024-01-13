@@ -16,6 +16,7 @@ const _style = await Deno.readTextFile("styles/style.css");
 const _easyMDEJS = await Deno.readTextFile("scripts/easymde.min.js");
 const _easyMDECSS = await Deno.readTextFile("styles/easymde.min.css");
 const _compressor = await Deno.readTextFile("scripts/compressor.min.js");
+const _cookieKey = Deno.env.get("APP_COOKIE_KEY");
 
 // --------------------------------------------------------------------------------------
 // Templates
@@ -146,6 +147,7 @@ function mainMenuTemplate(loggedIn = true, endSidebar = true) {
             <li class="purple-red discover-li-wide"><small>Lillihub:</small>
                 <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/settings">Settings</a></p>
                 <p style="margin-left:0;" class="margin-3xs"><a href="/">About</a></p>
+                <p style="margin-left:0;" class="margin-3xs"><a href="/app/logout">Logout</a></p>
             </li>
             <li class="purple-red noShift logo"><a href="/">${logoSVG()}</a></li>
         </ul>
@@ -1208,7 +1210,7 @@ async function createOrEditPostPage(access_token, title, content, destination, s
 
     let syndicateTo = '';
     for(let i = 0; i < syndicates['syndicate-to'].length; i++) {
-        syndicateTo += `<label style="display:inline;"><input checked="checked" type="checkbox" name="syndicate[]" value="${syndicates['syndicate-to'][i].uid}"/>${syndicates['syndicate-to'][i].name}</label>&nbsp;`;
+        syndicateTo += `<label style="display:inline-block;"><input checked="checked" type="checkbox" name="syndicate[]" value="${syndicates['syndicate-to'][i].uid}"/>${syndicates['syndicate-to'][i].name}</label>&nbsp;`;
     }
 
     fetching = await microBlogGet(`micropub?q=category${destination ? '&mp-destination=' + destination : ''}`, access_token);
@@ -1226,7 +1228,7 @@ async function createOrEditPostPage(access_token, title, content, destination, s
         {
             const category = categories.categories[j];
             const checked = postCategories.length > 0 && postCategories.includes(category);
-            categoriesList += `<label style="display:inline;"><input ${checked ? 'checked="checked"' : ''} type="checkbox" name="category[${category}]" value="${category}"/>${category}</label>&nbsp;`;
+            categoriesList += `<label style="display:inline-block;"><input ${checked ? 'checked="checked"' : ''} type="checkbox" name="category[${category}]" value="${category}"/>${category}</label>&nbsp;`;
         }
     }
 
@@ -1238,6 +1240,61 @@ async function createOrEditPostPage(access_token, title, content, destination, s
         <script>${_compressor}</script>
         <style>${_easyMDECSS}</style>
         <script>${_easyMDEJS}</script>
+        <style>
+            .editor-toolbar.fullscreen {
+                height: 60px;
+                z-index: 9999999999;
+                border-bottom: 1px solid var(--text);
+            }
+            @media (prefers-color-scheme: dark) {
+                .editor-toolbar.fullscreen {
+                    border-bottom: 1px solid var(--mantle);
+                    background-color: var(--mantle);
+                }
+                .editor-preview {
+                    background-color: var(--mantle);
+                }
+                .cm-s-easymde .cm-formatting-link, .cm-s-easymde .cm-url, .cm-s-easymde .cm-link {
+                    color: var(--base) !important;
+                }
+            } 
+            html:not(.style-scope)[dark] .editor-toolbar.fullscreen {
+                border-bottom: 1px solid var(--mantle); 
+                background-color: var(--mantle);  
+            }
+            html:not(.style-scope)[dark] .editor-preview  {
+                background-color: var(--mantle);  
+            }
+            html:not(.style-scope)[dark] .cm-s-easymde .cm-formatting-link, .cm-s-easymde .cm-url, .cm-s-easymde .cm-link   {
+                color: var(--base) !important;
+            }
+
+            .editor-toolbar {
+                border:none;
+            }
+
+            .editor-toolbar button {
+                border: 1px solid var(--crust);
+                background-color: var(--base);
+            }
+            @media (prefers-color-scheme: dark) {
+                .editor-toolbar button {
+                    border: 1px solid var(--crust);
+                    background-color: var(--base);
+                }
+            } 
+            html:not(.style-scope)[dark] .editor-toolbar button {
+                border: 1px solid var(--crust);
+                background-color: var(--base);  
+            }
+            .cm-spell-error {
+                background: rgba(255,0,0,0) !important;
+            }
+            span[data-img-src]::after {
+                max-width: 385px;
+                max-height: 600px;
+            }
+        </style>
         <form action="/app/blog/post" method="POST" enctype="multipart/form-data">
             <input name="url" type="hidden" value="${id}" />
             <label>
@@ -1250,8 +1307,11 @@ async function createOrEditPostPage(access_token, title, content, destination, s
                 const easymde = new EasyMDE({
                     element: document.getElementById('content'),
                     uploadImage: true,
-                    spellChecker: true,
-                    status: ["autosave", "lines", "words", "cursor", {
+                    inputStyle: 'contenteditable',
+                    nativeSpellCheck: true,
+                    showIcons: ["code"],
+                    previewImagesInEditor: true,
+                    status: ["upload-image", "autosave", "lines", "words", "cursor", {
                         className: "keystrokes",
                         defaultValue: (el) => {
                             //el.setAttribute('data-keystrokes', 0);
@@ -1299,14 +1359,14 @@ async function createOrEditPostPage(access_token, title, content, destination, s
                 });
                 </script>
             </div>
-            <details style="background-color:var(--mantle);font-size:var(--step--1)">
-                <summary style="background-color:var(--mantle);margin-bottom:0">Micro.blog tag list</summary>
+            <details style="font-size:var(--step--1)">
+                <summary style="margin-bottom:0">Micro.blog tag list</summary>
                 <p>Use an emoji below in your text to tag your post for a Micro.blog tagmoji feed.</p>
                 <ul style="list-style:none;columns: 2;-webkit-columns: 2;-moz-columns: 2;">${emojiList}</ul>
             </details>
-            <p>Categories</p>
+            <p style="text-decoration:underline;">Categories</p>
             <p>${categoriesList}</p>
-            ${syndicateTo ? `<p>Crossposting</p><p>${syndicateTo}</p>` : ''}
+            ${syndicateTo ? `<p style="text-decoration:underline;">Crossposting</p><p>${syndicateTo}</p>` : ''}
             ${destinationSelect}
             <p><select name="status">
                     <option value="publish" ${status == "published" ? 'selected="selected"' : ''}>publish</option>
@@ -1322,6 +1382,8 @@ async function createOrEditPostPage(access_token, title, content, destination, s
 // --------------------------------------------------------------------------------------
 
 await router.get("/", async (ctx, next) => {
+    const uuid = crypto.randomUUID();
+    await ctx.cookies.set("state", uuid, { sameSite: 'lax', secure: _appURL.includes('localhost') ? false : true });
     ctx.response.body = `
     <!DOCTYPE html>
         <html lang="en">
@@ -1338,33 +1400,36 @@ await router.get("/", async (ctx, next) => {
                 <link rel="manifest" href="/manifest.webmanifest">
                 <link rel="stylesheet" href="https://unpkg.com/mvp.css"> 
                 <title>Lillihub</title>
-                <style>
-                    hr { background-color: #000; }
-                    section aside {
-                        border: none;
-                        box-shadow: none;
-                    }
-                    
-                    section aside:hover {
-                        box-shadow: none;
-                    }
-                </style>
             </head>
-            <body style="background-color:#f1e3c7;">
+            <body style="background-color:#fefefe">
             <header>
                 <nav>
-                    <a href="/app/timeline">Lillihub</a>
+                    <a href="/app/timeline">My Lillihub Timeline</a>
                     <ul>
                         <li><a href="https://github.com/heyloura/lillihub-client">Code</a></li>
                         <li><a href="https://heyloura.com/categories/lillihub/">Blog</a> (<a href="https://heyloura.com/categories/lillihub/feed.xml">RSS</a>)</li>
                     </ul>
                 </nav>
-                <p><img alt="Logo" src="/lillihub-512.png" height="128"></p>
+                <p><img alt="Logo" src="/lillihub-512.png" height="128" style="border: 2px solid black;"></p>
                 <h1>Lillihub</h1>
                 <p>A delightful Micro.blog web client built by <a href="https://heyloura.com">Loura</a></p>
                 <br>
-                <p><a href="/app/login"><b>Sign in here</b></a></p>
-                <p>Welcome to the pond 🐸</p>
+                <section> 
+                <form action="https://micro.blog/indieauth/auth" method="get">
+                    <h3>Log in using Micro.blog</h3>
+                    <label style="font-weight:400;">
+                    Enter in your https://<em>username</em>.micro.blog website or your custom domain if you have one.
+                    <br/><br/><input style="width:90%;" type="url" name="me" value="https://" required/>
+                    </label>
+                    <input type="hidden" name="client_id" value="${_appURL}"/>
+                    <input type="hidden" name="redirect_uri" value="${_appURL}/app/auth"/>
+                    <input type="hidden" name="state" value="${uuid}"/>
+                    <input type="hidden" name="scope" value="create"/>
+                    <input type="hidden" name="response_type" value="code"/>
+                    <button style="display: block; margin: 0px auto;" type="submit" class="signIn">Sign In</button>
+                </form>
+                <p>Welcome to the pond! 🐸</p>
+                </section>
             </header>
             <main>
                 <section>
@@ -1468,7 +1533,7 @@ await router.get("/", async (ctx, next) => {
  */
 await router.get("/app/login", async (ctx, next) => {
     const uuid = crypto.randomUUID();
-    ctx.cookies.set("state", uuid);
+    await ctx.cookies.set("state", uuid);
     ctx.response.body = `
         ${beginHTMLTemplate()}
         </aside>
@@ -1495,6 +1560,62 @@ await router.get("/app/login", async (ctx, next) => {
 
 /**
  * For more info about indieAuth see: https://indieauth.spec.indieweb.org/
+ * @todo Allow for custom indieauth and not just Micro.blog
+ */
+await router.get("/app/logout", async (ctx, next) => {
+    await ctx.cookies.delete("state");
+    await ctx.cookies.delete("access_token");
+    await ctx.cookies.delete("name");
+    await ctx.cookies.delete("avatar");
+    await ctx.cookies.delete("username");
+    await ctx.cookies.delete("default");
+
+    ctx.response.body = `
+    <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="description" content="Lillihub - A delightful Micro.blog client">
+                <meta name="apple-mobile-web-app-capable" content="yes">
+                <link rel="icon" type="image/x-icon" href="/favicon.ico">
+                <link rel="apple-touch-icon" href="/lillihub-512.png">
+                <meta name="apple-mobile-web-app-status-bar-style" content="black">
+                <meta name="theme-color" content="#000000">
+                <meta name="apple-mobile-web-app-title" content="Lillihub">
+                <link rel="manifest" href="/manifest.webmanifest">
+                <link rel="stylesheet" href="https://unpkg.com/mvp.css"> 
+                <title>Lillihub</title>
+            </head>
+            <body style="background-color:#fefefe">
+            <header>
+                <nav>
+                    <a href="/">Lillihub Login</a>
+                    <ul>
+                        <li><a href="https://github.com/heyloura/lillihub-client">Code</a></li>
+                        <li><a href="https://heyloura.com/categories/lillihub/">Blog</a> (<a href="https://heyloura.com/categories/lillihub/feed.xml">RSS</a>)</li>
+                    </ul>
+                </nav>
+                <p><img alt="Logo" src="/lillihub-512.png" height="128" style="border: 2px solid black;"></p>
+                <h1>Lillihub</h1>
+                <p>A delightful Micro.blog web client built by <a href="https://heyloura.com">Loura</a></p>
+                <br>
+                <section> 
+                <p>You have been logged out. Thank you for visiting the pond! 🐸</p>
+                </section>
+            </header>
+            <main>
+
+            </main>
+            <script src="https://tinylytics.app/embed/5r2JkhATuM6jGxmbdcdV.js" defer></script>
+        </body>
+        </html>
+    `;
+    return await next();
+});
+
+/**
+ * For more info about indieAuth see: https://indieauth.spec.indieweb.org/
  * @todo Pass along errors to the login page for display
  */
 await router.get("/app/auth", async (ctx, next) => {
@@ -1511,14 +1632,14 @@ await router.get("/app/auth", async (ctx, next) => {
         const fetching = await microBlogPostForm('indieauth/token', formBody, null, 'application/json');
         const response = await fetching.json();
         const expiresOn = new Date(Date.now() + 12096e5); // two weeks
-        
-        ctx.cookies.set("access_token", response.access_token, { expires: expiresOn});
-        ctx.cookies.set("name", encodeURIComponent(response.profile.name), { expires: expiresOn});
-        ctx.cookies.set("avatar", response.profile.photo, { expires: expiresOn});
+
+        await ctx.cookies.set("access_token", response.access_token, { expires: expiresOn });
+        await ctx.cookies.set("name", encodeURIComponent(response.profile.name), { expires: expiresOn });
+        await ctx.cookies.set("avatar", response.profile.photo, { expires: expiresOn });
 
         const user = await getMicroBlogLoggedInUser(response.access_token);
-        ctx.cookies.set("username", encodeURIComponent(user.username), { expires: expiresOn});
-        ctx.cookies.set("default", encodeURIComponent(user.default_site), { expires: expiresOn});
+        await ctx.cookies.set("username", encodeURIComponent(user.username), { expires: expiresOn });
+        await ctx.cookies.set("default", encodeURIComponent(user.default_site), { expires: expiresOn });
 
         ctx.response.redirect('/app/timeline');
     } else {
@@ -2069,7 +2190,7 @@ await router.get("/app/blog/post", async (ctx, next) => {
             
             await streamAccountSwitch(ctx, controller, account ? account.uid : '', '/app/blog/post');
             
-            controller.enqueue(`<div class="profile profile-dark"><div style="margin-top:var(--space-s-m)" class="form">`);
+            controller.enqueue(`<div class="screen-width"><div style="margin-top:var(--space-s-m)" class="form">`);
             
             // Check if we are editing a post or not.
             if(id) {
@@ -2133,13 +2254,13 @@ await router.post("/app/settings", async (ctx, next) => {
             return value.toLowerCase().trim();
         });
             
-        ctx.cookies.set("contentFilter", JSON.stringify(result), { expires: new Date(Date.now() + 315600000000)}); // 10 years
+        await ctx.cookies.set("contentFilter", JSON.stringify(result), { expires: new Date(Date.now() + 315600000000)}); // 10 years
         ctx.response.body = iFrameTemplate('<small class="success">Saved filters.</small>', darkmodeCookie); 
     } else if(type == "setLimit") {
         const limit = (await body.value).get('limit');
         const newLimit = parseInt(limit);
         if(newLimit) {
-            ctx.cookies.set("limitComments", limit, { expires: new Date(Date.now() + 315600000000)}); // 10 years
+            await ctx.cookies.set("limitComments", limit, { expires: new Date(Date.now() + 315600000000)}); // 10 years
             ctx.response.body = iFrameTemplate('<small class="success">Saved limit.</small>', darkmodeCookie); 
         } else {
             ctx.response.body = iFrameTemplate('<small class="error">Failed.</small>', darkmodeCookie); 
@@ -2147,10 +2268,10 @@ await router.post("/app/settings", async (ctx, next) => {
     } else if(type == "darkmode") {
         const darkMode = (await body.value).get('enableDarkMode');
         if(darkMode == "on"){
-            ctx.cookies.set("darkMode", true, { expires: new Date(Date.now() + 315600000000)}); // 10 years
+            await ctx.cookies.set("darkMode", true, { expires: new Date(Date.now() + 315600000000)}); // 10 years
             ctx.response.body = iFrameTemplate('<small class="success">Saved preference.</small>', darkmodeCookie); 
         } else {
-            ctx.cookies.set("darkMode", false, { expires: new Date(Date.now() + 315600000000)}); // 10 years
+            await ctx.cookies.set("darkMode", false, { expires: new Date(Date.now() + 315600000000)}); // 10 years
             ctx.response.body = iFrameTemplate('<small class="success">Saved preference.</small>', darkmodeCookie); 
         }
     }
@@ -2293,7 +2414,7 @@ await router.post("/app/pinPost", async (ctx) => {
     let currentPins = await ctx.cookies.get('pinnedPosts');
     currentPins = currentPins == undefined ? [] : JSON.parse(currentPins);
     currentPins.push(value.get('id'));
-    ctx.cookies.set("pinnedPosts", JSON.stringify(currentPins), { expires: new Date(Date.now() + 315600000000)}); // 10 years
+    await ctx.cookies.set("pinnedPosts", JSON.stringify(currentPins), { expires: new Date(Date.now() + 315600000000)}); // 10 years
 
     ctx.response.body = iFrameTemplate(`<form action="/app/unpinPost" method="POST">
         <input type="hidden" name="id" value="${id}" />
@@ -2313,7 +2434,7 @@ await router.post("/app/unpinPost", async (ctx) => {
     if (index > -1) { 
         currentPins.splice(index, 1);
     }
-    ctx.cookies.set("pinnedPosts", JSON.stringify(currentPins), { expires: new Date(Date.now() + 315600000000)}); // 10 years
+    await ctx.cookies.set("pinnedPosts", JSON.stringify(currentPins), { expires: new Date(Date.now() + 315600000000)}); // 10 years
     
     ctx.response.body = iFrameTemplate(`<form action="/app/pinPost" method="POST">
         <input type="hidden" name="id" value="${id}" />
@@ -2840,12 +2961,13 @@ async function getMicroBlogDestination(destination, access_token) {
  * @return {object}      An object containing values of common cookies if available. 
  */
 async function getCookies(ctx) {
-    return {
+    const cookies = {
         access_token: await ctx.cookies.get('access_token'),
         username: await ctx.cookies.get('username'),
         avatar: await ctx.cookies.get('avatar'),
         profileName: await ctx.cookies.get('name')
     };
+    return cookies;
 }
 /**
  * Extend the Error class and capture information from the response
@@ -3042,7 +3164,7 @@ function logoSVG() {
 // --------------------------------------------------------------------------------------
 // Configure and start the HTTP server
 // --------------------------------------------------------------------------------------
-const app = new Application({ logErrors: true });
+const app = new Application({ logErrors: true, keys: [_cookieKey] });
 app.use(oakCors());
 
 /**
