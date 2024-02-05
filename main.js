@@ -17,6 +17,7 @@ const _easyMDEJS = await Deno.readTextFile("scripts/easymde.min.js");
 const _easyMDECSS = await Deno.readTextFile("styles/easymde.min.css");
 const _compressor = await Deno.readTextFile("scripts/compressor.min.js");
 const _cookieKey = Deno.env.get("APP_COOKIE_KEY");
+//const _cookieKey = "secret1";
 
 // --------------------------------------------------------------------------------------
 // Templates
@@ -67,6 +68,7 @@ function beginHTMLTemplate(avatar, username, title, darkMode) {
         <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
         </head>
         <body class="u-container">
+        <a id="topJump" href="#top">Top ↑</a>
         <header id="top">
             <nav>
                 ${!username ? loginHTML : navBarHTML }
@@ -121,8 +123,9 @@ function iFrameForm(form, darkmode) {
  * Gets the application main menu
  * @param  {bool} loggedIn - Is the user is logged in. Defaults to yes because of the redirect middleware
  * @param  {bool} endSidebar - closes the sidebar HTML with a </aside>
+ * @param  {bool} is_premium - Is this a premium micro.blog user?
  */
-function mainMenuTemplate(loggedIn = true, endSidebar = true) {
+function mainMenuTemplate(loggedIn = true, endSidebar = true, is_premium = false) {
     return loggedIn ? `
         <ul class="discover">
             <li class="blue-purple"><a href="/app/blog/post">New Post</a></li>
@@ -138,6 +141,7 @@ function mainMenuTemplate(loggedIn = true, endSidebar = true) {
             </li>
             <li class="orange-yellow discover-li-wide"><small>My Stuff:</small>
                 <p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/bookmarks">Bookmarks</a></p>
+                ${is_premium ? `<p style="margin-left:0;" class="margin-3xs"><a class="margin-bottom-3xs" href="/app/highlights">Highlights</a></p>` : ``}
                 <p style="margin-left:0;" class="margin-3xs"><a href="/app/bookshelves">Bookshelves</a></p>
             </li>
             <li class="red-orange discover-li-wide"><small>Manage MB:</small>
@@ -406,7 +410,7 @@ function postActionTemplate(darkmode, id, username, isPinned, _microblog, conten
                                         </form></details>` : '';
     return `
         <div class="actions">
-            <details style="position:absolute;z-index:${id};border-radius: var(--space-3xs);color: var(--subtext-1);border: 1px solid var(--mantle);background-color: var(--mantle);margin-left: -92px;">
+            <details style="position:absolute;z-index:${id};border-radius: var(--space-3xs);color: var(--subtext-1);background-color: var(--mantle);margin-left: -92px;">
                 <summary style="padding: var(--space-2xs); font-size: var(--step--1); margin: 0;">Actions</summary>
                 <div style="padding: var(--space-2xs); width: 200px; margin-left: -129px; background-color: var(--mantle);">
                 ${followAction}
@@ -611,16 +615,13 @@ async function streamDiscoverTags(ctx, controller) {
 /**
  * Streams the boomark tags submenu to the client (premium users only)
  * @param  {object} ctx - The request context
- * @param  {object} controller - The controller of the readable stream     
+ * @param  {object} controller - The controller of the readable stream    
+ * @param  {array} tags - the Micro.blog tags 
  */
-async function streamBookmarkTags(ctx, controller) {
-    const access_token = await ctx.cookies.get('access_token');
+async function streamBookmarkTags(ctx, controller, tags) {
     const id = await ctx.request.url.searchParams.get('id');
-
     controller.enqueue(`<ul class="categories">`); 
 
-    const tags = await getMicroBlogBookmarkTags(access_token);
-    
     for(let i = 0; i < tags.length; i++) {
         const tag = tags[i];
         streamSubMenuItem(controller, undefined, `${tag}`, `/app/bookmarks?id=${tag}`, tag == id, i);
@@ -710,11 +711,14 @@ async function streamPosts(ctx, controller, posts, isConvo, includeReplies = tru
                         return `<label style="display:block;text-align:left;"><input name="tags[]" type="checkbox" ${currentTags.includes(tag) ? 'checked="checked"' : ''} value="${tag}">${tag}</label>` 
                     }).join('');
             }
-            const post_content = post.tags ? `${post.content_html}<div><p style="color:var(--subtext-1)"><small>Tags: ${post.tags}</small></p></div>` : post.content_html;
 
+            const post_content = post.content_html;
             const returnLocation = getReturnLocation(await ctx.request.url.href);
             const postActions = includeActions ? postActionTemplate(darkmodeCookie, post.id, post.author._microblog.username, !pinned.includes(post.id), post._microblog, post.content_html, bookshelves.items, isFollowing, tagCheck, true, '', 0, previous, returnLocation) : '';
             controller.enqueue(postContentTemplate(post.id, post.author._microblog.username, post.author.name, post.author.avatar, post.url, post.date_published, post_content, postActions, isFollowing, post._microblog.date_relative));
+            if(post.tags) {
+                controller.enqueue(`<div><p style="color:var(--subtext-1)"><small>Tags: ${post.tags.split(',').map(function(tag){ return `<span class="tag"><a href="/app/bookmarks?id=${tag.trim()}">${tag.trim()}</a></span>` }).join(' ')}</small></p></div>`);
+            }
 
             if(includeReplies) {
                 await streamComments(ctx, controller, post.id, openConvo, isConvo ? convo : null, previous);
@@ -974,6 +978,7 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
     const darkmodeCookie = await ctx.cookies.get('darkMode');
     const clear = await ctx.request.url.searchParams.get('clear');
     const location = getReturnLocation(await ctx.request.url.href);
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, conversations ? "Conversations" : name ? name : "Timeline", darkmodeCookie));  
 
@@ -982,14 +987,14 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
         controller.enqueue(discoverMenuTemplate());
         await streamDiscoverTags(ctx, controller); 
     } else {
-        controller.enqueue(mainMenuTemplate(true, false));
+        controller.enqueue(mainMenuTemplate(true, false, user.is_premium));
         await streamPinned(ctx, controller); 
     }  
 
     controller.enqueue(`<div class="posts">`);
 
     const kv = await Deno.openKv();
-    const user = await getMicroBlogLoggedInUser(cookies.access_token);
+
     const result = await getMicroBlogTimeline(name, last ? last : before ? before : null, cookies.access_token, before ? true : false);
     let posts = result ? result.items : [];
     const lastSeen = { };
@@ -1126,9 +1131,10 @@ async function streamTimelineOrConversations(ctx, controller, conversations = fa
 async function streamManageUsersPage(ctx, controller, type, title) {
     const cookies = await getCookies(ctx);
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, title, darkmodeCookie));  
-    controller.enqueue(mainMenuTemplate(true, true));
+    controller.enqueue(mainMenuTemplate(true, true, user.is_premium));
     controller.enqueue(`<div class="posts">`);
     controller.enqueue(`<div class="switch-field">
         <a ${type == 'following' ? 'class="selected"' : ''} href="/app/users/following">Following</a>
@@ -1654,10 +1660,11 @@ await router.get("/app/settings", async (ctx, next) => {
     const limitCookie = await ctx.cookies.get('limitComments');
     const contentFilters = contentFilterCookie == undefined ? [] : JSON.parse(contentFilterCookie);
     const darkmodeCookie = await ctx.cookies.get('darkMode');  
-  
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
+    
     ctx.response.body = `
         ${beginHTMLTemplate(cookies.avatar, cookies.username, 'Settings', darkmodeCookie)}
-        ${mainMenuTemplate()} 
+        ${mainMenuTemplate(true, true, user.is_premium)} 
             <div class="posts">
                 <div style="margin-bottom: var(--space-m);display:block;" class="profile">
                     <h3>Content filters</h3>
@@ -1720,12 +1727,13 @@ await router.get("/app/photos", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const name = await ctx.request.url.searchParams.get('name');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Photos", darkmodeCookie));  
         
-            controller.enqueue(mainMenuTemplate(true, false));
+            controller.enqueue(mainMenuTemplate(true, false, user.is_premium));
             await streamPinned(ctx, controller); 
         
             controller.enqueue(`<div class="posts">`);
@@ -1755,8 +1763,9 @@ await router.get("/app/mentions", async (ctx, next) => {
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
+            const user = await getMicroBlogLoggedInUser(cookies.access_token);
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, "Mentions", darkmodeCookie));  
-            controller.enqueue(mainMenuTemplate(true, false));
+            controller.enqueue(mainMenuTemplate(true, false, user.is_premium));
             await streamPinned(ctx, controller); 
             controller.enqueue(`<div class="posts">`);
             
@@ -1779,7 +1788,6 @@ await router.get("/app/mentions", async (ctx, next) => {
             controller.enqueue(postMenuBarTemplate('mentions', null));  
 
             const kv = await Deno.openKv();
-            const user = await getMicroBlogLoggedInUser(cookies.access_token);
             let seen = [];
             if(last && !clear) {
                 const result = await kv.get(['mentions', user.username]);
@@ -1876,11 +1884,12 @@ await router.get("/app/post", async (ctx, next) => {
     const id = await ctx.request.url.searchParams.get('id');
     const cookies = await getCookies(ctx);
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, `Post: ${id}`, darkmodeCookie));  
-            controller.enqueue(mainMenuTemplate(true, false));
+            controller.enqueue(mainMenuTemplate(true, false, user.is_premium));
             await streamPinned(ctx, controller); 
 
             controller.enqueue(`<div class="posts">`);
@@ -1934,31 +1943,69 @@ await router.get("/app/bookmarks", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const id = await ctx.request.url.searchParams.get('id');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const last = await ctx.request.url.searchParams.get('last');
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, id ? id : 'Bookmarks', darkmodeCookie));  
             const user = await getMicroBlogLoggedInUser(cookies.access_token);
             
-            controller.enqueue(mainMenuTemplate(true, !user.is_premium));
-            if(user.is_premium) {      
-                await streamBookmarkTags(ctx, controller); 
+            controller.enqueue(mainMenuTemplate(true, !user.is_premium, user.is_premium));
+            let tagCheck = '';
+            if(user.is_premium) {     
+                const tags = await getMicroBlogBookmarkTags(cookies.access_token); 
+                await streamBookmarkTags(ctx, controller, tags); 
+                tagCheck = tags.map(function (tag) { 
+                    return `<label style="display:block;text-align:left;"><input name="tags[]" type="checkbox" value="${tag}" ${tag == id? `checked="checked"`:``}>${tag}</label>` 
+                }).join('');
             }
 
-            controller.enqueue(`<div class="posts">`);
-            if(!id) {
-                controller.enqueue(`<div style="margin-bottom: var(--space-m);display:block;" class="profile">
-                    <form method="POST" action="/app/bookmarks/new">
-                        <label>Add Bookmark:<br/><br/><input type="url" name="url" /></label>
-                        <button type="submit">Add Bookmark</button>
-                    </form></div>`);
-            }
+            controller.enqueue(`<div class="bookmarks posts">`);
+            controller.enqueue(`<div style="margin-bottom: var(--space-m);display:block;" class="profile">
+            <form method="POST" action="/app/bookmarks/new">
+                <label>Add Bookmark${id ? ` to ${id}` : ``}:<br/><br/><input type="url" name="url" /></label>
+                ${!user.is_premium ? `` : 
+                    `<details class="actionExpand" style="margin-bottom:var(--space-xs); background-color:initial;" >
+                        <summary style="background-color:initial;" class="actionExpandToggle">Assign Tags</summary>
+                        ${tagCheck}
+                        <label style="margin-top:var(--space-xs)" for="newTag">New tag</label>
+                        <input style="width:140px;" type="text" id="newTag" name="newTag" />
+                    </details>`
+                }
+                <button type="submit">Add Bookmark</button>
+            </form></div>`);
 
-            const fetching = await microBlogGet(id ? `posts/bookmarks?tag=${id}` : 'posts/bookmarks', cookies.access_token);
+            const fetching = await microBlogGet(id ? `posts/bookmarks?tag=${id}${last ? `&before_id=${last}` : ``}` : `posts/bookmarks${last ? `?before_id=${last}` : ``}`, cookies.access_token);
             const bookmarks = await fetching.json();
+            let highlightItems = [];
+
+            if(user.is_premium) {
+                const highlightFetching = await microBlogGet(`posts/bookmarks/highlights`, cookies.access_token);
+                let highlights = await highlightFetching.json();
+                highlightItems = highlights.items;
+                
+                // let i = 0;
+                // while(highlights.items.length > 0 && i < 5) { 
+                //     i++;
+                //     highlights = await (await microBlogGet(`posts/bookmarks/highlights?before_id=${highlightItems[highlightItems.length - 1].id}`, cookies.access_token)).json();
+                //     highlightItems.concat(highlights.items);
+                // }
+            }
+
+            for(let i = 0; i < bookmarks.items.length; i++) {
+                const bookmark = bookmarks.items[i];
+                const bookmarkHighlights = highlightItems.filter(h => h.url == bookmark.url);
+                if(bookmarkHighlights && bookmarkHighlights.length > 0) {
+                    bookmark.content_html = bookmark.content_html.replaceAll("https://micro.blog/bookmarks/", `/app/bookmarks/reader?title=${encodeURIComponent(bookmark.content_html)}&highlights=${encodeURIComponent(bookmarkHighlights.map(bh => bh.id).join(','))}&id=`);
+                    bookmark.content_html += `<small><mark>${bookmarkHighlights.length} highlight(s)</mark></small>`;
+                } else {
+                    bookmark.content_html = bookmark.content_html.replaceAll("https://micro.blog/bookmarks/", `/app/bookmarks/reader?title=${encodeURIComponent(bookmark.content_html)}&id=`);
+                }
+            }
 
             await streamPosts(ctx, controller, bookmarks.items, false, false, true, false);
 
+            controller.enqueue(`<p class="center"><a style="margin-right:var(--space-3xl)" href="${id ? `/app/bookmarks?id=${id}&last=${bookmarks.items[bookmarks.items.length - 1].id}` : `/app/bookmarks?last=${bookmarks.items[bookmarks.items.length - 1].id}`}">Next</a></p>`); 
             controller.enqueue(`</div>${endHTMLTemplate()}`); 
             controller.close();
         }
@@ -1968,15 +2015,181 @@ await router.get("/app/bookmarks", async (ctx, next) => {
     return await next();
 });
 
+await router.get("/app/highlights", async (ctx, next) => {
+    const cookies = await getCookies(ctx);
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
+    
+    ctx.response.body = new ReadableStream({
+        async start(controller) {
+            controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'Highlights', darkmodeCookie));  
+            
+            controller.enqueue(mainMenuTemplate(true, true, user.is_premium));
+
+            if(user.is_premium) {
+                controller.enqueue(`<div class="highlights posts">`);
+
+                const fetching = await microBlogGet(`posts/bookmarks/highlights`, cookies.access_token);
+                const highlights = await fetching.json();
+
+                for(let i =0; i < highlights.items.length; i++) {
+                    const highlight = highlights.items[i];
+                    controller.enqueue(`<article class="post" style="display:block;">
+                    <section style="display:flex; flex-direction: column;">
+                        <header style="display:flex; flex-direction: row;margin-bottom:var(--space-xs);">
+                            <div>
+                                <p>${highlight.title}</p>
+                            </div>
+                            <div style="margin-left: auto;">                        
+                                <div class="actions">
+                                    <details style="position:absolute;z-index:30421533;border-radius: var(--space-3xs);color: var(--subtext-1);background-color: var(--mantle);margin-left: -92px;">
+                                        <summary style="padding: var(--space-2xs); font-size: var(--step--1); margin: 0;">Actions</summary>
+                                        <div style="padding: var(--space-2xs); width: 200px; margin-left: -129px; background-color: var(--mantle);">         
+                                            <a target="_top" href="/app/blog/post?content=${encodeURIComponent(`<blockquote cite="${highlight.url}">${highlight.content_text}<footer>—<cite><a href="${highlight.url}" target="_blank">${highlight.title}</a></cite></footer></blockquote>`)}">Quote</a>
+                                        
+                                            <details class="actionExpand">
+                                                <summary class="actionExpandToggle">Delete</summary>
+                                                <form method="POST" action="/app/highlight/delete">
+                                                    <input type="hidden" name="id" value="${highlight.id}">
+                                                    <button type="submit">Confirm Delete</button>
+                                                </form>
+                                            </details>
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                        </header>
+                        <mark>${highlight.content_text}</mark>
+                        <div style="padding-top:var(--space-3xs);"><small>
+                            <a href="${highlight.url}"><sl-format-date month="long" day="numeric" year="numeric" hour="numeric" minute="numeric" hour-format="12" date="${highlight.date_published}">${highlight.date_published}</sl-format-date></a></small></div>
+                    </section></article>`);
+                }
+                controller.enqueue(`<p class="center"><a style="margin-right:var(--space-3xl)" href="${`/app/highlights?last=${highlights.items[highlights.items.length - 1].id}`}">Next</a></p>`); 
+            }
+
+            controller.enqueue(`</div>${endHTMLTemplate()}`); 
+            controller.close();
+        }
+    });
+
+    return await next();
+});
+
+await router.get("/app/bookmarks/reader", async (ctx, next) => {
+    const cookies = await getCookies(ctx);
+    const id = await ctx.request.url.searchParams.get('id');
+    const title = await ctx.request.url.searchParams.get('title');
+    const highlightIds = await ctx.request.url.searchParams.get('highlights');
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
+    let result = ``;
+    const fetching = await microBlogGet(`hybrid/bookmarks/${id}`, cookies.access_token);
+    const webreader = await fetching.text();
+    
+    const parser = new DOMParser();
+    result += beginHTMLTemplate(cookies.avatar, cookies.username, 'Highlight Reader', darkmodeCookie); 
+    result += mainMenuTemplate(true, true, user.is_premium);
+    result += `<div class="reader posts screen-width">`;
+
+    const titleDoc = parser.parseFromString(title);
+    const readerLink = titleDoc.querySelector(".post_archived_links");
+    const parent = readerLink.parentNode;
+    parent.removeChild(readerLink);
+    result += `<div style="border-bottom: 1px solid var(--crust)">
+        ${titleDoc.toString().replaceAll("<p>",`<h2><a style="margin-right:var(--space-xs);" class="button" href="/app/bookmarks">Back</a>`).replaceAll("</p>","</h2>")} 
+        </div>`;
+    
+    const doc = parser.parseFromString(webreader);
+    const content = doc.querySelector("#content");
+    const base = doc.querySelector("base");
+    const baseURL = base.getAttribute("href");
+    const root = baseURL.split('/');
+    root.pop();
+
+    const r = new RegExp('^(?:[a-z]+:)?//', 'i');
+    const images = doc.querySelectorAll("img");
+    for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        const source = image.getAttribute('src')
+        if(!r.test(source)) {
+            image.setAttribute('src', `${root.join("/")}/${source}`)
+        }
+    }
+
+    let contentWithHighlights = content.toString();
+    if(highlightIds) {
+        let highlightItems = [];
+        const highlightFetching = await microBlogGet(`posts/bookmarks/highlights`, cookies.access_token);
+        let highlights = await highlightFetching.json();
+        highlightItems = highlights.items;
+        
+        // let i = 0;
+        // while(highlights.items.length > 0 && i < 5) { 
+        //     i++;
+        //     highlights = await (await microBlogGet(`posts/bookmarks/highlights?before_id=${highlightItems[highlightItems.length - 1].id}`, cookies.access_token)).json();
+        //     highlightItems.concat(highlights.items);
+        // }
+
+        highlightItems = highlightItems.filter(hi => highlightIds.includes(hi.id));
+
+        for(let j=0; j < highlightItems.length; j++) {
+            contentWithHighlights = contentWithHighlights.replaceAll(highlightItems[j].content_text,`<span class="highlight">${highlightItems[j].content_text}</span>`);
+        }
+    }
+    result += contentWithHighlights;  
+
+    result += `<form method="POST" action="/app/highlight/add" >
+            <input type="hidden" name="highlightIds" value="${highlightIds}"/>
+            <input type="hidden" name="title" value="${encodeURIComponent(title)}"/>
+            <input type="hidden" name="selection" id="selectionInput"/>
+            <button style="display:none;" id="highlightMe">Highlight selection</button>
+        </form>
+        <script>
+        function getSelectionHtml() {
+            var html = "";
+            if (typeof window.getSelection != "undefined") {
+                var sel = window.getSelection();
+                if (sel.rangeCount) {
+                    var container = document.createElement("div");
+                    for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                        container.appendChild(sel.getRangeAt(i).cloneContents());
+                    }
+                    html = container.innerHTML;
+                }
+            } else if (typeof document.selection != "undefined") {
+                if (document.selection.type == "Text") {
+                    html = document.selection.createRange().htmlText;
+                }
+            }
+            return html;
+        }
+        document.addEventListener("selectionchange", function(event) {
+            const selection = window.getSelection();
+            
+            if (selection.rangeCount === 0) {
+                return;
+            }
+        
+            document.getElementById('selectionInput').value = getSelectionHtml();
+        });
+    </script>`;
+
+    result += `</div>${endHTMLTemplate()}`; 
+    ctx.response.body = result;
+
+    return await next();
+});
+
 await router.get("/app/bookshelves", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const id = await ctx.request.url.searchParams.get('id');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'Bookshelves', darkmodeCookie));             
-            controller.enqueue(mainMenuTemplate(true, false));
+            controller.enqueue(mainMenuTemplate(true, false, user.is_premium));
             await streamBookshelfLinks(ctx, controller);
 
             if(!id) {
@@ -2043,11 +2256,12 @@ await router.get("/app/blog/posts", async (ctx, next) => {
     const destination = await ctx.request.url.searchParams.get('destination');
     const status = await ctx.request.url.searchParams.get('status');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'My Blog', darkmodeCookie));  
-            controller.enqueue(mainMenuTemplate(true));
+            controller.enqueue(mainMenuTemplate(true, true, user.is_premium));
             controller.enqueue(`<div class="posts">`);
 
             const account = await getMicroBlogDestination(destination, cookies.access_token);
@@ -2100,6 +2314,7 @@ await router.get("/app/blog/media", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const destination = await ctx.request.url.searchParams.get('destination');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
@@ -2117,7 +2332,7 @@ await router.get("/app/blog/media", async (ctx, next) => {
             }
             </script>`);
             
-            controller.enqueue(mainMenuTemplate(true));
+            controller.enqueue(mainMenuTemplate(true, true, user.is_premium));
             controller.enqueue(`<div class="posts">`);
             
             await streamAccountSwitch(ctx, controller, account ? account.uid : '', '/app/blog/media');
@@ -2139,7 +2354,7 @@ await router.get("/app/blog/media", async (ctx, next) => {
                 </div>`);
 
             const media = await getMicroBlogMedia(account, cookies.access_token);
-            controller.enqueue(`<section class="posts">`);
+            controller.enqueue(`<section class="media posts">`);
             controller.enqueue(media.items.map(i => postContentTemplate(i.url, 
                 cookies.username, 
                 i.published.split('T')[0], 
@@ -2179,13 +2394,14 @@ await router.get("/app/blog/post", async (ctx, next) => {
     const destination = await ctx.request.url.searchParams.get('destination');
     const content = await ctx.request.url.searchParams.get('content');
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             const account = await getMicroBlogDestination(destination, cookies.access_token);
 
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, id ? 'Edit Post' : 'Create Post', darkmodeCookie));              
-            controller.enqueue(mainMenuTemplate(true));
+            controller.enqueue(mainMenuTemplate(true, true, user.is_premium));
             controller.enqueue(`<div class="posts">`);
             
             await streamAccountSwitch(ctx, controller, account ? account.uid : '', '/app/blog/post');
@@ -2215,11 +2431,12 @@ await router.get("/app/blog/post", async (ctx, next) => {
 await router.get("/app/replies", async (ctx, next) => {
     const cookies = await getCookies(ctx);
     const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const user = await getMicroBlogLoggedInUser(cookies.access_token);
 
     ctx.response.body = new ReadableStream({
         async start(controller) {
             controller.enqueue(beginHTMLTemplate(cookies.avatar, cookies.username, 'Replies', darkmodeCookie));  
-            controller.enqueue(mainMenuTemplate(true));
+            controller.enqueue(mainMenuTemplate(true, true, user.is_premium));
 
             controller.enqueue(`<div class="posts">`);
             controller.enqueue(`<p class="center"><a target="_blank" class="button" href="https://micro.blog/account/replies">Manage replies on Micro.blog ${externalLinkSVG()}</a></p>`);
@@ -2496,7 +2713,85 @@ await router.post("/app/bookmarks/new", async (ctx) => {
 
     const postingContent = await microBlogPostForm('micropub', formBody, access_token);
     const response = await postingContent.text();
+
+    const fetchingBookmarks = await microBlogGet('posts/bookmarks', access_token);
+    const bookmark = (await fetchingBookmarks.json()).items[0];
+
+    const tags = value.getAll('tags[]') ? value.getAll('tags[]') : [];
+    const newTag = value.get('newTag');
+    const id = bookmark.id;
+
+    if(newTag) {
+        tags.push(newTag);
+    }
+
+    // only add tags if there were any
+    if(tags.length > 0) {
+        const formBodyTags = new URLSearchParams();
+        formBodyTags.append("tags", tags.join(','));
+        
+        const fetchingTags = await microBlogPostForm(`posts/bookmarks/${id}`, formBodyTags, access_token);
+        const responseTags = await fetchingTags.text();
+    }
+
     ctx.response.redirect('/app/bookmarks');
+});
+
+// await router.post("/app/highlight/add", async (ctx) => {
+//     const access_token = await ctx.cookies.get('access_token');
+//     const body = ctx.request.body({ type: 'form' });
+//     const value = await body.value;
+//     const selection = value.get('selection');
+//     const title = value.get('title');
+//     const highlightIds = value.get('highlightIds');
+
+//     console.log(selection);
+//     console.log(title);
+//     console.log(highlightIds);
+
+//     const fetching = await microBlogSimplePost(`/bookmarks/${id}/highlights`, access_token);
+//     const response = await fetching.text();
+
+//     ctx.response.redirect('/app/bookmarks');
+// });
+
+await router.post("/app/highlight/delete", async (ctx) => {
+    const access_token = await ctx.cookies.get('access_token');
+    const body = ctx.request.body({ type: 'form' });
+    const value = await body.value;
+    const id = value.get('id');
+
+    const fetching = await microBlogSimpleDelete(`posts/bookmarks/highlights/${id}`, access_token);
+    const response = await fetching.text();
+
+    try {
+        JSON.parse(response);
+        ctx.response.redirect("/app/highlights");
+    }
+    catch {
+        //TO-DO....
+        //ctx.response.body = iFrameTemplate(`<small class="fail">Unsuccessful.</small>'`); 
+    } 
+});
+
+await router.post("/app/share", async (ctx, next) => {
+    const darkmodeCookie = await ctx.cookies.get('darkMode');
+    const cookies = await getCookies(ctx);
+    const body = ctx.request.body({ type: 'form-data' });
+    const data = await body.value.read({ maxSize: Number.MAX_SAFE_INTEGER });
+
+    ctx.response.body = `
+        ${beginHTMLTemplate()}
+        </aside>
+        <div class="posts" style="padding:var(--space-3xs);">
+        <h1>You Shared Stuff</h1>
+
+        ${JSON.stringify(data)}
+
+        </div>
+        ${endHTMLTemplate()}
+    `;
+    return await next();
 });
 
 await router.post("/app/bookmarks/manageTags", async (ctx) => {
@@ -3186,7 +3481,27 @@ app.use(async (ctx, next) => {
                     "sizes": "512x512",
                     "type": "image/png",
                     "purpose": "any maskable"
-                  }]
+                  }],
+                  "share_target": {
+                    "action": "/app/share",
+                    "method": "POST",
+                    "enctype": "multipart/form-data",
+                    "params": {
+                      "title": "name",
+                      "text": "description",
+                      "url": "link",
+                      "files": [
+                        {
+                          "name": "photos",
+                          "accept": ["image/jpeg", ".jpg"]
+                        },
+                        {
+                            "name": "screenshot",
+                            "accept": ["image/png", ".png"]
+                        }
+                      ]
+                    }
+                  }
               }`;
             ctx.response.type = "text/json";
         } else if(ctx.request.url.pathname == "/sw.js") {
