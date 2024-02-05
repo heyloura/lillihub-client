@@ -129,7 +129,7 @@ a:visited {
 .show-lg {
     display: none;
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .show-lg {
         display: inline-block;
     }
@@ -144,7 +144,7 @@ a:visited {
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     grid-gap: 1rem;     
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .u-grid {
         grid-template-columns: 150px 1fr;
         padding-inline: var(--grid-gutter);
@@ -180,7 +180,7 @@ header nav {
 html:not(.style-scope)[dark] header nav {
     background-color: var(--mantle);   
 }
-@media screen and (min-width: 711px)
+@media screen and (min-width: 650px)
 {
     header nav {
         border-radius: var(--space-3xs);
@@ -203,7 +203,7 @@ header nav a {
     color: var(--text);
     text-decoration: none;
 }
-@media screen and (min-width: 711px)
+@media screen and (min-width: 650px)
 {
     header nav a {
         border-right: 1px solid var(--crust);
@@ -307,7 +307,7 @@ a.selected {
     gap: 5px;
     grid-auto-rows: minmax(100px, auto);
 }
-@media screen and (min-width: 711px)
+@media screen and (min-width: 650px)
 {
     #photos {
         display: grid;
@@ -344,7 +344,7 @@ a.selected {
     margin: var(--space-xs-s) 0;
     padding: 0 var(--space-xs-s);   
 }
-@media screen and (min-width: 711px)
+@media screen and (min-width: 650px)
 {
     .switch-field {
         padding: 0;   
@@ -401,7 +401,7 @@ html:not(.style-scope)[dark] form > details > summary {
     margin:0px auto;
     border-radius: var(--space-3xs);
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .form {
         margin: var(--space-s-m);
     }
@@ -414,7 +414,7 @@ html:not(.style-scope)[dark] form > details > summary {
     padding: var(--space-xs-s);
     padding-bottom: var(--space-s);    
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .posts article {
         margin: var(--space-s-m);
         padding-bottom: var(--space-xs-s);
@@ -493,7 +493,7 @@ html:not(.style-scope)[dark] .comment {
     -webkit-overflow-scrolling: touch;
     margin-bottom: 0;
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .categories {
         display: block;
         padding: 0 0 var(--space-s) 0;
@@ -512,7 +512,7 @@ html:not(.style-scope)[dark] .comment {
     min-height: var(--space-l);
     min-width: var(--space-l);
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .categories li {
         margin-bottom: var(--space-2xs);
         margin-right: 0;
@@ -537,7 +537,7 @@ html:not(.style-scope)[dark] .comment {
     margin-top: 0;
     margin-bottom: 0;
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .discover {
         display: inline-grid;
         grid-template-columns: 100%;
@@ -567,7 +567,7 @@ html:not(.style-scope)[dark] .comment {
         border: 1px solid var(--base);
     }
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .discover li {
         padding: var(--space-xs);
         height: auto;
@@ -577,7 +577,7 @@ html:not(.style-scope)[dark] .comment {
 html:not(.style-scope)[dark] .discover li {
     border: 1px solid var(--base);
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .discover li {
         display: block;
         width: 100%;
@@ -623,7 +623,7 @@ html:not(.style-scope)[dark] .discover a {
 .column-fill {
     margin: var(--space-xs-s);
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .column-fill {
         margin: var(--space-s-m);
     }
@@ -643,7 +643,7 @@ html:not(.style-scope)[dark] .discover a {
 html:not(.style-scope)[dark] .profile {
     background-color: var(--mantle);
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .profile {
         margin: var(--space-s-m);
     }
@@ -652,12 +652,12 @@ html:not(.style-scope)[dark] .profile {
 {
     margin: var(--space-xs-s);
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .screen-width {
         margin: var(--space-s-m);
     }
 } 
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .logo {
         display:none !important;
     }
@@ -665,7 +665,7 @@ html:not(.style-scope)[dark] .profile {
 .profile .name {
     text-align: center;
 }
-@media screen and (min-width: 711px) {
+@media screen and (min-width: 650px) {
     .profile .name {
         text-align: left;
     } 
@@ -881,5 +881,64 @@ html:not(.style-scope)[dark] .all-caught-up {
         border: 1px solid var(--yellow);
         padding: var(--space-3xs);
         color: var(--yellow);
+    }
+}
+#topJump {
+    position: fixed;
+    bottom: 10px;
+    left: 77.25%;
+    font-size: var(--step--2);
+    border-color: var(--mantle);
+    background-color: var(--crust);
+    padding: var(--space-2xs);
+    border-radius: var(--space-3xs);
+    color: var(--text);
+    z-index: 999999999;
+}
+.bookmarks .content > p:last-child a, .tag {
+    border-radius: var(--space-3xs);
+    background-color: var(--mantle);
+    padding: var(--space-3xs);
+    font-size: var(--step--1);
+}
+.media {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 5px;
+    grid-auto-rows: minmax(100px, auto);
+}
+@media screen and (min-width: 650px)
+{
+    .media {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        grid-auto-rows: minmax(100px, auto);
+    }
+}
+mark {
+    background-color: var(--yellow);
+    padding: var(--space-2xs);
+}
+#highlightMe {
+    position: fixed;
+    bottom: 55px;
+    left: 77.25%;
+    font-size: var(--step--2);
+    border-color: var(--yellow);
+    padding: var(--space-2xs);
+    border-radius: var(--space-3xs);
+    color: var(--yellow);
+    z-index: 999999999;
+}
+.highlight {
+    background-color: var(--yellow);  
+}
+html:not(.style-scope)[dark] .highlight  {
+    color: var(--crust);
+}
+@media (prefers-color-scheme: dark) {
+    .highlight   {
+        color: var(--crust);
     }
 }
