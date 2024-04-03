@@ -1,0 +1,21 @@
+<div class="container mt-2">
+    <div class="no-border mb-2 hide-if-user-has-no-javascript">
+        <div class="input-group following-search">
+            <input type="search" oninput="liveSearch('.tile', 'searchbox')" id="searchbox" class="form-input" placeholder="Search Page" />
+        </div>
+    </div>
+    <ul class="tab tab-block mt-2">
+        <li class="tab-item {{followingActive}}">
+            <a href="/users/following">Following</a>
+        </li>
+        <li class="tab-item {{mutedActive}}">
+            <a href="/users/muted">Muted</a>
+        </li>
+        <li class="tab-item {{blockedActive}}">
+            <a href="/users/blocked">Blocked</a>
+        </li>
+    </ul>
+    <br/>
+    {{message}}
+    {{feed}}
+</div>

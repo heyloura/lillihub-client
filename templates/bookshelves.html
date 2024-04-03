@@ -1,0 +1,16 @@
+<style>
+    .label-secondary {
+        display:none;
+    }
+</style>
+<div class="container">
+    <form method="POST" action="/bookshelf/add" target="InteractionResult" onsubmit="showIframeResult()">
+        <div class="input-group float-right mb-2 mt-2">
+            <input type="text" name="name" class="form-input" placeholder="Name...">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> Bookshelf</button>
+        </div>
+    </form>
+    <p style="clear: both;" class="pt-2"><b>My bookshelves</b><br/><br/>{{shelves}}<br/></p>
+    <p><b>Find some inspiration from recent book posts from the community.</b></p>
+</div>
+{{feed}}

@@ -1,0 +1,14 @@
+<div class="card mt-2">
+    <div class="card-body">{{content}}</div>
+    <div class="card-footer">Updated: 
+        <sl-format-date month="long" 
+            day="numeric" 
+            year="numeric" 
+            hour="numeric" 
+            minute="numeric" 
+            hour-format="12" 
+            date="{{modified}}">{{modified}}
+        </sl-format-date>
+        <small>{{is_shared}}</small>
+    </div>
+</div>

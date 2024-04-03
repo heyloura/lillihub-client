@@ -1,0 +1,35 @@
+<div class="card mt-2">
+    <div class="card-header">
+        <div class="tile">
+            <div class="tile-icon">
+                <figure class="avatar avatar-lg"><img loading="lazy" src="{{avatar}}" alt="Avatar" height="48" width="48"></figure>
+            </div>
+            <div class="tile-content">
+                <div class="tile-title pb-2 mb-2">{{name}}<br/>
+                    <small>
+                        Bookmarked <sl-format-date month="long" day="numeric" year="numeric" hour="numeric" minute="numeric" hour-format="12" date="{{published}}">{{publishedDisplay}}</sl-format-date>
+                        {{tags}}
+                    </small>
+                </div>
+            </div>
+            <div class="tile-action">
+                <div class="btn-group">
+                    {{addTag}}
+                    <div class="dropdown dropdown-right">
+                        <a class="btn btn-link dropdown-toggle" tabindex="0"><i class="bi bi-three-dots-vertical"></i></a>
+                        <ul class="menu text-left">
+                            <li class="menu-item"><form autocomplete="off" method="POST" action="/bookmarks/unbookmark">
+                                <input type="hidden" name="id" value="{{id}}" />
+                                <button class="btn btn-link btn-block" type="submit">Unbookmark</button>
+                            </form></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        {{summary}}
+        {{highlightCount}}
+    </div>
+</div>

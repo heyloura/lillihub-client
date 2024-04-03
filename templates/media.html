@@ -1,0 +1,23 @@
+<div class="container">
+    <div class="float-right mt-2">
+        <div class="input-group mb-2 mt-2">
+            {{destinationDropdown}}
+            <input style="padding:0;height:unset;" type="file" name="media" class="form-input" />
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+    </div>
+    <div style="clear: both;">
+        <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
+            <div class="input-group">
+                <input type="search" id="searchbox" oninput="liveSearch('.tile', 'searchbox')" class="form-input" placeholder="Search" />
+            </div>
+        </div>
+        {{feed}}
+        <a class="float-right" href="/media?destination={{destination}}&offset={{offset}}" class="btn btn-primary">Next</a>
+    </div>
+    <style>
+    .tile-title {
+        max-width: 400px;
+    }
+    </style>
+</div>

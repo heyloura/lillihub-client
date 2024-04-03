@@ -1,0 +1,22 @@
+<div class="container">
+    <div class="float-right btn-group">
+        {{HMTLUserActionDropdown}}
+    </div>
+    <div class="profile mb-2" style="clear:both">
+        <div style="margin-bottom:2rem;" class="panel-header text-center">
+            <figure class="avatar avatar-xl"><img loading="lazy" src="{{avatar}}" alt="{{name}} Avatar" height="48" width="48"></figure>
+            <div class="panel-title h5 mt-10">{{name}}</div>
+            <div class="panel-subtitle">{{pronouns}}</div>
+            {{bio}}
+        </div>
+    </div>
+    <ul class="tab tab-block mt-2">
+        <li class="tab-item {{postsActive}}">
+            <a href="/user/{{username}}">Posts & Conversations</a>
+        </li>
+        <li class="tab-item {{photosActive}}">
+            <a href="/user/photos/{{username}}">Photos</a>
+        </li>
+    </ul>
+</div>
+{{feed}}

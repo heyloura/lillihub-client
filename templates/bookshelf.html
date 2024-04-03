@@ -1,0 +1,18 @@
+<div class="container">
+    <div class="input-group float-right mb-2 mt-2">
+        <a href="/bookshelves/shelf/{{id}}/update" class="btn btn-primary"><i class="bi bi-plus"></i> Book</a>
+    </div>
+    <div style="clear: both;">
+        <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
+            <div class="input-group">
+                <input type="search" id="searchbox" oninput="liveSearch('.tile', 'searchbox')" class="form-input" placeholder="Search" />
+            </div>
+        </div>
+        {{feed}}
+    </div>
+</div>
+<style>
+.tile-title {
+    max-width: 400px;
+}
+</style>

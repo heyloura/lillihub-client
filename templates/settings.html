@@ -1,0 +1,25 @@
+<div class="container">
+    <p class="pt-2">
+        <b>Content filters</b>
+    </p>
+    <p>A comma seperated list of terms that lillihub will use to exclude posts and comments from showing.</p>
+    <form method="POST" action="/settings/contentfilters" target="InteractionResult" onsubmit="showIframeResult();">
+        <div class="grow-wrap">
+            <textarea name="exclude" onInput="growTextArea(this)">{{exclude}}</textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Save content filter list</button>
+    </form>
+    <br/>
+    <hr class="mt-2"/>
+    <p class="pt-2">
+        <b>Always dark theme</b>
+    </p>
+    <p>Have Lillihub use the dark theme. Overrides browser/system <em><small>prefers-color-scheme</small></em>.
+    You will need to refresh the page to see the changes take effect.</p>
+    <form method="POST" action="/settings/darktheme" target="InteractionResult" onsubmit="showIframeResult();">
+        <label>
+            <input type="checkbox" name="enableDarkMode" {{darktheme}} /> Enable dark theme
+        </label>
+        <button class="btn btn-primary" type="submit">Save dark theme setting</button>
+    </form>
+</div>

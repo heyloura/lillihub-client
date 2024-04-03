@@ -1,0 +1,106 @@
+<script src="https://cdn.jsdelivr.net/npm/showdown@2.0.3/dist/showdown.min.js" defer></script>
+<div class="container">
+    <div class="no-border panel mb-2 mt-2 p-2 bg-primary hide-if-user-has-javascript" style="clear:both">
+        <p>Notes require JavaScript to be enabled.</p>
+    </div>
+    <div class="btn-group btn-group-block mt-2 float-right">
+        <a href="/notes/{{id}}/update" class="btn btn-link"><i class="bi bi-pencil"></i> Note</a>
+    </div>
+    <div class="clearfix"></div>
+    <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
+        <div class="input-group">
+            <input type="search" id="searchbox" oninput="liveSearch('.card', 'searchbox')" class="form-input" placeholder="Search" />
+        </div>
+    </div>
+    {{notes}}
+    <style>
+    .card {
+        background-color: {{color}} !important;
+        cursor: pointer;
+        transition: all .2s ease-in-out;
+    }
+    .card:hover {
+        border: {{light}} !important;
+        transform: scale(1.025);
+    }
+    @media (prefers-color-scheme: dark) {
+        .card {
+            background-color: {{dark}} !important;
+        }
+    }
+    </style>
+    <script type="module">
+        const imported_key = localStorage.getItem("notes_key") ? await crypto.subtle.importKey(
+            'raw',
+            hexStringToArrayBuffer(localStorage.getItem("notes_key").substr(4)),
+            { name: 'AES-GCM', length: 256 },
+            true,
+            ['encrypt', 'decrypt']
+        ) : '';
+
+        function hexStringToArrayBuffer(hexString) {
+            const length = hexString.length / 2;
+            const array_buffer = new ArrayBuffer(length);
+            const uint8_array = new Uint8Array(array_buffer);
+        
+            for (let i = 0; i < length; i++) {
+                const byte = parseInt(hexString.substr(i * 2, 2), 16);
+                uint8_array[i] = byte;
+            }
+        
+            return array_buffer;
+        }
+
+        async function decryptWithKey(encryptedText) {
+            const encrypted_data = new Uint8Array(atob(encryptedText).split('').map(char => char.charCodeAt(0)));
+            const iv = encrypted_data.slice(0, 12);
+            const ciphertext = encrypted_data.slice(12);
+
+            const decrypted_buffer = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv },
+                imported_key,
+                ciphertext
+            );
+        
+            const decoder = new TextDecoder();
+            const decrypted_text = decoder.decode(decrypted_buffer);
+            return decrypted_text;
+        }
+
+        async function decryptNotes() {
+            if(localStorage.getItem("notes_key"))
+            {
+                const converter = new showdown.Converter();
+                const cards = document.querySelectorAll('.decryptMe');
+                for (var i = 0; i < cards.length; i++) {
+                    cards[i].innerHTML = converter.makeHtml(await decryptWithKey(cards[i].innerHTML));
+                }
+            }
+        }
+
+        async function encryptWithKey(text) {
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encoder = new TextEncoder();
+            const plaintext_buffer = encoder.encode(text);
+        
+            const ciphertext_buffer = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                imported_key,
+                plaintext_buffer
+            );
+        
+            const encrypted_data = new Uint8Array([...iv, ...new Uint8Array(ciphertext_buffer)]);
+            const base64_encoded = btoa(String.fromCharCode(...encrypted_data));
+            return base64_encoded;
+        }
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", async function(event) {
+                await decryptNotes();
+            });
+        }
+        else
+        {
+            await decryptNotes();
+        }
+    </script>
+</div>
