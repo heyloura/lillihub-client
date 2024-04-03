@@ -67,8 +67,6 @@ const UNFOLLOW_USER = new URLPattern({ pathname: "/users/unfollow" });
 const FOLLOW_USER = new URLPattern({ pathname: "/users/follow" });
 const MUTE_USER = new URLPattern({ pathname: "/users/mute" });
 const BLOCK_USER = new URLPattern({ pathname: "/users/block" });
-// const UNMUTE_USER = new URLPattern({ pathname: "/users/unmute" });
-// const UNBLOCK_USER = new URLPattern({ pathname: "/users/unblock" });
 const FAVORTIE_USER_TOGGLE = new URLPattern({ pathname: "/users/favorite/toggle" });
 const PIN_TIMELINE_POST = new URLPattern({ pathname: "/timeline/favorite/toggle" });
 const BOOKMARKS_UPDATE_TAGS = new URLPattern({ pathname: "/bookmarks/update" });
@@ -81,6 +79,9 @@ const ADD_NOTE = new URLPattern({ pathname: "/note/update" });
 const DELETE_NOTE = new URLPattern({ pathname: "/note/delete" });
 const ADD_NOTEBOOK = new URLPattern({ pathname: "/notebook/add" });
 const ADD_POST = new URLPattern({ pathname: "/post/add" });
+const UPLOAD_MEDIA_ROUTE = new URLPattern({ pathname: "/media/upload" });
+const DELETE_MEDIA_ROUTE = new URLPattern({ pathname: "/media/delete" });
+
 
 const SESSION = {};
 
@@ -610,7 +611,6 @@ async function handler(req) {
 
 
 
-
     if(ADD_POST.exec(req.url) && user) {
         const value = await req.formData();
         const destination = value.get('destination');
@@ -642,11 +642,85 @@ async function handler(req) {
 
         const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + accessTokenValue, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
         if (!posting.ok) {
-            return ReturnIframeResponse('Unsuccessful.');
+            console.log(`${user.username} tried to add a post and ${await posting.text()}`);
+            return new Response(HTMLPage(`Redirect`, `<h3 class="container">An error was encountered while posting. Redirecting back...</h3>`, user, req.url.replaceAll('/unbookmark','')), {
+                status: 200,
+                headers: {
+                    "content-type": "text/html",
+                },
+            });
         }
 
-        return Response.redirect(req.url.replaceAll('/post/add', '/posts'));
+        return Response.redirect(req.url.replaceAll('/post/add', `/posts?destination=${destination}`));
     }
+
+    if(UPLOAD_MEDIA_ROUTE.exec(req.url) && user) {
+        const value = await req.formData();
+        let redirect = false;
+        let destination = '';
+
+        const formData = new FormData();
+        let fileBlob;  
+
+        for (const pair of value.entries()) {
+            const field = pair[0], val = pair[1];
+            if (val instanceof File) {
+              fileBlob = new Blob([await val.arrayBuffer()], { 'type': val.contentType });  
+              formData.append('file', fileBlob, val.name);
+            } else {
+              if(field == 'destination') {
+                formData.append("mp-destination", val);
+                destination = val;
+              }
+              if(field == 'redirect') {
+                redirect = true;
+              }
+            }
+        }
+
+        let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } } );
+        const config = await fetching.json();
+        const mediaEndpoint = config["media-endpoint"];
+
+        fetching = await fetch(mediaEndpoint, { method: "POST", headers: { "Authorization": "Bearer " + accessTokenValue }, body: formData } );
+        const uploaded = await fetching.json();
+
+        if(redirect) {
+            return Response.redirect(req.url.replaceAll('/media/upload', `/media?destination=${destination}`));
+        }
+        else
+        {
+            return new Response(uploaded.url, {
+                status: 200,
+                headers: {
+                    "content-type": "text/plain",
+                },
+            });
+        }
+    }
+
+    if(DELETE_MEDIA_ROUTE.exec(req.url) && user) {
+        const value = await req.formData();
+        const destination = value.get('destination');
+        const url = value.get('url');
+
+        const formBody = new URLSearchParams();
+        formBody.append("mp-destination", destination);
+        formBody.append('action', 'delete');
+        formBody.append('url', url);
+
+        const fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } } );
+        const config = await fetching.json();
+        const mediaEndpoint = config["media-endpoint"];
+
+        const posting = await fetch(mediaEndpoint, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + accessTokenValue, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
+        if (!posting.ok) {
+            console.log(`${user.username} tried to delete a media item and ${await posting.text()}`);
+        }
+
+        return Response.redirect(req.url.replaceAll('/media/delete', `/media?destination=${destination}`));
+    }
+
 
     if(PIN_TIMELINE_POST.exec(req.url) && user) {
         const value = await req.formData();
@@ -854,7 +928,7 @@ async function handler(req) {
     // Defalut page for unauthenticated user
     if(DISCOVER_ROUTE.exec(req.url) || (HOME_ROUTE.exec(req.url) && !user)) {
         const uuid = crypto.randomUUID();
-        return new Response(await DiscoverTemplate(user, accessTokenValue, uuid), {
+        return new Response(await DiscoverTemplate(user, accessTokenValue, uuid, req.url), {
             status: 200,
             headers: {
                 "content-type": "text/html",
@@ -947,15 +1021,22 @@ async function handler(req) {
 
                 SESSION[user.username] = user;
                 const expiresOn = new Date(Date.now() + (12096e5 * 2)); // four weeks
-                const page = new Response(await TimelineTemplate(SESSION, user, response.access_token, req, true), {
+                const page =  new Response(HTMLPage(`Redirect`, `<h3 class="container">You have been logged in. Redirecting to your timeline</h3>`, user, req.url.split('?')[0].replaceAll('/auth','')), {
                     status: 200,
                     headers: {
                         "content-type": "text/html",
                         "set-cookie": `access_token=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn}`
                     },
                 });
-                //const page = await TimelineTemplate(SESSION, user, response.access_token, req, true);
-                //page.headers.append("set-cookie", `access_token=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn}`); 
+                
+                
+                // new Response(await TimelineTemplate(SESSION, user, response.access_token, req, true), {
+                //     status: 200,
+                //     headers: {
+                //         "content-type": "text/html",
+                //         "set-cookie": `access_token=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn}`
+                //     },
+                // });
                 return page;
             }
         }
@@ -988,12 +1069,6 @@ async function handler(req) {
             "content-type": "text/html",
         },
     });
-    // return new Response(await DiscoverTemplate(undefined, undefined), {
-    //     status: 200,
-    //     headers: {
-    //         "content-type": "text/html",
-    //     },
-    // });
 }
 
 serve(handler);

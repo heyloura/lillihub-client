@@ -102,7 +102,7 @@ export async function UserTemplate(user, token, id, photos = false) {
         .replaceAll('{{bio}}', results._microblog.bio)
         .replaceAll('{{postsActive}}', !photos ? 'active' : '')
         .replaceAll('{{photosActive}}', photos ? 'active' : '')
-        .replaceAll('{{feed}}', feed)
+        .replaceAll('{{feed}}', photos ? `<div class="image-gallery">${feed}</div>` : feed)
         .replaceAll('{{username}}', results._microblog.username);
 
     return HTMLPage(id, content, user)

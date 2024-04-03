@@ -11,7 +11,6 @@ export async function MediaTemplate(user, token, req) {
     const q = searchParams.get('q');
     const offset = searchParams.get('offset');
 
-
     let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const config = await fetching.json();
     
@@ -33,7 +32,9 @@ export async function MediaTemplate(user, token, req) {
     const feed = (results.items.map((item) => {
         return _mediaItemTemplate
             .replaceAll('{{url}}',item.url)
+            .replaceAll('{{destination}}', encodeURIComponent(mpDestination))
             .replaceAll('{{published}}',item.published)
+            .replaceAll('{{publishedDisplay}}', item.published.split('T')[0])
     })).join('');
 
     const content = _mediaTemplate

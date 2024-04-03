@@ -1,6 +1,8 @@
 const _spectre = await Deno.readTextFile("styles/spectre.min.css");
 const _style = await Deno.readTextFile("styles/style.css");
+const _shoelacecss = await Deno.readTextFile("styles/shoelace.css");
 const _commonjs = await Deno.readTextFile("scripts/client/common.js");
+const _shoelacejs = await Deno.readTextFile("scripts/client/shoelace.js");
 
 function NavBarContent(user) {
     return `<section class="navbar-section mt-1 mb-2">
@@ -109,9 +111,8 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                         ${CSSThemeColors(user && user.lillihub ? user.lillihub.darktheme : false)}
                     </style>
                     <style>${_spectre}</style>
-                    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
-                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.13.1/cdn/themes/light.css" />
-                    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.13.1/cdn/shoelace-autoloader.js"></script>
+                    <style>${_shoelacecss}</style>
+                    <script type="module">${_shoelacejs}</script>
                     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
                     <title>${title}</title>
                     <noscript><style>.hide-if-user-has-no-javascript { display: none }</style></noscript>

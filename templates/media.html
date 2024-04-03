@@ -1,9 +1,13 @@
 <div class="container">
     <div class="float-right mt-2">
         <div class="input-group mb-2 mt-2">
-            {{destinationDropdown}}
-            <input style="padding:0;height:unset;" type="file" name="media" class="form-input" />
-            <button type="submit" class="btn btn-primary">Upload</button>
+            <form enctype="multipart/form-data" style="display: inherit;" action="/media/upload" method="POST">
+                {{destinationDropdown}}
+                <input type="hidden" name="destination" value="{{destination}}"/>
+                <input type="hidden" name="redirect" value="true"/>
+                <input style="padding:0;height:unset;" type="file" name="media" class="form-input" />
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
         </div>
     </div>
     <div style="clear: both;">
@@ -12,7 +16,9 @@
                 <input type="search" id="searchbox" oninput="liveSearch('.tile', 'searchbox')" class="form-input" placeholder="Search" />
             </div>
         </div>
-        {{feed}}
+        <div class="image-gallery" style="overflow-wrap: break-word; word-break: break-all;">
+            {{feed}}
+        </div>
         <a class="float-right" href="/media?destination={{destination}}&offset={{offset}}" class="btn btn-primary">Next</a>
     </div>
     <style>

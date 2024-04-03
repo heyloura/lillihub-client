@@ -6,12 +6,13 @@ const _discoverTemplate = new TextDecoder().decode(await Deno.readFile("template
 const _ctaTemplate = new TextDecoder().decode(await Deno.readFile("templates/_cta.html"));
 const _loginTemplate = new TextDecoder().decode(await Deno.readFile("templates/_login.html"));
 
-//const _appURL = Deno.env.get("APP_URL");
-const _appURL = "http://localhost:8000";
+export async function DiscoverTemplate(user, token, uuid, url) {
 
-export async function DiscoverTemplate(user, token, uuid) {
-
-    console.log('DiscoverTemplate',uuid);
+    console.log(url);
+    url = url.replaceAll('/discover','');
+    if(url[url.length - 1] == '/') {
+        url = url.substring(0, url.length - 1);
+    }
 
     const fetching = await fetch('https://micro.blog/posts/discover', { method: "GET" });
     const results = await fetching.json();
@@ -41,8 +42,8 @@ export async function DiscoverTemplate(user, token, uuid) {
             _ctaTemplate
                 .replaceAll('{{HTMLLoginForm}}', 
             _loginTemplate
-                .replaceAll('{{uuid}}',uuid)
-                .replaceAll('{{appURL}}',_appURL)) : '')
+                .replaceAll('{{uuid}}', uuid)
+                .replaceAll('{{appURL}}', url)) : '')
         .replaceAll('{{tagmojis}}', tagmojis)
 
     return HTMLPage(`Discover`, content, user);
