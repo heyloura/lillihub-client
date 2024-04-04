@@ -741,7 +741,7 @@ async function handler(req) {
 
     if(FAVORTIE_USER_TOGGLE.exec(req.url) && user) {
         const value = await req.formData();
-        const username = value.get('username');
+        const username = value.get('id');
         const following = value.get('following');
         const kv = await Deno.openKv();
 
