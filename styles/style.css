@@ -1,3 +1,6 @@
+.bi {
+    font-size: 1.2em;
+}
 html {
     scroll-behavior: smooth;
 }
@@ -481,4 +484,8 @@ display: none !important;
 }
 .editor-preview {
     background: var(--base) !important;
+}
+.card-body {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }

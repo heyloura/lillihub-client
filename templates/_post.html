@@ -18,16 +18,18 @@
     </div>
     <div class="card-body">{{content}}</div>
     <div class="card-footer">
-        <a href="{{url}}">
-            <sl-format-date month="long" 
-                day="numeric" 
-                year="numeric" 
-                hour="numeric" 
-                minute="numeric" 
-                hour-format="12" 
-                date="{{publishedDate}}">{{relativeDate}}
-            </sl-format-date>
-        </a>
+        <small>
+            <a href="{{url}}">
+                <sl-format-date month="long" 
+                    day="numeric" 
+                    year="numeric" 
+                    hour="numeric" 
+                    minute="numeric" 
+                    hour-format="12" 
+                    date="{{publishedDate}}">{{relativeDate}}
+                </sl-format-date>
+            </a>
+        </small>
         <br/>
         <div id="{{id}}" class="comments">
             {{comments}}

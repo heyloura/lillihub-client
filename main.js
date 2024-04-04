@@ -608,9 +608,6 @@ async function handler(req) {
         });
     }
 
-
-
-
     if(ADD_POST.exec(req.url) && user) {
         const value = await req.formData();
         const destination = value.get('destination');
@@ -721,7 +718,6 @@ async function handler(req) {
         return Response.redirect(req.url.replaceAll('/media/delete', `/media?destination=${destination}`));
     }
 
-
     if(PIN_TIMELINE_POST.exec(req.url) && user) {
         const value = await req.formData();
         const id = value.get('id');
@@ -740,25 +736,19 @@ async function handler(req) {
         await kv.set([user.username, 'global'], user.lillihub);
         SESSION[user.username] = user;
 
-        return new Response(await SingleTemplate(user, accessTokenValue, id), {
-            status: 200,
-            headers: {
-                "content-type": "text/html",
-            },
-        });
+        return Response.redirect(req.url.replaceAll('/timeline/favorite/toggle', `/timeline/${id}`));
     }
 
     if(FAVORTIE_USER_TOGGLE.exec(req.url) && user) {
         const value = await req.formData();
         const username = value.get('username');
-        const id = value.get('id');
+        const following = value.get('following');
         const kv = await Deno.openKv();
 
         if(username)
         {
             const index = user.lillihub.favorites.indexOf(username);
             if (index > -1) {            
-                console.log(user.lillihub.favorites);
                 user.lillihub.favorites = user.lillihub.favorites.filter(function(el) { return el != username; });
             } else {
                 user.lillihub.favorites.push(username);
@@ -768,10 +758,10 @@ async function handler(req) {
         await kv.set([user.username, 'global'], user.lillihub);
         SESSION[user.username] = user;
 
-        if(id) {
-            return UserPage(user, accessTokenValue, id);
+        if(!following) {
+            return Response.redirect(req.url.replaceAll('/users/favorite/toggle', `/user/${username}`));
         }
-        return FollowingPage(user, accessTokenValue);
+        return Response.redirect(req.url.replaceAll('/users/favorite/toggle', `/users/following`));
     }
 
     if(SETTINGS_DARKTHEME.exec(req.url) && user) {
@@ -790,12 +780,7 @@ async function handler(req) {
         await kv.set([user.username, 'global'], user.lillihub);
         SESSION[user.username] = user;
         
-        return new Response(await SettingsTemplate(user), {
-            status: 200,
-            headers: {
-                "content-type": "text/html",
-            },
-        });
+        return Response.redirect(req.url.replaceAll('/settings/darktheme', `/settings`));
     }
 
     if(SETTINGS_CONTENTFILTERS.exec(req.url) && user) {
@@ -814,12 +799,7 @@ async function handler(req) {
         await kv.set([user.username, 'global'], user.lillihub);
         SESSION[user.username] = user;
         
-        return new Response(await SettingsTemplate(user), {
-            status: 200,
-            headers: {
-                "content-type": "text/html",
-            },
-        });
+        return Response.redirect(req.url.replaceAll('/settings/contentfilters', `/settings`));
     }
 
     if(SETTINGS_TIMELINE.exec(req.url) && user) {
@@ -830,12 +810,7 @@ async function handler(req) {
         
         SESSION[user.username] = user;
 
-        return new Response(await TimelineTemplate(SESSION, user, accessTokenValue, req), {
-            status: 200,
-            headers: {
-                "content-type": "text/html",
-            },
-        });
+        return Response.redirect(req.url.replaceAll('/settings/timeline', `/`));
     }
 
     if(ADD_NOTE.exec(req.url) && user) {
@@ -1028,15 +1003,6 @@ async function handler(req) {
                         "set-cookie": `access_token=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn}`
                     },
                 });
-                
-                
-                // new Response(await TimelineTemplate(SESSION, user, response.access_token, req, true), {
-                //     status: 200,
-                //     headers: {
-                //         "content-type": "text/html",
-                //         "set-cookie": `access_token=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn}`
-                //     },
-                // });
                 return page;
             }
         }

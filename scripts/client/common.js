@@ -38,15 +38,15 @@ function liveSearch(selector, searchboxId) {
 }
 
 function toggleSummary(el, e) {
-    e.preventDefault();
-    var expanded = el.parentElement.getAttribute('aria-expanded');
-    var open = el.parentElement.hasAttribute("open");
-    if(!open) {
-        el.parentElement.setAttribute('aria-expanded', true);
-        el.parentElement.setAttribute('open','true');
-    } else {
-        el.parentElement.setAttribute('aria-expanded', false);
-        el.parentElement.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
-        window.setTimeout(waitForScroll, 0, el.parentElement);
-    }
+    // //e.preventDefault();
+    // var expanded = el.parentElement.getAttribute('aria-expanded');
+    // var open = el.parentElement.hasAttribute("open");
+    // if(!open) {
+    //     el.parentElement.setAttribute('aria-expanded', true);
+    //     el.parentElement.setAttribute('open','true');
+    // } else {
+    //     el.parentElement.setAttribute('aria-expanded', false);
+    //     //el.parentElement.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+    //     //window.setTimeout(waitForScroll, 0, el.parentElement);
+    // }
 }

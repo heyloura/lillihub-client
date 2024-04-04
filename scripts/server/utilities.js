@@ -2,10 +2,6 @@ import { DOMParser } from "https://esm.sh/linkedom@0.16.8";
 import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
 await ammonia.init();
 
-//const key = await crypto.subtle.generateKey({ name: "AES-CBC", length: 128 },true,["encrypt", "decrypt"]);
-//const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
-//console.log(rawKey)
-//const _appSecret = JSON.parse(Deno.env.get("APP_SECRET"));
 const _appSecret = JSON.parse('{"kty":"oct","k":"c2V4g-FQSxzpeCE8E0JcMg","alg":"A128CBC","key_ops":["encrypt","decrypt"],"ext":true}');
 
 export function getCookieValue(req, name) {
