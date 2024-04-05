@@ -30,6 +30,7 @@ import { TimelineTemplate } from "./layouts/timeline.js";
 import { DiscoverTemplate } from "./layouts/discover.js";
 import { TagmojiTemplate } from "./layouts/tagmoji.js";
 import { UserTemplate } from "./layouts/user.js";
+import { ConversationsTemplate } from "./layouts/conversations.js";
 
 const _replyFormTemplate = new TextDecoder().decode(await Deno.readFile("templates/_reply_form.html"));
 
@@ -39,6 +40,7 @@ const SERVICEWORKER_ROUTE = new URLPattern({ pathname: "/sw.js" });
 const LILLIHUB_ICON_ROUTE = new URLPattern({ pathname: "/lillihub-512.png" });
 
 const HOME_ROUTE = new URLPattern({ pathname: "/" });
+const CONVERSATIONS_ROUTE = new URLPattern({ pathname: "/conversations" });
 const DISCOVER_ROUTE = new URLPattern({ pathname: "/discover" });
 const DISCOVERTAG_ROUTE = new URLPattern({ pathname: "/discover/:id" });
 const USER_ROUTE = new URLPattern({ pathname: "/user/:id" });
@@ -165,7 +167,16 @@ async function handler(req) {
      * Authenticated Only Routes
      ********************************************************/
     if(HOME_ROUTE.exec(req.url) && user) {
-        return new Response(await TimelineTemplate(SESSION, user, accessTokenValue, req), {
+        return new Response(await TimelineTemplate(user, accessTokenValue, req), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+            },
+        });
+    }
+
+    if(CONVERSATIONS_ROUTE.exec(req.url) && user) {
+        return new Response(await ConversationsTemplate(user, accessTokenValue, req), {
             status: 200,
             headers: {
                 "content-type": "text/html",
@@ -810,7 +821,7 @@ async function handler(req) {
         
         SESSION[user.username] = user;
 
-        return Response.redirect(req.url.replaceAll('/settings/timeline', `/`));
+        return Response.redirect(req.url.replaceAll('/settings/timeline', `/settings`));
     }
 
     if(ADD_NOTE.exec(req.url) && user) {
@@ -1038,39 +1049,3 @@ async function handler(req) {
 }
 
 serve(handler);
-
-/********************************************************
-* Default Responses
-********************************************************/
-function ReturnIframeResponse(text) {
-    console.log('ReturnIframeResponse',text);
-    return new Response(IFramePage(`<span class="text-light">${text}</span>`), {
-        status: 200,
-        headers: {
-            "content-type": "text/html",
-        },
-    });
-}
-
-function IFramePage(contentHTML) {
-    return `<!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="utf-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1">
-                    <style>
-                        body {
-                            background: rgba(48,55,66,1);
-                            color: #fff;
-                            font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-                            font-size: .8rem;
-                            overflow-x: hidden;
-                            text-rendering: optimizeLegibility;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${contentHTML}
-                </body>
-            </html>`;
-}

@@ -83,6 +83,11 @@ a[href]:where(
     height: auto !important;
     margin-left: -0.8rem;
 }
+hr {
+    border:0;
+    border-top: 0.05rem solid var(--mantle);
+    margin-top: 1.4rem;
+}
 .conversation {
     clear:both;
     margin-top: 1rem;

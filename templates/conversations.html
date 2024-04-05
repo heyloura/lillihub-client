@@ -1,14 +1,11 @@
-<div class="container">
-    {{favorites}}
-</div>
 {{feed}}
 <div class="paging clearfix">
     <ul class="pagination float-right">
         <li class="page-item {{before}}">
-            <a href="/?before={{beforeId}}" tabindex="-1">Previous</a>
+            <a href="/conversations?before={{beforeId}}" tabindex="-1">Previous</a>
         </li>
         <li class="page-item">
-            <a href="/?last={{lastId}}">Next</a>
+            <a href="/conversations?last={{lastId}}">Next</a>
         </li>
     </ul>
 </div>
