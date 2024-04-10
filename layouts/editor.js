@@ -13,6 +13,7 @@ export async function EditorTemplate(user, token, req) {
     const destination = searchParams.get('destination');
     const edit = searchParams.get('edit');
     const quote = searchParams.get('quote');
+    const image = searchParams.get('img');
     let post = undefined;
     let quoteback = '';
 
@@ -85,6 +86,8 @@ export async function EditorTemplate(user, token, req) {
         .replaceAll('{{mpDestination}}', mpDestination)
         .replaceAll('{{editInput}}', edit ? `<input type="hidden" name="url" value="${edit}" />` : '')
         .replaceAll('{{title}}', post && post.properties.name[0] ? `value="${post.properties.name[0]}"` : '' )
+        //.replaceAll('{{image}}', image ? `<img alt="" width="" height="" src="${image}" />` : '')
+        .replaceAll('{{image}}', image ? `![](${image})` : '')
         .replaceAll('{{quoteback}}', quoteback)
         .replaceAll('{{content}}', post && post.properties.content[0] ? post.properties.content[0] : '' )
         .replaceAll('{{publishSelected}}', post && post.properties["post-status"][0] == 'published' ? `selected="selected"` : '' )

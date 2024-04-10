@@ -31,7 +31,8 @@ export async function MediaTemplate(user, token, req) {
 
     const feed = (results.items.map((item) => {
         return _mediaItemTemplate
-            .replaceAll('{{url}}',item.url)
+            .replaceAll('{{url}}', item.url)
+            .replaceAll('{{encodedUrl}}',encodeURIComponent(item.url))
             .replaceAll('{{destination}}', encodeURIComponent(mpDestination))
             .replaceAll('{{published}}',item.published)
             .replaceAll('{{publishedDisplay}}', item.published.split('T')[0])
