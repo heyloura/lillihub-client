@@ -31,7 +31,7 @@ export async function EditorTemplate(user, token, req) {
 
     const syndicates = syndicate["syndicate-to"] ? syndicate["syndicate-to"].map(item => {
         return `<li class="menu-item"><label>
-                <input type="checkbox" name="syndicate[]" value="${item.uid}" checked="checked"> ${item.name}
+                <input type="checkbox" name="syndicate[]" value="${item.uid}" onchange="countChecked('syndicate[]', 'syndicatesDropdown')" checked="checked"> ${item.name}
                 </label></li>`;
     }).join('') : '';
 
@@ -55,7 +55,7 @@ export async function EditorTemplate(user, token, req) {
 
     const categoriesCheckboxList = categories.categories ? categories.categories.map(item => {
         return `<li class="menu-item"><label>
-                <input ${post && post.properties.category.includes(item) ? 'checked="checked"' : '' } type="checkbox" name="category[]" value="${item}"> ${item}
+                <input ${post && post.properties.category.includes(item) ? 'checked="checked"' : '' } type="checkbox" name="category[]" onchange="countChecked('category[]', 'categoriesDropdown')" value="${item}"> ${item}
                 </label></li>`;
     }).join('') : '';
 
@@ -66,12 +66,12 @@ export async function EditorTemplate(user, token, req) {
 
     const categoriesDropdown = _dropdownTemplate
         .replaceAll('{{title}}', '')
-        .replaceAll('{{icon}}', '<i class="bi bi-tags"></i>')
+        .replaceAll('{{icon}}', `<span id="categoriesDropdown" class="badge"><i class="bi bi-tags"></i></span>`)
         .replaceAll('{{menuItems}}', categoriesCheckboxList);
 
     const syndicatesDropdown = _dropdownTemplate
         .replaceAll('{{title}}', '')
-        .replaceAll('{{icon}}', `<span class="badge" data-badge="${syndicate["syndicate-to"].length}"><i class="bi bi-share"></i></span>`)
+        .replaceAll('{{icon}}', `<span id="syndicatesDropdown" class="badge" data-badge="${syndicate["syndicate-to"].length}"><i class="bi bi-share"></i></span>`)
         .replaceAll('{{menuItems}}', syndicates)
 
     const content = _editorTemplate

@@ -406,6 +406,7 @@ async function handler(req) {
                     .replaceAll('{{checkboxes}}', atob(checkboxes))
                     .replaceAll('{{checkboxes64}}', checkboxes)
                     .replaceAll('{{buttonText}}','Send Another Reply')
+                    .replaceAll('{{backgroundColor}}','var(--mantle)')
                     .replaceAll('{{response}}','Reply was sent.'), {
                 status: 200,
                 headers: {

@@ -41,7 +41,21 @@ textarea:focus, textarea:active {
         </div>
     </form>
 <div>
-<script src="https://cdn.micro.blog/quoteback.js"></script>
+<script>
+    countChecked('category[]', 'categoriesDropdown');
+    function countChecked(name, id) {
+        var checkedBoxes = document.querySelectorAll(`input[name="${name}"]:checked`).length;
+        var element = document.getElementById(id);
+
+        if(checkedBoxes == 0) {
+            element.removeAttribute('data-badge');
+            element.classList.remove('badge');
+        } else {
+            element.setAttribute('data-badge', checkedBoxes);
+            element.classList.add('badge');
+        }
+    }
+</script>
 <script>
     const easymde = new EasyMDE({
         element: document.getElementById('content'),
