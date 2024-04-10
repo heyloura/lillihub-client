@@ -8,7 +8,7 @@ function NavBarContent(user) {
     return `<section class="navbar-section mt-1 mb-2">
         <div class="btn-group btn-group-block">
             <a href="/" class="btn btn-link"><i class="bi bi-house green-text"></i></a>
-            ${ user.lillihub.display != 'both' ? '<a href="/conversations" class="btn btn-link"><i class="bi bi-chat green-text"></i></a>' : '' }
+            ${ user && user.lillihub && user.lillihub.display != 'both' ? '<a href="/conversations" class="btn btn-link"><i class="bi bi-chat green-text"></i></a>' : '' }
             ${ user && !user.error ? `
             <a href="/discover" class="btn btn-link"><i class="bi bi-search greenblue-text"></i></a>
             <a href="/mentions" class="btn btn-link"><i class="bi bi-at blue-text"></i></a>

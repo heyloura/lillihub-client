@@ -87,7 +87,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
         _postTemplate.replaceAll('{{avatar}}',post.author.avatar) 
                     .replaceAll('{{name}}',post.author.name)
                     .replaceAll('{{username}}',post.author._microblog.username)
-                    .replaceAll('{{new}}', notSeen ?  '<span class="label label-rounded label-success"><small>new</small></span>' : '')
+                    .replaceAll('{{new}}', notSeen ?  'badge' : '')
                     .replaceAll('{{tags}}', customTag ? customTag : '')
                     .replaceAll('{{actions}}', user ? 
                         _actionsTemplate

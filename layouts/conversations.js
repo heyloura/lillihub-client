@@ -11,7 +11,7 @@ export async function ConversationsTemplate(user, token, req) {
 
     // keeps track of now, last, and seen ids.
     const kv = await Deno.openKv();
-    const userKV = await kv.get([user.username, 'timeline']);
+    const userKV = await kv.get([user.username, 'conversation']);
     const timeline = {};
 
     if(!last && !before) {
@@ -70,7 +70,7 @@ export async function ConversationsTemplate(user, token, req) {
     const beforeId = last ? results.items[0].id : 0;
 
     timeline.viewed = new Date().toLocaleDateString('en-us', { year:"numeric", month:"short", day:"numeric"});
-    await kv.set([user.username, 'timeline'], timeline);
+    await kv.set([user.username, 'conversation'], timeline);
 
     const result = _conversationTemplate
         .replaceAll('{{feed}}', feed)
