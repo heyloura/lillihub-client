@@ -494,3 +494,12 @@ display: none !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
+table, th, td {
+    border: .05rem solid var(--crust);
+  }
+  table {
+    border-collapse: collapse;
+  }
+td {
+    padding: 0.2rem;
+}
