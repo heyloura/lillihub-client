@@ -39,10 +39,11 @@ export async function BlogTemplate(user, token, req) {
             .replaceAll('{{username}}', user.username)
             .replaceAll('{{new}}', '')
             .replaceAll('{{tags}}', '')
-            .replaceAll('{{actions}}',  
-                _dropdownTemplate.replaceAll('{{title}}', '')
-                    .replaceAll('{{icon}}', '<i class="bi bi-three-dots-vertical"></i>')
-                    .replaceAll('{{menuItems}}', `<li class="menu-item"><a href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}">Edit post</a></li>`))
+            .replaceAll('{{actions}}', `<a href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}">Edit post</a>`)
+            // .replaceAll('{{actions}}',  
+            //     _dropdownTemplate.replaceAll('{{title}}', '')
+            //         .replaceAll('{{icon}}', '<i class="bi bi-three-dots-vertical"></i>')
+            //         .replaceAll('{{menuItems}}', `<li class="menu-item"><a href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}">Edit post</a></li>`))
             .replaceAll('{{content}}', item.properties["name"][0] ? `<details><summary><b>${item.properties["name"][0]}</b></summary>${text}</details>` : text)
             .replaceAll('{{publishedDate}}', item.properties["published"][0])
             .replaceAll('{{relativeDate}}', item.properties["published"][0])

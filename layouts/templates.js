@@ -7,7 +7,7 @@ const _shoelacejs = await Deno.readTextFile("scripts/client/shoelace.js");
 function NavBarContent(user) {
     return `<section class="navbar-section mt-1 mb-2">
         <div class="btn-group btn-group-block">
-            <a href="/" class="btn btn-link"><i class="bi bi-house green-text"></i></a>
+            <a href="/" class="btn btn-link"><i class="bi bi-view-list green-text"></i></a>
             ${ user && user.lillihub && user.lillihub.display != 'both' ? '<a href="/conversations" class="btn btn-link"><i class="bi bi-chat green-text"></i></a>' : '' }
             ${ user && !user.error ? `
             <a href="/discover" class="btn btn-link"><i class="bi bi-search greenblue-text"></i></a>
@@ -134,14 +134,14 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                                     <div class="btn-group btn-group-block mt-2">
                                         <a href="/post" class="btn btn-link dropdown-toggle greenblue-text" tabindex="0"><i class="bi bi-pencil-square"></i></a>
                                         <div class="dropdown dropdown-right">
-                                            <a class="btn btn-link dropdown-toggle greenblue-text" tabindex="0"><i class="bi bi-globe"></i></a>
+                                            <a class="btn btn-link dropdown-toggle greenblue-text" tabindex="0"><i class="bi bi-window-stack"></i></a>
                                             <ul class="menu text-left">
-                                                <li class="menu-item"><a href="/posts">Posts</a></li>
-                                                <li class="menu-item"><a href="/media">Media</a></li>
+                                                <li class="menu-item"><a href="/posts">My Blog Posts</a></li>
+                                                <li class="menu-item"><a href="/media">My Media</a></li>
                                             </ul>
                                         </div>
                                         <div class="dropdown dropdown-right">
-                                            <a class="btn btn-link dropdown-toggle greenblue-text" tabindex="0"><i class="bi bi-list"></i></a>
+                                            <a class="btn btn-link dropdown-toggle greenblue-text" tabindex="0"><i class="bi bi-gear"></i></a>
                                             <ul class="menu text-left">
                                                 <li class="menu-item">
                                                     <div class="panel-header text-center pb-0">

@@ -14,16 +14,16 @@ export async function DiscoverTemplate(user, token, uuid, url) {
         url = url.substring(0, url.length - 1);
     }
 
-    const fetching = await fetch('https://micro.blog/posts/discover', { method: "GET" });
+    const config = token ? { method: "GET", headers: { "Authorization": "Bearer " + token } } : { method: "GET", headers: { "Authorization": "Bearer " + token }  };
+    const fetching = await fetch('https://micro.blog/posts/discover', config);
     const results = await fetching.json();
 
     const tagmojis = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
         `<span class="chip"><a href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
     ).join('');
 
-
     const feed = (await Promise.all(results.items.map(async (item) => {
-        if(item._microblog.is_conversation && user && !user.error) {
+        if(user && !user.error) {
             const conversation = await getConversation(item.id, token);
             if(conversation) {
                 const convo = conversation.items[conversation.items.length - 1];

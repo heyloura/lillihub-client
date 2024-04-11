@@ -3,11 +3,12 @@ import { PostTemplate } from "./_post.js";
 import { getConversation } from "../scripts/server/mb.js";
 
 export async function TagmojiTemplate(user, token, id) {
-    const fetching = await fetch(`https://micro.blog/posts/discover/${id}`, { method: "GET" });
+    const config = token ? { method: "GET", headers: { "Authorization": "Bearer " + token } } : { method: "GET", headers: { "Authorization": "Bearer " + token }  };
+    const fetching = await fetch(`https://micro.blog/posts/discover/${id}`, config);
     const results = await fetching.json();
     
     const feed = (await Promise.all(results.items.map(async (item) => {
-        if(item._microblog.is_conversation && user && !user.error) {
+        if(user && !user.error) {
             const conversation = await getConversation(item.id, token);
             if(conversation) {
                 const convo = conversation.items[conversation.items.length - 1];
