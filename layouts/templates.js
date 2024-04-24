@@ -121,7 +121,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                     <script>document.write('<style>.hide-if-user-has-javascript{display:none}</style>');</script>
                     <style>${_style}</style>
                 </head>
-                <body class="body-content">
+                <body id="top" class="body-content">
                     ${ user && !user.error ? `
                         <header class="app-header">
                             <div class="navbar bg-light p-1">

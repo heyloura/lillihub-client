@@ -678,7 +678,8 @@ async function handler(req) {
               formData.append('file', fileBlob, val.name);
             } else {
               if(field == 'destination') {
-                formData.append("mp-destination", val);
+                const decoded = decodeURI(val);
+                formData.append("mp-destination", decoded);
                 destination = val;
               }
               if(field == 'redirect') {

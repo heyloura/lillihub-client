@@ -33,7 +33,7 @@ export async function MediaTemplate(user, token, req) {
         return _mediaItemTemplate
             .replaceAll('{{url}}', item.url)
             .replaceAll('{{encodedUrl}}',encodeURIComponent(item.url))
-            .replaceAll('{{destination}}', encodeURIComponent(mpDestination))
+            .replaceAll('{{destination}}', mpDestination)
             .replaceAll('{{published}}',item.published)
             .replaceAll('{{publishedDisplay}}', item.published.split('T')[0])
     })).join('');
@@ -41,7 +41,7 @@ export async function MediaTemplate(user, token, req) {
     const content = _mediaTemplate
         .replaceAll('{{destinationDropdown}}', destinationDropdown)
         .replaceAll('{{feed}}', feed)
-        .replaceAll('{{destination}}', encodeURIComponent(mpDestination))
+        .replaceAll('{{destination}}', mpDestination)
         .replaceAll('{{offset}}', offset ? offset + 50 : '50')
 
     return HTMLPage('Media', content, user);
