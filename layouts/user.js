@@ -84,7 +84,7 @@ export async function UserTemplate(user, token, id, photos = false) {
                 .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme)));
 
         actions = mutedUser || blockedUser ? 
-            `<p style="text-align:center;"><a href="https://micro.blog/account/muting">Manage blocked and muted users on micro.blog</a><p>` :
+            `<p style="text-align:center;"><a onclick="addLoading(this)" href="https://micro.blog/account/muting">Manage blocked and muted users on micro.blog</a><p>` :
             _userActionsTemplate
                 .replaceAll('{{followForm}}', !results._microblog.is_following && !results._microblog.is_you ? followForm : '')
                 .replaceAll('{{username}}', results._microblog.username)

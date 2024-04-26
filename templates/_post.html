@@ -6,7 +6,7 @@
             </div>
             <div class="tile-content">
                 <p class="tile-title">
-                    {{name}}<br/><small class="tile-subtitle"><a href="/user/{{username}}">@{{username}}</a></small>
+                    {{name}}<br/><small class="tile-subtitle"><a onclick="addLoading(this)" href="/user/{{username}}">@{{username}}</a></small>
                 </p>
             </div>
             <div class="tile-action">
@@ -18,7 +18,7 @@
     <div class="card-body">{{content}}</div>
     <div class="card-footer">
         <small>
-            <a href="{{url}}">
+            <a onclick="addLoading(this)" href="{{url}}">
                 <sl-format-date month="long" 
                     day="numeric" 
                     year="numeric" 

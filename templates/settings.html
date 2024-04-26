@@ -7,7 +7,7 @@
         <div class="grow-wrap">
             <textarea name="exclude" onInput="growTextArea(this)">{{exclude}}</textarea>
         </div>
-        <button class="btn btn-primary" type="submit">Save content filter list</button>
+        <button onclick="addLoading(this)" class="btn btn-primary" type="submit">Save content filter list</button>
     </form>
     <br/>
     <hr class="mt-2"/>
@@ -20,7 +20,7 @@
         <label>
             <input type="checkbox" name="enableDarkMode" {{darktheme}} /> Enable dark theme
         </label>
-        <button class="btn btn-primary" type="submit">Save dark theme setting</button>
+        <button onclick="addLoading(this)" class="btn btn-primary" type="submit">Save dark theme setting</button>
     </form>
     <hr class="mt-2"/>
     <p class="pt-2">

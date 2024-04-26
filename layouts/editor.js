@@ -23,7 +23,7 @@ export async function EditorTemplate(user, token, req) {
     const mpDestination = destination ? destination : config.destination.filter(d => d["microblog-default"])[0].uid;
     const destinationSelect = config.destination ? config.destination.map(item => {
         if(item.uid != mpDestination) {
-            return `<li class="menu-item"><a href="/post?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
+            return `<li class="menu-item"><a onclick="addLoading(this)" href="/post?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
         }
     }).join('') : '';
 

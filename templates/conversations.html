@@ -2,15 +2,15 @@
 <div class="paging clearfix">
     <ul class="pagination float-left">
         <li class="page-item">
-            <a href="/conversations" tabindex="-1">Refresh</a>
+            <a onclick="addLoading(this)" href="/conversations" tabindex="-1">Refresh</a>
         </li>
     </ul>
     <ul class="pagination float-right">
         <li class="page-item {{before}}">
-            <a href="/conversations?before={{beforeId}}" tabindex="-1">Previous</a>
+            <a onclick="addLoading(this)" href="/conversations?before={{beforeId}}" tabindex="-1">Previous</a>
         </li>
         <li class="page-item">
-            <a href="/conversations?last={{lastId}}">Next</a>
+            <a onclick="addLoading(this)" href="/conversations?last={{lastId}}">Next</a>
         </li>
     </ul>
 </div>

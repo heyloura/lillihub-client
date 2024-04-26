@@ -2,7 +2,7 @@
     <form id="add_notebook" method="POST" action="/notebook/add">
         <div class="hide-if-user-has-no-javascript input-group float-right mb-2 mt-2">
             <input type="text" name="name" class="form-input" placeholder="Name...">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> Notebook</button>
+            <button onclick="addLoading(this)" type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> Notebook</button>
         </div>
     </form>
     <div class="no-border panel mb-2 mt-2 p-2 bg-primary hide-if-user-has-javascript" style="clear:both">
@@ -15,11 +15,11 @@
             local storage and is never sent to Lillihub. You can review this file's source code to confirm.</p>
             <div class="input-group">
                 <input id="notes_key" type="text" class="form-input bg-light" placeholder="Micro.blog Key">
-                <button class="btn btn-primary" onclick="localStorage.setItem('notes_key', document.getElementById('notes_key').value);window.location.href = '/notes';"><i class="bi bi-save"></i></button>
+                <button onclick="addLoading(this)" class="btn btn-primary" onclick="localStorage.setItem('notes_key', document.getElementById('notes_key').value);window.location.href = '/notes';"><i class="bi bi-save"></i></button>
             </div>
         </div>
         <div id="hide_notes_key">
-            <p><button class="btn btn-link d-inline" onclick="localStorage.setItem('notes_key', '');window.location.href = '/notes';"><i class="bi bi-trash"></i> Clear out your secret key from your browser's local storage.</button></p>           
+            <p><button onclick="addLoading(this)" class="btn btn-link d-inline" onclick="localStorage.setItem('notes_key', '');window.location.href = '/notes';"><i class="bi bi-trash"></i> Clear out your secret key from your browser's local storage.</button></p>           
         </div>
     </div>
     <ul id="notebooks" class="hide-if-user-has-no-javascript" style="clear:both;">{{notebooks}}</ul>

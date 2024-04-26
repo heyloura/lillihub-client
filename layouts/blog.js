@@ -18,7 +18,7 @@ export async function BlogTemplate(user, token, req) {
     const mpDestination = destination ? destination : config.destination.filter(d => d["microblog-default"])[0].uid;
     const destinationSelect = config.destination ? config.destination.map(item => {
         if(item.uid != mpDestination) {
-            return `<li class="menu-item"><a href="/posts?destination=${encodeURIComponent(item.uid)}${status ? '&status=draft' : ''}">${item.name}</a></li>`;
+            return `<li class="menu-item"><a onclick="addLoading(this)" href="/posts?destination=${encodeURIComponent(item.uid)}${status ? '&status=draft' : ''}">${item.name}</a></li>`;
         }
     }).join('') : '';
 
@@ -39,7 +39,7 @@ export async function BlogTemplate(user, token, req) {
             .replaceAll('{{username}}', user.username)
             .replaceAll('{{new}}', '')
             .replaceAll('{{tags}}', '')
-            .replaceAll('{{actions}}', `<a href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}">Edit post</a>`)
+            .replaceAll('{{actions}}', `<a onclick="addLoading(this)" href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}">Edit post</a>`)
             // .replaceAll('{{actions}}',  
             //     _dropdownTemplate.replaceAll('{{title}}', '')
             //         .replaceAll('{{icon}}', '<i class="bi bi-three-dots-vertical"></i>')

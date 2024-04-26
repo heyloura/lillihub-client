@@ -17,7 +17,7 @@ export async function MediaTemplate(user, token, req) {
     const mpDestination = destination ? destination : config.destination.filter(d => d["microblog-default"])[0].uid;
     const destinationSelect = config.destination ? config.destination.map(item => {
         if(item.uid != mpDestination) {
-            return `<li class="menu-item"><a href="/media?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
+            return `<li class="menu-item"><a onclick="addLoading(this)" href="/media?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
         }
     }).join('') : '';
 

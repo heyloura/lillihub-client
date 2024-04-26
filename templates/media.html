@@ -6,7 +6,7 @@
                 <input type="hidden" name="destination" value="{{destination}}"/>
                 <input type="hidden" name="redirect" value="true"/>
                 <input style="padding:0;height:unset;" type="file" name="media" class="form-input" />
-                <button type="submit" class="btn btn-primary">Upload</button>
+                <button onclick="addLoading(this)" type="submit" class="btn btn-primary">Upload</button>
             </form>
         </div>
     </div>
@@ -19,7 +19,7 @@
         <div class="image-gallery" style="overflow-wrap: break-word; word-break: break-all;">
             {{feed}}
         </div>
-        <a class="float-right" href="/media?destination={{destination}}&offset={{offset}}" class="btn btn-primary">Next</a>
+        <a onclick="addLoading(this)" class="float-right" href="/media?destination={{destination}}&offset={{offset}}" class="btn btn-primary">Next</a>
     </div>
     <style>
     .tile-title {

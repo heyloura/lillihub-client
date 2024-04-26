@@ -7,15 +7,15 @@ const _shoelacejs = await Deno.readTextFile("scripts/client/shoelace.js");
 function NavBarContent(user) {
     return `<section class="navbar-section mt-1 mb-2">
         <div class="btn-group btn-group-block">
-            <a href="/" class="btn btn-link"><i class="bi bi-view-list green-text"></i></a>
-            ${ user && user.lillihub && user.lillihub.display != 'both' ? '<a href="/conversations" class="btn btn-link"><i class="bi bi-chat green-text"></i></a>' : '' }
+            <a onclick="addLoading(this)" href="/" class="btn btn-link"><i class="bi bi-view-list green-text"></i></a>
+            ${ user && user.lillihub && user.lillihub.display != 'both' ? '<a onclick="addLoading(this)" href="/conversations" class="btn btn-link"><i class="bi bi-chat green-text"></i></a>' : '' }
             ${ user && !user.error ? `
-            <a href="/discover" class="btn btn-link"><i class="bi bi-search greenblue-text"></i></a>
-            <a href="/mentions" class="btn btn-link"><i class="bi bi-at blue-text"></i></a>
-            <a href="/users/following" class="btn btn-link"><i class="bi bi-people bluepurple-text"></i></a>
-            <a href="/bookmarks" class="btn btn-link"><i class="bi bi-bookmark-star purple-text"></i></a>
-            <a href="/bookshelves" class="btn btn-link"><i class="bi bi-book purplered-text"></i></a>
-            ${user.plan == 'premium' ? '<a href="/notes" class="btn btn-link"><i class="bi bi-file-text red-text"></i></a>' : ''}
+            <a onclick="addLoading(this)" href="/discover" class="btn btn-link"><i class="bi bi-search greenblue-text"></i></a>
+            <a onclick="addLoading(this)" href="/mentions" class="btn btn-link"><i class="bi bi-at blue-text"></i></a>
+            <a onclick="addLoading(this)" href="/users/following" class="btn btn-link"><i class="bi bi-people bluepurple-text"></i></a>
+            <a onclick="addLoading(this)" href="/bookmarks" class="btn btn-link"><i class="bi bi-bookmark-star purple-text"></i></a>
+            <a onclick="addLoading(this)" href="/bookshelves" class="btn btn-link"><i class="bi bi-book purplered-text"></i></a>
+            ${user.plan == 'premium' ? '<a onclick="addLoading(this)" href="/notes" class="btn btn-link"><i class="bi bi-file-text red-text"></i></a>' : ''}
             ` : '' }
         </div>
     </section>`;
@@ -93,6 +93,8 @@ export function CSSThemeColors(dark = false) {
     }`;
 }
 
+// <style>${_shoelacecss}</style>
+// <script type="module">${_shoelacejs}</script>
 export function HTMLPage(title, contentHTML, user, redirect = '') {
     return `<!DOCTYPE html>
             <html lang="en">
@@ -111,9 +113,9 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                     <style>
                         ${CSSThemeColors(user && user.lillihub ? user.lillihub.darktheme : false)}
                     </style>
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css" />
+                    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js"></script>
                     <style>${_spectre}</style>
-                    <style>${_shoelacecss}</style>
-                    <script type="module">${_shoelacejs}</script>
                     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
                     <title>${title}</title>
                     <noscript><style>.hide-if-user-has-no-javascript { display: none }</style></noscript>
@@ -136,8 +138,8 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                                         <div class="dropdown dropdown-right">
                                             <a class="btn btn-link dropdown-toggle greenblue-text" tabindex="0"><i class="bi bi-window-stack"></i></a>
                                             <ul class="menu text-left">
-                                                <li class="menu-item"><a href="/posts">My Blog Posts</a></li>
-                                                <li class="menu-item"><a href="/media">My Media</a></li>
+                                                <li class="menu-item"><a onclick="addLoading(this)" href="/posts">My Blog Posts</a></li>
+                                                <li class="menu-item"><a onclick="addLoading(this)" href="/media">My Media</a></li>
                                             </ul>
                                         </div>
                                         <div class="dropdown dropdown-right">
@@ -147,27 +149,22 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                                                     <div class="panel-header text-center pb-0">
                                                         <figure class="avatar avatar-xl"><img height="48" width="48" src="${user.avatar}" alt="${user.username} Avatar" loading="lazy"></figure>
                                                         <div class="panel-title h5 mt-10">${user.name}</div>
-                                                        <div class="panel-subtitle"><a href="/user/${user.username}">@${user.username}</a></div>
+                                                        <div class="panel-subtitle"><a onclick="addLoading(this)" href="/user/${user.username}">@${user.username}</a></div>
                                                     </div>
                                                 </li>
                                                 <li class="menu-item"><hr/></li>
-                                                <li class="menu-item"><a href="/settings">Settings</a></li>
-                                                <li class="menu-item"><a href="/logout">Logout</a></li>
+                                                <li class="menu-item"><a onclick="addLoading(this)" href="/settings">Settings</a></li>
+                                                <li class="menu-item"><a onclick="addLoading(this)" href="/logout">Logout</a></li>
                                                 <li class="menu-item"><hr/></li>
-                                                <li class="menu-item"><small><a href="https://github.com/heyloura/lillihub-client">Github</a> · Buy Me a Coffee · Version 0.2.0<br/>
-                                                    Designed and built with ♥ by <a href="https://heyloura.com">Loura</a>. Licensed under the MIT License.</small></li>
+                                                <li class="menu-item"><small><a onclick="addLoading(this)" href="https://github.com/heyloura/lillihub-client">Github</a> · Buy Me a Coffee · Version 0.2.0<br/>
+                                                    Designed and built with ♥ by <a onclick="addLoading(this)" href="https://heyloura.com">Loura</a>. Licensed under the MIT License.</small></li>
                                             </ul>
                                         </div>
                                     </div>
                                 </section>
                             </div>
-                            <!--<div id="toast" style="position:fixed;bottom:90%;" class="toast hide-if-user-has-javascript">
-                                <button onclick="this.parentNode.style = 'display:none;'" class="btn btn-clear float-right hide-if-user-has-no-javascript"></button>
-                                <iframe style="border:0;" srcdoc='<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="background-color: rgba(48,55,66,1);"></body></html>' name="InteractionResult" width="220" height="45"></iframe>
-                            </div>-->
                         </header>`
                     : '' }
-                    <!--<div class="content-page hide-if-user-has-javascript">&nbsp;</div>-->
                     <div class="content-page container grid-md">
                         <div class="columns">
                             <div class="column col-1 hide-sm">

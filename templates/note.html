@@ -3,7 +3,7 @@
 
 <ul class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="/notes/{{id}}">{{name}}</a>
+        <a onclick="addLoading(this)" href="/notes/{{id}}">{{name}}</a>
     </li>
     <li class="breadcrumb-item">
         <a href="#">Update</a>
@@ -13,7 +13,7 @@
     <input type="hidden" id="original" value="{{originalValue}}" />
     <textarea id="content"></textarea>
 </div>
-<button class="btn btn-primary mt-2 float-right" id="saveNoteBtn">Save Note</button>
+<button onclick="addLoading(this)" class="btn btn-primary mt-2 float-right" id="saveNoteBtn">Save Note</button>
 <div style="clear:both"></div>
 <script type="module">
     const easymde = new EasyMDE({

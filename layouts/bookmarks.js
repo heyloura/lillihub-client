@@ -69,7 +69,7 @@ export async function BookmarksTemplate(user, token, req) {
         }).join('');
 
         tagsCheckList = `${tagsCheckList}<li class="menu-item"><input name="newTag" type="text" /><input type="hidden" value="{{id}}" name="id"/></li>`;
-        tagsCheckList =`${tagsCheckList}<li class="menu-item"><button class="btn btn-primary">Save</button></li>`;
+        tagsCheckList =`${tagsCheckList}<li class="menu-item"><button onclick="addLoading(this)" class="btn btn-primary">Save</button></li>`;
     }
 
     // Premium users can have highlights from bookmarks.
@@ -101,8 +101,9 @@ export async function BookmarksTemplate(user, token, req) {
             return `<span class="chip purple-chip">${tag}</span>`;
         }).join('') : '';
         
+        let list = tagsCheckList;
         if(item.tags ) {
-            item.tags.split(',').forEach((tag) => tagsCheckList = tagsCheckList.replaceAll(`{{${tag}}}`,'checked="checked"'))
+            item.tags.split(',').forEach((tag) => list = list.replaceAll(`{{${tag}}}`,'checked="checked"'))
         }
 
         return _bookmarkTemplate
@@ -113,7 +114,7 @@ export async function BookmarksTemplate(user, token, req) {
             .replaceAll('{{tags}}', tags)
             .replaceAll('{{addTag}}', user.plan == 'premium' ? 
                 `<form action="/bookmarks/update" method="post">${_dropDownTemplate
-                    .replaceAll('{{menuItems}}', tagsCheckList.replaceAll(`{{id}}`, item.id))
+                    .replaceAll('{{menuItems}}', list.replaceAll(`{{id}}`, item.id))
                     .replaceAll('{{title}}', '')
                     .replaceAll('{{icon}}', '<i class="bi bi-tags"></i>')}</form>` : '')
             .replaceAll('{{id}}', item.id)

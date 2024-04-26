@@ -92,7 +92,7 @@ export async function TimelineTemplate(user, token, req) {
     const favorites = user && user.lillihub && user.lillihub.favorites && !last ? (await Promise.all(user.lillihub.favorites.map(async (item) => {
         try {
             if(parseInt(item)) {
-                return `<div class="chip"><a href="/timeline/${item}">Post ${item}</a></div>`;
+                return `<div class="chip"><a onclick="addLoading(this)" href="/timeline/${item}">Post ${item}</a></div>`;
             }
             else {
                 const profileFetch = await fetch(`https://micro.blog/posts/${item}?count=1`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
@@ -100,7 +100,7 @@ export async function TimelineTemplate(user, token, req) {
            
                 // Could be interesting to put a notification dot if a favorite has a new post.
                 return `<div class="chip">
-                        <a href="/user/${item}">
+                        <a onclick="addLoading(this)" href="/user/${item}">
                         <img height="48" width="48" loading="lazy" class="avatar avatar-sm" src="${profile.author.avatar}" alt="${item} Avatar">@${item}</a>
                     </div>`;
             }

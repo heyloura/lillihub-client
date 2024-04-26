@@ -37,13 +37,48 @@
             }
 
             form:hover{background:#f1f1fc;color:#5755d9}
+
+            .loading {
+                color: transparent !important;
+                min-height: .8rem;
+                pointer-events: none;
+                position: relative;
+            }
+
+            .loading::after {
+                animation: loading .5s infinite linear;
+                background: 0 0;
+                border: .1rem solid #5755d9;
+                    border-top-color: rgb(87, 85, 217);
+                    border-right-color: rgb(87, 85, 217);
+                border-radius: 50%;
+                border-right-color: transparent;
+                border-top-color: transparent;
+                content: '';
+                display: block;
+                height: .8rem;
+                left: 50%;
+                margin-left: -.4rem;
+                margin-top: -.4rem;
+                opacity: 1;
+                padding: 0;
+                position: absolute;
+                top: 50%;
+                width: .8rem;
+                z-index: 1;
+            }
         </style>
     </head>
     <body>
         <form method='POST' action='/bookmarks/new'>
             <input class='form-input' type='hidden' name='url' value='{{url}}' />
             <input type='hidden' name='redirect' value='false' />
-            <button type='submit' class='btn btn-primary btn-block'>Bookmark Post</button>
+            <button onclick='addLoading(this)' type='submit' class='btn btn-primary btn-block'>Bookmark Post</button>
         </form>
     </body>
+    <script>
+        function addLoading(elem) {
+            elem.classList.add('loading');
+        }
+    </script>
 </html>

@@ -12,10 +12,10 @@
     </div>
     <ul class="tab tab-block mt-2">
         <li class="tab-item {{postsActive}}">
-            <a href="/user/{{username}}">Posts & Conversations</a>
+            <a onclick="addLoading(this)" href="/user/{{username}}">Posts & Conversations</a>
         </li>
         <li class="tab-item {{photosActive}}">
-            <a href="/user/photos/{{username}}">Photos</a>
+            <a onclick="addLoading(this)" href="/user/photos/{{username}}">Photos</a>
         </li>
     </ul>
 </div>
