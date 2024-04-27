@@ -60,7 +60,7 @@ export async function BlogTemplate(user, token, req) {
         .replaceAll('{{draftActive}}', status ? 'class="active"' : '')
         .replaceAll('{{q}}', q ? q : '')
         .replaceAll('{{feed}}', feed)
-        .replaceAll('{{destination}}', encodeURIComponent(destination))
+        .replaceAll('{{destination}}', encodeURIComponent(mpDestination))
         .replaceAll('{{offset}}', offset ? offset + 50 : '50')
 
     return HTMLPage('Posts', content, user);

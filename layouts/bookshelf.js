@@ -6,11 +6,15 @@ const _bookshelfTemplate = new TextDecoder().decode(await Deno.readFile("templat
 export async function BookshelfTemplate(user, token, id) {
     const fetching = await fetch(`https://micro.blog/books/bookshelves/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const results = await fetching.json();
-
+    
     const feed = (await Promise.all(results.items.map(async (item) => {
         return _bookTemplate
             .replaceAll('{{image}}', item.image)
             .replaceAll('{{title}}', item.title)
+            .replaceAll('{{titleEncoded}}', encodeURIComponent(item.title))
+            .replaceAll('{{shelf}}', encodeURIComponent(results.title.replaceAll('Micro.blog - ','')))
+            .replaceAll('{{link}}', encodeURIComponent(item.url))
+            .replaceAll('{{authorsEncoded}}', encodeURIComponent(item.authors.map(i => i.name).join(', ')))
             .replaceAll('{{authors}}', item.authors.map(i => i.name).join(', '));
     }))).join('');
 

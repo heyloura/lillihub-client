@@ -14,8 +14,13 @@ export async function EditorTemplate(user, token, req) {
     const edit = searchParams.get('edit');
     const quote = searchParams.get('quote');
     const image = searchParams.get('img');
+    const book = searchParams.get('book');
+    const authors = searchParams.get('authors');
+    const shelf = searchParams.get('shelf');
+    const link = searchParams.get('link');
     let post = undefined;
     let quoteback = '';
+    let bookPost = '';
 
     let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const config = await fetching.json();
@@ -49,6 +54,10 @@ export async function EditorTemplate(user, token, req) {
             .replaceAll('{{avatar}}',convo.author.avatar)
             .replaceAll('{{url}}',convo.url)
             .replaceAll('{{content_html}}',convo.content_html)
+    }
+
+    if(book) {
+        bookPost = `${shelf}: [${book}](${link}) by ${authors} 📚`;
     }
 
     fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
@@ -89,6 +98,7 @@ export async function EditorTemplate(user, token, req) {
         //.replaceAll('{{image}}', image ? `<img alt="" width="" height="" src="${image}" />` : '')
         .replaceAll('{{image}}', image ? `![](${image})` : '')
         .replaceAll('{{quoteback}}', quoteback)
+        .replaceAll('{{bookPost}}',bookPost)
         .replaceAll('{{content}}', post && post.properties.content[0] ? post.properties.content[0] : '' )
         .replaceAll('{{publishSelected}}', post && post.properties["post-status"][0] == 'published' ? `selected="selected"` : '' )
         .replaceAll('{{draftSelected}}', post && post.properties["post-status"][0] == 'draft' ? `selected="selected"` : '' )

@@ -1,14 +1,18 @@
 <div class="container">
-    <div class="input-group float-right mb-2 mt-2">
+    <!--<div class="input-group float-right mb-2 mt-2">
         <a onclick="addLoading(this)" href="/bookshelves/shelf/{{id}}/update" class="btn btn-primary"><i class="bi bi-plus"></i> Book</a>
-    </div>
+    </div>-->
     <div style="clear: both;">
+        <p><b>Search</b></p>
         <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
             <div class="input-group">
                 <input type="search" id="searchbox" oninput="liveSearch('.tile', 'searchbox')" class="form-input" placeholder="Search" />
             </div>
         </div>
-        {{feed}}
+        <p class="pt-2"><b>Books</b></p>
+        <div style="overflow-wrap: break-word; word-break: break-all;">
+            {{feed}}
+        </div>
     </div>
 </div>
 <style>

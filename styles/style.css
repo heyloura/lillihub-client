@@ -503,3 +503,8 @@ table, th, td {
 td {
     padding: 0.2rem;
 }
+.loading::after {
+    border: .1rem solid var(--purple);
+        border-top-color: var(--purplered);
+        border-right-color: var(--purplered);
+}
