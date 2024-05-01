@@ -44,3 +44,17 @@ function addLoading(elem) {
 function toggleSummary(el, e) {
     // at some point find all the references and remove them
 }
+
+async function loadConversation(el, id) {
+    const fetching = await fetch(`/conversation/${id}`, { method: "GET" } );
+    try {
+        const result = await fetching.text();
+        el.insertAdjacentHTML(
+            'afterend',
+            result,
+          );
+    }
+    catch {
+        return null;
+    }
+}

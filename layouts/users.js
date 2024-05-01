@@ -6,13 +6,13 @@ const _favoriteTemplate = new TextDecoder().decode(await Deno.readFile("template
 const _avatarTemplate = new TextDecoder().decode(await Deno.readFile("templates/_avatar.html"));
 
 export async function UsersTemplate(user, token, type, url) {
+    console.time(`getUsers`);
     const fetching = await fetch(url, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const results = await fetching.json();
+    console.timeEnd(`getUsers`);
 
     const feed = (await Promise.all(results.map(async (item) => {
         try {
-            const profileFetch = await fetch(`https://micro.blog/posts/${item.username}?count=1`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
-            const profile = await profileFetch.json();
             const favorite = user.lillihub.favorites.includes(item.username);
 
             const actions = type == 'following' ? _favoriteTemplate
@@ -27,9 +27,10 @@ export async function UsersTemplate(user, token, type, url) {
                         .replaceAll('{{username}}',item.username) : '')
                 .replaceAll('{{name}}',  type == 'following' ? item.name : '')
                 .replaceAll('{{username}}',item.username)
-                .replaceAll('{{pronouns}}', profile._microblog.pronouns ? `<small>(${profile._microblog.pronouns})</small>` : '')
-                .replaceAll('{{bio}}', profile._microblog.bio)
-                .replaceAll('{{userActionDropDown}}', actions);
+                .replaceAll('{{pronouns}}', '')
+                .replaceAll('{{bio}}', '')
+                .replaceAll('{{userActionDropDown}}', actions)
+                .replaceAll('{{microblog}}', item.username.split('@').length == 1 ? '<span class="chip">Micro.blog</span>' : '<span class="chip">Other</span>');
         } catch {
             return '';
         }

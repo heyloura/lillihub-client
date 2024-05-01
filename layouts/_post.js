@@ -14,7 +14,7 @@ const _bookmarkFormTemplate = new TextDecoder().decode(await Deno.readFile("temp
 const _bookmarkIframeTemplate = new TextDecoder().decode(await Deno.readFile("templates/_bookmark_iframe.html"));
 
 
-export async function PostTemplate(id, post, conversation, user = false, token = '', lastTimestamp = 0, customTag = '', open = false, getFollowing = true) {
+export async function PostTemplate(id, post, conversation, user = false, token = '', lastTimestamp = 0, customTag = '', open = false, getFollowing = true, clientConvoLoad = false) {
     const isConversation = conversation && conversation.length > 0;
 
     let isFollowingUser = false;
@@ -30,7 +30,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
             return `<label><input {{${person}}} type='checkbox' name='replyingTo[]' value='${person}'/> @${person}</label> `
         }).join(' ');
 
-    const conversations = isConversation && conversation ? conversation.slice(0).reverse().slice(1).map((item) => 
+    const conversations = isConversation ? conversation.slice(0).reverse().slice(1).map((item) => 
         item && !filterOut(user ?  user.lillihub.exclude : '', item.content_html) ?
             _conversationTemplate
                 .replaceAll('{{id}}', item.id)
@@ -79,9 +79,10 @@ export async function PostTemplate(id, post, conversation, user = false, token =
     const comments = _commentsTemplate
         .replaceAll('{{open}}', open ? 'open' : '')
         .replaceAll('{{avatars}}', avatars)
-        .replaceAll('{{convoCount}}', conversation.length - 1)
+        .replaceAll('{{convoCount}}', clientConvoLoad ? 'View ' : conversation.length - 1)
         .replaceAll('{{conversations}}', conversations ? conversations : '')
-        .replaceAll('{{reply}}', reply);
+        .replaceAll('{{reply}}', reply)
+        .replaceAll('{{clientConvoLoad}}', clientConvoLoad ? `loadConversation(this,${id});` : '');
 
     return !filterOut(user ?  user.lillihub.exclude : '', post.content_html) ? 
         _postTemplate.replaceAll('{{avatar}}',post.author.avatar) 
@@ -110,7 +111,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                     .replaceAll('{{relativeDate}}', post._microblog.date_relative)
                     .replaceAll('{{url}}', post.url)
                     .replaceAll('{{id}}', post.id)
-                    .replaceAll('{{comments}}', user && conversation.length - 1 > 0 ? comments : '')
-                    .replaceAll('{{reply}}', user && conversation.length - 1 == 0 ? reply  : '')
+                    .replaceAll('{{comments}}', user && (conversation.length - 1 > 0 || (clientConvoLoad && post._microblog.is_conversation) ) ? comments : '')
+                    .replaceAll('{{reply}}', user ? conversation.length == 0 && !(clientConvoLoad && post._microblog.is_conversation) ? reply : '' : '')
         : ''
 }

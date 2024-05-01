@@ -129,7 +129,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                             <div class="navbar bg-light p-1">
                                 <section class="navbar-section mt-1 mb-2">
                                     <div class="btn-group btn-group-block mt-2">
-                                        <a href="#top" class="btn btn-link greenblue-text">${title}</a>
+                                        <a id="nav-title" href="#top" class="btn btn-link greenblue-text">${title}</a>
                                     </div>
                                 </section>
                                 <section class="navbar-section mt-1 mb-2">

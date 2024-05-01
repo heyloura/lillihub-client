@@ -18,6 +18,7 @@ export async function EditorTemplate(user, token, req) {
     const authors = searchParams.get('authors');
     const shelf = searchParams.get('shelf');
     const link = searchParams.get('link');
+    const alt = searchParams.get('alt');
     let post = undefined;
     let quoteback = '';
     let bookPost = '';
@@ -28,7 +29,7 @@ export async function EditorTemplate(user, token, req) {
     const mpDestination = destination ? destination : config.destination.filter(d => d["microblog-default"])[0].uid;
     const destinationSelect = config.destination ? config.destination.map(item => {
         if(item.uid != mpDestination) {
-            return `<li class="menu-item"><a onclick="addLoading(this)" href="/post?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
+            return `<li class="menu-item"><a onclick="if(confirm('You are navigating away from the page and will lose any changes. Continue?')){addLoading(this);return true;}return false;" href="/post?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
         }
     }).join('') : '';
 
@@ -96,7 +97,7 @@ export async function EditorTemplate(user, token, req) {
         .replaceAll('{{editInput}}', edit ? `<input type="hidden" name="url" value="${edit}" />` : '')
         .replaceAll('{{title}}', post && post.properties.name[0] ? `value="${post.properties.name[0]}"` : '' )
         //.replaceAll('{{image}}', image ? `<img alt="" width="" height="" src="${image}" />` : '')
-        .replaceAll('{{image}}', image ? `![](${image})` : '')
+        .replaceAll('{{image}}', image ? `![${alt ? alt : ''}](${image})` : '')
         .replaceAll('{{quoteback}}', quoteback)
         .replaceAll('{{bookPost}}',bookPost)
         .replaceAll('{{content}}', post && post.properties.content[0] ? post.properties.content[0] : '' )

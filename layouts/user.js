@@ -52,18 +52,24 @@ export async function UserTemplate(user, token, id, photos = false) {
                 if(item == null){
                     return '';
                 }
+
+                let conversations = [];
+                let convo = item;
         
-                const conversation = await getConversation(item.id, token);
-        
-                if(conversation) {
-                    const convo = conversation.items[conversation.items.length - 1];
-                    if(convo && !seen.has(convo.id)) {
-                        seen.add(convo.id);
-                        return await PostTemplate(item.id, convo, conversation.items, user, token, 0, '')
-                    }
+                if(item._microblog && item._microblog.is_conversation && item._microblog.is_mention) {
+                    const conversation = await getConversation(item.id, token);
+                    convo = conversation.items[conversation.items.length - 1];
+                    conversations = conversation.items;
                 }
-                return '';
-        
+
+                if(!seen.has(convo.id)) {
+                    seen.add(convo.id);
+
+                    if(item._microblog.is_mention) {
+                        return await PostTemplate(item.id, convo, conversations, user, token, 0, '', false, true, false); 
+                    }
+                    return await PostTemplate(item.id, convo, conversations, user, token, 0, '', false, true, true);    
+                }
             }))).join('');
         }
 

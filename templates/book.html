@@ -1,3 +1,11 @@
+<ul class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a onclick="addLoading(this)" href="/bookshelves/shelf/{{shelfId}}">{{shelfName}}</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="#">Edit</a>
+    </li>
+</ul>
 <div class="panel" style="background-color: unset;">
     <div class="panel-header text-center">
       <img style="margin: 0px auto; margin-bottom: 1em;" class="img-responsive" src="{{image}}" alt="{{title}} bookcover">
@@ -28,6 +36,7 @@
             <summary>Remove book?</summary>
             <form method='POST' action='/book/remove' style="margin-bottom: 1em;">
                 <input type="hidden" name="id" value="{{id}}">
+                <input type="hidden" name="shelfId" value="{{shelfId}}">
                 <button type="submit" class="btn">Remove book from shelf</button>
             </form>
         </details>

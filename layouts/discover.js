@@ -1,14 +1,11 @@
 import { HTMLPage } from "./templates.js";
 import { PostTemplate } from "./_post.js";
-import { getConversation } from "../scripts/server/mb.js";
 
 const _discoverTemplate = new TextDecoder().decode(await Deno.readFile("templates/discover.html"));
 const _ctaTemplate = new TextDecoder().decode(await Deno.readFile("templates/_cta.html"));
 const _loginTemplate = new TextDecoder().decode(await Deno.readFile("templates/_login.html"));
 
 export async function DiscoverTemplate(user, token, uuid, url) {
-
-    console.log(url);
     url = url.replaceAll('/discover','');
     if(url[url.length - 1] == '/') {
         url = url.substring(0, url.length - 1);
@@ -24,12 +21,7 @@ export async function DiscoverTemplate(user, token, uuid, url) {
 
     const feed = (await Promise.all(results.items.map(async (item) => {
         if(user && !user.error) {
-            const conversation = await getConversation(item.id, token);
-            if(conversation) {
-                const convo = conversation.items[conversation.items.length - 1];
-                return await PostTemplate(item.id, convo, conversation.items, user, token, 0, '', false)
-            }
-            return '';
+            return await PostTemplate(item.id, item, [], user, token, 0, '', false, true, true)
         }
         else {
             return await PostTemplate(item.id, item, item._microblog.is_conversation, user, token, 0, '', false)

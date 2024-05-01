@@ -18,6 +18,7 @@ export async function BookTemplate(user, token, shelfid, id) {
             .replaceAll('{{image}}', item.image)
             .replaceAll('{{title}}', item.title)
             .replaceAll('{{shelfId}}', shelfid)
+            .replaceAll('{{shelfName}}', results.title.replaceAll('Micro.blog - ',''))
             .replaceAll('{{id}}', item.id)
             .replaceAll('{{shelfList}}', shelvesButtonListHTML)
             .replaceAll('{{authors}}', item.authors.map(i => i.name).join(', '));
@@ -25,5 +26,5 @@ export async function BookTemplate(user, token, shelfid, id) {
         return '';
     }))).join('');
 
-    return HTMLPage(id, content, user);
+    return HTMLPage('Edit book', content, user);
 }

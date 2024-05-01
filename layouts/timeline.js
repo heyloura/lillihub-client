@@ -25,21 +25,7 @@ export async function TimelineTemplate(user, token, req) {
 
     timeline.seen = userKV && userKV.value && userKV.value.seen ? userKV.value.seen : [];
 
-    // keeps track of now, last, and seen ids.
-    // const session = SESSION[user.username];
-    // const timeline = session.timeline ? session.timeline : {};
-
-    // if(!last && !before) {
-    //     const kv = await Deno.openKv();
-    //     await kv.set([user.username, 'timeline'], new Date().toLocaleDateString('en-us', { year:"numeric", month:"short", day:"numeric"}));
-
-    //     if(replyTo == 0) {
-    //         timeline.last = timeline.now ? timeline.now : 0;
-    //         timeline.now = Math.trunc(new Date().getTime()/1000);
-    //     }
-    // }
-
-    const fetching = await fetch(`https://micro.blog/posts/timeline?count=30${last ? `&before_id=${last}` : ''}${before ? `&since_id=${before}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
+    const fetching = await fetch(`https://micro.blog/posts/timeline?count=15${last ? `&before_id=${last}` : ''}${before ? `&since_id=${before}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
     const results = await fetching.json();
 
     if(!results || !results.items || results.items.length == 0) {
@@ -51,38 +37,14 @@ export async function TimelineTemplate(user, token, req) {
         timeline.seen.forEach(seen.add, seen);
     }
 
-    const feed = (await Promise.all(results.items.map(async (item) => {
+    let feed = await getFeed(results.items, user, seen, token, timeline);
 
-        if(item == null){
-            return '';
-        }
-        let conversations = [];
-        let convo = item;
-
-        if(item._microblog && item._microblog.is_conversation) {
-            console.time(`getConversation${item.id}`);
-            const conversation = await getConversation(item.id, token);
-            convo = conversation.items[conversation.items.length - 1];
-            conversations = conversation.items;
-            console.timeEnd(`getConversation${item.id}`);
-        }
-
-        if(!seen.has(convo.id)) {
-            seen.add(convo.id);
-
-            if(user.lillihub.display == 'posts') {
-                if(!item._microblog.is_mention) {
-                    return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '')
-                }
-            } else {
-                return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '')
-            }
-            return '';    
-        }
-
-    }))).join('');
-
-    
+    // in the case of posts only, 15 may not be enough to find some. Try some more....
+    let i = 0;
+    while(!feed && i < 5) {
+        feed = await getFeed(results.items, user, seen, token, timeline);
+        i++;
+    }
 
     if(last) {
         timeline.seen = timeline.seen.concat([...seen])
@@ -117,12 +79,60 @@ export async function TimelineTemplate(user, token, req) {
     timeline.viewed = new Date().toLocaleDateString('en-us', { year:"numeric", month:"short", day:"numeric"});
     await kv.set([user.username, 'timeline'], timeline);
 
+    const config = token ? { method: "GET", headers: { "Authorization": "Bearer " + token } } : { method: "GET", headers: { "Authorization": "Bearer " + token }  };
+    const fetchingTimeline = await fetch('https://micro.blog/posts/discover', config);
+
+    const tagmojis = (await fetchingTimeline.json())._microblog.tagmoji;
+    const favoritePages = user && user.lillihub && user.lillihub.feeds && !last ? (await Promise.all(user.lillihub.feeds.map(async (item) => {
+        try {
+            const tagmoji = tagmojis.filter(t => t.name == item)[0];
+            return `<div class="chip">
+                <a onclick="addLoading(this)" href="/discover/${item}">
+                    ${tagmoji.emoji} ${tagmoji.name}
+                </a>
+                </div>`;
+        } catch {
+            return '';
+        }
+    }))).join('') : '';
+
     const result = _timelineTemplate
-        .replaceAll('{{favorites}}', !last && !before ? _favoritesTemplate.replaceAll('{{favorites}}', favorites) + '<hr/>' : '')
+        .replaceAll('{{favorites}}', !last && !before ? _favoritesTemplate.replaceAll('{{favorites}}', favorites + favoritePages) + '<hr/>' : '')
         .replaceAll('{{feed}}', feed)
         .replaceAll('{{before}}',  beforeId ? '' : 'disabled')
         .replaceAll('{{beforeId}}', beforeId)
         .replaceAll('{{lastId}}', lastPostId);
     
     return HTMLPage('Timeline', result, user);
+}
+
+async function getFeed(items, user, seen, token, timeline) {
+    return (await Promise.all(items.map(async (item) => {
+
+        if(item == null){
+            return '';
+        }
+        let conversations = [];
+        let convo = item;
+
+        if(item._microblog && item._microblog.is_conversation) {
+            const conversation = await getConversation(item.id, token);
+            convo = conversation.items[conversation.items.length - 1];
+            conversations = conversation.items;
+        }
+
+        if(!seen.has(convo.id)) {
+            seen.add(convo.id);
+
+            if(user.lillihub.display == 'posts') {
+                if(!item._microblog.is_mention) {
+                    return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '')
+                }
+            } else {
+                return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '')
+            }
+            return '';    
+        }
+
+    }))).join('');
 }

@@ -25,7 +25,7 @@ export async function ConversationsTemplate(user, token, req) {
 
     timeline.seen = userKV && userKV.value && userKV.value.seen ? userKV.value.seen : [];
 
-    const fetching = await fetch(`https://micro.blog/posts/timeline?count=30${last ? `&before_id=${last}` : ''}${before ? `&since_id=${before}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
+    const fetching = await fetch(`https://micro.blog/posts/timeline?count=15${last ? `&before_id=${last}` : ''}${before ? `&since_id=${before}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
     const results = await fetching.json();
 
     if(!results || !results.items || results.items.length == 0) {

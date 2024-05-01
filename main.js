@@ -31,6 +31,7 @@ import { DiscoverTemplate } from "./layouts/discover.js";
 import { TagmojiTemplate } from "./layouts/tagmoji.js";
 import { UserTemplate } from "./layouts/user.js";
 import { ConversationsTemplate } from "./layouts/conversations.js";
+import { ConversationTemplate } from "./layouts/conversation.js";
 import { BookTemplate } from "./layouts/book.js";
 
 const _replyFormTemplate = new TextDecoder().decode(await Deno.readFile("templates/_reply_form.html"));
@@ -72,6 +73,7 @@ const FOLLOW_USER = new URLPattern({ pathname: "/users/follow" });
 const MUTE_USER = new URLPattern({ pathname: "/users/mute" });
 const BLOCK_USER = new URLPattern({ pathname: "/users/block" });
 const FAVORTIE_USER_TOGGLE = new URLPattern({ pathname: "/users/favorite/toggle" });
+const FAVORTIE_FEED_TOGGLE = new URLPattern({ pathname: "/feed/favorite/toggle" });
 const PIN_TIMELINE_POST = new URLPattern({ pathname: "/timeline/favorite/toggle" });
 const BOOK_MOVE = new URLPattern({ pathname: "/book/move" });
 const BOOK_CHANGE_COVER= new URLPattern({ pathname: "/book/change" });
@@ -88,6 +90,9 @@ const ADD_NOTEBOOK = new URLPattern({ pathname: "/notebook/add" });
 const ADD_POST = new URLPattern({ pathname: "/post/add" });
 const UPLOAD_MEDIA_ROUTE = new URLPattern({ pathname: "/media/upload" });
 const DELETE_MEDIA_ROUTE = new URLPattern({ pathname: "/media/delete" });
+const GET_CONVERSATION_ROUTE = new URLPattern({ pathname: "/conversation/:id" });
+const ADD_BOOK = new URLPattern({ pathname: "/book/add" });
+
 
 
 const SESSION = {};
@@ -360,7 +365,6 @@ async function handler(req) {
         });
     }
 
-
     if(UPDATE_NOTES_ROUTE.exec(req.url) && user) {
         if(user.plan != 'premium') {
             return new Response(HTMLPage(`Notebooks`,`<div class="container><p><b>You need to be a premium micro.blog user to access notebooks</b></p></div>"`, user), {
@@ -381,21 +385,16 @@ async function handler(req) {
         });
     }
 
+    if(GET_CONVERSATION_ROUTE.exec(req.url) && user) {
+        const id = GET_CONVERSATION_ROUTE.exec(req.url).pathname.groups.id;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return new Response(await ConversationTemplate(id, user, accessTokenValue), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+            },
+        });
+    }
 
     /********************************************************
      * Authenticated Only Actions
@@ -525,10 +524,7 @@ async function handler(req) {
     if(BOOK_MOVE.exec(req.url) && user) {
         const value = await req.formData();
         const shelf = value.getAll('shelf[]');
-        const shelfId = value.get('shelfId');
         const id = value.get('id');
-
-        console.log(shelf, shelfId, id);
 
         const formBody = new URLSearchParams();
         formBody.append("book_id", id);
@@ -543,6 +539,38 @@ async function handler(req) {
         });
 
         return Response.redirect(req.url.replaceAll('/book/move', `/bookshelves/shelf/${shelf[0]}`));
+    }
+
+    if(BOOK_REMOVE.exec(req.url) && user) {
+        const value = await req.formData();
+        const shelfId = value.get('shelfId');
+        const id = value.get('id');
+
+        const posting = await fetch(`https://micro.blog/books/bookshelves/${shelfId}/remove/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + accessTokenValue
+            }
+        });
+
+        return Response.redirect(req.url.replaceAll('/book/remove', `/bookshelves/shelf/${shelfId}`));
+    }
+
+    if(ADD_BOOK.exec(req.url) && user) {
+        const value = await req.formData();
+        const shelf = value.getAll('shelf[]');
+        const title = value.get('title');
+        const author = value.get('author');
+        const isbn = value.get('isbn');
+
+        const posting = await fetch(`https://micro.blog/books?bookshelf_id=${shelf[0]}&isbn=${isbn}&title=${title}&author=${author}`, {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + accessTokenValue
+            }
+        });
+
+        return Response.redirect(req.url.replaceAll('/book/add', `/bookshelves/shelf/${shelf[0]}`));
     }
 
     if(BOOKMARKS_NEW.exec(req.url) && user) {
@@ -838,6 +866,27 @@ async function handler(req) {
         return Response.redirect(req.url.replaceAll('/users/favorite/toggle', `/users/following`));
     }
 
+    if(FAVORTIE_FEED_TOGGLE.exec(req.url) && user) {
+        const value = await req.formData();
+        const feed = value.get('id');
+        const kv = await Deno.openKv();
+
+        if(feed)
+        {
+            const index = user.lillihub.feeds.indexOf(feed);
+            if (index > -1) {            
+                user.lillihub.feeds = user.lillihub.feeds.filter(function(el) { return el != feed; });
+            } else {
+                user.lillihub.feeds.push(feed);
+            }
+        }
+
+        await kv.set([user.username, 'global'], user.lillihub);
+        SESSION[user.username] = user;
+
+        return Response.redirect(req.url.replaceAll('/feed/favorite/toggle', `/discover/${feed}`));
+    }
+
     if(SETTINGS_DARKTHEME.exec(req.url) && user) {
         const value = await req.formData();
         const enableDarkMode = value.get('enableDarkMode');
@@ -952,7 +1001,7 @@ async function handler(req) {
         return Response.redirect(req.url.replaceAll('/notebook/add', '/notes'));
     }
 
-
+ 
 
 
 

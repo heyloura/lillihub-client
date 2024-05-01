@@ -6,7 +6,7 @@ const _bookshelfTemplate = new TextDecoder().decode(await Deno.readFile("templat
 export async function BookshelfTemplate(user, token, id) {
     const fetching = await fetch(`https://micro.blog/books/bookshelves/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const results = await fetching.json();
-    
+
     const feed = (await Promise.all(results.items.map(async (item) => {
         return _bookTemplate
             .replaceAll('{{image}}', item.image)
@@ -25,5 +25,5 @@ export async function BookshelfTemplate(user, token, id) {
         .replaceAll('{{id}}', id)
         .replaceAll('{{feed}}', feed)
 
-    return HTMLPage(id, content, user);
+    return HTMLPage(results.title.replaceAll('Micro.blog - ',''), content, user);
 }

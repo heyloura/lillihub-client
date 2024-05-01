@@ -1,6 +1,5 @@
 import { HTMLPage } from "./templates.js";
 import { PostTemplate } from "./_post.js";
-import { getConversation } from "../scripts/server/mb.js";
 
 const _addShelfTemplate = new TextDecoder().decode(await Deno.readFile("templates/_shelf_add.html"));
 const _bookshelvesTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookshelves.html"));
@@ -25,29 +24,16 @@ export async function BookshelvesTemplate(user, token, replyTo = 0) {
    
   
     const feed = (await Promise.all(results.items.map(async (item) => {
-        console.log(item._microblog, item._microblog.is_conversation);
-        let conversations = [];
-        let convo = item;
-
-        if(item._microblog && item._microblog.is_conversation) {
-            console.time(`getConversation${item.id}`);
-            const conversation = await getConversation(item.id, token);
-            convo = conversation.items[conversation.items.length - 1];
-            conversations = conversation.items;
-            console.timeEnd(`getConversation${item.id}`);
-        }
-
         return await PostTemplate(item.id, 
-            convo, 
-            conversations, 
+            item, 
+            [], 
             user, 
             token, 
             0, 
             _addShelfTemplate.replaceAll('{{title}}',item._microblog.book_title).replaceAll('{{author}}',item._microblog.book_author).replaceAll('{{isbn}}',item._microblog.isbn).replaceAll('{{shelfChecklist}}', shelvesChecklistHTML), 
-            conversations ? conversations.filter(item => item ? item.id == replyTo : false).length > 0 : false,
-            'bookshelves',
-            replyTo, 
-            false);
+            false,
+            false, 
+            true);
 
     }))).join('');
    

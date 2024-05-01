@@ -10,6 +10,8 @@
             </div>
         </div>
     </div>
+    <p><b>Categories</b></p>
+    {{categoriesHTML}}
     <ul class="tab tab-block">
         <li class="tab-item">
             <a onclick="addLoading(this)" href="/posts?destination={{destination}}" {{postsActive}}>Posts</a>
@@ -19,5 +21,5 @@
         </li>
     </ul>
     {{feed}}
-    <a onclick="addLoading(this)" class="float-right" href="/posts?destination={{destination}}&offset={{offset}}" class="btn btn-primary">Next</a>
+    <a onclick="addLoading(this)" class="float-right" href="{{nextHref}}" class="btn btn-primary">Next</a>
 </div>

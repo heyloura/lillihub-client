@@ -57,8 +57,9 @@ export async function BookmarksTemplate(user, token, req) {
 
         tags.sort();
         tagsHTML = tags.map((item) =>
-            `<span class="chip"><a href="/bookmarks?tag=${encodeURIComponent(item)}">${item}</a></span>`
+            `<span class="chip" ${tagParam == item ? 'style="background-color:var(--purplered);"' : ''}><a ${tagParam == item ? 'style="color:var(--crust);"' : ''} href="/bookmarks?tag=${encodeURIComponent(item)}">${item}</a></span>`
         ).join('');
+        tagsHTML = tagParam ? tagsHTML + `<span class="chip"><a href="/bookmarks"><em>Clear Selection</em></a></span>` : tagsHTML;
         
         tagsDataList = tags.map((item) => `<option value="${item}"></option>`).join('');
         

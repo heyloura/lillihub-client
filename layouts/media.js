@@ -32,6 +32,9 @@ export async function MediaTemplate(user, token, req) {
     const feed = (results.items.map((item) => {
         return _mediaItemTemplate
             .replaceAll('{{url}}', item.url)
+            .replaceAll('{{alt}}', item.alt ? item.alt : '')
+            .replaceAll('{{altDisp}}', item.alt ? `<p class="p-2"><i class="bi bi-robot"></i> ${item.alt}</p>` : '')
+            .replaceAll('{{altEncoded}}', item.alt ? encodeURIComponent(item.alt) : '')
             .replaceAll('{{encodedUrl}}',encodeURIComponent(item.url))
             .replaceAll('{{destination}}', mpDestination)
             .replaceAll('{{published}}',item.published)

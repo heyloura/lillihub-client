@@ -1,24 +1,34 @@
+<style>
+    .tile:nth-child(2n) {
+        background-color: var(--crust)
+    }
+    @media screen and (max-width:600px) {
+        /* .tile { flex-wrap: wrap;  } */
+        .tile-icon { flex-basis: 100% !important; flex: unset !important; }
+    }
+</style>
 <div class="container">
-    <div class="float-right mt-2">
-        <div class="input-group mb-2 mt-2">
-            <form enctype="multipart/form-data" style="display: inherit;" action="/media/upload" method="POST">
+    <div class="float-right mt-2">     
+        <form enctype="multipart/form-data" style="display: inherit;" action="/media/upload" method="POST">
+            <div class="float-right">
                 {{destinationDropdown}}
+            </div>
+            <div style="clear:both" class="input-group mb-2 mt-2">
                 <input type="hidden" name="destination" value="{{destination}}"/>
                 <input type="hidden" name="redirect" value="true"/>
                 <input style="padding:0;height:unset;" type="file" name="media" class="form-input" />
                 <button onclick="addLoading(this)" type="submit" class="btn btn-primary">Upload</button>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
     <div style="clear: both;">
-        <!--<div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
+        <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
             <div class="input-group">
-                <input type="search" id="searchbox" oninput="liveSearch('.card', 'searchbox')" class="form-input" placeholder="Search" />
+                <input type="search" id="searchbox" oninput="liveSearch('.tile', 'searchbox')" class="form-input" placeholder="Search" />
             </div>
-        </div>-->
-        <div class="image-gallery" style="overflow-wrap: break-word; word-break: break-all;">
-            {{feed}}
         </div>
+        <p><b>My Blog Media</b></p>
+        {{feed}}
         <a onclick="addLoading(this)" class="float-right" href="/media?destination={{destination}}&offset={{offset}}" class="btn btn-primary">Next</a>
     </div>
     <style>
