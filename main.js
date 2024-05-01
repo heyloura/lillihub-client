@@ -160,7 +160,7 @@ async function handler(req) {
             const kv = await Deno.openKv();
             const userKV = await kv.get([user.username, 'global']);
             if(userKV && !userKV.value) {
-                const starterFavs = { favorites: ['manton', 'jean', 'news', 'help'], feeds: [] };
+                const starterFavs = { favorites: ['manton', 'jean', 'news', 'help'], feeds: [], display: 'both' };
                 await kv.set([user.username, 'global'], starterFavs);
                 user.lillihub = starterFavs;
             } else {   
@@ -1100,7 +1100,7 @@ async function handler(req) {
                
                 const userKV = await kv.get([user.username, 'global']);
                 if(userKV && !userKV.value) {
-                    const starterFavs = { favorites: ['manton', 'jean', 'news', 'help'], feeds: [] };
+                    const starterFavs = { favorites: ['manton', 'jean', 'news', 'help'], feeds: [], display: 'both' };
                     await kv.set([user.username, 'global'], starterFavs);
                     user.lillihub = starterFavs;
                 } else {   
