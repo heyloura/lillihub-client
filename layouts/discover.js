@@ -16,7 +16,7 @@ export async function DiscoverTemplate(user, token, uuid, url) {
     const results = await fetching.json();
 
     const tagmojis = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-        `<span class="chip"><a href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+        `<span class="chip"><a onclick="addLoading(this)" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
     ).join('');
 
     const feed = (await Promise.all(results.items.map(async (item) => {

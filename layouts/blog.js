@@ -27,9 +27,9 @@ export async function BlogTemplate(user, token, req) {
     const categories = await fetchingCategories.json();
 
     let categoriesHTML = categories.categories.map((item) =>
-        `<span class="chip" ${category == item ? 'style="background-color:var(--purplered);"' : ''} ><a ${category == item ? 'style="color:var(--crust);"' : ''} href="/posts?destination=${encodeURIComponent(mpDestination)}&category=${encodeURIComponent(item)}">${item}</a></span>`
+        `<span class="chip" ${category == item ? 'style="background-color:var(--purplered);"' : ''} ><a onclick="addLoading(this)" ${category == item ? 'style="color:var(--crust);"' : ''} href="/posts?destination=${encodeURIComponent(mpDestination)}&category=${encodeURIComponent(item)}">${item}</a></span>`
     ).join('');
-    categoriesHTML = category ? categoriesHTML + `<span class="chip"><a href="/posts?destination=${encodeURIComponent(mpDestination)}"><em>Clear Selection</em></a></span>` : categoriesHTML;
+    categoriesHTML = category ? categoriesHTML + `<span class="chip"><a onclick="addLoading(this)" href="/posts?destination=${encodeURIComponent(mpDestination)}"><em>Clear Selection</em></a></span>` : categoriesHTML;
 
     const destinationDropdown = _dropdownTemplate
         .replaceAll('{{title}}', config.destination.filter(d => d.uid == mpDestination)[0].name)
