@@ -181,6 +181,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                         </div>
                     </footer>
                 </body>
+                <style>.small-img{width:unset!important;margin-left:unset!important;}</style>
                 <script>${_commonjs}</script>
             </html>`;
 }

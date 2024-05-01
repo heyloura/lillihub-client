@@ -79,8 +79,8 @@ a[href]:where(
     width: 100%;
 }
 .card-body img, .card-body video, sl-carousel {
-    width: calc(100% + (0.8rem * 2)) !important;
-    height: auto !important;
+    width: calc(100% + (0.8rem * 2));
+    height: auto;
     margin-left: -0.8rem;
 }
 hr {
