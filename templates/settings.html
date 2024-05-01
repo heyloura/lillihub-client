@@ -1,0 +1,31 @@
+<div class="container">
+    <p class="pt-2">
+        <b>Content filters</b>
+    </p>
+    <p>A comma seperated list of terms that lillihub will use to exclude posts and comments from showing.</p>
+    <form method="POST" action="/settings/contentfilters">
+        <div class="grow-wrap">
+            <textarea name="exclude" onInput="growTextArea(this)">{{exclude}}</textarea>
+        </div>
+        <button onclick="addLoading(this)" class="btn btn-primary" type="submit">Save content filter list</button>
+    </form>
+    <br/>
+    <hr class="mt-2"/>
+    <p class="pt-2">
+        <b>Always dark theme</b>
+    </p>
+    <p>Have Lillihub use the dark theme. Overrides browser/system <em><small>prefers-color-scheme</small></em>.
+    You will need to refresh the page to see the changes take effect.</p>
+    <form method="POST" action="/settings/darktheme">
+        <label>
+            <input type="checkbox" name="enableDarkMode" {{darktheme}} /> Enable dark theme
+        </label>
+        <button onclick="addLoading(this)" class="btn btn-primary" type="submit">Save dark theme setting</button>
+    </form>
+    <hr class="mt-2"/>
+    <p class="pt-2">
+        <b>Combine posts and conversations on the homepage</b>
+    </p>
+    <p>Have Lillihub combine posts and conversations on the home page. This removes the conversation icon from the navigation bar.</p>
+    {{timelineSettings}}
+</div>

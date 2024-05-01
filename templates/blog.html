@@ -1,0 +1,25 @@
+<div class="container my-posts">
+    <div class="float-right mt-2">
+        {{destinationDropdown}}
+    </div>
+    <div style="clear: both">
+        <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
+            <div class="input-group mb-2 mt-2">
+                <input autocomplete="off" type="search" id="q" class="form-input" value="{{q}}">
+                <button onclick="addLoading(this);window.location.href='/posts?destination={{destination}}&q='+encodeURIComponent(document.getElementById('q').value)" class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+            </div>
+        </div>
+    </div>
+    <p><b>Categories</b></p>
+    {{categoriesHTML}}
+    <ul class="tab tab-block">
+        <li class="tab-item">
+            <a onclick="addLoading(this)" href="/posts?destination={{destination}}" {{postsActive}}>Posts</a>
+        </li>
+        <li class="tab-item">
+            <a onclick="addLoading(this)" href="/posts?status=draft&destination={{destination}}" {{draftActive}}>Drafts</a>
+        </li>
+    </ul>
+    {{feed}}
+    <a onclick="addLoading(this)" class="float-right" href="{{nextHref}}" class="btn btn-primary">Next</a>
+</div>

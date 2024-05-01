@@ -1,0 +1,23 @@
+{{followForm}}
+<form class="d-inline-block" method="POST" action="/users/favorite/toggle">
+    <input type="hidden" name="id" value="{{username}}" />
+    <button onclick="addLoading(this)" type="submit" class="btn btn-link greenblue-text"><i class="bi {{starIcon}}"></i></button>
+</form>
+<div class="dropdown dropdown-right">
+    <a class="btn btn-link dropdown-toggle blue-text" tabindex="0"><i class="bi bi-gear"></i></a>
+    <ul class="menu text-left">
+        {{unFollowForm}}
+        <li class="menu-item">
+            <form method="POST" action="/users/{{muteUnmute}}">
+                <input type="hidden" name="username" value="{{username}}" />
+                <button onclick="addLoading(this)" class="btn btn-block" type="submit">{{muteUnmute}} user</button>
+            </form>
+        </li>
+        <li class="menu-item">
+            <form method="POST" action="/users/{{blockUnblock}}">
+                <input type="hidden" name="username" value="{{username}}" />
+                <button onclick="addLoading(this)" class="btn btn-block" type="submit">{{blockUnblock}} user</button>
+            </form>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,20 @@
+<div class="tile mt-2 mb-2">
+    <div class="tile-icon">
+        {{avatar}}
+    </div>
+    <div class="tile-content">
+        <p class="tile-title">
+            {{name}}
+            <br/>
+            <small class="tile-subtitle">
+                <a onclick="addLoading(this)" href="/user/{{username}}">@{{username}}</a>
+            </small>
+            {{pronouns}}     
+        </p>
+        <p class="tile-subtitle">{{bio}}</p>
+    </div>
+    <div class="tile-action">
+        {{userActionDropDown}}
+        {{microblog}}
+    </div>
+</div>

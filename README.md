@@ -1,5 +1,5 @@
 # Lillihub - An unofficial Micro.Blog web client
-Lillihub is a simple, lightweight micro.blog web client with a light/dark mode and responsive design. It is built using [Deno](https://deno.com/), HTML, CSS, and a sprinkle of vanilla JavaScript. It is delightfully usable without JavaScript being enabled. Everything is saved locally to the client so no backend storage is used.
+Lillihub is a simple, lightweight micro.blog web client with a light/dark mode and responsive design. It is built using [Deno](https://deno.com/), HTML, CSS, and a sprinkle of vanilla JavaScript. It is delightfully usable without JavaScript being enabled.
 
 The goal of this project was to make a web app that covered common use cases of Micro.Blog. With this app you can:
     
@@ -15,11 +15,17 @@ The goal of this project was to make a web app that covered common use cases of 
 
 I hope people enjoy using the app as much as I did building it ❤️🐸
 
+# Details stored by Lillihub
+
+An encrypted cookie with the Micro.blog app token is stored on the user browser. 
+Some details are about the user are stored in memory, including username, avatar image location, micro.blog subscription type and ....
+Some user details are saved to Deno Deploy's KV storage. This includes the username, the last time the app was accessed by the user, and lillihub user preferences.
+
 # Contributing
 
 
 # Running Locally
-You will need to have [Deno](https://deno.com/) installed and available on your `$PATH`. Then run the command `deno run --allow-env --allow-net --allow-read --unstable main.js`. This will run the webserver on your `localhost`. There is no build step.
+You will need to have [Deno](https://deno.com/) installed and available on your `$PATH`. Then run the command `deno run --allow-env --allow-net --allow-read --unstable-kv main.js`. This will run the webserver on your `localhost`. There is no build step.
 
 You will also need an `.env` file with the `APP_URL` pointing to your `localhost`. In my case it was
 `localhost:8080`
@@ -33,9 +39,16 @@ Otherwise you will need edit the URL that Micro.Blog returns to `http://` and no
 Clone the repository and then create an account on [Deno Deploy](https://deno.com/deploy) and from the Deno Deploy dashboard, 
 click the "New Project" button and choose the option to "Select a repository". Follow the on-screen instructions to deploy your existing application.
 
-You will then need to set the environmental variable `APP_URL` by going to the settings tab and adding it to the environmental variable section.
+You **will** then need to set the environmental variable `APP_URL` by going to the settings tab and adding it to the environmental variable section.
 Deno deploy offers all projects a `.deno.dev` domain. You can copy and paste that domain as the `APP_URL` if you are not
 using a custom one.
+
+You **will** also need to create an APP_SECRET environmental variable. You can use the following code to generate the rawKey in JSON string format, you will need to save it.
+
+```
+const key = await crypto.subtle.generateKey({ name: "AES-CBC", length: 128 },true,["encrypt", "decrypt"]);
+const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
+```
 
 # FAQ
 
