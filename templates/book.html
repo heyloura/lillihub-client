@@ -1,0 +1,36 @@
+<div class="panel" style="background-color: unset;">
+    <div class="panel-header text-center">
+      <img style="margin: 0px auto; margin-bottom: 1em;" class="img-responsive" src="{{image}}" alt="{{title}} bookcover">
+      <div class="panel-title h5 mt-10">{{title}}</div>
+      <div class="panel-subtitle">{{authors}}</div>
+    </div>
+    <div class="panel-body">
+        <p><b>Update cover image</b></p>
+        <form method='POST' action='/book/change' style="margin-bottom: 1em;">
+            <div class="input-group">
+                <input type="hidden" name="id" value="{{id}}">
+                <input type="hidden" name="shelfId" value="{{shelfId}}">
+                <input name="location" class="form-input" type="url" placeholder="image location (url)">
+                <button type="submit" class="btn btn-primary input-group-btn">Change Cover</button>
+            </div>
+        </form>
+        <p><b>Move to shelf</b></p>
+        <form method='POST' action='/book/move' style="margin-bottom: 1em;">
+            <input type="hidden" name="id" value="{{id}}">
+            <input type="hidden" name="shelfId" value="{{shelfId}}">
+            <ul style="list-style: none;">
+                {{shelfList}}
+            </ul>
+            <button type="submit" class="btn">Move book</button>
+        </form>
+        <p><b>Remove book</b></p>
+        <details>
+            <summary>Remove book?</summary>
+            <form method='POST' action='/book/remove' style="margin-bottom: 1em;">
+                <input type="hidden" name="id" value="{{id}}">
+                <button type="submit" class="btn">Remove book from shelf</button>
+            </form>
+        </details>
+    </div>
+  </div>
+

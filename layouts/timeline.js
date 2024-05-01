@@ -56,25 +56,29 @@ export async function TimelineTemplate(user, token, req) {
         if(item == null){
             return '';
         }
+        let conversations = [];
+        let convo = item;
 
-        const conversation = await getConversation(item.id, token);
-
-        if(conversation) {
-            const convo = conversation.items[conversation.items.length - 1];
-            if(!seen.has(convo.id)) {
-                seen.add(convo.id);
-
-                if(user.lillihub.display == 'posts') {
-                    if(!item._microblog.is_mention) {
-                        return await PostTemplate(item.id, convo, conversation.items, user, token, timeline.last, '')
-                    }
-                } else {
-                    return await PostTemplate(item.id, convo, conversation.items, user, token, timeline.last, '')
-                }
-                return '';    
-            }
+        if(item._microblog && item._microblog.is_conversation) {
+            console.time(`getConversation${item.id}`);
+            const conversation = await getConversation(item.id, token);
+            convo = conversation.items[conversation.items.length - 1];
+            conversations = conversation.items;
+            console.timeEnd(`getConversation${item.id}`);
         }
-        return '';
+
+        if(!seen.has(convo.id)) {
+            seen.add(convo.id);
+
+            if(user.lillihub.display == 'posts') {
+                if(!item._microblog.is_mention) {
+                    return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '')
+                }
+            } else {
+                return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '')
+            }
+            return '';    
+        }
 
     }))).join('');
 

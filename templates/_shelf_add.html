@@ -1,17 +1,7 @@
-<!--<details class="d-inline p-absolute" style="margin-left: -85px; margin-top: 5px;">
-    <summary>Add book</summary>
-    <form style="margin-left: -175px;" class="bg-secondary p-2" autocomplete="off" method="POST" action="/bookshelves/addBook" target="InteractionResult" onsubmit="showIframeResult();">
-        <input type="hidden" name="title" value="{{title}}" />
-        <input type="hidden" name="author" value="{{author}}" />
-        <input type="hidden" name="isbn" value="{{isbn}}" />
-        {{shelfChecklist}}
-        <button class="btn btn-sm btn-primary">Add</button>
-    </form>
-</details>-->
-<form style="display: inline-block; position: relative;overflow: hidden;width: 34px; height: 36px;" autocomplete="off" method="POST" action="/bookshelves/addBook">
+<form autocomplete="off" method="POST" action="/bookshelves/addBook">
     <input type="hidden" name="title" value="{{title}}" />
     <input type="hidden" name="author" value="{{author}}" />
     <input type="hidden" name="isbn" value="{{isbn}}" />
     <div style="display:none;">{{shelfChecklist}}</div>
-    <button onclick="addLoading(this)" class="btn btn-sm btn-link"><i class="bi bi-journal-plus"></i></button>
+    <button onclick="addLoading(this)" class="btn btn-sm btn-link"><i class="bi bi-journal-plus"></i> Add book</button>
 </form>

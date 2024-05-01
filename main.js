@@ -31,6 +31,7 @@ import { DiscoverTemplate } from "./layouts/discover.js";
 import { TagmojiTemplate } from "./layouts/tagmoji.js";
 import { UserTemplate } from "./layouts/user.js";
 import { ConversationsTemplate } from "./layouts/conversations.js";
+import { BookTemplate } from "./layouts/book.js";
 
 const _replyFormTemplate = new TextDecoder().decode(await Deno.readFile("templates/_reply_form.html"));
 
@@ -53,6 +54,7 @@ const REPLIES_ROUTE = new URLPattern({ pathname: "/replies" });
 const BOOKMARKS_ROUTE = new URLPattern({ pathname: "/bookmarks" });
 const BOOKSHELVES_ROUTE = new URLPattern({ pathname: "/bookshelves" });
 const BOOKSHELF_ROUTE = new URLPattern({ pathname: "/bookshelves/shelf/:id" });
+const BOOK_ROUTE = new URLPattern({ pathname: "/bookshelves/shelf/:shelfid/book/:id" });
 const NOTEBOOKS_ROUTE = new URLPattern({ pathname: "/notes" });
 const NOTES_ROUTE = new URLPattern({ pathname: "/notes/:id" });
 const UPDATE_NOTES_ROUTE = new URLPattern({ pathname: "/notes/:id/update" });
@@ -71,6 +73,9 @@ const MUTE_USER = new URLPattern({ pathname: "/users/mute" });
 const BLOCK_USER = new URLPattern({ pathname: "/users/block" });
 const FAVORTIE_USER_TOGGLE = new URLPattern({ pathname: "/users/favorite/toggle" });
 const PIN_TIMELINE_POST = new URLPattern({ pathname: "/timeline/favorite/toggle" });
+const BOOK_MOVE = new URLPattern({ pathname: "/book/move" });
+const BOOK_CHANGE_COVER= new URLPattern({ pathname: "/book/change" });
+const BOOK_REMOVE= new URLPattern({ pathname: "/book/remove" });
 const BOOKMARKS_UPDATE_TAGS = new URLPattern({ pathname: "/bookmarks/update" });
 const BOOKMARKS_NEW = new URLPattern({ pathname: "/bookmarks/new" });
 const BOOKMARKS_UNBOOKMARK = new URLPattern({ pathname: "/bookmarks/unbookmark" });
@@ -271,6 +276,18 @@ async function handler(req) {
         const id = BOOKSHELF_ROUTE.exec(req.url).pathname.groups.id;
 
         return new Response(await BookshelfTemplate(user, accessTokenValue, id), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+            },
+        });
+    }
+
+    if(BOOK_ROUTE.exec(req.url) && user) {
+        const id = BOOK_ROUTE.exec(req.url).pathname.groups.id;
+        const shelfid = BOOK_ROUTE.exec(req.url).pathname.groups.shelfid;
+
+        return new Response(await BookTemplate(user, accessTokenValue, shelfid, id), {
             status: 200,
             headers: {
                 "content-type": "text/html",
@@ -482,6 +499,50 @@ async function handler(req) {
                 "content-type": "text/html",
             },
         });
+    }
+
+    if(BOOK_CHANGE_COVER.exec(req.url) && user) {
+        const value = await req.formData();
+        const location = value.get('location');
+        const shelfId = value.get('shelfId');
+        const id = value.get('id');
+
+        const formBody = new URLSearchParams();
+        formBody.append("cover_url", location);
+
+        const posting = await fetch(`https://micro.blog/books/bookshelves/${shelfId}/cover/${id}`, {
+            method: "POST",
+            body: formBody.toString(),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "Authorization": "Bearer " + accessTokenValue
+            }
+        });
+
+        return Response.redirect(req.url.replaceAll('/book/change', `/bookshelves/shelf/${shelfId}/book/${id}`));
+    }
+
+    if(BOOK_MOVE.exec(req.url) && user) {
+        const value = await req.formData();
+        const shelf = value.getAll('shelf[]');
+        const shelfId = value.get('shelfId');
+        const id = value.get('id');
+
+        console.log(shelf, shelfId, id);
+
+        const formBody = new URLSearchParams();
+        formBody.append("book_id", id);
+
+        const posting = await fetch(`https://micro.blog/books/bookshelves/${shelf[0]}/assign`, {
+            method: "POST",
+            body: formBody.toString(),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "Authorization": "Bearer " + accessTokenValue
+            }
+        });
+
+        return Response.redirect(req.url.replaceAll('/book/move', `/bookshelves/shelf/${shelf[0]}`));
     }
 
     if(BOOKMARKS_NEW.exec(req.url) && user) {
@@ -860,6 +921,7 @@ async function handler(req) {
     if(DELETE_NOTE.exec(req.url) && user) {
         const value = await req.formData();
         const id = value.get('id');
+        const notebookId = value.get('notebookId');
 
         const posting = await fetch(`https://micro.blog/notes/${id}`, {
             method: "DELETE",
@@ -868,12 +930,7 @@ async function handler(req) {
             }
         });
 
-        if (!posting.ok) {
-            console.log('DELETE_NOTE', await posting.text());
-            return ReturnIframeResponse('Unsuccessful.');
-        }
-
-        return ReturnIframeResponse(`Note deleted.`);
+        return Response.redirect(req.url.replaceAll('/note/delete', `/notes/${notebookId}`));
     }
 
     if(ADD_NOTEBOOK.exec(req.url) && user) {
@@ -892,12 +949,7 @@ async function handler(req) {
             }
         });
 
-        if (!posting.ok) {
-            console.log('ADD_NOTEBOOK', await posting.text());
-            return ReturnIframeResponse('Unsuccessful.');
-        }
-
-        return Response.redirect(req.url.replaceAll('/notes', ''));
+        return Response.redirect(req.url.replaceAll('/notebook/add', '/notes'));
     }
 
 
@@ -1000,7 +1052,6 @@ async function handler(req) {
                 const userKV = await kv.get([user.username, 'global']);
                 if(userKV && !userKV.value) {
                     const starterFavs = { favorites: ['manton', 'jean', 'news', 'help'], feeds: [] };
-                    console.log('kv.set AUTH_ROUTE');
                     await kv.set([user.username, 'global'], starterFavs);
                     user.lillihub = starterFavs;
                 } else {   

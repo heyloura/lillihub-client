@@ -15,6 +15,8 @@ export async function BookshelfTemplate(user, token, id) {
             .replaceAll('{{shelf}}', encodeURIComponent(results.title.replaceAll('Micro.blog - ','')))
             .replaceAll('{{link}}', encodeURIComponent(item.url))
             .replaceAll('{{authorsEncoded}}', encodeURIComponent(item.authors.map(i => i.name).join(', ')))
+            .replaceAll('{{shelfId}}', id)
+            .replaceAll('{{id}}', item.id)
             .replaceAll('{{authors}}', item.authors.map(i => i.name).join(', '));
     }))).join('');
 

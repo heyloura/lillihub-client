@@ -14,13 +14,13 @@ const _bookmarkFormTemplate = new TextDecoder().decode(await Deno.readFile("temp
 const _bookmarkIframeTemplate = new TextDecoder().decode(await Deno.readFile("templates/_bookmark_iframe.html"));
 
 
-export async function PostTemplate(id, post, conversation, user = false, token = '', lastTimestamp = 0, customTag = '', open = false) {
+export async function PostTemplate(id, post, conversation, user = false, token = '', lastTimestamp = 0, customTag = '', open = false, getFollowing = true) {
     const isConversation = conversation && conversation.length > 0;
 
     let isFollowingUser = false;
     const notSeen = lastTimestamp != 0 ? post._microblog.date_timestamp > lastTimestamp: false;
 
-    if(user && !user.error) {
+    if(getFollowing && user && !user.error) {
         const following = await getIsFollowingUser(post.author._microblog.username, token);
         isFollowingUser = following.is_you || following.is_following;
     }
@@ -91,7 +91,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                     .replaceAll('{{tags}}', customTag ? customTag : '')
                     .replaceAll('{{actions}}', user ? 
                         _actionsTemplate
-                            .replaceAll('{{followIframe}}', !isFollowingUser ? 
+                            .replaceAll('{{followIframe}}', !isFollowingUser && getFollowing ? 
                                 _followTemplate.replaceAll('{{src}}', 
                                     _followFormTemplate.replaceAll('{{username}}',post.author._microblog.username)
                                         .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme))) : '')
