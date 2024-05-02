@@ -1142,7 +1142,7 @@ async function handler(req) {
     /********************************************************
      * Not Found Route
      ********************************************************/
-    return new Response(HTMLPage(`auth`, `<h1>Sorry, we couldn't find that...</h1>`), {
+    return new Response(HTMLPage(`auth`, `<h1>Sorry, we couldn't find that...</h1><p><a href="/">Back home to Lillihub 🐸.</a></p>`), {
         status: 200,
         headers: {
             "content-type": "text/html",
