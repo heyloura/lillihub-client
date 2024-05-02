@@ -18,8 +18,7 @@ I hope people enjoy using the app as much as I did building it ❤️🐸
 # Details stored by Lillihub
 
 An encrypted cookie with the Micro.blog app token is stored on the user browser. 
-Some details are about the user are stored in memory, including username, avatar image location, micro.blog subscription type and ....
-Some user details are saved to Deno Deploy's KV storage. This includes the username, the last time the app was accessed by the user, and lillihub user preferences.
+Some user details are saved to Deno Deploy's KV storage. This includes the username, the last time the app was accessed by the user, a list of post ids, and lillihub user preferences.
 
 # Contributing
 
@@ -54,6 +53,3 @@ const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 
 ## Why are you loading in the CSS/JavaScript and serving it with the page?
 This is to keep the number of requests being called to Deno Deploy low since there is request limit on the free plan. This could also be resolved by hosting the resources on a CDN. 
-
-## Why does it take forever for the DOMContentLoaded event?
-This app streams HTML to the client while it is processing the API calls to Micro.Blog. While the stream is open the event won't fire even though DOM content is available and interactive on the client. 

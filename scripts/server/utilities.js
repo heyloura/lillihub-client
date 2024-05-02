@@ -2,7 +2,7 @@ import { DOMParser } from "https://esm.sh/linkedom@0.16.8";
 import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
 await ammonia.init();
 
-const _appSecret = JSON.parse('{"kty":"oct","k":"c2V4g-FQSxzpeCE8E0JcMg","alg":"A128CBC","key_ops":["encrypt","decrypt"],"ext":true}');
+const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
 
 export function getCookieValue(req, name) {
     const cookies = req.headers.get("cookie") ? req.headers.get("cookie").split('; ') : [];
