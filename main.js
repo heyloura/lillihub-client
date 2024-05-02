@@ -144,8 +144,8 @@ async function handler(req) {
      * Check if request comes from an authenticated user
      ********************************************************/
     let user = false;
-    const accessToken = getCookieValue(req, 'access_token');
-    const accessTokenValue = accessToken ? await decryptMe(getCookieValue(req, 'access_token')) : undefined;
+    const accessToken = getCookieValue(req, 'atoken');
+    const accessTokenValue = accessToken ? await decryptMe(getCookieValue(req, 'atoken')) : undefined;
     
     if(accessTokenValue) {
         const mbUser = await getMicroBlogLoggedInUser(accessTokenValue);
@@ -1113,7 +1113,7 @@ async function handler(req) {
                     status: 200,
                     headers: {
                         "content-type": "text/html",
-                        "set-cookie": `access_token=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn}`
+                        "set-cookie": `atoken=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn}`
                     },
                 });
                 return page;
@@ -1134,7 +1134,7 @@ async function handler(req) {
             status: 200,
             headers: {
                 "content-type": "text/html",
-                "set-cookie": `access_token=undefined;SameSite=Strict;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+                "set-cookie": `atoken=undefined;SameSite=Strict;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT`
             },
         });
     }

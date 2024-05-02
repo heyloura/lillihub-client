@@ -2,7 +2,7 @@
 <form action="https://micro.blog/indieauth/auth" method="get" class="cta-form p-centered">
     <div class="form-group">
         <div class="input-group">  
-              <input id="loginMe" class="form-input" type="url" placeholder="https://username.micro.blog" name="me">
+              <input style="background-color: white;" id="loginMe" class="form-input" type="url" placeholder="https://username.micro.blog" name="me">
               <button onclick="addLoading(this)" type="submit" class="btn btn-primary input-group-btn">Sign In</button>
               <input type="hidden" name="client_id" value="{{appURL}}"/>
               <input type="hidden" name="redirect_uri" value="{{appURL}}/auth"/>

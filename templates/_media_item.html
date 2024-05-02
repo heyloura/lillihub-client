@@ -20,7 +20,7 @@
                     <li class="menu-item"><a onclick="addLoading(this)" href="/post?img={{encodedUrl}}&alt={{altEncoded}}">Create Post</a></li>
                     <li class="menu-item">
                         <details>
-                            <summary>Delete?</summary>
+                            <summary class="c-hand">Delete?</summary>
                             <form action="/media/delete" method="POST">
                                 <input type="hidden" name="destination" value="{{destination}}" />
                                 <input type="hidden" name="url" value="{{url}}" />

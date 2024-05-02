@@ -97,7 +97,7 @@ export async function EditorTemplate(user, token, req) {
         .replaceAll('{{editInput}}', edit ? `<input type="hidden" name="url" value="${edit}" />` : '')
         .replaceAll('{{title}}', post && post.properties.name[0] ? `value="${post.properties.name[0]}"` : '' )
         //.replaceAll('{{image}}', image ? `<img alt="" width="" height="" src="${image}" />` : '')
-        .replaceAll('{{image}}', image ? `![${alt ? alt : ''}](${image})` : '')
+        .replaceAll('{{image}}', image ? `![${alt ? `Auto-generated description: ${alt}` : ''}](${image})` : '')
         .replaceAll('{{quoteback}}', quoteback)
         .replaceAll('{{bookPost}}',bookPost)
         .replaceAll('{{content}}', post && post.properties.content[0] ? post.properties.content[0] : '' )
