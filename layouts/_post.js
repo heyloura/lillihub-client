@@ -79,7 +79,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
     const comments = _commentsTemplate
         .replaceAll('{{open}}', open ? 'open' : '')
         .replaceAll('{{avatars}}', avatars)
-        .replaceAll('{{convoCount}}', clientConvoLoad ? 'View ' : conversation.length - 1)
+        .replaceAll('{{convoCount}}', clientConvoLoad ? 'View ' : isConversation ? conversation.length - 1 : 0)
         .replaceAll('{{conversations}}', conversations ? conversations : '')
         .replaceAll('{{reply}}', reply)
         .replaceAll('{{clientConvoLoad}}', clientConvoLoad ? `loadConversation(this,${id});` : '');
@@ -111,7 +111,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                     .replaceAll('{{relativeDate}}', post._microblog.date_relative)
                     .replaceAll('{{url}}', post.url)
                     .replaceAll('{{id}}', post.id)
-                    .replaceAll('{{comments}}', user && (conversation.length - 1 > 0 || (clientConvoLoad && post._microblog.is_conversation) ) ? comments : '')
-                    .replaceAll('{{reply}}', user ? conversation.length == 0 && !(clientConvoLoad && post._microblog.is_conversation) ? reply : '' : '')
+                    .replaceAll('{{comments}}', user && ((isConversation && conversation.length - 1 > 0) || (clientConvoLoad && post._microblog.is_conversation) ) ? comments : '')
+                    .replaceAll('{{reply}}', user ? (conversation == undefined || conversation.length == 0) && !(clientConvoLoad && post._microblog.is_conversation) ? reply : '' : '')
         : ''
 }

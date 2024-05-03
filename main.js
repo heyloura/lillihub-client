@@ -88,6 +88,7 @@ const ADD_NOTE = new URLPattern({ pathname: "/note/update" });
 const DELETE_NOTE = new URLPattern({ pathname: "/note/delete" });
 const ADD_NOTEBOOK = new URLPattern({ pathname: "/notebook/add" });
 const ADD_POST = new URLPattern({ pathname: "/post/add" });
+const EDIT_POST = new URLPattern({ pathname: "/post/edit" });
 const UPLOAD_MEDIA_ROUTE = new URLPattern({ pathname: "/media/upload" });
 const DELETE_MEDIA_ROUTE = new URLPattern({ pathname: "/media/delete" });
 const GET_CONVERSATION_ROUTE = new URLPattern({ pathname: "/conversation/:id" });
@@ -750,6 +751,49 @@ async function handler(req) {
         }
 
         return Response.redirect(req.url.replaceAll('/post/add', `/posts?destination=${destination}`));
+    }
+
+    if(EDIT_POST.exec(req.url) && user) {
+        const value = await req.formData();
+        const destination = value.get('destination');
+        const categories = value.getAll('category[]');
+        const syndicates = value.getAll('syndicate[]');
+        const content = value.get('content');
+        const status = value.get('status');
+        const name = value.get('name');
+        const url = value.get('url');
+
+        const updatePost = {
+            action: "update",
+            url: url,
+            replace: {
+                content: [content],
+                name: [name],
+                category: categories, 
+                "post-status": status == 'draft' ? ['draft'] : ['published']
+            }
+        };
+
+        if(destination) {
+            updatePost["mp-destination"] = destination;
+        }
+
+        if(syndicates) {
+            updatePost["mp-syndicate-to[]"] = syndicates;
+        }
+
+        const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: JSON.stringify(updatePost), headers: { "Authorization": "Bearer " + accessTokenValue, "Content-Type": "application/json" } });
+        if (!posting.ok) {
+            console.log(`${user.username} tried to update a post and ${await posting.text()}`);
+            return new Response(HTMLPage(`Redirect`, `<h3 class="container">An error was encountered while updating a post. Redirecting back...</h3>`, user, req.url.replaceAll('/edit','')), {
+                status: 200,
+                headers: {
+                    "content-type": "text/html",
+                },
+            });
+        }
+
+        return Response.redirect(req.url.replaceAll('/post/edit', `/posts?destination=${destination}`));
     }
 
     if(UPLOAD_MEDIA_ROUTE.exec(req.url) && user) {

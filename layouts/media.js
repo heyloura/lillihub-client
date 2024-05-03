@@ -14,7 +14,12 @@ export async function MediaTemplate(user, token, req) {
     let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const config = await fetching.json();
     
-    const mpDestination = destination ? destination : config.destination.filter(d => d["microblog-default"])[0].uid;
+    if(!config.destination || config.destination.length == 0) {
+        return HTMLPage('Posts', `<p><mark>No blog is configured.</mark></p>`, user);
+    }
+
+    const defaultDestination = config.destination.filter(d => d["microblog-default"]) ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
+    const mpDestination = destination ? destination : defaultDestination;
     const destinationSelect = config.destination ? config.destination.map(item => {
         if(item.uid != mpDestination) {
             return `<li class="menu-item"><a onclick="addLoading(this)" href="/media?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;

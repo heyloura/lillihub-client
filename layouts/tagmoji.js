@@ -15,7 +15,7 @@ export async function TagmojiTemplate(user, token, id) {
         }
     }))).join('');
 
-    const favorite = user.lillihub.feeds.indexOf(id) > -1;
+    const favorite = user && user.lillihub && user.lillihub.feeds && user.lillihub.feeds.indexOf(id) > -1;
     
     const favorites = user ? `<form method="POST" action="/feed/favorite/toggle">
         <input type="hidden" name="id" value="${id}" />
