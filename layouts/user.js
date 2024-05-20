@@ -18,19 +18,30 @@ export async function UserTemplate(user, token, id, photos = false) {
         // Return public feed.    
         if(photos) {
             const fetching = await fetch(`https://micro.blog/posts/${id}/photos`, { method: "GET" });
-            results = await fetching.json();
 
-            feed = (await Promise.all(results.items.map(async (item) => {
-                return `<a target="_blank" href="${item.url}"><img loading="lazy" src="${item._microblog.thumbnail_url}" alt="" /></a>`;
-            }))).join('');
+            try {
+                results = await fetching.json();
+
+                feed = (await Promise.all(results.items.map(async (item) => {
+                    return `<a target="_blank" href="${item.url}"><img loading="lazy" src="${item._microblog.thumbnail_url}" alt="" /></a>`;
+                }))).join('');
+            } catch(error) {
+                console.log(`error loading https://micro.blog/posts/${id}/photos, ${error}`);
+                feed = 'Could not fetch results from Micro.blog';
+            }
         }
         else {
             const fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET" });
-            results = await fetching.json();
-
-            feed = (await Promise.all(results.items.map(async (item) => {
-                return await PostTemplate(item.id, item, item.is_conversation, user, token, 0, '', false);
-            }))).join('');
+                
+            try {
+                results = await fetching.json();
+                feed = (await Promise.all(results.items.map(async (item) => {
+                    return await PostTemplate(item.id, item, item.is_conversation, user, token, 0, '', false);
+                }))).join('');
+            } catch(error) {
+                console.log(`error loading https://micro.blog/posts/${id}, ${error}`);
+                feed = 'Could not fetch results from Micro.blog';
+            }
         }
     } else {
         if(photos) {

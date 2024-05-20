@@ -26,7 +26,8 @@ export async function EditorTemplate(user, token, req) {
     let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const config = await fetching.json();
 
-    const mpDestination = destination ? destination : config.destination.filter(d => d["microblog-default"])[0].uid;
+    const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
+    const mpDestination = destination ? destination : defaultDestination;
     const destinationSelect = config.destination ? config.destination.map(item => {
         if(item.uid != mpDestination) {
             return `<li class="menu-item"><a onclick="if(confirm('You are navigating away from the page and will lose any changes. Continue?')){addLoading(this);return true;}return false;" href="/post?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;

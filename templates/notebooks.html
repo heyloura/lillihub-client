@@ -24,11 +24,11 @@
             local storage and is never sent to Lillihub. You can review this file's source code to confirm.</p>
             <div class="input-group">
                 <input id="notes_key" type="text" class="form-input bg-light" placeholder="Micro.blog Key">
-                <button onclick="addLoading(this)" class="btn btn-primary" onclick="localStorage.setItem('notes_key', document.getElementById('notes_key').value);window.location.href = '/notes';"><i class="bi bi-save"></i></button>
+                <button class="btn btn-primary" onclick="addLoading(this);localStorage.setItem('notes_key', document.getElementById('notes_key').value);window.location.href = '/notes';"><i class="bi bi-save"></i></button>
             </div>
         </div>
         <div id="hide_notes_key">
-            <p><button onclick="addLoading(this)" class="btn btn-link d-inline" onclick="localStorage.setItem('notes_key', '');window.location.href = '/notes';"><i class="bi bi-trash"></i> Clear out your secret key from your browser's local storage.</button></p>           
+            <p><button class="btn btn-link d-inline" onclick="addLoading(this);localStorage.setItem('notes_key', '');window.location.href = '/notes';"><i class="bi bi-trash"></i> Clear out your secret key from your browser's local storage.</button></p>           
         </div>
     </div>
     <ul id="notebooks" class="hide-if-user-has-no-javascript" style="clear:both;">{{notebooks}}</ul>
