@@ -1152,12 +1152,13 @@ async function handler(req) {
                 }
 
                 SESSION[user.username] = user;
-                const expiresOn = new Date(Date.now() + (12096e5 * 2)); // four weeks
+                let expiresOn = new Date();
+                expiresOn.setDate( expiresOn.getDate() + 399); //chrome limits to 400 days
                 const page =  new Response(HTMLPage(`Redirect`, `<h3 class="container">You have been logged in. Redirecting to your timeline</h3>`, user, req.url.split('?')[0].replaceAll('/auth','')), {
                     status: 200,
                     headers: {
                         "content-type": "text/html",
-                        "set-cookie": `atoken=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn}`
+                        "set-cookie": `atoken=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`
                     },
                 });
                 return page;
