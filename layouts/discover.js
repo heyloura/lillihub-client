@@ -26,7 +26,6 @@ export async function DiscoverTemplate(user, token, uuid, url) {
     const fetching = await fetch('https://micro.blog/posts/discover', config);
     let results;
     let result = await fetching.text();
-    console.log(result)
     if(tryParseJSONObject(result)){
         results = JSON.parse(result);
     } else {
