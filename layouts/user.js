@@ -113,14 +113,14 @@ export async function UserTemplate(user, token, id, photos = false) {
 
     const content = _userTemplate
         .replaceAll('{{HMTLUserActionDropdown}}', actions)
-        .replaceAll('{{avatar}}', results.author.avatar)
-        .replaceAll('{{name}}', results.author.name)
-        .replaceAll('{{pronouns}}', results._microblog.pronouns)
-        .replaceAll('{{bio}}', results._microblog.bio)
+        .replaceAll('{{avatar}}', results.author == null ? '': results.author.avatar)
+        .replaceAll('{{name}}', results.author == null ? '': results.author.name)
+        .replaceAll('{{pronouns}}', results._microblog == null ? '': results._microblog.pronouns)
+        .replaceAll('{{bio}}', results._microblog == null ? '': results._microblog.bio)
         .replaceAll('{{postsActive}}', !photos ? 'active' : '')
         .replaceAll('{{photosActive}}', photos ? 'active' : '')
         .replaceAll('{{feed}}', photos ? `<div class="image-gallery">${feed}</div>` : feed)
-        .replaceAll('{{username}}', results._microblog.username);
+        .replaceAll('{{username}}', results._microblog == null ? '': results._microblog.username);
 
     return HTMLPage(id, content, user)
 }
