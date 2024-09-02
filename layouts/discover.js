@@ -25,10 +25,10 @@ export async function DiscoverTemplate(user, token, uuid, url) {
     const config = token ? { method: "GET", headers: { "Authorization": "Bearer " + token } } : { method: "GET", headers: { "Authorization": "Bearer " + token }  };
     const fetching = await fetch('https://micro.blog/posts/discover', config);
     let results;
-    let result = fetching.text();
+    let result = await fetching.text();
     console.log(result)
     if(tryParseJSONObject(result)){
-        results = await result.json();
+        results = JSON.parse(result);
     } else {
         return HTMLPage(`Discover`, `<p>Micro.blog did not return results.</p>`, user);
     }
