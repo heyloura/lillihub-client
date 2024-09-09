@@ -102,7 +102,7 @@ async function handler(req) {
     var nope = ["robot","spider","facebook","crawler","google"]
     for(var i = 0; i < nope.length; i++) {
         if(req.headers.get("user-agent").toLowerCase().includes(nope[i])) {
-            console.log('bot?', req.url, req.headers.get("user-agent") );
+            //console.log('bot?', req.url, req.headers.get("user-agent") );
             return new Response('', {
                 status: 401,
             });
