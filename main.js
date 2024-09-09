@@ -99,7 +99,7 @@ const ADD_BOOK = new URLPattern({ pathname: "/book/add" });
 const SESSION = {};
 
 async function handler(req) {  
-    var nope = ["robot","spider","facebook","crawler","google"]
+    var nope = ["robot","spider","facebook","crawler","google","updown.io daemon 2.11"]
     for(var i = 0; i < nope.length; i++) {
         if(req.headers.get("user-agent").toLowerCase().includes(nope[i])) {
             //console.log('bot?', req.url, req.headers.get("user-agent") );
@@ -107,6 +107,12 @@ async function handler(req) {
                 status: 401,
             });
         }
+    }
+    if(req.url == 'https://lillihub.com//wp-includes/wlwmanifest.xml' ||
+      req.url == 'https://lillihub.com//xmlrpc.php?rsd') {
+        return new Response('', {
+                status: 404,
+            });
     }
 
 
