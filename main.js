@@ -147,7 +147,7 @@ async function handler(req) {
     let user = false;
     const accessToken = getCookieValue(req, 'atoken');
     const accessTokenValue = accessToken ? await decryptMe(getCookieValue(req, 'atoken')) : undefined;
-    console.log(req.url);
+    console.log(req.url, req.headers);
     
     if(accessTokenValue) {
         const mbUser = await getMicroBlogLoggedInUser(accessTokenValue);
