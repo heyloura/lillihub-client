@@ -172,7 +172,7 @@ async function handler(req) {
         user.avatar = mbUser.avatar;
         user.plan = mbUser.plan;
 
-        console.log(user.username, req.url)
+        console.log('---------------------->', user.username, req.url)
         //check to see if we have user settings in-memory...
         if(!SESSION[user.username]) {
             const kv = await Deno.openKv();
