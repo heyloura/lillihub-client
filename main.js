@@ -1072,7 +1072,7 @@ async function handler(req) {
         });
     }
    
-    if(DISCOVERTAG_ROUTE.exec(req.url)) {
+    if(DISCOVERTAG_ROUTE.exec(req.url) && user) {
         const id = DISCOVERTAG_ROUTE.exec(req.url).pathname.groups.id;
 
         return new Response(await TagmojiTemplate(user, accessTokenValue, id), {
@@ -1083,7 +1083,7 @@ async function handler(req) {
         });
     }
 
-    if(USER_ROUTE.exec(req.url)) {
+    if(USER_ROUTE.exec(req.url) && user) {
         const id = USER_ROUTE.exec(req.url).pathname.groups.id;
         
         return new Response(await UserTemplate(user, accessTokenValue, id), {
@@ -1094,7 +1094,7 @@ async function handler(req) {
         });
     }
 
-    if(USERPHOTOS_ROUTE.exec(req.url)) {
+    if(USERPHOTOS_ROUTE.exec(req.url) && user) {
         const id = USERPHOTOS_ROUTE.exec(req.url).pathname.groups.id;
 
         return new Response(await UserTemplate(user, accessTokenValue, id, true), {
@@ -1189,8 +1189,8 @@ async function handler(req) {
     /********************************************************
      * Not Found Route
      ********************************************************/
-    return new Response(HTMLPage(`auth`, `<h1>Sorry, we couldn't find that...</h1><p><a href="/">Back home to Lillihub 🐸.</a></p>`), {
-        status: 200,
+    return new Response(HTMLPage(`Not found`, `<h1>Sorry, we couldn't find that...</h1><p><a href="/">Back home to Lillihub 🐸.</a></p>`), {
+        status: 404,
         headers: {
             "content-type": "text/html",
         },
