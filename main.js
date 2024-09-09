@@ -99,7 +99,7 @@ const ADD_BOOK = new URLPattern({ pathname: "/book/add" });
 const SESSION = {};
 
 async function handler(req) {  
-    var nope = ["robot","spider","facebook","crawler","google","updown.io daemon 2.11"]
+    var nope = ["robot","spider","facebook","crawler","google","updown.io daemon 2.11","bingbot"]
     for(var i = 0; i < nope.length; i++) {
         if(req.headers.get("user-agent").toLowerCase().includes(nope[i])) {
             //console.log('bot?', req.url, req.headers.get("user-agent") );
