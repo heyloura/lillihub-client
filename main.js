@@ -157,7 +157,6 @@ async function handler(req) {
     let user = false;
     const accessToken = getCookieValue(req, 'atoken');
     const accessTokenValue = accessToken ? await decryptMe(getCookieValue(req, 'atoken')) : undefined;
-    console.log(req.url, req.headers);
     
     if(accessTokenValue) {
         const mbUser = await getMicroBlogLoggedInUser(accessTokenValue);
@@ -184,6 +183,8 @@ async function handler(req) {
         } else {
             user.lillihub = SESSION[user.username].lillihub;
         }
+    } else {
+        console.log(req.url, req.headers.get("user-agent"));
     }
    
     /********************************************************
@@ -1199,8 +1200,8 @@ async function handler(req) {
     /********************************************************
      * Not Found Route
      ********************************************************/
-    return new Response(HTMLPage(`Not found`, `<h1>Sorry, we couldn't find that...</h1><p><a href="/">Back home to Lillihub 🐸.</a></p>`), {
-        status: 404,
+    return new Response(HTMLPage(`Not authenticated`, `<h1>Sorry, you need to be authenticated for that...</h1><p><a href="/">Back home to Lillihub 🐸.</a></p>`), {
+        status: 401,
         headers: {
             "content-type": "text/html",
         },
