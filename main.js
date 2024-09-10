@@ -66,6 +66,7 @@ const POSTS_ROUTE = new URLPattern({ pathname: "/posts" });
 const MEDIA_ROUTE = new URLPattern({ pathname: "/media" });
 const LOGOUT_ROUTE = new URLPattern({ pathname: "/logout" });
 const AUTH_ROUTE = new URLPattern({ pathname: "/auth" });
+const ROBOT_ROUTE = new URLPattern({pathname: "/robots.txt"})
 
 const ADD_REPLY = new URLPattern({ pathname: "/replies/add" });
 const UNFOLLOW_USER = new URLPattern({ pathname: "/users/unfollow" });
@@ -99,7 +100,19 @@ const ADD_BOOK = new URLPattern({ pathname: "/book/add" });
 const SESSION = {};
 
 async function handler(req) {  
-    var nope = ["robot","spider","facebook","crawler","google","updown.io daemon 2.11","bingbot"]
+    if(ROBOT_ROUTE.exec(req.url)){
+        return new Response(`
+            User-agent: *
+            Disallow: /
+        `, {
+            status: 200,
+            headers: {
+                "content-type": "text/plain",
+            },
+        });
+    }
+
+    var nope = ["robot","spider","facebook","crawler","google","updown.io daemon 2.11","bingbot","bot","duckduckgo"]
     for(var i = 0; i < nope.length; i++) {
         if(req.headers.get("user-agent").toLowerCase().includes(nope[i])) {
             //console.log('bot?', req.url, req.headers.get("user-agent") );
@@ -1206,11 +1219,8 @@ async function handler(req) {
     /********************************************************
      * Not Found Route
      ********************************************************/
-    return new Response(HTMLPage(`Not authenticated`, `<h1>Sorry, you need to be authenticated for that...</h1><p><a href="/">Back home to Lillihub 🐸.</a></p>`), {
-        status: 401,
-        headers: {
-            "content-type": "text/html",
-        },
+    return new Response('', {
+        status: 404,
     });
 }
 
