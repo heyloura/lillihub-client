@@ -114,7 +114,7 @@ async function handler(req) {
 
     var nope = ["robot","spider","facebook","crawler","google","updown.io daemon 2.11","bingbot","bot","duckduckgo"]
     for(var i = 0; i < nope.length; i++) {
-        if(req.headers.get("user-agent").toLowerCase().includes(nope[i])) {
+        if(!req.headers.get("user-agent") || req.headers.get("user-agent").toLowerCase().includes(nope[i])) {
             //console.log('bot?', req.url, req.headers.get("user-agent") );
             return new Response('', {
                 status: 401,
