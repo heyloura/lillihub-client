@@ -122,7 +122,8 @@ async function handler(req) {
         }
     }
     if(req.url == 'https://lillihub.com//wp-includes/wlwmanifest.xml' ||
-      req.url == 'https://lillihub.com//xmlrpc.php?rsd') {
+      req.url == 'https://lillihub.com//xmlrpc.php?rsd' ||
+      req.url.includes('wp-content')) {
         return new Response('', {
                 status: 404,
             });
@@ -185,7 +186,7 @@ async function handler(req) {
         user.avatar = mbUser.avatar;
         user.plan = mbUser.plan;
 
-        console.log('---------------------->', user.username, req.url)
+        console.log('---------------------->', user.username, req.url.split('?')[0])
         //check to see if we have user settings in-memory...
         if(!SESSION[user.username]) {
             const kv = await Deno.openKv();
@@ -203,7 +204,7 @@ async function handler(req) {
             user.lillihub = SESSION[user.username].lillihub;
         }
     } else {
-        console.log(req.url, req.headers.get("user-agent"));
+        //console.log(req.url, req.headers.get("user-agent"));
     }
    
     /********************************************************
