@@ -1,4 +1,4 @@
-import * as mb from "./scripts/server/utilities.js";
+import * as mb from "./scripts/server/mb.js";
 
 /******************************************************************************************************************
 * README
@@ -7,11 +7,15 @@ import * as mb from "./scripts/server/utilities.js";
 *      const key = await crypto.subtle.generateKey({ name: "AES-CBC", length: 128 },true,["encrypt", "decrypt"]);
 *      const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 ******************************************************************************************************************/
-const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
+//const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
+const _appSecret = JSON.parse('{"kty":"oct","k":"c2V4g-FQSxzpeCE8E0JcMg","alg":"A128CBC","key_ops":["encrypt","decrypt"],"ext":true}');
+
 const _development = true;
 
 Deno.serve(async (req) => { 
-
+    if(_development) {
+        console.log(req.url);
+    }
 
     //********************************************************
     // Let's catch bots first and toss them out if we can...
@@ -63,9 +67,19 @@ Deno.serve(async (req) => {
     // - the icon
     // - the webmanifest
     // - the service worker
+    // - JS libraries and CSS resources
     //********************************************************
     if((new URLPattern({ pathname: "/lillihub-512.png" })).exec(req.url)){
         return new Response(new Uint8Array(await Deno.readFile("static/lillihub-512.png")), {
+            status: 200,
+            headers: {
+                "content-type": "image/png",
+            },
+        });
+    }
+
+    if((new URLPattern({ pathname: "/logo.png" })).exec(req.url)){
+        return new Response(new Uint8Array(await Deno.readFile("static/logo-ai-lillihub-xs.png")), {
             status: 200,
             headers: {
                 "content-type": "image/png",
@@ -93,10 +107,41 @@ Deno.serve(async (req) => {
         });
     }
 
+    if((new URLPattern({ pathname: "/timeline.js" })).exec(req.url))
+    {
+        return new Response(await Deno.readFile("scripts/client/timeline.js"), {
+            status: 200,
+            headers: {
+                "content-type": "text/javascript",
+            },
+        });
+    }
+
+    if((new URLPattern({ pathname: "/settings.js" })).exec(req.url))
+        {
+            return new Response(await Deno.readFile("scripts/client/settings.js"), {
+                status: 200,
+                headers: {
+                    "content-type": "text/javascript",
+                },
+            });
+        }
+
+    if((new URLPattern({ pathname: "/main.css" })).exec(req.url))
+    {
+        return new Response(await Deno.readFile("styles/main.css"), {
+            status: 200,
+            headers: {
+                "content-type": "text/css",
+            },
+        });
+    }
+
     //********************************************************
     // Now let's see if we have a user or if someone needs to 
     // login
     //********************************************************
+    const nonce = crypto.randomUUID(); // this is to protect our scripts and css
     const mbTokenCookie = getCookieValue(req, 'atoken');
     const mbToken = mbTokenCookie ? await decryptMe(getCookieValue(req, 'atoken')) : undefined;
 
@@ -104,10 +149,7 @@ Deno.serve(async (req) => {
     const following = [];
     if(mbToken) {
         const mbUser = await mb.getMicroBlogUser(mbToken);
-        const fetching = await fetch(`https://micro.blog/users/following/${mbUser.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-        const results = await fetching.json();      
-        following = results.map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
-        
+
         // grab only the info we need
         if(mbUser) {
 
@@ -123,35 +165,333 @@ Deno.serve(async (req) => {
 
             //const kv = await Deno.openKv();
 
+            const CHECK_ROUTE = new URLPattern({ pathname: "/check/:id" });
+            if(CHECK_ROUTE.exec(req.url)) {
+                const id = CHECK_ROUTE.exec(req.url).pathname.groups.id;
+                const fetching = await fetch(`https://micro.blog/posts/check?since_id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const results = await fetching.json(); 
+                return new Response(JSON.stringify(results),JSONHeaders());
+            }
+
+            const MARK_TIMELINE_ROUTE = new URLPattern({ pathname: "/mark/timeline/:id" });
+            if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
+                const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
+                const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+                return new Response('Timeline marked', {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });
+            }
+
+            const TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
+            if(TIMELINE_ROUTE.exec(req.url)) {
+                console.log('get posts')
+                const id = TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
+                const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
+                const html = posts.map(post => postHTML(post)).join('');
+
+                return new Response(`${html}<br/><p class="p-centered"><button class="btn btn-primary loadTimeline" data-id="${posts[posts.length-1].id}">load more</button></p>`,HTMLHeaders(nonce));
+            }
+
+            const CONVERSATION_ROUTE = new URLPattern({ pathname: "/conversation/:id" });
+            if(CONVERSATION_ROUTE.exec(req.url)) {
+                const id = CONVERSATION_ROUTE.exec(req.url).pathname.groups.id;
+                const searchParams = new URLSearchParams(req.url.split('?')[1]);
+                const view = searchParams.get('view');
+             
+                const posts = await mb.getMicroBlogConversation(mbToken, id);  
+                const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username)).map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
+                       
+                const data = {};
+                data.ids = posts.map(i => i.id);
+                const follows = following.map(f => {return JSON.parse(f)});
+        
+                //const uniqueRepliers = [...new Set([...posts.map(p => p ? JSON.stringify({username: p.username, avatar: p.avatar}) : ''), ...following])];
+                //const bookmarkURLS = new Set();
+                data.conversation = `        
+                <div class="panel tile-no-sides">
+                <div class="panel-body">
+                ${posts.map(i => {
+                    const stranger = follows.filter(f => f.username == i.username);
+                    const convo = conversationHTML(i, stranger.length == 0, id, posts.length);
+                    // let anchors = i.content.split('<a');
+                    // if(anchors && anchors.length > 1) {
+                    //     for(var i = 0; i < anchors.length; i++) {
+                    //         if(anchors[i].includes('http') && anchors[i].includes('</a>') && !anchors[i].includes('@')) {
+                    //             var href = anchors[i].replaceAll("'",'"').split('href="');
+                    //             var anchor = href[1].split('"')[0];
+                    //             bookmarkURLS.add(anchor);
+                    //         } 
+                    //     }
+                    // }
+                    return convo;
+                }).join('')}
+                </div>
+
+                <div class="side-padding">
+                    <form class="form" id='replybox-form-${id}' data-id="${id}">
+                        <div class="form-group">
+                            <label class="form-label" for="replybox-textarea-${id}">Message</label>
+                            <div class="grow-wrap"><textarea id="replybox-textarea-${id}" class="form-input grow-me textarea" name="content" rows="3"></textarea></div>
+                            <input type="hidden" class="form-input" name="id" value="${id}" />
+                        </div>
+                        <div class="form-group">
+                            <button data-id="${id}" type="button" class="btn btn-primary btn-sm replyBtn">Send Reply</button>
+                        </div>
+                    </form>
+                    <div id="toast-${id}" class="toast hide">
+                        <button data-id="${id}" class="btn btn-clear float-right clearToast"></button>
+                        <div id="toast-content-${id}">Waiting for server....</div>
+                    </div>
+                </div>
+            </div>
+                    
+                    `;
+                    // ${getReplyBox(id, uniqueRepliers)}
+                    // ${Array.from(bookmarkURLS).length > 0 ? `<br/><p class="mt-2"><b>Links:</b></p><table class="table table-striped">${Array.from(bookmarkURLS).map(b => `<tr><td><a target="_blank" href="${b}">${b}</a></td><td><button data-url="${b}" class="btn btn-link addBookmark">Add Bookmark</button></td></tr>`).join('')}</table>` : ''}
+
+                if(!view) {
+                    return new Response(JSON.stringify(data), JSONHeaders());
+                } 
+                const nonce = crypto.randomUUID();
+                return new Response(await HTML(data.conversation,nonce,'conversation',mbToken),HTMLHeaders(undefined,nonce));
+            }
+
+            if(((new URLPattern({ pathname: "/suggestions" })).exec(req.url))) {
+                const users = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
+
+                const random = users[Math.floor(Math.random()*users.length)];
+                let suggestions = await mb.getMicroBlogFollowing(mbToken, random.username, false);
+                suggestions = suggestions.reverse().slice(0, 5);
+
+                console.log(suggestions)
+
+                return new Response(suggestions.map(s => {
+                    return `<div class="tile">
+                    <div class="tile-icon">
+                        <figure class="avatar avatar-lg"><img src="${s.avatar}" alt="Avatar"></figure>
+                    </div>
+                    <div class="tile-content">
+                        <p class="tile-title">${s.name}<br /><span class="tile-subtitle text-gray"><a href="/user/${s.username}">@${s.username}</a></span></p>
+                        
+                    </div>
+                    </div>`}).join(''),HTMLHeaders(nonce));
+            }
+
+            if(((new URLPattern({ pathname: "/discover/feed" })).exec(req.url))) {
+                const posts = await mb.getMicroBlogDiscoverPosts(mbToken);
+                const html = posts.map(p => !p.image ? `
+                    <div class="tile">
+                        <div class="tile-icon">
+                            ${getAvatar(p, 'sm')}
+                        </div>
+                        <div class="tile-content">
+                            <p class="tile-title text-bold">
+                                ${p.username}
+                            </p>
+                            <p class="tile-subtitle">${p.content}</p>
+                        </div>
+                    </div>
+                ` : '').join('');
+
+                return new Response(html,HTMLHeaders(nonce));
+            }
+
+            if(((new URLPattern({ pathname: "/discover/photos" })).exec(req.url))) {
+                const posts = await mb.getMicroBlogDiscoverPhotoPosts(mbToken);
+                const html = posts.map((p, index) => index < 9 ? `<li>
+                    <img src="${p.image}" alt="Image 1" class="img-responsive">
+                </li>` : '').join('');
+
+                return new Response(`<ul class="discover-gallery">${html}</ul>`,HTMLHeaders(nonce));
+            }
+
+            if(((new URLPattern({ pathname: "/settings" })).exec(req.url))) {
+                const layout = new TextDecoder().decode(await Deno.readFile("settings.html"));
+                return new Response(layout.replaceAll('{{nonce}}', nonce)
+                      .replace('{{year}}', new Date().getFullYear()),
+                  HTMLHeaders(nonce));
+            }
+
+
+            // Here we have the reply and posting functionality
+            if(new URLPattern({ pathname: "/reply" }).exec(req.url)) {
+                const value = await req.formData();
+                const id = value.get('id');
+                const replyingTo = value.getAll('replyingTo[]');
+                let content = value.get('content');
+        
+                if(content != null && content != undefined && content != '' && content != 'null' && content != 'undefined') {
+                    const replies = replyingTo.map(function (reply, i) { return '@' + reply }).join(' ');
+                    content = replies + ' ' + content;
+        
+                    const posting = await fetch(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+                    if (!posting.ok) {
+                        console.log(`${user.username} tried to add a reply and ${await posting.text()}`);
+                    }
+        
+                    return new Response('Reply was sent.', {
+                        status: 200,
+                        headers: {
+                            "content-type": "text/html",
+                        },
+                    });
+                }
+        
+                return new Response('Something went wrong sending the reply.', {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });
+            }
+
+            if((new URLPattern({ pathname: "/post/add" })).exec(req.url) && user) {
+                const value = await req.formData();
+                const destination = value.get('destination');
+                const syndicates = value.getAll('syndicate[]');
+                const categories = value.getAll('category[]');
+                let content = value.get('content');
+                const status = value.get('status');
+                const name = value.get('name');
+                const replyingTo = value.getAll('replyingTo[]');
+                const postingType = value.get('postingType');
+                const omgApi = value.get('omgApi');
+                const omgAddess = value.get('omgAddess');
+                const indieToken = value.get('indieToken');
+                const microPub = value.get('microPub');
+
+                const replies = replyingTo.map(function (reply) { return '@' + reply }).join(', ');
+                content = replies + ' ' + content;
+
+                if(!postingType || postingType === 'mb') {
+                    const formBody = new URLSearchParams();
+                    formBody.append("mp-destination", destination);
+                    formBody.append("h", "entry");
+                    formBody.append("content", content);
+                   
+                    if(name){
+                        formBody.append("name", name);
+                    }
+                    if(categories.length > 0) {
+                        categories.forEach((item) => formBody.append("category[]", item));
+                    }
+                    if(status == 'draft'){
+                        formBody.append("post-status", "draft");
+                    }
+                    if(syndicates.length > 0) {
+                        syndicates.forEach((item) => formBody.append("mp-syndicate-to[]", item));
+                    } else {
+                        formBody.append("mp-syndicate-to[]", "");
+                    }
+                    
+                    const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
+                    if (!posting.ok) {
+                        console.log(`${user.username} tried to add a post and ${await posting.text()}`);
+                    }
+                    return new Response(JSON.stringify({"response":{"message":"Post was sent."}}), JSONHeaders());
+
+                } else if(postingType === 'statuslog') {
+                    const posting = await fetch(`https://api.omg.lol/address/${omgAddess}/statuses/`, { method: "POST", body: JSON.stringify({"status": content}), headers: { "Authorization": "Bearer " + omgApi } });
+                    if (!posting.ok) {
+                        console.log(`${user.username} tried to add a post and ${await posting.text()}`);
+                    }
+                    const data = await posting.json(); 
+                    return new Response(JSON.stringify(data), JSONHeaders());
+
+                } else if(postingType === 'weblog') {
+                    const posting = await fetch(`https://api.omg.lol/address/${omgAddess}/weblog/entry/abc123`, { method: "POST", body: content, headers: { "Authorization": "Bearer " + omgApi } });
+                    if (!posting.ok) {
+                        console.log(`${user.username} tried to add a post and ${await posting.text()}`);
+                    }
+                    const data = await posting.json(); 
+                    return new Response(JSON.stringify(data), JSONHeaders());
+                }
+                
+        
+                //return Response.redirect(req.url.replaceAll('/post/add', status == 'draft' ? `/blog?status=draft&destination=${destination}` : `/blog?status=published&destination=${destination}`));
+            }
+
+
+            const layout = new TextDecoder().decode(await Deno.readFile("timeline.html"));
+            const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username)).map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
+            return new Response(layout.replaceAll('{{nonce}}', nonce)
+                  .replace('{{username}}', mbUser.username)
+                  .replace('{{replyBox}}', getReplyBox('main',following, true)),
+              HTMLHeaders(nonce));
         } else {
             return returnBadGateway('Micro.blog did not return a user from the provided token.')
         }
     } else {
         // -----------------------------------------------------
         // We don't have a user, they can only see the homepage,
-        // and the login/authentication routes
+        // and the authentication routes
         // -----------------------------------------------------
         
-        // homepage it is
-        const discoverPosts = await mb.getMicroBlogDiscoverPosts();
-        return new Response(
-            `<textarea rows="20">${JSON.stringify(discoverPosts, null, 2)}</textarea>`,
-            HTMLHeaders()
-        );
+        // Is it the redirect back from indieauth?
+        if(new URLPattern({ pathname: "/auth" }).exec(req.url)) {
+            const stateCookie = getCookieValue(req, 'state');
+            const searchParams = new URLSearchParams(req.url.split('?')[1]);
+            const code = searchParams.get('code');
+            const state = searchParams.get('state');
+
+            if(_development) {
+                console.log(`code: ${code}, state: ${state} == ${stateCookie}`);
+            }
+    
+            if(code && stateCookie == state) {
+                const formBody = new URLSearchParams();
+                formBody.append("code", code);
+                formBody.append("client_id", req.url.split('?')[0].replaceAll('auth',''));
+                formBody.append("grant_type", "authorization_code");
+    
+                const fetching = await fetch('https://micro.blog/indieauth/token', {
+                    method: "POST",
+                    body: formBody.toString(),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                        "Accept": "application/json"
+                    }
+                });
+
+                const response = await fetching.json();
+                
+                if(!response.error && response.access_token) {
+                  const expiresOn = new Date();
+                  const accessToken = await encryptMe(response.access_token);
+                  expiresOn.setDate( expiresOn.getDate() + 399); //chrome limits to 400 days
+                                    
+                  const layout = new TextDecoder().decode(await Deno.readFile("loggingIn.html"));
+                  return new Response(layout.replaceAll('{{nonce}}', nonce)
+                        .replace('{{year}}', new Date().getFullYear()),
+                    HTMLHeaders(nonce,`atoken=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`));
+                }
+
+                return returnBadGateway(`Micro.blog indieauth did not return a token. ${response.error} ${response.access_token}`); 
+            }
+            return new Response(`Something went wrong. No code returned or state does not match cookie value.`,HTMLHeaders()); 
+        } 
+        
+        // Is it the homepage?
+        else if((new URLPattern({ pathname: "/" })).exec(req.url))
+        {
+            const layout = new TextDecoder().decode(await Deno.readFile("signin.html"));
+            const state = crypto.randomUUID();
+            return new Response(
+                layout.replace('{{nonce}}', nonce)
+                    .replace('{{state}}', state)
+                    .replaceAll('{{appURL}}', req.url.endsWith('/') ? req.url.slice(0, -1) : req.url)
+                    .replace('{{year}}', new Date().getFullYear()),
+                HTMLHeaders(nonce, `state=${state};HttpOnly;`)
+            );
+        } else {
+            return new Response('', {
+                status: 404,
+            });
+        }
     }
-
-    //
-    //     if(DISCOVER_ROUTE.exec(req.url) || (HOME_ROUTE.exec(req.url) && !user)) {
-//         const uuid = crypto.randomUUID();
-//         return new Response(await DiscoverTemplate(user, accessTokenValue, uuid, req.url), {
-//             status: 200,
-//             headers: {
-//                 "content-type": "text/html",
-//                 "set-cookie": `state=${uuid};HttpOnly;`
-//             },
-//         });
-//     }
-
 });
 
 
@@ -205,8 +545,8 @@ async function decryptMe(encrypted)
 // Helper method for returning a proper response header
 // can set a cookie if provided
 // the uuid is set per request to set a nonce
-function HTMLHeaders(cookie, uuid) {
-    const csp = `default-src 'self' micro.blog *.micro.blog 'nonce-${uuid}'`;
+function HTMLHeaders(uuid, cookie) {
+    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com 'nonce-${uuid}'`;
     if(!cookie) {
         return {
             headers: {
@@ -226,24 +566,225 @@ function HTMLHeaders(cookie, uuid) {
     };
 }
 
+function JSONHeaders() {
+    return {
+        headers: {
+            "content-type": "text/json",
+            status: 200,
+        },
+    };
+}
+
 // Helper method to return a bad gateway and the reason.
 function returnBadGateway(reason) {
-    return new Response(`
-        <!doctype html>
-        <html lang="en">
-            <head>
-                <title>502 Bad Gateway</title>
-            </head>
-            <body>
-                <h1>Bad Gateway</h1>
-                <p>The server was unable to complete your request. Please try again later.</p>
-                <p><b>Reason</b>: ${reason}</p>
-            </body>
-        </html>
-        `, {
+    return new Response(reason, {
         status: 502,
         "content-type": "text/html"
     });
+}
+
+function getAvatar(p, size) {
+    return `<figure class="avatar ${size}" data-initial="${p.username.substring(0,1)}">
+            <img src="${p.avatar}" loading="lazy">
+        </figure>`;
+}
+
+function postHTML(post, marker, stranger) {
+    const multipleImgs = !post.linkpost && post.content.split('<img').length > 2;
+
+    if(multipleImgs) {
+        post.content = post.content.replaceAll('<img', `<img data-gallery='${post.id}'`);
+    }
+
+    // const anchors = post.content.split('<a');
+    // if(anchors && anchors.length > 1) {
+    //     for(var i = 0; i < anchors.length; i++) {
+    //         if(anchors[i].includes('https://micro.blog/') && anchors[i].includes('@')) {
+    //             var href = anchors[i].replaceAll("'",'"').split('href="');
+    //             if(href[1]) {
+    //                 var anchor = href[1].split('"')[0];
+    //                 var username = href[1].split('"')[0].replace('https://micro.blog/','');
+    //                 post.content = post.content.replaceAll(anchor, '/user/' + username);
+    //             }
+    //         } 
+    //     }
+    // }
+    post.content.replaceAll('<script', `<div`);
+    post.content.replaceAll('</script', `</div`);
+    
+    //${marker && marker.time_published && (marker.time_published >= post.timestamp) ? 'seen' : ''}
+    return `
+        <article id="${post.id}" class="card parent ${marker && marker.id == post.id ? 'marked' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-marked="${marker && marker.id == post.id ? 'true' : 'false'}" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+            <header class="card-header">
+                ${getAvatar(post, 'avatar-lg')}
+                <div class="card-top">
+                    <div class="card-title h5">${post.name}</div>
+                    <div class="card-subtitle">
+                        <a href="/user/${post.username}" class="text-gray">@${post.username}${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}</a>
+                    </div>           
+                </div>
+                <div class="card-buttons">
+                    <button data-id="${post.id}" class="btn btn-link openDetailsBtn float-right"><i data-id="${post.id}" class="icon icon-more-vert openDetailsBtn"></i></button>
+                </div>
+            </header>
+            ${ post.conversation ? `<details class="accordion">
+                    <summary data-id="${post.id}" data-reply="${post.username}" data-avatar="${post.avatar}" class="accordion-header text-gray openConversationBtn">
+                        <i class="icon icon-arrow-right mr-1"></i>
+                        view conversation
+                    </summary>
+                    <div class="accordion-body">
+                        <div class="content" id="content-${post.id}">
+                            <span class="loading d-block"></span>
+                        </div>
+                    </div>
+                </details>` : ''}
+            <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
+            ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
+            ${!post.conversation ? `
+                <details class="accordion">
+                    <summary  data-reply="${post.username}" data-avatar="${post.avatar}" class="accordion-header text-gray">
+                        <i class="icon icon-arrow-right mr-1"></i>
+                        Be the first to reply
+                    </summary>
+                    <div class="accordion-body">
+                        <div class="side-padding">
+                            <form class="form" id='replybox-form-${post.id}-main' data-id="${post.id}">
+                                <div class="form-group">
+                                    <div class="grow-wrap"><textarea id="replybox-textarea-${post.id}-main" class="form-input grow-me textarea" name="content" rows="3">@${post.username}</textarea></div>
+                                    <input type="hidden" class="form-input" name="id" value="${post.id}" />
+                                </div>
+                                <div class="form-group">
+                                    <button data-id="${post.id}-main" type="button" class="btn btn-primary btn-sm replyBtn">Send Reply</button>
+                                </div>
+                            </form>
+                             <div id="toast-${post.id}-main" class="toast hide">
+                                <button data-id="${post.id}-main" class="btn btn-clear float-right clearToast"></button>
+                                <div id="toast-content-${post.id}-main">Waiting for server....</div>
+                            </div>
+                        </div>
+                    </div>
+                </details>` : '' }
+        </article>
+        <div class="modal" id="details-${post.id}">
+            <div data-id="${post.id}" class="modal-overlay closeDetailsBtn" aria-label="Close"></div>
+            <div class="modal-container">
+                <div class="modal-header">
+                    <button data-id="${post.id}" class="btn btn-clear float-right closeDetailsBtn" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <a href="/post?quote=${post.id}" class="btn">Quote Post</a>
+                    <button data-url="${post.url}" class="btn addBookmark">Bookmark Post</button>
+                    <a href="/conversation/${post.id}?view=true" class="btn">View Post</a>
+                    <dl>
+                        <dt>Published:</dt><dd>${post.relative}<br/>${post.published}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function conversationHTML(post, stranger, parent, length) {
+    const p = post;
+
+    const multipleImgs = !p.linkpost && p.content.split('<img').length > 2;
+
+    if(multipleImgs) {
+        p.content = p.content.replaceAll('<img', `<img data-gallery='${p.id}-${parent}'`);
+    }
+    return `
+        <div class="tile mb-2 mt-2 tile-bordered ${p.id == parent ? 'highlight' : ''}" id="convo-${p.id}-${parent}" data-id="${p.id}" data-parent="${parent}" data-stranger="${stranger}">
+            <div class="tile-icon ">
+                <figure class="avatar avatar-sm " data-initial="${p.username.substring(0,1)}">
+                    <img src="${p.avatar}" loading="lazy">
+                </figure>
+            </div>
+            <div class="tile-content">
+                <p class="tile-title">
+                    ${p.name} <a class="text-gray" href="/user/${p.username}">@${p.username}</a>${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}
+                    <button type="button" class="addToReply btn btn-sm btn-link btn-icon float-right" data-target="replybox-textarea-${parent}" data-id="${p.username}">
+                        <i data-target="replybox-textarea-${parent}" data-id="${p.username}" class="icon icon-share addToReply"></i>
+                    </button>
+                </p>
+                ${p.content}
+                ${multipleImgs ? `<div data-id="${p.id}-${parent}" class='gallery'></div>` : ''}
+            </div>
+        </div>
+    `;
+
+
+//     <article class="card parent" id="convo-${p.id}-${parent}" data-id="${p.id}" data-parent="${parent}" data-stranger="${stranger}">
+//     <header class="card-header">
+//             ${getAvatar(p, 'avatar-sm')}
+//             <div class="card-title card-top">
+//                 ${p.name} <a class="text-gray" href="/user/${p.username}">@${p.username}</a>${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}
+//             </div>
+//             <div class="card-buttons convoBtns">
+//                 <button data-id="${parent}" class="btn btn-link float-right openConversationBtn">${length} <i data-id="${parent}" class="icon icon-message openConversationBtn"></i></button>
+//             </div>
+//         </div>
+//     </header>
+//     <main>${p.content}</main>
+//     ${multipleImgs ? `<div data-id="${p.id}-${parent}" class='gallery'></div>` : ''}
+// </article>
+}
+
+function getReplyBox(id, repliers, boxOnly = false) {  
+    if(boxOnly) {
+        return `<div id="replybox-${id}" class="form-group">
+                    <div class="form-autocomplete">
+                    <div id="replybox-input-container-${id}" class="form-autocomplete-input form-input">
+                        <div id="replybox-chips-${id}">
+                        </div>
+                        <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
+                    </div>
+                    <ul id="replybox-menu-${id}" class="menu hide">
+                        ${repliers.map(r => {
+                            const replier = JSON.parse(r);
+                            return `<li class="menu-item" class="hide" data-name="${replier.username}" data-avatar="${replier.avatar}"></li>`}).join('')}
+                    </ul>
+                    </div>
+                </div>
+                ${repliers.map(function (ur) {
+                    const person = JSON.parse(ur);
+                    return `<input id="replybox-checkbox-${id}-${person.username}" class="hide" type='checkbox' name='replyingTo[]' value='${person.username}'/>`
+                }).join(' ')}
+                `;
+    }
+    const author = JSON.parse(repliers[0]);
+    return `
+        <form class="form" id='replybox-form-${id}' data-id="${id}">
+            ${repliers.map(function (ur) {
+                const person = JSON.parse(ur);
+                return `<input id="replybox-checkbox-${id}-${person.username}" class="hide" ${person.username.trim() == author.username.trim() ? 'checked="checked"' : ''} type='checkbox' name='replyingTo[]' value='${person.username}'/>`
+            }).join(' ')}
+            <div id="replybox-${id}" class="form-group">
+                <label class="form-label">Repling to:</label>
+                <div class="form-autocomplete">
+                <div id="replybox-input-container-${id}" class="form-autocomplete-input form-input">
+                    <div id="replybox-chips-${id}">
+                        <span id="chip-${id}-${author.username}" class="chip"><img class="avatar avatar-sm" src="${author.avatar}" />@${author.username}<a data-name="${author.username}" data-id="${id}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>
+                    </div>
+
+                    <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="" value="">
+                </div>
+                <ul id="replybox-menu-${id}" class="menu hide">
+                    ${repliers.map(r => {
+                        const replier = JSON.parse(r);
+                        return `<li class="menu-item" class="hide" data-name="${replier.username}" data-avatar="${replier.avatar}"></li>`}).join('')}
+                </ul>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="input-example-3">Message</label>
+                <div class="grow-wrap"><textarea id="replybox-textarea-${id}" class="form-input grow-me" name="content" rows="3"></textarea></div>
+                <input type="hidden" class="form-input" name="id" value="${id}" />
+            </div>
+            <div class="form-group">
+                <button data-id="${id}" type="button" class="btn btn-primary replyBtn">Send Reply</button>
+            </div>
+        </form>
+    `;
 }
 
 

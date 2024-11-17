@@ -31,9 +31,9 @@ export function flattenedMicroBlogPost(post) {
 }
 
 // Gets information about the M.B. user
-export async function getMicroBlogUser(access_token) {
+export async function getMicroBlogUser(accessToken) {
     const formBody = new URLSearchParams();
-    formBody.append("token", access_token);
+    formBody.append("token", accessToken);
 
     const fetching = await fetch('https://micro.blog/account/verify', {
         method: "POST",
@@ -51,18 +51,88 @@ export async function getMicroBlogUser(access_token) {
 }
 
 // Gets the Micro.Blog discover posts
-export async function getMicroBlogDiscoverPosts(access_token) {
+export async function getMicroBlogDiscoverPosts(accessToken) {
     // the discover endpoint does not support paging.
-    return await __getMicroBlogPosts(access_token, 'https://micro.blog/posts/discover');
+    const items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/discover');
+
+    items.map(post => {
+        if(post.content.split('<img').length > 1) {
+            const startTag = post.content.split('<img')[1];
+            const startSrc = startTag.split('src="')[1];
+            const endSrc = startSrc.split('"')[0];
+            post.image = endSrc;
+        }
+
+        return post;
+    });
+    return items;
 }
 
-async function __getMicroBlogPosts(access_token, url, lastId, count) {
+export async function getMicroBlogTimelinePosts(accessToken,lastId) {
+    const fetching = await fetch(`https://micro.blog/posts/check`, { method: "GET", headers: { "Authorization": "Bearer " + accessToken } } );
+    const results = await fetching.json(); 
+    const marker = results.markers.timeline;
+
+    let items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/timeline', lastId && lastId != 0 ? lastId : null, 40);
+    let ids = items.map(i => i.id);
+    let posts = items;
+    
+    let i = 0;
+    if(marker && !ids.includes(marker.id) && lastId == 0) {
+        while(!ids.includes(results.markers.timeline.id) && i < 10)
+        {
+            items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/timeline', ids[ids.length - 1], 40);
+
+            if(!items || items.length == 0) {
+                break;
+            }
+
+            posts = [...posts, ...items];
+            ids = [...ids, ...items.map(i => i.id)];
+            i++;
+
+            if(items.length < 40) {
+                break;
+            }
+        }
+    }
+    return posts;
+}
+
+export async function getMicroBlogDiscoverPhotoPosts(accessToken) {
+    // the discover endpoint does not support paging.
+    return (await getMicroBlogDiscoverPosts(accessToken)).filter(post => post.image);
+}
+
+export async function getMicroBlogConversation(accessToken, id) {
+    const items = await __getMicroBlogPosts(accessToken, `https://micro.blog/posts/conversation?id=${id}`);
+    return items.slice(0).reverse();
+}
+
+export async function getMicroBlogUserProfile(accessToken, username) {
+    const fetching = await fetch(`https://micro.blog/posts/${username}?count=1`, { 
+        method: "GET", 
+        headers: { "Authorization": "Bearer " + accessToken } 
+    });
+    return await fetching.json();   
+}
+
+export async function getMicroBlogFollowing(accessToken, username, isMe = true) {
+    const fetching = await fetch(isMe ? `https://micro.blog/users/following/${username}` : `https://micro.blog/users/discover/${username}`, { 
+        method: "GET", 
+        headers: { "Authorization": "Bearer " + accessToken } 
+    });
+    return await fetching.json();   
+}
+
+async function __getMicroBlogPosts(accessToken, url, lastId, count) {
+    console.log('__getMicroBlogPosts', accessToken, url, lastId, count)
     try {
         const guard = count ? Math.ceil(count / 40) : 1; // prevent infinite loops
         let loop = 0;
         let items = [];
         lastId = lastId ?? 0;
-        while(loop < guard && items.length < count) {
+        while(loop < guard && (!count || items.length < count)) {
             loop++;
             
             let fetchMe = url;
@@ -70,12 +140,13 @@ async function __getMicroBlogPosts(access_token, url, lastId, count) {
                 fetchMe = `${fetchMe}?${lastId ? `before_id=${lastId}${lastId && count ? '&' : ''}${count ? `count=${count}` : ''}` : ''}`;
             }
 
-            if(access_token) {
+            if(accessToken) {
                 const fetching = await fetch(fetchMe, { 
                     method: "GET", 
-                    headers: { "Authorization": "Bearer " + access_token } 
+                    headers: { "Authorization": "Bearer " + accessToken } 
                 });
-                const results = await fetching.json();          
+                const results = await fetching.json();   
+            
                 items = [...items, ...results.items];
             } else {
                 const fetching = await fetch(fetchMe, { 
@@ -86,7 +157,8 @@ async function __getMicroBlogPosts(access_token, url, lastId, count) {
             }
 
         }
-        return items; 
+        
+        return items.map(item => flattenedMicroBlogPost(item)); 
     } catch {
         return undefined; 
     }

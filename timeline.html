@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Lillihub - A delightful Micro.blog client">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="apple-touch-icon" href="/lillihub-512.png">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="theme-color" content="#000000">
+        <meta name="apple-mobile-web-app-title" content="Lillihub">
+        <link rel="manifest" href="/manifest.webmanifest">
+        <title>Lillihub: Timeline</title>
+        <noscript><style>.hide-if-user-has-no-javascript{ display: none }</style></noscript>
+        <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
+        <script>document.write('<style>.hide-if-user-has-javascript{display:none}</style>');</script>
+        <link rel="stylesheet" href="main.css">  
+    </head>
+    <body>
+        <header class="navbar">
+            <section class="navbar-section">
+                <a class="show-lg off-canvas-toggle btn btn-link btn-action" href="#sidebar-id">
+                    <i class="icon icon-menu"></i>
+                </a>
+                <a href="/blog" class="btn btn-link hide-lg blogLink">Blog</a>
+                <a href="/bookmarks" class="btn btn-link hide-lg bookmarksLink">Bookmarks</a>
+                <a href="/bookshelves" class="btn btn-link hide-lg bookshelvesLink">Bookshelves</a>
+                <a href="/notes" class="btn btn-link hide-lg notesLink">Notes</a>
+                <a href="/" class="btn btn-link hide-lg active">Timeline</a>
+            </section>
+            <!-- <section class="navbar-section">
+                <button class="btn btn-primary"><i class="icon icon-plus"></i> New Post</button>
+            </section> -->
+        </header>
+          <div class="container grid-xl mt-2">
+            <div class="columns">
+              <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                <div>
+                    <div class="off-canvas off-canvas-sidebar-show">                
+                        <div id="sidebar-id" class="off-canvas-sidebar bg-secondary">
+                            <div class="panel sidebar">
+                                <div class="panel-header text-center">
+                                    <img src="/logo.png" width="100px">
+                                    <div class="panel-title h5 mt-10">Lillihub</div>
+                                </div>
+                                <div class="panel-footer">
+                                    <ul class="menu mb-2">
+                                        <li class="divider" data-content="Micro.blog Feed"></li>
+                                        <li class="menu-item active">
+                                            <a href="/" class="active">Timeline</a>
+                                        </li>
+                                        <li class="menu-item">
+                                            <a href="/discover">Discover</a>
+                                        </li>
+                                        <li class="menu-item">
+                                            <a href="/mentions">Mentions</a>
+                                        </li>
+                                        <li class="menu-item">
+                                            <a href="/following">Following</a>
+                                        </li>
+                                    </ul> 
+                                    <ul class="menu mb-2 mt-2 show-md">
+                                        <li class="divider" data-content="Lillihub apps"></li>
+                                        <li class="menu-item blogLink"><a href="/blog">Blog</a></li>
+                                        <li class="menu-item bookmarksLink"><a href="/Bookmarks">Bookmarks</a></li>
+                                        <li class="menu-item bookshelvesLink"><a href="/Bookshelves">Bookshelves</a></li>
+                                        <li class="menu-item notesLink"><a href="/notes">Notes</a></li>
+                                        <li class="menu-item"><a href="/">Timeline</a></li>
+                                    </ul>
+                                    <ul class="menu mt-2 mb-2">
+                                        <li class="divider" data-content="Lillihub"></li>
+                                        <li class="menu-item"><a href="/settings">Settings</a></li>
+                                        <li class="menu-item"><a href="/logout">Logout</a></li>
+                                    </ul>
+                                    <small class="mt-2 app-info mb-2 d-block">
+                                        <a href="https://github.com/heyloura/lillihub-client">Github</a> · Version 0.0.1
+                                        <br/>Designed and built with ♥ by <a href="https://heyloura.com">Loura</a>.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                      
+                        <a class="off-canvas-overlay" href="#close"></a>
+                    </div>
+                </div>
+              </div>
+              <div class="column col-xs-12 col-sm-12 col-md-9 col-lg-8 col-xl-6 col-6">
+                <main>
+                    <form id="mainPost" class="card">
+                        <div class="card-body">
+                            <div id="mainReplyBox" class="hide">{{replyBox}}</div>
+                            <div class="grow-wrap">
+                                <textarea name="content" placeholder="Share your thoughts...." id="post" class="form-input grow-me" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="card-footer mb-2">
+                            <input type="hidden" name="postingType" id="postingType" />
+                            <input type="hidden" name="omgApi" id="omgApi" />
+                            <input type="hidden" name="omgAddess" id="omgAddess" />
+                            <input type="hidden" name="indieToken" id="indieToken" />
+                            <input type="hidden" name="microPub" id="microPub" />
+                            <div class="dropdown">
+                                <a href="#" class="btn btn-link dropdown-toggle" tabindex="0">
+                                  <span id="postingName">{{username}}</span> <i class="icon icon-caret"></i>
+                                </a>
+                                <!-- menu component -->
+                                <ul class="menu">
+                                    <li class="menu-item">
+                                        <a class="checkForChanges" href="/settings#posting">
+                                          Settings
+                                        </a>
+                                    </li>
+                                </ul>
+                              </div>
+                              <div class="btn-group float-right">
+                                <button type="button" class="btn btn-link hide"><i class="icon icon-photo"></i></button>
+                                <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button>
+                                <button type="button" class="btn btn-primary sendPost"><i class="icon icon-message sendPost"></i> Post</button>
+                              </div> 
+                        </div>
+                        <div id="postToast" class="toast toast-dark hide mt-2">
+                            <button class="btn btn-clear float-right dismissPostToast"></button>
+                            <div id="postToastMessage"></div>
+                        </div>  
+                    </form>
+
+                    <!-- Feed -->
+                    <div id="morePostsToast" class="toast hide getNewPosts mt-2">
+                        <button class="btn btn-clear float-right dismissMorePostsToast"></button>
+                        <b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.
+                    </div>
+                     <div class="mt-2" id="add-0"><span class="loading d-block"></span></div>
+                </main>
+              </div>
+              <div class="column col-xs-12 col-sm-12 col-md-3 col-lg-4 col-xl-3 col-3">
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-subtitle text-gray">People you can follow</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="suggestions">
+                                <span class="loading d-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mt-2">
+                        <div class="card-header">
+                            <div class="card-subtitle text-gray">Discover Photos</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="discover-photos">
+                                <span class="loading d-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel mt-2 bg-light">
+                        <div class="panel-header">
+                          <div class="panel-title text-gray card-subtitle">Discover Feed</div>
+                        </div>
+                        <div class="panel-body">
+
+                            <div class="mt-2" id="discover-feed"><span class="loading d-block"></span></div>
+
+                        </div>
+                        <div class="panel-footer">
+
+                        </div>
+                      </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script src="/timeline.js" type="text/javascript"></script>
+    </body>
+</html>
