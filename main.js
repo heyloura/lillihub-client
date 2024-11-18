@@ -693,7 +693,7 @@ function conversationHTML(post, stranger, parent, length) {
         p.content = p.content.replaceAll('<img', `<img data-gallery='${p.id}-${parent}'`);
     }
     return `
-        <div class="tile mb-2 mt-2 tile-bordered ${p.id == parent ? 'highlight' : ''}" id="convo-${p.id}-${parent}" data-id="${p.id}" data-parent="${parent}" data-stranger="${stranger}">
+        <div class="tile mb-2 mt-2 pt-2 ${p.id == parent ? 'highlight' : ''}" id="convo-${p.id}-${parent}" data-id="${p.id}" data-parent="${parent}" data-stranger="${stranger}">
             <div class="tile-icon ">
                 <figure class="avatar avatar-sm " data-initial="${p.username.substring(0,1)}">
                     <img src="${p.avatar}" loading="lazy">
