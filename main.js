@@ -192,7 +192,20 @@ Deno.serve(async (req) => {
                 const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
                 const html = posts.map(post => postHTML(post)).join('');
 
-                return new Response(`${html}<br/><p class="p-centered"><button class="btn btn-primary loadTimeline" data-id="${posts[posts.length-1].id}">load more</button></p>`,HTMLHeaders(nonce));
+                return new Response(`${html}<br/><p class="p-centered">
+                    <button class="btn btn-primary loadTimeline" data-id="${posts[posts.length-1].id}">load more</button>
+                    <div id="add-${posts[posts.length-1] ? posts[posts.length-1].id : 'error'}"></div>
+                    <div class="hide firstPost" data-id="${posts[0].id}"></div>
+                    </p>`,HTMLHeaders(nonce));
+            }
+
+            // this is called from JavaScript to get the posts
+            const POSTS_ROUTE = new URLPattern({ pathname: "/posts/:id" });
+            const TAGMOJI_ROUTE = new URLPattern({ pathname: "/posts/discover/:id" });
+            if((POSTS_ROUTE.exec(req.url) || TAGMOJI_ROUTE.exec(req.url)) && user) {
+                const id = POSTS_ROUTE.exec(req.url) ? POSTS_ROUTE.exec(req.url).pathname.groups.id : 'discover/' + TAGMOJI_ROUTE.exec(req.url).pathname.groups.id;
+                const posts = await mb.getMicroBlogUserOrTagmojiPosts(mbToken, id);
+                return new Response(posts.map(post => postHTML(post)).join(''),HTMLHeaders());
             }
 
             const CONVERSATION_ROUTE = new URLPattern({ pathname: "/conversation/:id" });
@@ -415,6 +428,34 @@ Deno.serve(async (req) => {
             }
 
 
+
+            // -----------------------------------------------------
+            // User page
+            // -----------------------------------------------------
+            const USER_ROUTE = new URLPattern({ pathname: "/user/:id" });
+            if(USER_ROUTE.exec(req.url) && user) {
+                const id = USER_ROUTE.exec(req.url).pathname.groups.id;
+            
+                const results = await mb.getMicroBlogUserOrTagmojiPosts(mbToken, id);
+                const follows = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
+                const stranger = follows.filter(f => f.username == results.username).length == 0;
+
+                const layout = new TextDecoder().decode(await Deno.readFile("user.html"));
+
+                return new Response(layout.replaceAll('{{results._microblog.username}}', results.username)
+                    .replaceAll('{{results.author.name}}',results.name)
+                    .replaceAll('{{results.author.url}}',results.url)
+                    .replaceAll('{{results._microblog.bio}}', results.bio)
+                    .replaceAll('{{posts}}', results.map(post => postHTML(post)).join(''))
+                    .replaceAll('{{showIfFollowing}}', !stranger ? '' : 'hide')
+                    .replaceAll('{{showIfStranger}}', stranger ? '' : 'hide')
+                    ,HTMLHeaders(undefined,nonce));
+            }
+
+
+            // -----------------------------------------------------
+            // Home page
+            // -----------------------------------------------------
             const layout = new TextDecoder().decode(await Deno.readFile("timeline.html"));
             const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username)).map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
             return new Response(layout.replaceAll('{{nonce}}', nonce)

@@ -27,6 +27,7 @@ export function flattenedMicroBlogPost(post) {
         conversation: post &&  post._microblog && post._microblog.is_conversation ? post._microblog.is_conversation : false,
         linkpost: post && post._microblog && post._microblog.is_linkpost ? post._microblog.is_linkpost : false,
         mention: post && post._microblog && post._microblog.is_mention ? post._microblog.is_mention : false,
+        bio: post && post._microblog && post._microblog.bio ? post._microblog.bio : ''
     };
 }
 
@@ -65,6 +66,12 @@ export async function getMicroBlogDiscoverPosts(accessToken) {
 
         return post;
     });
+    return items;
+}
+
+export async function getMicroBlogUserOrTagmojiPosts(accessToken, id) {
+    // does not support paging.
+    const items = await __getMicroBlogPosts(accessToken, `https://micro.blog/posts/${id}`);
     return items;
 }
 
