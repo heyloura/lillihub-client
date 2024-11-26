@@ -166,6 +166,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
                                 document.getElementById('morePostsToast').classList.remove('hide');
                                 document.getElementById('showPostCount').innerHTML = data.count;
                                 console.log(data);
+                                document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
                             }     
                         });
                     checks++;
@@ -455,21 +456,21 @@ document.addEventListener("click", (item) => {
         submitReply(new FormData(form), id);
         form.reset();
     }
-    // if(item.target.classList.contains('openConversationBtn')) {
-    //     const id = item.target.getAttribute('data-id');
+    if(item.target.classList.contains('openConversationBtn')) {
+        const id = item.target.getAttribute('data-id');
 
-    //     if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
-    //         document.getElementById('main-' + id).classList.toggle('hide')
-    //     } else {
-    //         fetch("/conversation/" + id, { method: "get" })
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             document.getElementById('content-' + id).innerHTML = data.conversation;
-    //             item.target.setAttribute('data-loaded', 'true')
-    //             document.getElementById('main-' + id).classList.toggle('hide')
-    //         });
-    //     }
-    // }
+        if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
+            document.getElementById('main-' + id).classList.toggle('hide')
+        } else {
+            fetch("/conversation/" + id, { method: "get" })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('content-' + id).innerHTML = data.conversation;
+                item.target.setAttribute('data-loaded', 'true')
+                document.getElementById('main-' + id).classList.toggle('hide')
+            });
+        }
+    }
     // if(item.target.classList.contains('closeConversationBtn')) {
     //     let id = item.target.getAttribute('data-id');
     //     document.getElementById('modal-' + id).classList.remove("active");
@@ -505,7 +506,8 @@ document.addEventListener("click", (item) => {
         document.getElementById('morePostsToast').classList.add("hide");
     }
     if(item.target.classList.contains('getNewPosts')) {
-        console.log('You clicked to get more posts!')
+        console.log('You clicked to get more posts!');
+        console.log(document.getElementById('showPostCount'));
     }
     if(item.target.classList.contains('addToReply')) {
         const username = item.target.getAttribute('data-id');
