@@ -506,8 +506,36 @@ document.addEventListener("click", (item) => {
         document.getElementById('morePostsToast').classList.add("hide");
     }
     if(item.target.classList.contains('getNewPosts')) {
-        console.log('You clicked to get more posts!');
-        console.log(document.getElementById('showPostCount').getAttribute('marker'));
+        document.getElementById('add-0').getAttribute('marker').innerHTML = '<span class="loading"></span>';
+        fetch("/timeline/0", { method: "get" })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('add-0').innerHTML = data;
+                const article = document.querySelector('article:first-child');
+                const id = article.getAttribute('id');
+                let checks = 0;
+                const timerID = setInterval(function() {
+                    fetch("/check/" + id, { method: "get" })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.count > 0) {
+                                document.getElementById('morePostsToast').classList.remove('hide');
+                                document.getElementById('showPostCount').innerHTML = data.count;
+                                console.log(data);
+                                document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
+                            }     
+                        });
+                    checks++;
+                    if(checks > 10) {
+                        clearInterval(timerID);
+                    }
+                }, 60 * 1000); 
+                fetch("/mark/timeline/" + id, { method: "get" })
+                    .then(response => response.text())
+                    .then(_data => {});
+
+                buildCarousels();
+            });
     }
     if(item.target.classList.contains('addToReply')) {
         const username = item.target.getAttribute('data-id');
