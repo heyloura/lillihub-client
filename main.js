@@ -665,7 +665,17 @@ function postHTML(post, marker, stranger) {
                     </div>           
                 </div>
                 <div class="card-buttons">
-                    <button data-id="${post.id}" class="btn btn-link openDetailsBtn float-right"><i data-id="${post.id}" class="icon icon-more-vert openDetailsBtn"></i></button>
+                    <div class="dropdown"><a class="btn btn-link dropdown-toggle" tabindex="0">dropdown button <i class="icon icon-caret"></i></a>
+                        <ul class="menu">
+                            <li class="divider" data-content="Published: ${post.relative}">
+                            <li class="menu-item"><a href="/post?quote=${post.id}" class="btn">Quote Post</a></li>
+                            <li class="menu-item"><button data-url="${post.url}" class="btn addBookmark">Bookmark Post</button></li>
+                            <li class="menu-item"><a href="/conversation/${post.id}?view=true" class="btn">View Post</a></li>
+                            <li class="menu-item"><a href="#dropdowns">Slack</a></li>
+                            <li class="menu-item"><a href="#dropdowns">Hipchat</a></li>
+                            <li class="menu-item"><a href="#dropdowns">Skype</a></li>
+                        </ul>
+                    </div>
                 </div>
             </header>
             ${ post.conversation ? `<details class="accordion">
@@ -706,22 +716,6 @@ function postHTML(post, marker, stranger) {
                     </div>
                 </details>` : '' }
         </article>
-        <div class="modal" id="details-${post.id}">
-            <div data-id="${post.id}" class="modal-overlay closeDetailsBtn" aria-label="Close"></div>
-            <div class="modal-container">
-                <div class="modal-header">
-                    <button data-id="${post.id}" class="btn btn-clear float-right closeDetailsBtn" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <a href="/post?quote=${post.id}" class="btn">Quote Post</a>
-                    <button data-url="${post.url}" class="btn addBookmark">Bookmark Post</button>
-                    <a href="/conversation/${post.id}?view=true" class="btn">View Post</a>
-                    <dl>
-                        <dt>Published:</dt><dd>${post.relative}<br/>${post.published}</dd>
-                    </dl>
-                </div>
-            </div>
-        </div>
     `;
 }
 

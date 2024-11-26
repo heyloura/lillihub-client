@@ -165,6 +165,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
                             if(data.count > 0) {
                                 document.getElementById('morePostsToast').classList.remove('hide');
                                 document.getElementById('showPostCount').innerHTML = data.count;
+                                console.log(data);
                             }     
                         });
                     checks++;
@@ -313,9 +314,6 @@ document.addEventListener("input", (event) => {
         growTextArea(event.target);
     }
     if(event.target.classList.contains('replierInput')){
-
-        console.log('event.target.classList.contains(replierInput) fired');
-
         let id = event.target.getAttribute('data-id');
         let menu = document.getElementById('replybox-menu-' + id); 
         menu.classList.remove('hide');
@@ -371,32 +369,32 @@ document.addEventListener("click", (item) => {
     //     var term = document.getElementById('searchPost').value;
     //     window.location.href = '/posts/search?q=' + encodeURIComponent(term);
     // }
-    if(item.target.classList.contains('addBookmark')){
-        let url = item.target.getAttribute('data-url');
-        let formData = new FormData();
-        formData.append("url", url);
-        fetch("/bookmarks/new", { body: formData, method: "post" })
-        .then(response => response.text())
-        .then(data => {
-            alert(data);
-        });
-    }
-    if(item.target.classList.contains('followUser') || item.target.classList.contains('unfollow')){
-        let username = item.target.getAttribute('data-username');
-        let formData = new FormData();
-        let tag = item.target.classList.contains('unfollow') ? '-unfollow' : '-follow';
-        formData.append("username", username);
-        formData.append("unfollow", item.target.classList.contains('unfollow'));
-        fetch("/users/follow", { body: formData, method: "post" })
-        .then(response => response.text())
-        .then(data => {
-            if(username && document.getElementById('toast-' + username + tag)) {
-                document.getElementById('toast-username-' + username + tag).innerHTML = data;
-                document.getElementById('toast-' + username + tag).classList.remove('hide');
-                item.target.classList.add('hide');
-            }
-        });
-    }
+    // if(item.target.classList.contains('addBookmark')){
+    //     let url = item.target.getAttribute('data-url');
+    //     let formData = new FormData();
+    //     formData.append("url", url);
+    //     fetch("/bookmarks/new", { body: formData, method: "post" })
+    //     .then(response => response.text())
+    //     .then(data => {
+    //         alert(data);
+    //     });
+    // }
+    // if(item.target.classList.contains('followUser') || item.target.classList.contains('unfollow')){
+    //     let username = item.target.getAttribute('data-username');
+    //     let formData = new FormData();
+    //     let tag = item.target.classList.contains('unfollow') ? '-unfollow' : '-follow';
+    //     formData.append("username", username);
+    //     formData.append("unfollow", item.target.classList.contains('unfollow'));
+    //     fetch("/users/follow", { body: formData, method: "post" })
+    //     .then(response => response.text())
+    //     .then(data => {
+    //         if(username && document.getElementById('toast-' + username + tag)) {
+    //             document.getElementById('toast-username-' + username + tag).innerHTML = data;
+    //             document.getElementById('toast-' + username + tag).classList.remove('hide');
+    //             item.target.classList.add('hide');
+    //         }
+    //     });
+    // }
     // if(item.target.classList.contains('deleteNote')){
     //     if(confirm('Are you sure you want to delete this note? This action cannot be undone.')){
     //         let id = item.target.getAttribute('data-id');
@@ -414,11 +412,11 @@ document.addEventListener("click", (item) => {
     //     document.getElementById('enter_notes_key').style.display = 'none';
     //     window.location.reload();
     // }
-    if(item.target.classList.contains('saveDisplayMode')){
-        let value = document.querySelector('input[name="display"]:checked').value;
-        localStorage.setItem('lillihub_display_mode', value);
-        window.location.reload();
-    }
+    // if(item.target.classList.contains('saveDisplayMode')){
+    //     let value = document.querySelector('input[name="display"]:checked').value;
+    //     localStorage.setItem('lillihub_display_mode', value);
+    //     window.location.reload();
+    // }
     if(item.target.classList.contains('addUserToReplyBox')){
         item.preventDefault();
         let id = item.target.getAttribute('data-id');
@@ -457,33 +455,33 @@ document.addEventListener("click", (item) => {
         submitReply(new FormData(form), id);
         form.reset();
     }
-    if(item.target.classList.contains('openConversationBtn')) {
-        const id = item.target.getAttribute('data-id');
+    // if(item.target.classList.contains('openConversationBtn')) {
+    //     const id = item.target.getAttribute('data-id');
 
-        if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
-            document.getElementById('main-' + id).classList.toggle('hide')
-        } else {
-            fetch("/conversation/" + id, { method: "get" })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('content-' + id).innerHTML = data.conversation;
-                item.target.setAttribute('data-loaded', 'true')
-                document.getElementById('main-' + id).classList.toggle('hide')
-            });
-        }
-    }
-    if(item.target.classList.contains('closeConversationBtn')) {
-        let id = item.target.getAttribute('data-id');
-        document.getElementById('modal-' + id).classList.remove("active");
-    }
-    if(item.target.classList.contains('openDetailsBtn')) {
-        let id = item.target.getAttribute('data-id');
-        document.getElementById('details-' + id).classList.add("active");
-    }
-    if(item.target.classList.contains('closeDetailsBtn')) {
-        let id = item.target.getAttribute('data-id');
-        document.getElementById('details-' + id).classList.remove("active");
-    }
+    //     if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
+    //         document.getElementById('main-' + id).classList.toggle('hide')
+    //     } else {
+    //         fetch("/conversation/" + id, { method: "get" })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             document.getElementById('content-' + id).innerHTML = data.conversation;
+    //             item.target.setAttribute('data-loaded', 'true')
+    //             document.getElementById('main-' + id).classList.toggle('hide')
+    //         });
+    //     }
+    // }
+    // if(item.target.classList.contains('closeConversationBtn')) {
+    //     let id = item.target.getAttribute('data-id');
+    //     document.getElementById('modal-' + id).classList.remove("active");
+    // }
+    // if(item.target.classList.contains('openDetailsBtn')) {
+    //     let id = item.target.getAttribute('data-id');
+    //     document.getElementById('details-' + id).classList.add("active");
+    // }
+    // if(item.target.classList.contains('closeDetailsBtn')) {
+    //     let id = item.target.getAttribute('data-id');
+    //     document.getElementById('details-' + id).classList.remove("active");
+    // }
     if(item.target.classList.contains('clearToast')) {
         let id = item.target.getAttribute('data-id');
         document.getElementById('toast-' + id).classList.add("hide");
@@ -505,6 +503,9 @@ document.addEventListener("click", (item) => {
     }
     if(item.target.classList.contains('dismissMorePostsToast')) {
         document.getElementById('morePostsToast').classList.add("hide");
+    }
+    if(item.target.classList.contains('getNewPosts')) {
+        console.log('You clicked to get more posts!')
     }
     if(item.target.classList.contains('addToReply')) {
         const username = item.target.getAttribute('data-id');
