@@ -6577,3 +6577,7 @@ article footer {
 .content {
   min-height: 2em;
 }
+
+.getNewPosts {
+  cursor: pointer;
+}
