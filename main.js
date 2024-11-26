@@ -650,11 +650,11 @@ function postHTML(post, marker, stranger) {
                     </div>           
                 </div>
                 <div class="card-buttons">
-                    <div class="dropdown"><a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-vert"></i></a>
+                    <div class="dropdown dropdown-right"><a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-vert"></i></a>
                         <ul class="menu">
                             <li class="divider" data-content="Published: ${post.relative}">
                             <li class="menu-item"><a href="/post?quote=${post.id}">Quote Post</a></li>
-                            <li class="menu-item"><button data-url="${post.url}" class="addBookmark">Bookmark Post</button></li>
+                            <li class="menu-item"><button data-url="${post.url}" class="addBookmark btn-link btn">Bookmark Post</button></li>
                             <li class="menu-item"><a href="/conversation/${post.id}?view=true">View Post</a></li>
                         </ul>
                     </div>
