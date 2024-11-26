@@ -6241,9 +6241,9 @@ a,pre,code {
   overflow-wrap: anywhere;
 }
 
-.card-buttons {
+/* .card-buttons {
   min-width: 80px;
-}
+} */
 
 article main {
   padding: 1em;
