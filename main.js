@@ -221,24 +221,12 @@ Deno.serve(async (req) => {
                 data.ids = posts.map(i => i.id);
                 const follows = following.map(f => {return JSON.parse(f)});
         
-                //const uniqueRepliers = [...new Set([...posts.map(p => p ? JSON.stringify({username: p.username, avatar: p.avatar}) : ''), ...following])];
-                //const bookmarkURLS = new Set();
                 data.conversation = `        
                 <div class="panel tile-no-sides">
                 <div class="panel-body">
                 ${posts.map(i => {
                     const stranger = follows.filter(f => f.username == i.username);
                     const convo = conversationHTML(i, stranger.length == 0, id, posts.length);
-                    // let anchors = i.content.split('<a');
-                    // if(anchors && anchors.length > 1) {
-                    //     for(var i = 0; i < anchors.length; i++) {
-                    //         if(anchors[i].includes('http') && anchors[i].includes('</a>') && !anchors[i].includes('@')) {
-                    //             var href = anchors[i].replaceAll("'",'"').split('href="');
-                    //             var anchor = href[1].split('"')[0];
-                    //             bookmarkURLS.add(anchor);
-                    //         } 
-                    //     }
-                    // }
                     return convo;
                 }).join('')}
                 </div>
@@ -260,10 +248,7 @@ Deno.serve(async (req) => {
                     </div>
                 </div>
             </div>
-                    
                     `;
-                    // ${getReplyBox(id, uniqueRepliers)}
-                    // ${Array.from(bookmarkURLS).length > 0 ? `<br/><p class="mt-2"><b>Links:</b></p><table class="table table-striped">${Array.from(bookmarkURLS).map(b => `<tr><td><a target="_blank" href="${b}">${b}</a></td><td><button data-url="${b}" class="btn btn-link addBookmark">Add Bookmark</button></td></tr>`).join('')}</table>` : ''}
 
                 if(!view) {
                     return new Response(JSON.stringify(data), JSONHeaders());
@@ -587,7 +572,7 @@ async function decryptMe(encrypted)
 // can set a cookie if provided
 // the uuid is set per request to set a nonce
 function HTMLHeaders(uuid, cookie) {
-    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com 'nonce-${uuid}'`;
+    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com 'nonce-${uuid}';media-src *;img-src *`;
     if(!cookie) {
         return {
             headers: {
@@ -665,15 +650,12 @@ function postHTML(post, marker, stranger) {
                     </div>           
                 </div>
                 <div class="card-buttons">
-                    <div class="dropdown"><a class="btn btn-link dropdown-toggle" tabindex="0">dropdown button <i class="icon icon-caret"></i></a>
+                    <div class="dropdown"><a class="btn btn-link" tabindex="0"><i class="icon icon-vert"></i></a>
                         <ul class="menu">
                             <li class="divider" data-content="Published: ${post.relative}">
-                            <li class="menu-item"><a href="/post?quote=${post.id}" class="btn">Quote Post</a></li>
-                            <li class="menu-item"><button data-url="${post.url}" class="btn addBookmark">Bookmark Post</button></li>
-                            <li class="menu-item"><a href="/conversation/${post.id}?view=true" class="btn">View Post</a></li>
-                            <li class="menu-item"><a href="#dropdowns">Slack</a></li>
-                            <li class="menu-item"><a href="#dropdowns">Hipchat</a></li>
-                            <li class="menu-item"><a href="#dropdowns">Skype</a></li>
+                            <li class="menu-item"><a href="/post?quote=${post.id}">Quote Post</a></li>
+                            <li class="menu-item"><button data-url="${post.url}" class="addBookmark">Bookmark Post</button></li>
+                            <li class="menu-item"><a href="/conversation/${post.id}?view=true">View Post</a></li>
                         </ul>
                     </div>
                 </div>

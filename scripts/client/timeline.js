@@ -507,7 +507,7 @@ document.addEventListener("click", (item) => {
     }
     if(item.target.classList.contains('getNewPosts')) {
         console.log('You clicked to get more posts!');
-        console.log(document.getElementById('showPostCount'));
+        console.log(document.getElementById('showPostCount').getAttribute('marker'));
     }
     if(item.target.classList.contains('addToReply')) {
         const username = item.target.getAttribute('data-id');
