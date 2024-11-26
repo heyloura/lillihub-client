@@ -17,10 +17,6 @@
   --secondary-shade: #6D4194;
 }
 
-
-
-
-
 /*!
   Theme: Default
   Description: Original highlight.js style
@@ -6578,7 +6574,6 @@ article footer {
 .tile .tile-content:not(:first-child) {
   margin-bottom: 0.6rem;
 }
-
-/* .tile-content p:last-child {
-  margin-bottom: 0.6rem;
-} */
+.content {
+  min-height: 2em;
+}
