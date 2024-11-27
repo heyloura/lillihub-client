@@ -506,7 +506,7 @@ document.addEventListener("click", (item) => {
         document.getElementById('morePostsToast').classList.add("hide");
     }
     if(item.target.classList.contains('getNewPosts')) {
-        document.getElementById('add-0').innerHTML = '<div class="center"><span class="loading"></span></div>';
+        document.getElementById('add-0').innerHTML = '<div class="mt-2" id="add-0"><span class="loading d-block"></span></div>';
         document.getElementById('morePostsToast').classList.add('hide');
         fetch("/timeline/0", { method: "get" })
             .then(response => response.text())
