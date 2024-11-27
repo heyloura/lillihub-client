@@ -31,6 +31,7 @@ let touchendX = 0
 function checkDirection() {
   if (touchendX < touchstartX - 50) {
     alert('swiped left!')
+    
   }
   if (touchendX > touchstartX) return;
 }
@@ -63,7 +64,6 @@ function removeHash() {
         document.body.scrollTop = scrollV;
         document.body.scrollLeft = scrollH;
     }
-    document.getElementById('goBackBtn').classList.toggle('hide');
 }
 function growTextArea(el) {
     el.parentNode.dataset.replicatedValue = el.value;
