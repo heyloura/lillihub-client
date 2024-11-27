@@ -6494,9 +6494,9 @@ textarea {
   background-color: var(--background-tint-1);
 }
 
-.navbar .btn-link {
+/* .navbar .btn-link {
   color: var(--background-tint-4);
-}
+} */
 
 .navbar .active {
   color: #e0cb5e !important;
@@ -6556,9 +6556,9 @@ article footer {
   padding-top: 0;
 }
 
-.tile-bordered {
+/* .tile-bordered {
   border-bottom: .05rem solid #dadee4;
-}
+} */
 
 .tile-no-sides {
   border-left: 0;
