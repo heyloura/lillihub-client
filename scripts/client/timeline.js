@@ -25,14 +25,14 @@
 
 
 // set up gesture navigation
-var zt = new ZingTouch.Region(document.body);
-var conversation = document.getElementById('conversation');
+// var zt = new ZingTouch.Region(document.body);
+// var conversation = document.getElementById('conversation');
 
-zt.bind(conversation, 'swipe', function(e){
-    alert('swipe detected.....');
-    history.back();
-	//removeHash();
-}, false);
+// zt.bind(conversation, 'swipe', function(e){
+//     alert('swipe detected.....');
+//     history.back();
+// 	//removeHash();
+// }, false);
 
 
 if(window.location.hash) {
