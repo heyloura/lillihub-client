@@ -6581,3 +6581,14 @@ article footer {
 .getNewPosts {
   cursor: pointer;
 }
+
+header {
+  position: fixed;
+  width: 100%;
+  z-index: 201;
+  margin-top: -0.5em;
+}
+
+.page {
+  padding-top: 3em;
+}
