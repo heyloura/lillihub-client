@@ -3227,12 +3227,12 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .menu .menu-item>a:focus,.menu .menu-item>a:hover {
-  background: #f1f1fc;
+  background: var(--background-tint-4);
   color: var(--primary);
 }
 
 .menu .menu-item>a.active,.menu .menu-item>a:active {
-  background: #f1f1fc;
+  background: var(--background-tint-3);
   color: var(--primary);
 }
 
@@ -4051,8 +4051,8 @@ a.text-error:visited {
 }
 
 .divider-vert[data-content]::after,.divider[data-content]::after {
-  background: #fff;
-  color: #bcc3ce;
+  background: var(--background-tint-1);
+  color: var(--background-tint-2);
   content: attr(data-content);
   display: inline-block;
   font-size: .7rem;
@@ -4061,7 +4061,7 @@ a.text-error:visited {
 }
 
 .divider {
-  border-top: .05rem solid #f1f3f5;
+  border-top: .05rem solid var(--background-tint-2);
   height: .05rem;
   margin: .4rem 0
 }
