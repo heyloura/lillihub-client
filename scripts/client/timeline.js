@@ -420,13 +420,12 @@ document.addEventListener("click", (item) => {
         form.reset();
     }
     if(parentHasClassOpenConversationId != 0 || item.target.classList.contains('openConversationBtn')) {
+        //chech if item is an anchor... if yes, bail...
         const id = parentHasClassOpenConversationId != 0 ?  parentHasClassOpenConversationId : item.target.getAttribute('data-id');
         fetch("/timeline/conversation/" + id, { method: "get" })
             .then(response => response.json())
             .then(data => {
                 document.getElementById('conversation-thread').innerHTML = `<div class="card">${data.conversation}</div>`;
-                //item.target.setAttribute('data-loaded', 'true')
-                ///document.getElementById('main-' + id).classList.toggle('hide')
             });
 
         redirectToAnchor('#conversation');

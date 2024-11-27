@@ -6636,7 +6636,7 @@ article footer {
 }
 .pages > *:target {
     display: block;
-    animation: pulse 0.5s linear 1;
+    animation: pulse 1s linear 1;
 }
 .pages > *:target ~ * {
     display: none;

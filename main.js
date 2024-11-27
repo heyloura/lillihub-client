@@ -245,7 +245,7 @@ Deno.serve(async (req) => {
                         <figure class="avatar avatar-lg"><img src="${s.avatar}" alt="Avatar"></figure>
                     </div>
                     <div class="tile-content">
-                        <p class="tile-title">${s.name}<br /><span class="tile-subtitle text-gray"><a href="/user/${s.username}">@${s.username}</a></span></p>
+                        <p class="tile-title">${s.name}<br /><span class="tile-subtitle text-gray"><a href="/timeline/user/${s.username}">@${s.username}</a></span></p>
                         
                     </div>
                     </div>`}).join(''),HTMLHeaders(nonce));
@@ -687,7 +687,7 @@ function postHTML(post, marker, stranger) {
                 <div class="card-top">
                     <div class="card-title h5">${post.name}</div>
                     <div class="card-subtitle">
-                        <a href="/user/${post.username}" class="text-gray">@${post.username}${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}</a>
+                        <a href="/timeline/user/${post.username}" class="text-gray">@${post.username}${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}</a>
                     </div>           
                 </div>
                 <!--<div class="card-buttons">
@@ -759,7 +759,7 @@ function conversationHTML(post, stranger, parent, length) {
             </div>
             <div class="tile-content">
                 <p class="tile-title">
-                    ${p.name} <a class="text-gray" href="/user/${p.username}">@${p.username}</a>${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}
+                    ${p.name} <a class="text-gray" href="/timeline/user/${p.username}">@${p.username}</a>${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}
                     <button type="button" class="addToReply btn btn-sm btn-link btn-icon float-right" data-target="replybox-textarea-${parent}" data-id="${p.username}">
                         <i data-target="replybox-textarea-${parent}" data-id="${p.username}" class="icon icon-share addToReply"></i>
                     </button>
