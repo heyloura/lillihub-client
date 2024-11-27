@@ -602,7 +602,7 @@ async function decryptMe(encrypted)
 // can set a cookie if provided
 // the uuid is set per request to set a nonce
 function HTMLHeaders(uuid, cookie) {
-    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com 'nonce-${uuid}' 'sha256-QSBn761ZD1IhLK/PQAF1mNEH1kskywqylNmJy5zbzAo=';media-src *;img-src *`;
+    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com unsafe-hashes 'nonce-${uuid}' 'sha256-QSBn761ZD1IhLK/PQAF1mNEH1kskywqylNmJy5zbzAo=';media-src *;img-src *`;
     if(!cookie) {
         return {
             headers: {
