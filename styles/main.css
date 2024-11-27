@@ -34,6 +34,7 @@
   --secondary: #7a49a5;
   --secondary-tint: #875BAE;
   --secondary-shade: #6D4194;
+  --text-color: #f1f1e5;
 }
 
 /*!
@@ -1188,7 +1189,7 @@ html {
 
 body {
   background: #fff;
-  color: #3b4351;
+  color: var(--text-color);
   font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   font-size: .8rem;
   overflow-x: hidden;
@@ -1206,12 +1207,12 @@ a:focus {
 }
 
 a.active,a:active,a:focus,a:hover {
-  color: #302ecd;
+  color: var(--primary-tint);
   text-decoration: underline
 }
 
 a:visited {
-  color: #807fe2
+  color: var(--secondary)
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -1421,20 +1422,20 @@ dl dd {
 
 .btn:focus,.btn:hover {
   background: #f1f1fc;
-  border-color: #416894;
+  border-color: var(--primary);
   text-decoration: none
 }
 
 .btn.active,.btn:active {
-  background: #416894;
-  border-color: #3634d2;
-  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary-shade);
+  color: var(--text-color);
   text-decoration: none
 }
 
 .btn.active.loading::after,.btn:active.loading::after {
-  border-bottom-color: #fff;
-  border-left-color: #fff
+  border-bottom-color: var(--text-color);
+  border-left-color: var(--text-color);
 }
 
 .btn.disabled,.btn:disabled,.btn[disabled] {
@@ -1445,14 +1446,14 @@ dl dd {
 
 .btn.btn-primary {
   background: var(--primary);
-  border-color: #416894;
-  color: #fff
+  border-color: var(--primary-shade);
+  color: var(--text-color);
 }
 
 .btn.btn-primary:focus,.btn.btn-primary:hover {
-  background: #4240d4;
-  border-color: #3634d2;
-  color: #fff
+  background: var(--primary-shade);
+  border-color: var(--primary-tint);
+  color: var(--text-color);
 }
 
 .btn.btn-primary.active,.btn.btn-primary:active {
