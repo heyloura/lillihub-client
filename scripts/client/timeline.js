@@ -303,7 +303,7 @@ function submitPost(formData) {
         });
 }
 function redirectToAnchor(anchor, scrollToTop = true) {
-    var delayInMilliseconds = 250; //1 second
+    var delayInMilliseconds = 400;
     setTimeout(function() {
         document.location.hash = anchor;
         if(scrollToTop) {
