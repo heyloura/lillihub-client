@@ -29,6 +29,7 @@ var zt = new ZingTouch.Region(document.body);
 var conversation = document.getElementById('conversation');
 
 zt.bind(conversation, 'swipe', function(e){
+    console.log('swipe detected.....')
 	removeHash();
 }, false);
 
@@ -51,6 +52,7 @@ function removeHash() {
         document.body.scrollTop = scrollV;
         document.body.scrollLeft = scrollH;
     }
+    document.getElementById('goBackBtn').classList.add('hide');
 }
 function growTextArea(el) {
     el.parentNode.dataset.replicatedValue = el.value;
@@ -437,6 +439,7 @@ document.addEventListener("click", (item) => {
             });
 
         redirectToAnchor('#conversation');
+        document.getElementById('goBackBtn').classList.remove('hide');
 
         // if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
         //     document.getElementById('main-' + id).classList.toggle('hide')
