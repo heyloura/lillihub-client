@@ -279,8 +279,8 @@ function submitPost(formData) {
         });
 }
 function redirectToAnchor(anchor) {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     document.location.hash = anchor;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 const anyParentHasClass = (el, className) => {
     if(!el || !el.parentNode) 
@@ -404,7 +404,17 @@ document.addEventListener("click", (item) => {
 
         redirectToAnchor('#conversation');
 
-        // const id = item.target.getAttribute('data-id');
+        const id = item.target.getAttribute('data-id');
+
+        console.log(id); //conversation-thread
+
+        fetch("/timeline/conversation/" + id, { method: "get" })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('conversation-thread').innerHTML = data.conversation;
+                //item.target.setAttribute('data-loaded', 'true')
+                ///document.getElementById('main-' + id).classList.toggle('hide')
+            });
 
         // if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
         //     document.getElementById('main-' + id).classList.toggle('hide')
