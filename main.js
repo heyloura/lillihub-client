@@ -196,7 +196,90 @@ Deno.serve(async (req) => {
 
             //const kv = await Deno.openKv();
 
-            const CHECK_ROUTE = new URLPattern({ pathname: "/check/:id" });
+            /********************************
+                TIMELINE BASED ROUTES
+            *********************************/
+            if(new URLPattern({ pathname: "/timeline/reply" }).exec(req.url)) {
+                const value = await req.formData();
+                const id = value.get('id');
+                const replyingTo = value.getAll('replyingTo[]');
+                let content = value.get('content');
+        
+                if(content != null && content != undefined && content != '' && content != 'null' && content != 'undefined') {
+                    const replies = replyingTo.map(function (reply, i) { return '@' + reply }).join(' ');
+                    content = replies + ' ' + content;
+        
+                    const posting = await fetch(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+                    if (!posting.ok) {
+                        console.log(`${user.username} tried to add a reply and ${await posting.text()}`);
+                    }
+        
+                    return new Response('Reply was sent.', {
+                        status: 200,
+                        headers: {
+                            "content-type": "text/html",
+                        },
+                    });
+                }
+        
+                return new Response('Something went wrong sending the reply.', {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });
+            }
+
+            if(((new URLPattern({ pathname: "/timeline/suggestions" })).exec(req.url))) {
+                const users = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
+
+                const random = users[Math.floor(Math.random()*users.length)];
+                let suggestions = await mb.getMicroBlogFollowing(mbToken, random.username, false);
+                suggestions = suggestions.reverse().slice(0, 5);
+
+                console.log(suggestions)
+
+                return new Response(suggestions.map(s => {
+                    return `<div class="tile">
+                    <div class="tile-icon">
+                        <figure class="avatar avatar-lg"><img src="${s.avatar}" alt="Avatar"></figure>
+                    </div>
+                    <div class="tile-content">
+                        <p class="tile-title">${s.name}<br /><span class="tile-subtitle text-gray"><a href="/user/${s.username}">@${s.username}</a></span></p>
+                        
+                    </div>
+                    </div>`}).join(''),HTMLHeaders(nonce));
+            }
+
+            if(((new URLPattern({ pathname: "/timeline/discover/feed" })).exec(req.url))) {
+                const posts = await mb.getMicroBlogDiscoverPosts(mbToken);
+                const html = posts.map(p => !p.image ? `
+                    <div class="tile">
+                        <div class="tile-icon">
+                            ${getAvatar(p, 'sm')}
+                        </div>
+                        <div class="tile-content">
+                            <p class="tile-title text-bold">
+                                ${p.username}
+                            </p>
+                            <p class="tile-subtitle">${p.content}</p>
+                        </div>
+                    </div>
+                ` : '').join('');
+
+                return new Response(html,HTMLHeaders(nonce));
+            }
+
+            if(((new URLPattern({ pathname: "/timeline/discover/photos" })).exec(req.url))) {
+                const posts = await mb.getMicroBlogDiscoverPhotoPosts(mbToken);
+                const html = posts.map((p, index) => index < 9 ? `<li>
+                    <img src="${p.image}" alt="Image 1" class="img-responsive">
+                </li>` : '').join('');
+
+                return new Response(`<ul class="discover-gallery">${html}</ul>`,HTMLHeaders(nonce));
+            }
+
+            const CHECK_ROUTE = new URLPattern({ pathname: "/timeline/check/:id" });
             if(CHECK_ROUTE.exec(req.url)) {
                 const id = CHECK_ROUTE.exec(req.url).pathname.groups.id;
                 const fetching = await fetch(`https://micro.blog/posts/check?since_id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -204,7 +287,7 @@ Deno.serve(async (req) => {
                 return new Response(JSON.stringify(results),JSONHeaders());
             }
 
-            const MARK_TIMELINE_ROUTE = new URLPattern({ pathname: "/mark/timeline/:id" });
+            const MARK_TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/mark/:id" });
             if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
                 const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
                 const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
@@ -216,38 +299,24 @@ Deno.serve(async (req) => {
                 });
             }
 
-            const TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
-            if(TIMELINE_ROUTE.exec(req.url)) {
-                console.log('get posts')
-                const id = TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
-                const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
-                const html = posts.map(post => postHTML(post)).join('');
-
-                return new Response(`${html}<br/><p class="p-centered">
-                    <button class="btn btn-primary loadTimeline" data-id="${posts[posts.length-1].id}">load more</button>
-                    <div id="add-${posts[posts.length-1] ? posts[posts.length-1].id : 'error'}"></div>
-                    <div class="hide firstPost" data-id="${posts[0].id}"></div>
-                    </p>`,HTMLHeaders(nonce));
-            }
-
-            // this is called from JavaScript to get the posts
-            const POSTS_ROUTE = new URLPattern({ pathname: "/posts/:id" });
-            const TAGMOJI_ROUTE = new URLPattern({ pathname: "/posts/discover/:id" });
+            // this is called from client side JavaScript to get posts
+            const POSTS_ROUTE = new URLPattern({ pathname: "/timeline/posts/:id" });
+            const TAGMOJI_ROUTE = new URLPattern({ pathname: "/timeline/posts/discover/:id" });
             if((POSTS_ROUTE.exec(req.url) || TAGMOJI_ROUTE.exec(req.url)) && user) {
                 const id = POSTS_ROUTE.exec(req.url) ? POSTS_ROUTE.exec(req.url).pathname.groups.id : 'discover/' + TAGMOJI_ROUTE.exec(req.url).pathname.groups.id;
                 const posts = await mb.getMicroBlogUserOrTagmojiPosts(mbToken, id);
                 return new Response(posts.map(post => postHTML(post)).join(''),HTMLHeaders());
             }
 
-            const CONVERSATION_ROUTE = new URLPattern({ pathname: "/conversation/:id" });
+            const CONVERSATION_ROUTE = new URLPattern({ pathname: "/timeline/conversation/:id" });
             if(CONVERSATION_ROUTE.exec(req.url)) {
                 const id = CONVERSATION_ROUTE.exec(req.url).pathname.groups.id;
                 const searchParams = new URLSearchParams(req.url.split('?')[1]);
                 const view = searchParams.get('view');
-             
+                
                 const posts = await mb.getMicroBlogConversation(mbToken, id);  
                 const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username)).map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
-                       
+                        
                 const data = {};
                 data.ids = posts.map(i => i.id);
                 const follows = following.map(f => {return JSON.parse(f)});
@@ -287,54 +356,43 @@ Deno.serve(async (req) => {
                 return new Response(await HTML(data.conversation,nonce,'conversation',mbToken),HTMLHeaders(undefined,nonce));
             }
 
-            if(((new URLPattern({ pathname: "/suggestions" })).exec(req.url))) {
-                const users = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
+            const USER_ROUTE = new URLPattern({ pathname: "/timeline/user/:id" });
+            if(USER_ROUTE.exec(req.url) && user) {
+                const id = USER_ROUTE.exec(req.url).pathname.groups.id;
+            
+                const results = await mb.getMicroBlogUserOrTagmojiPosts(mbToken, id);
+                const follows = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
+                const stranger = follows.filter(f => f.username == results.username).length == 0;
 
-                const random = users[Math.floor(Math.random()*users.length)];
-                let suggestions = await mb.getMicroBlogFollowing(mbToken, random.username, false);
-                suggestions = suggestions.reverse().slice(0, 5);
+                const layout = new TextDecoder().decode(await Deno.readFile("user.html"));
 
-                console.log(suggestions)
-
-                return new Response(suggestions.map(s => {
-                    return `<div class="tile">
-                    <div class="tile-icon">
-                        <figure class="avatar avatar-lg"><img src="${s.avatar}" alt="Avatar"></figure>
-                    </div>
-                    <div class="tile-content">
-                        <p class="tile-title">${s.name}<br /><span class="tile-subtitle text-gray"><a href="/user/${s.username}">@${s.username}</a></span></p>
-                        
-                    </div>
-                    </div>`}).join(''),HTMLHeaders(nonce));
+                return new Response(layout.replaceAll('{{results._microblog.username}}', results.username)
+                    .replaceAll('{{results.author.name}}',results.name)
+                    .replaceAll('{{results.author.url}}',results.url)
+                    .replaceAll('{{results._microblog.bio}}', results.bio)
+                    .replaceAll('{{posts}}', results.map(post => postHTML(post)).join(''))
+                    .replaceAll('{{showIfFollowing}}', !stranger ? '' : 'hide')
+                    .replaceAll('{{showIfStranger}}', stranger ? '' : 'hide')
+                    ,HTMLHeaders(undefined,nonce));
             }
 
-            if(((new URLPattern({ pathname: "/discover/feed" })).exec(req.url))) {
-                const posts = await mb.getMicroBlogDiscoverPosts(mbToken);
-                const html = posts.map(p => !p.image ? `
-                    <div class="tile">
-                        <div class="tile-icon">
-                            ${getAvatar(p, 'sm')}
-                        </div>
-                        <div class="tile-content">
-                            <p class="tile-title text-bold">
-                                ${p.username}
-                            </p>
-                            <p class="tile-subtitle">${p.content}</p>
-                        </div>
-                    </div>
-                ` : '').join('');
+            const TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
+            if(TIMELINE_ROUTE.exec(req.url)) {
+                console.log('get posts')
+                const id = TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
+                const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
+                const html = posts.map(post => postHTML(post)).join('');
 
-                return new Response(html,HTMLHeaders(nonce));
+                return new Response(`${html}<br/><p class="p-centered">
+                    <button class="btn btn-primary loadTimeline" data-id="${posts[posts.length-1].id}">load more</button>
+                    <div id="add-${posts[posts.length-1] ? posts[posts.length-1].id : 'error'}"></div>
+                    <div class="hide firstPost" data-id="${posts[0].id}"></div>
+                    </p>`,HTMLHeaders(nonce));
             }
 
-            if(((new URLPattern({ pathname: "/discover/photos" })).exec(req.url))) {
-                const posts = await mb.getMicroBlogDiscoverPhotoPosts(mbToken);
-                const html = posts.map((p, index) => index < 9 ? `<li>
-                    <img src="${p.image}" alt="Image 1" class="img-responsive">
-                </li>` : '').join('');
 
-                return new Response(`<ul class="discover-gallery">${html}</ul>`,HTMLHeaders(nonce));
-            }
+
+
 
             if(((new URLPattern({ pathname: "/settings" })).exec(req.url))) {
                 const layout = new TextDecoder().decode(await Deno.readFile("settings.html"));
@@ -345,36 +403,7 @@ Deno.serve(async (req) => {
 
 
             // Here we have the reply and posting functionality
-            if(new URLPattern({ pathname: "/reply" }).exec(req.url)) {
-                const value = await req.formData();
-                const id = value.get('id');
-                const replyingTo = value.getAll('replyingTo[]');
-                let content = value.get('content');
-        
-                if(content != null && content != undefined && content != '' && content != 'null' && content != 'undefined') {
-                    const replies = replyingTo.map(function (reply, i) { return '@' + reply }).join(' ');
-                    content = replies + ' ' + content;
-        
-                    const posting = await fetch(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
-                    if (!posting.ok) {
-                        console.log(`${user.username} tried to add a reply and ${await posting.text()}`);
-                    }
-        
-                    return new Response('Reply was sent.', {
-                        status: 200,
-                        headers: {
-                            "content-type": "text/html",
-                        },
-                    });
-                }
-        
-                return new Response('Something went wrong sending the reply.', {
-                    status: 200,
-                    headers: {
-                        "content-type": "text/html",
-                    },
-                });
-            }
+
 
             if((new URLPattern({ pathname: "/post/add" })).exec(req.url) && user) {
                 const value = await req.formData();
@@ -444,39 +473,21 @@ Deno.serve(async (req) => {
 
 
 
-            // -----------------------------------------------------
-            // User page
-            // -----------------------------------------------------
-            const USER_ROUTE = new URLPattern({ pathname: "/user/:id" });
-            if(USER_ROUTE.exec(req.url) && user) {
-                const id = USER_ROUTE.exec(req.url).pathname.groups.id;
-            
-                const results = await mb.getMicroBlogUserOrTagmojiPosts(mbToken, id);
-                const follows = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
-                const stranger = follows.filter(f => f.username == results.username).length == 0;
-
-                const layout = new TextDecoder().decode(await Deno.readFile("user.html"));
-
-                return new Response(layout.replaceAll('{{results._microblog.username}}', results.username)
-                    .replaceAll('{{results.author.name}}',results.name)
-                    .replaceAll('{{results.author.url}}',results.url)
-                    .replaceAll('{{results._microblog.bio}}', results.bio)
-                    .replaceAll('{{posts}}', results.map(post => postHTML(post)).join(''))
-                    .replaceAll('{{showIfFollowing}}', !stranger ? '' : 'hide')
-                    .replaceAll('{{showIfStranger}}', stranger ? '' : 'hide')
-                    ,HTMLHeaders(undefined,nonce));
+            if((new URLPattern({ pathname: "/timeline" })).exec(req.url) && user) {
+                const layout = new TextDecoder().decode(await Deno.readFile("timeline.html"));
+                const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username)).map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
+                return new Response(layout.replaceAll('{{nonce}}', nonce)
+                      .replace('{{username}}', mbUser.username)
+                      .replace('{{replyBox}}', getReplyBox('main',following, true)),
+                  HTMLHeaders(nonce));
             }
 
 
             // -----------------------------------------------------
             // Home page
             // -----------------------------------------------------
-            const layout = new TextDecoder().decode(await Deno.readFile("timeline.html"));
-            const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username)).map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
-            return new Response(layout.replaceAll('{{nonce}}', nonce)
-                  .replace('{{username}}', mbUser.username)
-                  .replace('{{replyBox}}', getReplyBox('main',following, true)),
-              HTMLHeaders(nonce));
+            return Response.redirect('/timeline');
+
         } else {
             return returnBadGateway('Micro.blog did not return a user from the provided token.')
         }
@@ -683,9 +694,9 @@ function postHTML(post, marker, stranger) {
                     <div class="dropdown dropdown-right"><a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-vert"></i></a>
                         <ul class="menu">
                             <li class="divider" data-content="Published: ${post.relative}">
-                            <li class="menu-item"><a href="/post?quote=${post.id}">Quote Post</a></li>
+                            <li class="menu-item"><a href="/post?quote=${post.id}" class="btn-link btn">Quote Post</a></li>
                             <li class="menu-item"><button data-url="${post.url}" class="addBookmark btn-link btn">Bookmark Post</button></li>
-                            <li class="menu-item"><a href="/conversation/${post.id}?view=true">View Post</a></li>
+                            <li class="menu-item"><a href="/conversation/${post.id}?view=true" class="btn-link btn">View Post</a></li>
                         </ul>
                     </div>
                 </div>

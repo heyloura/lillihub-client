@@ -71,7 +71,7 @@ function loadConversations() {
             child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
             child.setAttribute('data-processed', 'true');
 
-            var promise = fetch("/conversation/" + id, { method: "get" })
+            var promise = fetch("/timeline/conversation/" + id, { method: "get" })
                 .then(response => response.json())
                 .then(data => {
                     var doc = new DOMParser().parseFromString(data.conversation, "text/html");
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
                 const id = article.getAttribute('id');
                 let checks = 0;
                 const timerID = setInterval(function() {
-                    fetch("/check/" + id, { method: "get" })
+                    fetch("/timeline/check/" + id, { method: "get" })
                         .then(response => response.json())
                         .then(data => {
                             if(data.count > 0) {
@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
                         clearInterval(timerID);
                     }
                 }, 60 * 1000); 
-                fetch("/mark/timeline/" + id, { method: "get" })
+                fetch("/timeline/mark/" + id, { method: "get" })
                     .then(response => response.text())
                     .then(_data => {});
 
@@ -183,21 +183,21 @@ document.addEventListener("DOMContentLoaded", async (event) => {
             });
 
         //fetch the discover photos
-        fetch("/discover/photos", { method: "get" })
+        fetch("/timeline/discover/photos", { method: "get" })
             .then(response => response.text())
             .then(data => {
                 document.getElementById('discover-photos').innerHTML = data;
             });
 
         //fetch the discover feed
-        fetch("/discover/feed", { method: "get" })
+        fetch("/timeline/discover/feed", { method: "get" })
             .then(response => response.text())
             .then(data => {
                 document.getElementById('discover-feed').innerHTML = data;
             });
 
         //suggestions
-        fetch("/suggestions", { method: "get" })
+        fetch("/timeline/suggestions", { method: "get" })
             .then(response => response.text())
             .then(data => {
                 document.getElementById('suggestions').innerHTML = data;
@@ -337,7 +337,7 @@ document.addEventListener("input", (event) => {
     }
 });
 function submitReply(formData, id) {
-    fetch("/reply", { body: formData, method: "post" })
+    fetch("/timeline/reply", { body: formData, method: "post" })
         .then(response => response.text())
         .then(data => {
             if(id && document.getElementById('toast-' + id)) {
@@ -462,7 +462,7 @@ document.addEventListener("click", (item) => {
         if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
             document.getElementById('main-' + id).classList.toggle('hide')
         } else {
-            fetch("/conversation/" + id, { method: "get" })
+            fetch("/timeline/conversation/" + id, { method: "get" })
             .then(response => response.json())
             .then(data => {
                 document.getElementById('content-' + id).innerHTML = data.conversation;
@@ -516,7 +516,7 @@ document.addEventListener("click", (item) => {
                 const id = article.getAttribute('id');
                 let checks = 0;
                 const timerID = setInterval(function() {
-                    fetch("/check/" + id, { method: "get" })
+                    fetch("/timeline/check/" + id, { method: "get" })
                         .then(response => response.json())
                         .then(data => {
                             if(data.count > 0) {
@@ -531,7 +531,7 @@ document.addEventListener("click", (item) => {
                         clearInterval(timerID);
                     }
                 }, 60 * 1000); 
-                fetch("/mark/timeline/" + id, { method: "get" })
+                fetch("/timeline/mark/" + id, { method: "get" })
                     .then(response => response.text())
                     .then(_data => {});
 
