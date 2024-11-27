@@ -279,26 +279,24 @@ function submitPost(formData) {
         });
 }
 function redirectToAnchor(anchor) {
-    // We remove previous anchors from the current URL    
-    var redirectToURL = document.URL.replace(/#.*$/, "");
-
-    redirectToURL = redirectToURL + anchor
-    window.location.href = redirectToURL;
-    window.location.reload(true)
+    document.location.hash = anchor;
 }
-const findAscendingTag = (el, className) => {
-    while (el.parentNode) {
-      el = el.parentNode;
-      return el.classList.contains(className) ? el : null;
-  }
+const anyParentHasClass = (el, className) => {
+    if(!el || !el.parentNode) 
+    {
+        return false;
+    }
+    if(el.parentNode.classList.contains(className)) 
+    {
+        return true;
+    }
+    return anyParentHasClass(el.parentNode, className);
 }
 document.addEventListener("submit", (item) => {
     item.preventDefault();
 });
 document.addEventListener("click", (item) => {
-    console.log(item.target);
-
-    var parentHasClassOpenConversation = findAscendingTag(item.target, 'openConversationBtn')
+    var parentHasClassOpenConversation = anyParentHasClass(item.target, 'openConversationBtn')
 
 
 
