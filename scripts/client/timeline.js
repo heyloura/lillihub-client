@@ -420,20 +420,16 @@ document.addEventListener("click", (item) => {
         form.reset();
     }
     if(parentHasClassOpenConversationId != 0 || item.target.classList.contains('openConversationBtn')) {
-
-        redirectToAnchor('#conversation');
-
         const id = parentHasClassOpenConversationId != 0 ?  parentHasClassOpenConversationId : item.target.getAttribute('data-id');
-
-        console.log(id); //conversation-thread
-
         fetch("/timeline/conversation/" + id, { method: "get" })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('conversation-thread').innerHTML = data.conversation;
+                document.getElementById('conversation-thread').innerHTML = `<div class="card">${data.conversation}</div>`;
                 //item.target.setAttribute('data-loaded', 'true')
                 ///document.getElementById('main-' + id).classList.toggle('hide')
             });
+
+        redirectToAnchor('#conversation');
 
         // if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
         //     document.getElementById('main-' + id).classList.toggle('hide')
