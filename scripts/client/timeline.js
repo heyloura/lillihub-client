@@ -29,15 +29,17 @@ let touchstartX = 0
 let touchendX = 0
     
 function checkDirection() {
-  if (touchendX < touchstartX) alert('swiped left!')
-  if (touchendX > touchstartX) alert('swiped right!')
+  if (touchendX < touchstartX - 100) {
+    alert('swiped left!')
+  }
+  if (touchendX > touchstartX) return;
 }
 
-document.addEventListener('touchstart', e => {
+document.getElementById('conversation').addEventListener('touchstart', e => {
   touchstartX = e.changedTouches[0].screenX
 })
 
-document.addEventListener('touchend', e => {
+document.getElementById('conversation').addEventListener('touchend', e => {
   touchendX = e.changedTouches[0].screenX
   checkDirection()
 })
