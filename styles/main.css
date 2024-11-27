@@ -6606,3 +6606,34 @@ article footer {
 .parent:first {
   margin-top: 0;
 }
+
+/* 
+*   Hide and show via css based on location.hash
+*   Not sure where the original
+*   concept came from, I used it in a project back in
+*   2016 from another project even earlier than that ...
+*/
+.container > * {
+    display: none;
+}
+.container > *:last-child {
+    display: block;
+}
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.0125);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+.container > *:target {
+    display: block;
+    animation: pulse 0.5s linear 1;
+}
+.container > *:target ~ * {
+    display: none;
+}
