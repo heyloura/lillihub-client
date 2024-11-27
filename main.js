@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
         });
     }
 
-    const CHECK_SCRIPT_ROUTE = new URLPattern({ pathname: "/script/:id" });
+    const CHECK_SCRIPT_ROUTE = new URLPattern({ pathname: "/scripts/:id" });
     if(CHECK_SCRIPT_ROUTE.exec(req.url))
     {
         const id = CHECK_SCRIPT_ROUTE.exec(req.url).pathname.groups.id;
@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
         if(mbUser) {
 
             if(_development) {
-                console.log(mbUser);
+                //console.log(mbUser);
             }
 
             user = {};
