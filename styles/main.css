@@ -1661,11 +1661,11 @@ legend {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background: #fff;
+  background: var(--background-tint-1);
   background-image: none;
-  border: .05rem solid #bcc3ce;
+  /* border: .05rem solid #bcc3ce; */
   border-radius: .1rem;
-  color: #3b4351;
+  color: var(--text-color);
   display: block;
   font-size: .8rem;
   height: 1.8rem;

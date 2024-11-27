@@ -286,11 +286,19 @@ function redirectToAnchor(anchor) {
     window.location.href = redirectToURL;
     window.location.reload(true)
 }
+const findAscendingTag = (el, className) => {
+    while (el.parentNode) {
+      el = el.parentNode;
+      return el.classList.contains(className) ? el : null;
+  }
+}
 document.addEventListener("submit", (item) => {
     item.preventDefault();
 });
 document.addEventListener("click", (item) => {
     console.log(item.target);
+
+    var parentHasClassOpenConversation = findAscendingTag(item.target, 'openConversationBtn')
 
 
 
@@ -393,7 +401,7 @@ document.addEventListener("click", (item) => {
         submitReply(new FormData(form), id);
         form.reset();
     }
-    if(item.target.classList.contains('openConversationBtn')) {
+    if(parentHasClassOpenConversation || item.target.classList.contains('openConversationBtn')) {
 
         redirectToAnchor('#conversation');
 
