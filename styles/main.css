@@ -1,10 +1,29 @@
-:root {
-  color-scheme: light; /* both supported */
+/* :root {
+  color-scheme: light; 
   --background: #e0e0c5;
   --background-tint-1: #F2F2E7;
   --background-tint-2: #F5F5ED;
   --background-tint-3: #F8F8F3;
   --background-tint-4: #FBFBF9;
+  --background-shade-1: #C9C9B1;
+  --background-shade-2: #B3B39D;
+  --background-shade-3: #9C9C89;
+  --background-shade-4: #868676;
+  --primary: #4974a5;
+  --primary-tint: #5B81AE;
+  --primary-shade: #416894;
+  --secondary: #7a49a5;
+  --secondary-tint: #875BAE;
+  --secondary-shade: #6D4194;
+} */
+
+:root {
+  color-scheme: dark; /* both supported */
+  --background: #e0e0c5;
+  --background-tint-1: #121212;
+  --background-tint-2: #575757;
+  --background-tint-3: #3f3f3f;
+  --background-tint-4: #282828;
   --background-shade-1: #C9C9B1;
   --background-shade-2: #B3B39D;
   --background-shade-3: #9C9C89;
