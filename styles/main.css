@@ -3437,7 +3437,7 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .panel {
-  border: .05rem solid #dadee4;
+  /* border: .05rem solid #dadee4; */
   border-radius: .1rem;
   display: -ms-flexbox;
   display: flex;
