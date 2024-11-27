@@ -22,6 +22,14 @@
 //         element.classList.add('badge');
 //     }
 // }
+
+
+
+console.log('loaded!')
+
+
+
+
 function growTextArea(el) {
     el.parentNode.dataset.replicatedValue = el.value;
 }
