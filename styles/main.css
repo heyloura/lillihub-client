@@ -5042,7 +5042,7 @@ a.text-error:visited {
 }
 
 .off-canvas .off-canvas-sidebar {
-  background: #f7f8f9;
+  background: var(--background-tint-1);
   bottom: 0;
   left: 0;
   min-width: 10rem;
@@ -6598,10 +6598,10 @@ article footer {
   transition: background 0.8s;
 }
 .ripple:hover {
-  background: var(--background-tint-3) radial-gradient(circle, transparent 1%, var(--background-tint-3) 1%) center/15000%;
+  background: var(--background-tint-4) radial-gradient(circle, transparent 1%, var(--background-tint-4) 1%) center/15000%;
 }
 .ripple:active {
-  background-color: var(--background-tint-2);
+  background-color: var(--background-tint-3);
   background-size: 100%;
   transition: background 0s;
 }
