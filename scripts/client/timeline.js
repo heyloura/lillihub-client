@@ -25,14 +25,22 @@
 
 
 // set up gesture navigation
-// var zt = new ZingTouch.Region(document.body);
-// var conversation = document.getElementById('conversation');
+let touchstartX = 0
+let touchendX = 0
+    
+function checkDirection() {
+  if (touchendX < touchstartX) alert('swiped left!')
+  if (touchendX > touchstartX) alert('swiped right!')
+}
 
-// zt.bind(conversation, 'swipe', function(e){
-//     alert('swipe detected.....');
-//     history.back();
-// 	//removeHash();
-// }, false);
+document.addEventListener('touchstart', e => {
+  touchstartX = e.changedTouches[0].screenX
+})
+
+document.addEventListener('touchend', e => {
+  touchendX = e.changedTouches[0].screenX
+  checkDirection()
+})
 
 
 if(window.location.hash) {
