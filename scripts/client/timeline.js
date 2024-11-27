@@ -29,8 +29,9 @@ var zt = new ZingTouch.Region(document.body);
 var conversation = document.getElementById('conversation');
 
 zt.bind(conversation, 'swipe', function(e){
-    console.log('swipe detected.....')
-	removeHash();
+    alert('swipe detected.....');
+    history.back();
+	//removeHash();
 }, false);
 
 
@@ -440,6 +441,7 @@ document.addEventListener("click", (item) => {
             });
 
         redirectToAnchor('#conversation');
+        
         document.getElementById('goBackBtn').classList.toggle('hide');
 
         // if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
