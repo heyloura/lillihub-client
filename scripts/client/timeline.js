@@ -26,6 +26,7 @@
 
 
 console.log('loaded!')
+console.log(window.location.hash);
 
 
 
@@ -283,7 +284,7 @@ function redirectToAnchor(anchor) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 const findParentHasClassReturnId = (el, className) => {
-    if(!el || !el.parentNode) 
+    if(!el || !el.parentNode || !el.parentNode.classList) 
     {
         return 0;
     }
