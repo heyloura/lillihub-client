@@ -279,6 +279,7 @@ function submitPost(formData) {
         });
 }
 function redirectToAnchor(anchor) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     document.location.hash = anchor;
 }
 const anyParentHasClass = (el, className) => {
