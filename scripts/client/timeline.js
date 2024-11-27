@@ -134,164 +134,80 @@ function loadConversations() {
 }
 document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
-    if(window.location.pathname == '/') {
-        //set up the UI
-        if(localStorage.getItem('post_setting'))
-        {
-            if(localStorage.getItem('post_setting') === 'none') {
-                document.getElementById('mainPost').classList.add('hide');
+    if(localStorage.getItem('post_setting'))
+    {
+        if(localStorage.getItem('post_setting') === 'none') {
+            document.getElementById('mainPost').classList.add('hide');
+        } else {
+            if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
+            {
+                document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
+                document.getElementById('postingType').value = localStorage.getItem('post_setting');
+                document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
+                document.getElementById('omgApi').value = localStorage.getItem('omg_api');
+            } else if(localStorage.getItem('post_setting') === 'micropub') {
+                document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
+                document.getElementById('postingType').value = 'micropub';
+                document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
+                document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
             } else {
-                if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
-                {
-                    document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
-                    document.getElementById('postingType').value = localStorage.getItem('post_setting');
-                    document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
-                    document.getElementById('omgApi').value = localStorage.getItem('omg_api');
-                } else if(localStorage.getItem('post_setting') === 'micropub') {
-                    document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
-                    document.getElementById('postingType').value = 'micropub';
-                    document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
-                    document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
-                } else {
-                    document.getElementById('postingType').value = 'mb';
-                }
+                document.getElementById('postingType').value = 'mb';
             }
         }
+    }
 
-        //grab the timeline posts
-        fetch("/timeline/0", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('add-0').innerHTML = data;
-                const article = document.querySelector('article:first-child');
-                const id = article.getAttribute('id');
-                let checks = 0;
-                const timerID = setInterval(function() {
-                    fetch("/timeline/check/" + id, { method: "get" })
-                        .then(response => response.json())
-                        .then(data => {
-                            if(data.count > 0) {
-                                document.getElementById('morePostsToast').classList.remove('hide');
-                                document.getElementById('showPostCount').innerHTML = data.count;
-                                console.log(data);
-                                document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
-                            }     
-                        });
-                    checks++;
-                    if(checks > 10) {
-                        clearInterval(timerID);
-                    }
-                }, 60 * 1000); 
-                fetch("/timeline/mark/" + id, { method: "get" })
-                    .then(response => response.text())
-                    .then(_data => {});
+    //grab the timeline posts
+    fetch("/timeline/0", { method: "get" })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('add-0').innerHTML = data;
+            const article = document.querySelector('article:first-child');
+            const id = article.getAttribute('id');
+            let checks = 0;
+            const timerID = setInterval(function() {
+                fetch("/timeline/check/" + id, { method: "get" })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.count > 0) {
+                            document.getElementById('morePostsToast').classList.remove('hide');
+                            document.getElementById('showPostCount').innerHTML = data.count;
+                            console.log(data);
+                            document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
+                        }     
+                    });
+                checks++;
+                if(checks > 10) {
+                    clearInterval(timerID);
+                }
+            }, 60 * 1000); 
+            fetch("/timeline/mark/" + id, { method: "get" })
+                .then(response => response.text())
+                .then(_data => {});
 
-                buildCarousels();
-                //loadConversations();
-            });
+            buildCarousels();
+            //loadConversations();
+        });
 
-        //fetch the discover photos
-        fetch("/timeline/discover/photos", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('discover-photos').innerHTML = data;
-            });
+    //fetch the discover photos
+    fetch("/timeline/discover/photos", { method: "get" })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('discover-photos').innerHTML = data;
+        });
 
-        //fetch the discover feed
-        fetch("/timeline/discover/feed", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('discover-feed').innerHTML = data;
-            });
+    //fetch the discover feed
+    fetch("/timeline/discover/feed", { method: "get" })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('discover-feed').innerHTML = data;
+        });
 
-        //suggestions
-        fetch("/timeline/suggestions", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('suggestions').innerHTML = data;
-            });
-    } 
-    
-    // else if(window.location.pathname.includes('/user/')) {
-    //     fetch("/posts/" + window.location.pathname.replace('/user/',''), { method: "get" })
-    //         .then(response => response.text())
-    //         .then(data => {
-    //             document.getElementById('add-0').innerHTML = data;
-    //             buildCarousels();
-    //             loadConversations(); 
-    //         });
-    // } else if(window.location.pathname.includes('/discover')) {
-    //     console.log("/posts" + window.location.pathname);
-    //     fetch("/posts" + window.location.pathname, { method: "get" })
-    //         .then(response => response.text())
-    //         .then(data => {
-    //             document.getElementById('add-0').innerHTML = data;
-    //             buildCarousels();
-    //         });
-    // } else if(window.location.pathname == '/mentions') {
-    //     fetch("/posts/mentions", { method: "get" })
-    //         .then(response => response.text())
-    //         .then(data => {
-    //             document.getElementById('add-0').innerHTML = data;
-    //             buildCarousels();
-    //             loadConversations();
-    //         });
-    // }  else if(window.location.pathname.includes('/users/search')) {
-    //     buildCarousels();
-    //     loadConversations();
-    // } else if(window.location.pathname == '/post') {
-    //     document.getElementById('post').style.display = 'none';
-    //     countChecked('category[]', 'categoriesDropdown');
-    //     countChecked('syndicate[]', 'syndicatesDropdown');
-    // } else if(window.location.pathname == '/blog') {
-    //     const converter = new showdown.Converter();
-    //     var articles = document.querySelectorAll('article');
-    //     for(let i = 0; i < articles.length; i++) {
-    //         let article = articles[i];
-    //         let id = article.getAttribute('data-id');
-    //         let content = document.querySelector('#content-' + id);
-    //         content.innerHTML = converter.makeHtml(content.innerHTML);
-    //         content.classList.remove('hide');
-    //     }
-    // } else if(window.location.pathname.includes('/notebooks/')) {
-    //     document.getElementById('post').classList.add("hide");
-    //     document.getElementById('newnotebook').classList.remove("hide");
-    //     document.getElementById('newnotebook').setAttribute('href', window.location.pathname + '/add');
-    //     const converter = new showdown.Converter({metadata: true, openLinksInNewWindow: true, strikethrough:true, tables:true, tasklists:true, emoji:true });
-    //     ${EncryptJS()}
-    //     const notes = document.querySelectorAll('.decryptMe');
-    //     let tags = new Set();
-    //     for (var i = 0; i < notes.length; i++) {
-    //         var markdown = await decryptWithKey(notes[i].innerHTML);
-    //         notes[i].innerHTML = converter.makeHtml(markdown);
-    //         var metadata = converter.getMetadata();
-    //         let id = notes[i].getAttribute('data-id');
-    //         if(metadata) {
-    //             if(metadata.title) {
-    //                 document.getElementById('title-' + id).innerHTML = metadata.title;
-    //             }
-    //             if(metadata.tags) {
-    //                 document.getElementById('tags-' + id).innerHTML = metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ');
-    //                 metadata.tags.substring(1,metadata.tags.length - 1).split(',').forEach(t => tags.add(t));
-    //                 }
-    //             document.getElementById('metadata-' + id).innerHTML = JSON.stringify(metadata,null,2);
-    //         }
-    //     }
-    //     hljs.highlightAll();
-    //     const tables = document.querySelectorAll('table');
-    //     for (var i = 0; i < tables.length; i++) {
-    //         tables[i].classList.add('table');
-    //         tables[i].classList.add('table-striped');
-    //     }
-    //     if(Array.from(tags).length > 0) {
-    //         document.getElementById('noteTags').innerHTML = Array.from(tags).map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span> ').join('')
-    //     }
-    // } else if(window.location.pathname.includes('/bookmarks') || window.location.pathname.includes('/highlights')) {
-    //     document.getElementById('post').classList.add("hide");
-    //     document.getElementById('newbookmark').classList.remove("hide");
-    // } else if(window.location.pathname.includes('/reader')) {
-    //     document.getElementById('post').classList.add("hide");
-    // }
+    //suggestions
+    fetch("/timeline/suggestions", { method: "get" })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('suggestions').innerHTML = data;
+        });
 });
 // document.addEventListener("change", (event) => {
 //     if(event.target.classList.contains('countCheckedCategory')) {
