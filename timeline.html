@@ -15,7 +15,8 @@
         <noscript><style nonce="{{nonce}}">.hide-if-user-has-no-javascript{ display: none }</style></noscript>
         <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
         <script>document.write('<style nonce="{{nonce}}">.hide-if-user-has-javascript{display:none}</style>');</script>
-        <link rel="stylesheet" href="main.css">  
+        <link rel="stylesheet" href="styles/onsen-ui.min.css"> 
+        <link rel="stylesheet" href="styles/main.css">  
     </head>
     <body>
         <header class="navbar">
@@ -66,7 +67,6 @@
                                         <li class="menu-item bookmarksLink"><a href="/Bookmarks">Bookmarks</a></li>
                                         <li class="menu-item bookshelvesLink"><a href="/Bookshelves">Bookshelves</a></li>
                                         <li class="menu-item notesLink"><a href="/notes">Notes</a></li>
-                                        <li class="menu-item"><a href="/">Timeline</a></li>
                                     </ul>
                                     <ul class="menu mt-2 mb-2">
                                         <li class="divider" data-content="Lillihub"></li>
@@ -87,6 +87,12 @@
               </div>
               <div class="column col-xs-12 col-sm-12 col-md-9 col-lg-8 col-xl-6 col-6">
                 <main>
+                    <ons-navigator id="navigator" page="test.html"></ons-navigator>
+                    <template id="test.html">
+                        <ons-page id="test">
+                          <h1>hello!</h1>
+                        </ons-page>
+                    </template>
                     <form id="mainPost" class="card">
                         <div class="card-body">
                             <div id="mainReplyBox" class="hide">{{replyBox}}</div>
@@ -172,7 +178,7 @@
               </div>
             </div>
           </div>
-          <script src="/timeline.js" type="text/javascript"></script>
-          <script nonce="{{nonce}}" src="https://cdnjs.cloudflare.com/ajax/libs/zingtouch/1.0.6/zingtouch.min.js" integrity="sha512-HmaXasRYOQJEXJWYwYCMcIA/XnPtW9WPvaBVWE2mQP6K31sRdcgaYUyB//P5540J4hFqMBcj6vkDEEGkwHkYdA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+          <script src="scripts/onsen-ui-min.js" type="text/javascript"></script>
+          <script src="scripts/timeline.js" type="text/javascript"></script>
     </body>
 </html>

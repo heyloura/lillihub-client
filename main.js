@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     // - the icon
     // - the webmanifest
     // - the service worker
-    // - JS libraries and CSS resources
+    // - JS libraries, CSS and font resources
     //********************************************************
     if((new URLPattern({ pathname: "/lillihub-512.png" })).exec(req.url)){
         return new Response(new Uint8Array(await Deno.readFile("static/lillihub-512.png")), {
@@ -97,9 +97,11 @@ Deno.serve(async (req) => {
         });
     }
 
-    if((new URLPattern({ pathname: "/sw.js" })).exec(req.url))
+    const CHECK_SCRIPT_ROUTE = new URLPattern({ pathname: "/script/:id" });
+    if(CHECK_SCRIPT_ROUTE.exec(req.url))
     {
-        return new Response(await Deno.readFile("scripts/server/sw.js"), {
+        const id = CHECK_SCRIPT_ROUTE.exec(req.url).pathname.groups.id;
+        return new Response(await Deno.readFile("scripts/client/" + id), {
             status: 200,
             headers: {
                 "content-type": "text/javascript",
@@ -107,35 +109,64 @@ Deno.serve(async (req) => {
         });
     }
 
-    if((new URLPattern({ pathname: "/timeline.js" })).exec(req.url))
+    const CHECK_CSS_ROUTE = new URLPattern({ pathname: "/styles/:id" });
+    if(CHECK_CSS_ROUTE.exec(req.url))
     {
-        return new Response(await Deno.readFile("scripts/client/timeline.js"), {
-            status: 200,
-            headers: {
-                "content-type": "text/javascript",
-            },
-        });
-    }
-
-    if((new URLPattern({ pathname: "/settings.js" })).exec(req.url))
-        {
-            return new Response(await Deno.readFile("scripts/client/settings.js"), {
-                status: 200,
-                headers: {
-                    "content-type": "text/javascript",
-                },
-            });
-        }
-
-    if((new URLPattern({ pathname: "/main.css" })).exec(req.url))
-    {
-        return new Response(await Deno.readFile("styles/main.css"), {
+        const id = CHECK_CSS_ROUTE.exec(req.url).pathname.groups.id;
+        return new Response(await Deno.readFile("styles/" + id), {
             status: 200,
             headers: {
                 "content-type": "text/css",
             },
         });
     }
+
+    const CHECK_FONT_ROUTE = new URLPattern({ pathname: "/font/:id" });
+    if(CHECK_FONT_ROUTE.exec(req.url))
+    {
+        const id = CHECK_FONT_ROUTE.exec(req.url).pathname.groups.id;
+
+        if(id.includes('.eot')) {
+            return new Response(await Deno.readFile("static/font/" + id), {
+                status: 200,
+                headers: {
+                    "content-type": "application/vnd.ms-fontobject",
+                },
+            });
+        }
+        if(id.includes('.svg')) {
+            return new Response(await Deno.readFile("static/font/" + id), {
+                status: 200,
+                headers: {
+                    "content-type": "image/svg+xml",
+                },
+            });
+        }
+        if(id.includes('.ttf')) {
+            return new Response(await Deno.readFile("static/font/" + id), {
+                status: 200,
+                headers: {
+                    "content-type": "font/ttf",
+                },
+            });
+        }
+        if(id.includes('.woff2')) {
+            return new Response(await Deno.readFile("static/font/" + id), {
+                status: 200,
+                headers: {
+                    "content-type": "font/woff2",
+                },
+            });
+        }
+        if(id.includes('.woff')) {
+            return new Response(await Deno.readFile("static/font/" + id), {
+                status: 200,
+                headers: {
+                    "content-type": "font/woff",
+                },
+            });
+        }
+    } // end font route 
 
     //********************************************************
     // Now let's see if we have a user or if someone needs to 
@@ -247,8 +278,7 @@ Deno.serve(async (req) => {
                         <div id="toast-content-${id}">Waiting for server....</div>
                     </div>
                 </div>
-            </div>
-                    `;
+            </div>`;
 
                 if(!view) {
                     return new Response(JSON.stringify(data), JSONHeaders());
