@@ -3936,7 +3936,7 @@ a.text-error:visited {
 }
 
 .bg-secondary {
-  background: #e1e2c4!important
+  background: var(--background-shade-1)!important
 }
 
 .bg-light {
