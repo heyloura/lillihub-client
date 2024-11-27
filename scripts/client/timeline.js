@@ -31,6 +31,7 @@ let touchendX = 0
 function checkDirection() {
   if (touchendX < touchstartX - 50) {
     history.back();
+    document.getElementById('goBackBtn').classList.toggle('hide');
   }
   if (touchendX > touchstartX) return;
 }
