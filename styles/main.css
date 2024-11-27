@@ -6588,11 +6588,9 @@ article footer {
   z-index: 201;
   margin-top: -0.5em;
 }
-
 .page {
   padding-top: 3em;
 }
-
 .ripple {
   background-position: center;
   transition: background 0.8s;
@@ -6604,4 +6602,7 @@ article footer {
   background-color: var(--primary-shade);
   background-size: 100%;
   transition: background 0s;
+}
+.parent:first {
+  margin-top: 0;
 }
