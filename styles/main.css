@@ -6598,10 +6598,10 @@ article footer {
   transition: background 0.8s;
 }
 .ripple:hover {
-  background: var(--primary-tint) radial-gradient(circle, transparent 1%, var(--primary-tint) 1%) center/15000%;
+  background: var(--background-tint-3) radial-gradient(circle, transparent 1%, var(--background-tint-3) 1%) center/15000%;
 }
 .ripple:active {
-  background-color: var(--primary-shade);
+  background-color: var(--background-tint-2);
   background-size: 100%;
   transition: background 0s;
 }
