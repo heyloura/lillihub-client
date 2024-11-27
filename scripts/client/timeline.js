@@ -28,8 +28,6 @@
 if(window.location.hash) {
     removeHash();
 }
-
-
 function removeHash() { 
     var scrollV, scrollH, loc = window.location;
     if ("pushState" in history)
@@ -294,9 +292,14 @@ function submitPost(formData) {
             document.getElementById('postToast').classList.remove("hide");
         });
 }
-function redirectToAnchor(anchor) {
-    document.location.hash = anchor;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+function redirectToAnchor(anchor, scrollToTop = true) {
+    var delayInMilliseconds = 250; //1 second
+    setTimeout(function() {
+        document.location.hash = anchor;
+        if(scrollToTop) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, delayInMilliseconds);
 }
 const findParentHasClassReturnId = (el, className) => {
     if(!el || !el.parentNode || !el.parentNode.classList) 
