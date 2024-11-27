@@ -52,7 +52,7 @@ function removeHash() {
         document.body.scrollTop = scrollV;
         document.body.scrollLeft = scrollH;
     }
-    document.getElementById('goBackBtn').classList.add('hide');
+    document.getElementById('goBackBtn').classList.toggle('hide');
 }
 function growTextArea(el) {
     el.parentNode.dataset.replicatedValue = el.value;
@@ -432,6 +432,7 @@ document.addEventListener("click", (item) => {
     if(parentHasClassOpenConversationId != 0 || item.target.classList.contains('openConversationBtn')) {
         //chech if item is an anchor... if yes, bail...
         const id = parentHasClassOpenConversationId != 0 ?  parentHasClassOpenConversationId : item.target.getAttribute('data-id');
+        document.getElementById('conversation-thread').innerHTML = `<span class="loading d-block"></span>`;
         fetch("/timeline/conversation/" + id, { method: "get" })
             .then(response => response.json())
             .then(data => {
@@ -439,7 +440,7 @@ document.addEventListener("click", (item) => {
             });
 
         redirectToAnchor('#conversation');
-        document.getElementById('goBackBtn').classList.remove('hide');
+        document.getElementById('goBackBtn').classList.toggle('hide');
 
         // if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
         //     document.getElementById('main-' + id).classList.toggle('hide')
