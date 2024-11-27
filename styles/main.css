@@ -6485,7 +6485,8 @@ textarea {
 }
 
 .textarea {
-  width: 95% !important
+  width: 95% !important;
+  background-color: black;
 }
 
 .navbar {
@@ -6616,10 +6617,10 @@ article footer {
 *   concept came from, I used it in a project back in
 *   2016 from another project even earlier than that ...
 */
-.container > * {
+.pages > * {
     display: none;
 }
-.container > *:last-child {
+.pages > *:last-child {
     display: block;
 }
 @keyframes pulse {
@@ -6633,10 +6634,10 @@ article footer {
         transform: scale(1);
     }
 }
-.container > *:target {
+.pages > *:target {
     display: block;
     animation: pulse 0.5s linear 1;
 }
-.container > *:target ~ * {
+.pages > *:target ~ * {
     display: none;
 }
