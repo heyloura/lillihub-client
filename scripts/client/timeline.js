@@ -282,22 +282,22 @@ function redirectToAnchor(anchor) {
     document.location.hash = anchor;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-const anyParentHasClass = (el, className) => {
+const findParentHasClassReturnId = (el, className) => {
     if(!el || !el.parentNode) 
     {
-        return false;
+        return 0;
     }
     if(el.parentNode.classList.contains(className)) 
     {
-        return true;
+        return el.parentNode.getAttribute('id');
     }
-    return anyParentHasClass(el.parentNode, className);
+    return findParentHasClassReturnId(el.parentNode, className);
 }
 document.addEventListener("submit", (item) => {
     item.preventDefault();
 });
 document.addEventListener("click", (item) => {
-    var parentHasClassOpenConversation = anyParentHasClass(item.target, 'openConversationBtn')
+    var parentHasClassOpenConversationId = findParentHasClassReturnId(item.target, 'openConversationBtn')
 
 
 
@@ -400,11 +400,11 @@ document.addEventListener("click", (item) => {
         submitReply(new FormData(form), id);
         form.reset();
     }
-    if(parentHasClassOpenConversation || item.target.classList.contains('openConversationBtn')) {
+    if(parentHasClassOpenConversationId != 0 || item.target.classList.contains('openConversationBtn')) {
 
         redirectToAnchor('#conversation');
 
-        const id = item.target.getAttribute('data-id');
+        const id = parentHasClassOpenConversationId != 0 ?  parentHasClassOpenConversationId : item.target.getAttribute('data-id');
 
         console.log(id); //conversation-thread
 
