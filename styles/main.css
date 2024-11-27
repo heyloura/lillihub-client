@@ -31,9 +31,9 @@
   --primary: #9bafcd;
   --primary-tint: #afbfd7;
   --primary-shade: #87a0c3;
-  --secondary: #7a49a5;
-  --secondary-tint: #875BAE;
-  --secondary-shade: #6D4194;
+  --secondary: #b697cd;
+  --secondary-tint: #c5abd7;
+  --secondary-shade: #a783c3;
   --text-color: #f1f1e5;
 }
 
@@ -4051,7 +4051,7 @@ a.text-error:visited {
 }
 
 .divider-vert[data-content]::after,.divider[data-content]::after {
-  background: var(--background-tint-1);
+  background: var(--background-tint-4);
   color: var(--background-tint-2);
   content: attr(data-content);
   display: inline-block;
