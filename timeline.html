@@ -89,51 +89,57 @@
                 </div>
               </div>
               <div class="column col-xs-12 col-sm-12 col-md-9 col-lg-8 col-xl-6 col-6">
-                <main>
-                    <form id="mainPost" class="card hide-sm">
-                        <div class="card-body">
-                            <div id="mainReplyBox" class="hide">{{replyBox}}</div>
-                            <div class="grow-wrap">
-                                <textarea name="content" placeholder="Share your thoughts...." id="post" class="form-input grow-me" rows="3"></textarea>
+                <main class="pages">
+                    <section id="conversation">
+                        <h1>HELLO!!!!!!!!!!!</h1>
+                    </section>
+                    <!--DEFAULT PAGE-->
+                    <section>
+                        <form id="mainPost" class="card hide-sm">
+                            <div class="card-body">
+                                <div id="mainReplyBox" class="hide">{{replyBox}}</div>
+                                <div class="grow-wrap">
+                                    <textarea name="content" placeholder="Share your thoughts...." id="post" class="form-input grow-me" rows="3"></textarea>
+                                </div>
                             </div>
+                            <div class="card-footer mb-2">
+                                <input type="hidden" name="postingType" id="postingType" />
+                                <input type="hidden" name="omgApi" id="omgApi" />
+                                <input type="hidden" name="omgAddess" id="omgAddess" />
+                                <input type="hidden" name="indieToken" id="indieToken" />
+                                <input type="hidden" name="microPub" id="microPub" />
+                                <div class="dropdown">
+                                    <a href="#" class="btn btn-link dropdown-toggle" tabindex="0">
+                                      <span id="postingName">{{username}}</span> <i class="icon icon-caret"></i>
+                                    </a>
+                                    <!-- menu component -->
+                                    <ul class="menu">
+                                        <li class="menu-item">
+                                            <a class="checkForChanges" href="/settings#posting">
+                                              Settings
+                                            </a>
+                                        </li>
+                                    </ul>
+                                  </div>
+                                  <div class="btn-group float-right">
+                                    <button type="button" class="btn btn-link hide"><i class="icon icon-photo"></i></button>
+                                    <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button>
+                                    <button type="button" class="btn btn-primary sendPost"><i class="icon icon-message sendPost"></i> Post</button>
+                                  </div> 
+                            </div>
+                            <div id="postToast" class="toast toast-dark hide mt-2">
+                                <button class="btn btn-clear float-right dismissPostToast"></button>
+                                <div id="postToastMessage"></div>
+                            </div>  
+                        </form>
+    
+                        <!-- Feed -->
+                        <div id="morePostsToast" class="toast hide getNewPosts mt-2">
+                            <button class="btn btn-clear float-right dismissMorePostsToast"></button>
+                            <b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.
                         </div>
-                        <div class="card-footer mb-2">
-                            <input type="hidden" name="postingType" id="postingType" />
-                            <input type="hidden" name="omgApi" id="omgApi" />
-                            <input type="hidden" name="omgAddess" id="omgAddess" />
-                            <input type="hidden" name="indieToken" id="indieToken" />
-                            <input type="hidden" name="microPub" id="microPub" />
-                            <div class="dropdown">
-                                <a href="#" class="btn btn-link dropdown-toggle" tabindex="0">
-                                  <span id="postingName">{{username}}</span> <i class="icon icon-caret"></i>
-                                </a>
-                                <!-- menu component -->
-                                <ul class="menu">
-                                    <li class="menu-item">
-                                        <a class="checkForChanges" href="/settings#posting">
-                                          Settings
-                                        </a>
-                                    </li>
-                                </ul>
-                              </div>
-                              <div class="btn-group float-right">
-                                <button type="button" class="btn btn-link hide"><i class="icon icon-photo"></i></button>
-                                <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button>
-                                <button type="button" class="btn btn-primary sendPost"><i class="icon icon-message sendPost"></i> Post</button>
-                              </div> 
-                        </div>
-                        <div id="postToast" class="toast toast-dark hide mt-2">
-                            <button class="btn btn-clear float-right dismissPostToast"></button>
-                            <div id="postToastMessage"></div>
-                        </div>  
-                    </form>
-
-                    <!-- Feed -->
-                    <div id="morePostsToast" class="toast hide getNewPosts mt-2">
-                        <button class="btn btn-clear float-right dismissMorePostsToast"></button>
-                        <b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.
-                    </div>
-                     <div class="mt-2" id="add-0"><span class="loading d-block"></span></div>
+                        <div class="mt-2" id="add-0"><span class="loading d-block"></span></div>
+                    </section>
                 </main>
               </div>
               <div class="column col-xs-12 col-sm-12 col-md-3 col-lg-4 col-xl-3 col-3">

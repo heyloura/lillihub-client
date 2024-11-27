@@ -278,6 +278,14 @@ function submitPost(formData) {
             document.getElementById('postToast').classList.remove("hide");
         });
 }
+function redirectToAnchor(anchor) {
+    // We remove previous anchors from the current URL    
+    var redirectToURL = document.URL.replace(/#.*$/, "");
+
+    redirectToURL = redirectToURL + anchor
+    window.location.href = redirectToURL;
+    window.location.reload(true)
+}
 document.addEventListener("submit", (item) => {
     item.preventDefault();
 });
@@ -381,19 +389,22 @@ document.addEventListener("click", (item) => {
         form.reset();
     }
     if(item.target.classList.contains('openConversationBtn')) {
-        const id = item.target.getAttribute('data-id');
 
-        if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
-            document.getElementById('main-' + id).classList.toggle('hide')
-        } else {
-            fetch("/timeline/conversation/" + id, { method: "get" })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('content-' + id).innerHTML = data.conversation;
-                item.target.setAttribute('data-loaded', 'true')
-                document.getElementById('main-' + id).classList.toggle('hide')
-            });
-        }
+        redirectToAnchor('#conversation');
+
+        // const id = item.target.getAttribute('data-id');
+
+        // if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
+        //     document.getElementById('main-' + id).classList.toggle('hide')
+        // } else {
+        //     fetch("/timeline/conversation/" + id, { method: "get" })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         document.getElementById('content-' + id).innerHTML = data.conversation;
+        //         item.target.setAttribute('data-loaded', 'true')
+        //         document.getElementById('main-' + id).classList.toggle('hide')
+        //     });
+        // }
     }
     // if(item.target.classList.contains('closeConversationBtn')) {
     //     let id = item.target.getAttribute('data-id');

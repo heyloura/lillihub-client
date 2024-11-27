@@ -6480,7 +6480,8 @@ hr {
 }
 
 textarea {
-  width: 99% !important
+  width: 99% !important;
+  background-color: black;
 }
 
 .textarea {
@@ -6489,7 +6490,7 @@ textarea {
 
 .navbar {
   padding: 0.25em;
-  background-color: #4d8846;
+  background-color: var(--background-tint-1);
 }
 
 .navbar .btn-link {

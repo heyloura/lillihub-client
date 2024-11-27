@@ -681,7 +681,7 @@ function postHTML(post, marker, stranger) {
     
     //${marker && marker.time_published && (marker.time_published >= post.timestamp) ? 'seen' : ''}
     return `
-        <article id="${post.id}" class="card ripple parent ${marker && marker.id == post.id ? 'marked' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-marked="${marker && marker.id == post.id ? 'true' : 'false'}" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        <article id="${post.id}" class="openConversationBtn card ripple parent ${marker && marker.id == post.id ? 'marked' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-marked="${marker && marker.id == post.id ? 'true' : 'false'}" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
             <header class="card-header">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
@@ -690,7 +690,7 @@ function postHTML(post, marker, stranger) {
                         <a href="/user/${post.username}" class="text-gray">@${post.username}${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}</a>
                     </div>           
                 </div>
-                <div class="card-buttons">
+                <!--<div class="card-buttons">
                     <div class="dropdown dropdown-right"><a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-vert"></i></a>
                         <ul class="menu">
                             <li class="divider" data-content="Published: ${post.relative}">
@@ -699,9 +699,9 @@ function postHTML(post, marker, stranger) {
                             <li class="menu-item"><a href="/conversation/${post.id}?view=true" class="btn-link btn">View Post</a></li>
                         </ul>
                     </div>
-                </div>
+                </div>-->
             </header>
-            ${ post.conversation ? `<details class="accordion">
+            ${ post.conversation ? `<!--<details class="accordion">
                     <summary data-id="${post.id}" data-reply="${post.username}" data-avatar="${post.avatar}" class="accordion-header text-gray openConversationBtn">
                         <i class="icon icon-arrow-right mr-1"></i>
                         view conversation
@@ -711,11 +711,11 @@ function postHTML(post, marker, stranger) {
                             <span class="loading d-block"></span>
                         </div>
                     </div>
-                </details>` : ''}
+                </details>-->` : ''}
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
             ${!post.conversation ? `
-                <details class="accordion">
+                <!--<details class="accordion">
                     <summary  data-reply="${post.username}" data-avatar="${post.avatar}" class="accordion-header text-gray">
                         <i class="icon icon-arrow-right mr-1"></i>
                         Be the first to reply
@@ -737,7 +737,7 @@ function postHTML(post, marker, stranger) {
                             </div>
                         </div>
                     </div>
-                </details>` : '' }
+                </details>-->` : '' }
         </article>
     `;
 }
