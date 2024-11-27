@@ -681,7 +681,7 @@ function postHTML(post, marker, stranger) {
     
     //${marker && marker.time_published && (marker.time_published >= post.timestamp) ? 'seen' : ''}
     return `
-        <article id="${post.id}" class="card parent ${marker && marker.id == post.id ? 'marked' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-marked="${marker && marker.id == post.id ? 'true' : 'false'}" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        <article id="${post.id}" class="card ripple parent ${marker && marker.id == post.id ? 'marked' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-marked="${marker && marker.id == post.id ? 'true' : 'false'}" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
             <header class="card-header">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
