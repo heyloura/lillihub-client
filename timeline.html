@@ -13,8 +13,8 @@
         <link rel="manifest" href="/manifest.webmanifest">
         <title>Lillihub: Timeline</title>
         <noscript><style nonce="{{nonce}}">.hide-if-user-has-no-javascript{ display: none }</style></noscript>
-        <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
-        <script>document.write('<style nonce="{{nonce}}">.hide-if-user-has-javascript{display:none}</style>');</script>
+        <script nonce="{{nonce}}">if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
+        <script nonce="{{nonce}}">document.write('<style nonce="{{nonce}}">.hide-if-user-has-javascript{display:none}</style>');</script>
         <link rel="stylesheet" href="styles/onsen-ui.min.css"> 
         <link rel="stylesheet" href="styles/main.css">  
     </head>
