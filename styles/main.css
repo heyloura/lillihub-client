@@ -3069,7 +3069,7 @@ summary.accordion-header::-webkit-details-marker {
 
 .card {
   background: var(--background-tint-4);
-  border: .05rem solid var(--background-shade-1);
+  /* border: .05rem solid var(--background-shade-1); */
   border-radius: .1rem;
   display: -ms-flexbox;
   display: flex;
@@ -3835,7 +3835,7 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .text-primary {
-  color: var(--primary);!important
+  color: var(--primary) !important;
 }
 
 a.text-primary:focus,a.text-primary:hover {
@@ -6245,7 +6245,7 @@ a,pre,code {
 }
 
 .card-header {
-  border-bottom: .05rem solid #dadee4;
+  /* border-bottom: .05rem solid #dadee4; */
   display: flex;
   align-items: center;
   padding-bottom: 1em !important;
@@ -6356,15 +6356,6 @@ main p:last-child {
   }
 }
 
-/* #sidebar-id .panel {
-  border: 0;
-} */
-
-/* .sidebar {
-  max-width: 30ch;
-  border-right: .05rem solid #dadee4;
-} */
-
 .app-info {
   padding: .4rem;
 }
@@ -6440,15 +6431,6 @@ p, dd {
   font: inherit;
   grid-area: 1 / 1 / 2 / 2;
 }
-
-/* #post,.topbar, #newnotebook, #newbookmark {
-  display: block;
-  right: .4rem;
-  position: fixed;
-  top: .4rem;
-  transition: none;
-  z-index: 1;
-} */
 
 .topbar {
   right: unset;
