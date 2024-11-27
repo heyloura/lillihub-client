@@ -25,8 +25,9 @@
 
 
 
-console.log('loaded!')
-console.log(window.location.hash);
+if(window.location.hash) {
+    window.location.hash = '';
+}
 
 
 
