@@ -290,6 +290,11 @@ document.addEventListener("submit", (item) => {
     item.preventDefault();
 });
 document.addEventListener("click", (item) => {
+    console.log(item.target);
+
+
+
+
     // if(item.target.classList.contains('noteTag')) {
     //     document.getElementById('search').value = item.target.getAttribute('data-id');
     //     document.getElementById('search').dispatchEvent(new Event('input', {bubbles: true,cancelable: true}));
