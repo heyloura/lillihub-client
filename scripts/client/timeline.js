@@ -30,8 +30,7 @@ let touchendX = 0
     
 function checkDirection() {
   if (touchendX < touchstartX - 50) {
-    alert('swiped left!')
-    
+    history.back();
   }
   if (touchendX > touchstartX) return;
 }
