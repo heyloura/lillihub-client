@@ -1446,25 +1446,25 @@ dl dd {
 
 .btn.btn-primary {
   background: var(--primary);
-  border-color: var(--primary-shade);
-  color: var(--text-color);
+  border-color: var(--primary-tint);
+  color: var(--background-tint-1);
 }
 
 .btn.btn-primary:focus,.btn.btn-primary:hover {
   background: var(--primary-shade);
   border-color: var(--primary-tint);
-  color: var(--text-color);
+  color: var(--background-tint-1);
 }
 
 .btn.btn-primary.active,.btn.btn-primary:active {
-  background: #3a38d2;
-  border-color: #302ecd;
-  color: #fff
+  background: var(--primary-tint);
+  border-color: var(--primary-tint);
+  color: var(--background-tint-1);
 }
 
 .btn.btn-primary.loading::after {
-  border-bottom-color: #fff;
-  border-left-color: #fff
+  border-bottom-color: var(--background-tint-1);
+  border-left-color: var(--background-tint-1);
 }
 
 .btn.btn-success {

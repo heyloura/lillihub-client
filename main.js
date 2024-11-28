@@ -486,7 +486,8 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // Home page
             // -----------------------------------------------------
-            return Response.redirect('/timeline');
+            console.log(req);
+            return Response.redirect(`${req.url}timeline`);
 
         } else {
             return returnBadGateway('Micro.blog did not return a user from the provided token.')
@@ -613,7 +614,7 @@ async function decryptMe(encrypted)
 // can set a cookie if provided
 // the uuid is set per request to set a nonce
 function HTMLHeaders(uuid, cookie) {
-    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com 'nonce-${uuid}';media-src *;img-src *`;
+    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com *.previewbox.link 'nonce-${uuid}';media-src *;img-src *`;
     if(!cookie) {
         return {
             headers: {
@@ -665,17 +666,35 @@ function postHTML(post, marker, stranger) {
 
     // const anchors = post.content.split('<a');
     // if(anchors && anchors.length > 1) {
-    //     for(var i = 0; i < anchors.length; i++) {
-    //         if(anchors[i].includes('https://micro.blog/') && anchors[i].includes('@')) {
-    //             var href = anchors[i].replaceAll("'",'"').split('href="');
+    //     for(let i = 0; i < anchors.length; i++) {
+    //         if(!anchors[i].includes('@') && anchors[i].includes('href=')) {
+    //             //onst anchor = anchors[i].split('</a>')[0];
+    //             let href = anchors[i].replaceAll("'",'"').split('href="');
+    //             //console.log('Anchor:')
+    //             //console.log(anchors[i])
     //             if(href[1]) {
-    //                 var anchor = href[1].split('"')[0];
-    //                 var username = href[1].split('"')[0].replace('https://micro.blog/','');
-    //                 post.content = post.content.replaceAll(anchor, '/user/' + username);
+    //                 href = href[1].split('"')[0];
+    //                 // console.log(href)
+    //                 const previewbox = `<previewbox-link dark href="${href}"></previewbox-link>`;
+    //                 console.log(previewbox);
+    //                 post.content = post.content + previewbox;
+    //                 // var username = href[1].split('"')[0].replace('https://micro.blog/','');
+    //                 // post.content = post.content.replaceAll(anchor, '/user/' + username);
     //             }
     //         } 
+    //         // if(anchors[i].includes('https://micro.blog/') && anchors[i].includes('@')) {
+    //         //     var href = anchors[i].replaceAll("'",'"').split('href="');
+    //         //     if(href[1]) {
+    //         //         var anchor = href[1].split('"')[0];
+    //         //         var username = href[1].split('"')[0].replace('https://micro.blog/','');
+    //         //         post.content = post.content.replaceAll(anchor, '/user/' + username);
+    //         //     }
+    //         // } 
+
+    //         //<previewbox-link href="https://web-highlights.com"></previewbox-link>
     //     }
     // }
+    
     post.content.replaceAll('<script', `<div`);
     post.content.replaceAll('</script', `</div`);
     
@@ -685,9 +704,9 @@ function postHTML(post, marker, stranger) {
             <header class="card-header">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
-                    <div class="card-title h5">${post.name}</div>
+                    <div class="card-title h5">${post.name} <small><a href="/timeline/user/${post.username}" class="text-gray">@${post.username}${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}</a></small></div>
                     <div class="card-subtitle">
-                        <a href="/timeline/user/${post.username}" class="text-gray">@${post.username}${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}</a>
+                        <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
                     </div>           
                 </div>
                 <!--<div class="card-buttons">
@@ -701,43 +720,8 @@ function postHTML(post, marker, stranger) {
                     </div>
                 </div>-->
             </header>
-            ${ post.conversation ? `<!--<details class="accordion">
-                    <summary data-id="${post.id}" data-reply="${post.username}" data-avatar="${post.avatar}" class="accordion-header text-gray openConversationBtn">
-                        <i class="icon icon-arrow-right mr-1"></i>
-                        view conversation
-                    </summary>
-                    <div class="accordion-body">
-                        <div class="content" id="content-${post.id}">
-                            <span class="loading d-block"></span>
-                        </div>
-                    </div>
-                </details>-->` : ''}
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
-            ${!post.conversation ? `
-                <!--<details class="accordion">
-                    <summary  data-reply="${post.username}" data-avatar="${post.avatar}" class="accordion-header text-gray">
-                        <i class="icon icon-arrow-right mr-1"></i>
-                        Be the first to reply
-                    </summary>
-                    <div class="accordion-body">
-                        <div class="side-padding">
-                            <form class="form" id='replybox-form-${post.id}-main' data-id="${post.id}">
-                                <div class="form-group">
-                                    <div class="grow-wrap"><textarea id="replybox-textarea-${post.id}-main" class="form-input grow-me textarea" name="content" rows="3">@${post.username}</textarea></div>
-                                    <input type="hidden" class="form-input" name="id" value="${post.id}" />
-                                </div>
-                                <div class="form-group">
-                                    <button data-id="${post.id}-main" type="button" class="btn btn-primary btn-sm replyBtn">Send Reply</button>
-                                </div>
-                            </form>
-                             <div id="toast-${post.id}-main" class="toast hide">
-                                <button data-id="${post.id}-main" class="btn btn-clear float-right clearToast"></button>
-                                <div id="toast-content-${post.id}-main">Waiting for server....</div>
-                            </div>
-                        </div>
-                    </div>
-                </details>-->` : '' }
         </article>
     `;
 }
@@ -753,13 +737,14 @@ function conversationHTML(post, stranger, parent, length) {
     return `
         <div class="tile mb-2 mt-2 pt-2 ${p.id == parent ? 'highlight' : ''}" id="convo-${p.id}-${parent}" data-id="${p.id}" data-parent="${parent}" data-stranger="${stranger}">
             <div class="tile-icon ">
-                <figure class="avatar avatar-sm " data-initial="${p.username.substring(0,1)}">
+                <figure class="avatar avatar-lg" data-initial="${p.username.substring(0,1)}">
                     <img src="${p.avatar}" loading="lazy">
                 </figure>
             </div>
             <div class="tile-content">
                 <p class="tile-title">
-                    ${p.name} <a class="text-gray" href="/timeline/user/${p.username}">@${p.username}</a>${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}
+                    ${p.name} <a class="text-gray" href="/timeline/user/${p.username}">@${p.username}</a>
+                    <br/><a class="text-gray" href="${p.url}">${p.relative}</a>${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}
                     <button type="button" class="addToReply btn btn-sm btn-link btn-icon float-right" data-target="replybox-textarea-${parent}" data-id="${p.username}">
                         <i data-target="replybox-textarea-${parent}" data-id="${p.username}" class="icon icon-share addToReply"></i>
                     </button>

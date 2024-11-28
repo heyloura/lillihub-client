@@ -223,26 +223,26 @@ document.addEventListener("DOMContentLoaded", async (event) => {
             //loadConversations();
         });
 
-    //fetch the discover photos
-    fetch("/timeline/discover/photos", { method: "get" })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('discover-photos').innerHTML = data;
-        });
+    // //fetch the discover photos
+    // fetch("/timeline/discover/photos", { method: "get" })
+    //     .then(response => response.text())
+    //     .then(data => {
+    //         document.getElementById('discover-photos').innerHTML = data;
+    //     });
 
-    //fetch the discover feed
-    fetch("/timeline/discover/feed", { method: "get" })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('discover-feed').innerHTML = data;
-        });
+    // //fetch the discover feed
+    // fetch("/timeline/discover/feed", { method: "get" })
+    //     .then(response => response.text())
+    //     .then(data => {
+    //         document.getElementById('discover-feed').innerHTML = data;
+    //     });
 
-    //suggestions
-    fetch("/timeline/suggestions", { method: "get" })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('suggestions').innerHTML = data;
-        });
+    // //suggestions
+    // fetch("/timeline/suggestions", { method: "get" })
+    //     .then(response => response.text())
+    //     .then(data => {
+    //         document.getElementById('suggestions').innerHTML = data;
+    //     });
 });
 // document.addEventListener("change", (event) => {
 //     if(event.target.classList.contains('countCheckedCategory')) {
