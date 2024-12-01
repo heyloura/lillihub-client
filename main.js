@@ -10,6 +10,7 @@ import * as utility from "./scripts/server/utilities.js";
 ******************************************************************************************************************/
 const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
 const deployURL = 'https://sad-bee-43--version3.deno.dev/';
+const _development = true;
 
 Deno.serve(async (req) => { 
     if(_development) {
