@@ -31,7 +31,7 @@ let touchendX = 0
 function checkDirection() {
   if (touchendX < touchstartX - 50) {
     history.back();
-    document.getElementById('goBackBtn').classList.toggle('hide');
+    // document.getElementById('goBackBtn').classList.toggle('hide');
   }
   if (touchendX > touchstartX) return;
 }
@@ -49,25 +49,9 @@ document.getElementById('conversation').addEventListener('touchend', e => {
 if(window.location.hash) {
     removeHash();
 }
-function removeHash() { 
-    var scrollV, scrollH, loc = window.location;
-    if ("pushState" in history)
-        history.pushState("", document.title, loc.pathname + loc.search);
-    else {
-        // Prevent scrolling by storing the page's current scroll offset
-        scrollV = document.body.scrollTop;
-        scrollH = document.body.scrollLeft;
-
-        loc.hash = "";
-
-        // Restore the scroll offset, should be flicker free
-        document.body.scrollTop = scrollV;
-        document.body.scrollLeft = scrollH;
-    }
-}
-function growTextArea(el) {
-    el.parentNode.dataset.replicatedValue = el.value;
-}
+// function growTextArea(el) {
+//     el.parentNode.dataset.replicatedValue = el.value;
+// }
 function buildCarousel(id, imageArray) 
 {
     let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
@@ -102,71 +86,71 @@ function buildCarousels() {
         }
     }
 }
-function loadConversations() {
-    if(localStorage.getItem("lillihub_display_mode") == 'conversation') {
-        var promises = [];
-        var children = document.querySelectorAll('[data-mention="true"][data-conversation="true"][data-processed="false"]');
-        children = [...children];
-        children.forEach((child) => {
-            let id = child.getAttribute('data-id');
-            child.classList.remove('parent');
-            child.classList.add('child');
-            child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
-            child.setAttribute('data-processed', 'true');
+// function loadConversations() {
+//     if(localStorage.getItem("lillihub_display_mode") == 'conversation') {
+//         var promises = [];
+//         var children = document.querySelectorAll('[data-mention="true"][data-conversation="true"][data-processed="false"]');
+//         children = [...children];
+//         children.forEach((child) => {
+//             let id = child.getAttribute('data-id');
+//             child.classList.remove('parent');
+//             child.classList.add('child');
+//             child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
+//             child.setAttribute('data-processed', 'true');
 
-            var promise = fetch("/timeline/conversation/" + id, { method: "get" })
-                .then(response => response.json())
-                .then(data => {
-                    var doc = new DOMParser().parseFromString(data.conversation, "text/html");
-                    var parent = child.parentNode;
-                    var parentArticle = doc.querySelector('article');
-                    if(parentArticle.children.length == 3) {
-                        //clean up for gallery
-                        var galleryImgs = doc.querySelectorAll('article:first-child img');
-                        galleryImgs.forEach((img) => {
-                            img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
-                        });
-                        parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
-                    }
-                    if(parent && parentArticle && child) {
-                        parent.insertBefore(parentArticle, child);
-                    }
-                    document.getElementById('content-' + id).innerHTML = data.conversation.replaceAll('convoBtns', 'convoBtns hide');
-                    document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
+//             var promise = fetch("/timeline/conversation/" + id, { method: "get" })
+//                 .then(response => response.json())
+//                 .then(data => {
+//                     var doc = new DOMParser().parseFromString(data.conversation, "text/html");
+//                     var parent = child.parentNode;
+//                     var parentArticle = doc.querySelector('article');
+//                     if(parentArticle.children.length == 3) {
+//                         //clean up for gallery
+//                         var galleryImgs = doc.querySelectorAll('article:first-child img');
+//                         galleryImgs.forEach((img) => {
+//                             img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
+//                         });
+//                         parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
+//                     }
+//                     if(parent && parentArticle && child) {
+//                         parent.insertBefore(parentArticle, child);
+//                     }
+//                     document.getElementById('content-' + id).innerHTML = data.conversation.replaceAll('convoBtns', 'convoBtns hide');
+//                     document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
 
-                    let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
-                    if(visibleParent) {
-                        visibleParent.remove();
-                    }
+//                     let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
+//                     if(visibleParent) {
+//                         visibleParent.remove();
+//                     }
 
-                    document.getElementById('loading-' + id).remove();
-                });
+//                     document.getElementById('loading-' + id).remove();
+//                 });
 
-                promises.push(promise);
-        });
+//                 promises.push(promise);
+//         });
 
-        Promise.all(promises).then(results => {
-            var parents = document.querySelectorAll('.parent');
-            parents = [...parents];
-            let singles = new Set();
-            parents.forEach((parent) => {
-                let id = parent.getAttribute('data-id');
-                if(!parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
-                    parent.children[0].style.borderBottom = 0;
-                    if(parent.children.length > 1 && parent.children[1].nodeName == 'MAIN') {
-                        parent.children[1].remove();
-                    }
-                    if(parent.children.length > 2 && parent.children[1].nodeName == 'DIV') {
-                        parent.children[2].remove();
-                    }                                
-                }
-                singles.add(id);
-            });
-            buildCarousels();
-        });
+//         Promise.all(promises).then(results => {
+//             var parents = document.querySelectorAll('.parent');
+//             parents = [...parents];
+//             let singles = new Set();
+//             parents.forEach((parent) => {
+//                 let id = parent.getAttribute('data-id');
+//                 if(!parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
+//                     parent.children[0].style.borderBottom = 0;
+//                     if(parent.children.length > 1 && parent.children[1].nodeName == 'MAIN') {
+//                         parent.children[1].remove();
+//                     }
+//                     if(parent.children.length > 2 && parent.children[1].nodeName == 'DIV') {
+//                         parent.children[2].remove();
+//                     }                                
+//                 }
+//                 singles.add(id);
+//             });
+//             buildCarousels();
+//         });
 
-    }
-}
+//     }
+// }
 document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
     if(localStorage.getItem('post_setting'))
@@ -313,26 +297,6 @@ function submitPost(formData) {
             document.getElementById('postToast').classList.remove("hide");
         });
 }
-function redirectToAnchor(anchor, scrollToTop = true) {
-    var delayInMilliseconds = 400;
-    setTimeout(function() {
-        document.location.hash = anchor;
-        if(scrollToTop) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }, delayInMilliseconds);
-}
-const findParentHasClassReturnId = (el, className) => {
-    if(!el || !el.parentNode || !el.parentNode.classList) 
-    {
-        return 0;
-    }
-    if(el.parentNode.classList.contains(className)) 
-    {
-        return el.parentNode.getAttribute('id');
-    }
-    return findParentHasClassReturnId(el.parentNode, className);
-}
 document.addEventListener("submit", (item) => {
     item.preventDefault();
 });
@@ -441,7 +405,11 @@ document.addEventListener("click", (item) => {
         form.reset();
     }
     if(parentHasClassOpenConversationId != 0 || item.target.classList.contains('openConversationBtn')) {
-        //chech if item is an anchor... if yes, bail...
+        //check if item is an anchor... if yes, bail...
+        console.log(item.target.tagName);
+        if(item.target.tagName.toLowerCase() == "a"){
+            return;
+        }
         const id = parentHasClassOpenConversationId != 0 ?  parentHasClassOpenConversationId : item.target.getAttribute('data-id');
         document.getElementById('conversation-thread').innerHTML = `<span class="loading d-block"></span>`;
         fetch("/timeline/conversation/" + id, { method: "get" })
@@ -451,20 +419,6 @@ document.addEventListener("click", (item) => {
             });
 
         redirectToAnchor('#conversation');
-        
-        document.getElementById('goBackBtn').classList.toggle('hide');
-
-        // if(document.getElementById('main-' + id).classList.contains('hide') || item.target.getAttribute('data-loaded') === 'true') {
-        //     document.getElementById('main-' + id).classList.toggle('hide')
-        // } else {
-        //     fetch("/timeline/conversation/" + id, { method: "get" })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         document.getElementById('content-' + id).innerHTML = data.conversation;
-        //         item.target.setAttribute('data-loaded', 'true')
-        //         document.getElementById('main-' + id).classList.toggle('hide')
-        //     });
-        // }
     }
     // if(item.target.classList.contains('closeConversationBtn')) {
     //     let id = item.target.getAttribute('data-id');

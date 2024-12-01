@@ -132,8 +132,47 @@ export async function getMicroBlogFollowing(accessToken, username, isMe = true) 
     return await fetching.json();   
 }
 
+// for places that paging is not supported by micro.blog
+export async function getAllFromMicroBlog(access_token, url) {
+    let id = 0;
+    let newId = -1;
+    let i = 0;
+    let items = [];
+    let params = '';
+    
+  while(id != newId && i < 1000)
+    {
+      let params = url.split('?').length > 1 ? '?' + url.split('?')[1] : (i != 0 ? '?' : '');
+      url = url.split('?').length > 1 ? url.split('?')[0] : url;
+
+      if(i != 0 && !params) {
+        params = params + `before_id=${items[items.length - 1].id}`;
+      }
+      if(i != 0 && params) {
+        params = params + `&before_id=${items[items.length - 1].id}`;
+      }
+
+      const fetching = await fetch(`${url}${params}`, { method: "GET", headers: { "Authorization": "Bearer " + access_token } } );
+      const results = await fetching.json();
+
+      if(!results.items || results.items.length == 0) {
+          break;
+      }
+      
+      id = items.length > 0 ? items[items.length - 1].id : results.items[results.items.length - 1].id;
+      newId = i == 0 ? -1 : results.items[results.items.length - 1].id;
+      items = [...items, ...results.items];
+      i++;
+
+      if(results.items.length < 25) {
+        break;
+      }
+    }
+    return items;
+}
+
 async function __getMicroBlogPosts(accessToken, url, lastId, count) {
-    console.log('__getMicroBlogPosts', accessToken, url, lastId, count)
+    //console.log('__getMicroBlogPosts', url, lastId, count)
     try {
         const guard = count ? Math.ceil(count / 40) : 1; // prevent infinite loops
         let loop = 0;

@@ -1276,10 +1276,10 @@ kbd {
 }
 
 mark {
-  background: #ffe9b3;
-  border-bottom: .05rem solid #ffd367;
+  background: var(--background-tint-4);
+  border: .05rem solid #ffd367;
   border-radius: .1rem;
-  color: #3b4351;
+  color: var(--text);
   padding: .05rem .1rem 0
 }
 
@@ -1661,9 +1661,9 @@ legend {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background: var(--background-tint-1);
+  background: black;
   background-image: none;
-  /* border: .05rem solid #bcc3ce; */
+  border: .05rem solid var(--background-tint-4);
   border-radius: .1rem;
   color: var(--text-color);
   display: block;
@@ -1990,7 +1990,7 @@ textarea.form-input,textarea.form-input.input-lg,textarea.form-input.input-sm {
 .input-group .form-input,.input-group .form-select {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
-  width: 1%
+  /* width: 1% */
 }
 
 .input-group .input-group-btn {
@@ -3068,8 +3068,10 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .card {
-  background: var(--background-tint-4);
+  /* background: var(--background-tint-4); */
   /* border: .05rem solid var(--background-shade-1); */
+  background: var(--background-tint-1);
+  border-bottom: 1px solid var(--background-tint-4);
   border-radius: .1rem;
   display: -ms-flexbox;
   display: flex;
@@ -3111,7 +3113,7 @@ summary.accordion-header::-webkit-details-marker {
 
 .chip {
   align-items: center;
-  background: #eef0f3;
+  background: var(--background-tint-4);
   border-radius: 5rem;
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -3174,9 +3176,9 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .empty {
-  background: #f7f8f9;
+  background: var(--background-tint-1);
   border-radius: .1rem;
-  color: #66758c;
+  color: var(--text-color);
   padding: 3.2rem 1.6rem;
   text-align: center
 }
@@ -3194,7 +3196,8 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .menu {
-  background: var(--background-tint-4);
+  background: var(--background-tint-1);
+  border: 1px solid var(--background-tint-4);
   border-radius: .1rem;
   box-shadow: 0 .05rem .2rem rgba(48,55,66,.3);
   list-style: none;
@@ -4051,17 +4054,17 @@ a.text-error:visited {
 }
 
 .divider-vert[data-content]::after,.divider[data-content]::after {
-  background: var(--background-tint-4);
+  background: var(--background-tint-1);
   color: var(--background-tint-2);
   content: attr(data-content);
   display: inline-block;
   font-size: .7rem;
   padding: 0 .4rem;
-  transform: translateY(-.65rem)
+  transform: translateY(-.65rem);
 }
 
 .divider {
-  border-top: .05rem solid var(--background-tint-2);
+  border-top: .05rem solid var(--background-tint-4);
   height: .05rem;
   margin: .4rem 0
 }
@@ -4076,7 +4079,7 @@ a.text-error:visited {
 }
 
 .divider-vert::before {
-  border-left: .05rem solid #dadee4;
+  border-left: .05rem solid var(--background-tint-4);
   bottom: .4rem;
   content: "";
   display: block;
@@ -5265,7 +5268,7 @@ a.text-error:visited {
 
 .progress:indeterminate {
   animation: progress-indeterminate 1.5s linear infinite;
-  background: #eef0f3 linear-gradient(to right,var(--primary); 30%,#eef0f3 30%) top left/150% 150% no-repeat
+  background: #eef0f3 linear-gradient(to right,var(--primary) 30%,#eef0f3 30%) top left/150% 150% no-repeat
 }
 
 .progress:indeterminate::-moz-progress-bar {
@@ -6275,7 +6278,7 @@ article main {
 }
 
 .parent, .form {
-  margin-top: 1em;
+  margin-top: 0.75em;
 }
 
 .avatar.avatar-lg {
@@ -6426,7 +6429,7 @@ p, dd {
 }
 
 .grow-wrap > textarea, .grow-wrap::after {
-  border: .05rem solid #dadee4;
+  border: .05rem solid var(--background-tint-1);
   padding: 0.4rem;
   font: inherit;
   grid-area: 1 / 1 / 2 / 2;
@@ -6456,10 +6459,6 @@ p, dd {
 
 code {
   font-size: 95% !important;
-}
-
-.marked {
-  background-color: #f1f1fc !important;
 }
 
 .hide {
@@ -6503,7 +6502,9 @@ textarea {
 }
 
 .highlight {
-  background-color: var(--background-tint-2);
+  background-color: var(--background-tint-4);
+  padding: 0 0.8rem;
+  margin: 0 -0.8rem;
 }
 
 .navbar a:hover {
@@ -6600,10 +6601,10 @@ article footer {
   transition: background 0.8s;
 }
 .ripple:hover {
-  background: var(--background-tint-4) radial-gradient(circle, transparent 1%, var(--background-tint-4) 1%) center/15000%;
+  background: var(--background-tint-1) radial-gradient(circle, transparent 1%, var(--background-tint-1) 1%) center/15000%;
 }
 .ripple:active {
-  background-color: var(--background-tint-3);
+  background-color: var(--background-tint-4);
   background-size: 100%;
   transition: background 0s;
 }
@@ -6641,3 +6642,8 @@ article footer {
 .pages > *:target ~ * {
     display: none;
 }
+
+.bordered {
+  border: 1px solid var(--background-tint-4);
+}
+

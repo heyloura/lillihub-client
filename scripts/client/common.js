@@ -1,30 +1,6 @@
 function growTextArea(el) {
     el.parentNode.dataset.replicatedValue = el.value;
 }
-
-function clearReply(el) {
-    let form=el;
-    setTimeout(
-        function(){
-            form.children[2].dataset.replicatedValue = ''; form.children[2].children[0].value = '';
-        }, 250);
-    document.getElementById('toast').style.display = 'block';
-}
-
-function showIframeResult() {
-    document.getElementById('toast').style.display = 'block';
-}
-
-function collapse(el) {
-    el.removeAttribute("open");
-    el.classList.remove("closing");
-}
-
-function waitForScroll(el) {
-    el.classList.add("closing");
-    window.setTimeout(collapse, 500, el);
-}
-
 function liveSearch(selector, searchboxId) {
     let cards = document.querySelectorAll(selector)
     let search_query = document.getElementById(searchboxId).value;
@@ -36,25 +12,39 @@ function liveSearch(selector, searchboxId) {
         }
     }
 }
-
-function addLoading(elem) {
-    elem.classList.add("loading");
-}
-
-function toggleSummary(el, e) {
-    // at some point find all the references and remove them
-}
-
-async function loadConversation(el, id) {
-    const fetching = await fetch(`/conversation/${id}`, { method: "GET" } );
-    try {
-        const result = await fetching.text();
-        el.insertAdjacentHTML(
-            'afterend',
-            result,
-          );
+const findParentHasClassReturnId = (el, className) => {
+    if(!el || !el.parentNode || !el.parentNode.classList) 
+    {
+        return 0;
     }
-    catch {
-        return null;
+    if(el.parentNode.classList.contains(className)) 
+    {
+        return el.parentNode.getAttribute('id');
+    }
+    return findParentHasClassReturnId(el.parentNode, className);
+}
+function redirectToAnchor(anchor, scrollToTop = true) {
+    var delayInMilliseconds = 400;
+    setTimeout(function() {
+        document.location.hash = anchor;
+        if(scrollToTop) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, delayInMilliseconds);
+}
+function removeHash() { 
+    var scrollV, scrollH, loc = window.location;
+    if ("pushState" in history)
+        history.pushState("", document.title, loc.pathname + loc.search);
+    else {
+        // Prevent scrolling by storing the page's current scroll offset
+        scrollV = document.body.scrollTop;
+        scrollH = document.body.scrollLeft;
+
+        loc.hash = "";
+
+        // Restore the scroll offset, should be flicker free
+        document.body.scrollTop = scrollV;
+        document.body.scrollLeft = scrollH;
     }
 }
