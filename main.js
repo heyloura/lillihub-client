@@ -9,7 +9,7 @@ import * as utility from "./scripts/server/utilities.js";
 *      const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 ******************************************************************************************************************/
 const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
-const _lillihubToken = JSON.parse(Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "");
+const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
 const deployURL = 'https://sad-bee-43--version3.deno.dev/';
 const _development = true;
 
