@@ -37,7 +37,7 @@
                 <button class="btn btn-link btn-action show-sm"><i class="icon icon-plus"></i></button>
             </section>
         </header>
-          <div class="container grid-xl mt-2">
+          <div class="container grid-lg mt-2">
             <div class="columns page">
               <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                 <div>
@@ -77,6 +77,34 @@
               <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                 <main>
                     <h1>Settings:</h1>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div id="posting">
+                                <h2>Discovery Options</h2>
+                                <p>
+                                    Micro.blog has a person-curated discover feed of posts by Micro.blog users.
+                                    By defualt, Lillihub uses this feed in the discover section. You can change this
+                                    to use Lillihub's custom feed, which is a chronological display of Micro.blog posts.
+                                </p>
+                                <div class="form-group">
+                                    <label class="form-radio">
+                                      <input checked type="radio" id="defaultDiscoverFeed" value="standard" name="discoverOption">
+                                      <i class="form-icon"></i> Default Micro.blog discover feed
+                                    </label><br/>
+                                    <label class="form-radio">
+                                        <input type="checkbox" id="customDiscoverFeed" value="custom" name="discoverOption">
+                                        <i class="form-icon"></i> Custom discover feed
+                                    </label><br/>
+                                  </div>
+                                <button class="btn btn-primary saveDiscoverSetting">Save</button>
+                                <div id="saveDiscoverSettingToast" class="toast toast-dark hide">
+                                    <button class="btn btn-clear float-right dismissSaveDiscoverSettingToast"></button>
+                                    Settings have been saved.
+                                </div>  
+                            </div>
+
+                        </div>
+                    </div>
                     <div class="card mb-2">
                         <div class="card-body">
                             <div id="posting">

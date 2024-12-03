@@ -9,6 +9,7 @@ import * as utility from "./scripts/server/utilities.js";
 *      const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 ******************************************************************************************************************/
 const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
+const _lillihubToken = JSON.parse(Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "");
 const deployURL = 'https://sad-bee-43--version3.deno.dev/';
 const _development = true;
 
@@ -270,6 +271,13 @@ Deno.serve(async (req) => {
                 return new Response(html,HTMLHeaders(nonce));
             }
 
+            if(((new URLPattern({ pathname: "/timeline/discover/custom" })).exec(req.url))) {
+                const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
+                const html = posts.map(post => postHTML(post)).join('');
+
+                return new Response(html,HTMLHeaders(nonce));
+            }
+
             if(((new URLPattern({ pathname: "/timeline/discover/photos" })).exec(req.url))) {
                 const posts = await mb.getMicroBlogDiscoverPhotoPosts(mbToken);
                 const html = posts.map((p, index) => index < 9 ? `<li>
@@ -373,7 +381,6 @@ Deno.serve(async (req) => {
 
             const TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
             if(TIMELINE_ROUTE.exec(req.url)) {
-                console.log('get posts')
                 const id = TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
                 const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
                 const html = posts.map(post => postHTML(post)).join('');

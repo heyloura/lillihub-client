@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", event => {
         document.querySelector(`input[value="${localStorage.getItem('post_setting')}"]`).checked = true;
     }
 
+    if(localStorage.getItem('discover_setting')){
+        document.querySelector(`input[value="${localStorage.getItem('discover_setting')}"]`).checked = true;
+    }
+
 });
 document.addEventListener("click", (item) => { 
     // Posting settings
@@ -32,5 +36,12 @@ document.addEventListener("click", (item) => {
     }
     if(item.target.classList.contains('dismissOmgToast')) {
         document.getElementById('saveOmgToast').classList.add("hide");
+    }
+    if(item.target.classList.contains('saveDiscoverSetting')) {
+        localStorage.setItem('discover_setting',document.querySelector('input[name="discoverOption"]:checked').value)
+        document.getElementById('saveDiscoverSettingToast').classList.remove("hide");
+    }
+    if(item.target.classList.contains('dismissSaveDiscoverSettingToast')) {
+        document.getElementById('saveDiscoverSettingToast').classList.add("hide");
     }
 });

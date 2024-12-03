@@ -214,12 +214,20 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     //         document.getElementById('discover-photos').innerHTML = data;
     //     });
 
-    // //fetch the discover feed
-    // fetch("/timeline/discover/feed", { method: "get" })
-    //     .then(response => response.text())
-    //     .then(data => {
-    //         document.getElementById('discover-feed').innerHTML = data;
-    //     });
+    if(localStorage.getItem('discover_setting') === 'custom') {
+        fetch("/timeline/discover/custom", { method: "get" })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('discover-feed').innerHTML = data;
+            });
+    } else {
+        fetch("/timeline/discover/feed", { method: "get" })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('discover-feed').innerHTML = data;
+            });
+    }
+
 
     // //suggestions
     // fetch("/timeline/suggestions", { method: "get" })
@@ -416,8 +424,8 @@ document.addEventListener("click", (item) => {
             .then(response => response.json())
             .then(data => {
                 document.getElementById('conversation-thread').innerHTML = `<div class="card">${data.conversation}</div>`;
+                buildCarousels();
             });
-
         redirectToAnchor('#conversation');
     }
     // if(item.target.classList.contains('closeConversationBtn')) {
