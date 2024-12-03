@@ -31,14 +31,14 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         fetch("/timeline/discover/custom", { method: "get" })
             .then(response => response.text())
             .then(data => {
-                document.getElementById('discover-thread').innerHTML = data;
+                document.getElementById('add-0').innerHTML = data;
                 buildCarousels();
             });
     } else {
         fetch("/timeline/discover/feed", { method: "get" })
             .then(response => response.text())
             .then(data => {
-                document.getElementById('discover-thread').innerHTML = data;
+                document.getElementById('add-0').innerHTML = data;
                 buildCarousels();
             });
     }
