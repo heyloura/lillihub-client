@@ -273,6 +273,7 @@ Deno.serve(async (req) => {
 
             if(((new URLPattern({ pathname: "/timeline/discover/custom" })).exec(req.url))) {
                 const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
+                console.log(posts);
                 const html = posts.map(post => postHTML(post)).join('');
 
                 return new Response(html,HTMLHeaders(nonce));
