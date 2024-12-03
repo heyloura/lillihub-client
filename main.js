@@ -277,7 +277,7 @@ Deno.serve(async (req) => {
                 //const follows = following.map(f => {return JSON.parse(f)});
                 const html = posts.map(post => {
                     const stranger = following.filter(f => f.username == post.username);
-                    const result = postHTML(i, null, stranger.length == 0);
+                    const result = postHTML(post, null, stranger.length == 0);
                     return result;
                 }).join('');
                 return new Response(html,HTMLHeaders(nonce));
