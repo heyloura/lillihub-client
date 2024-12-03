@@ -49,43 +49,7 @@ document.getElementById('conversation').addEventListener('touchend', e => {
 if(window.location.hash) {
     removeHash();
 }
-// function growTextArea(el) {
-//     el.parentNode.dataset.replicatedValue = el.value;
-// }
-function buildCarousel(id, imageArray) 
-{
-    let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
-    let column1 = '<div class="masonry-column-1">';
-    let column2 = '<div class="masonry-column-2">';
-    for(var i = 0; i < imageArray.length; i++) {
-        let column = i % 2;
-        if(column == 0) {
-            column1 += '<img data-id="'+id+'" src="'+imageArray[i]+'">';
-        }
-        if(column == 1) {
-            column2 += '<img data-id="'+id+'" src="'+imageArray[i]+'">';
-        } 
-    }
-    return grid + column1 + '</div>' + column2 + '</div>' + '</div>';
-}
-function buildCarousels() {
-    let galleries = document.querySelectorAll('.gallery');
 
-    for(let i = 0; i < galleries.length; i++) {
-        let loaded = galleries[i].getAttribute('data-loaded');
-        if(!loaded) {
-            let id = galleries[i].getAttribute('data-id');
-            let imgs = document.querySelectorAll('[data-gallery="'+id+'"]');
-            let imageArray = [];
-            for(let j = 0; j < imgs.length; j++) {
-                imageArray.push(imgs[j].getAttribute('src'));
-                imgs[j].remove();
-            }
-            galleries[i].innerHTML = buildCarousel(id, imageArray);
-            galleries[i].setAttribute('data-loaded', 'true');
-        }
-    }
-}
 // function loadConversations() {
 //     if(localStorage.getItem("lillihub_display_mode") == 'conversation') {
 //         var promises = [];
@@ -213,20 +177,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     //     .then(data => {
     //         document.getElementById('discover-photos').innerHTML = data;
     //     });
-
-    if(localStorage.getItem('discover_setting') === 'custom') {
-        fetch("/timeline/discover/custom", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('discover-thread').innerHTML = data;
-            });
-    } else {
-        fetch("/timeline/discover/feed", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('discover-thread').innerHTML = data;
-            });
-    }
 
 
     // //suggestions

@@ -231,26 +231,26 @@ Deno.serve(async (req) => {
                 });
             }
 
-            if(((new URLPattern({ pathname: "/timeline/suggestions" })).exec(req.url))) {
-                const users = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
+            // if(((new URLPattern({ pathname: "/timeline/suggestions" })).exec(req.url))) {
+            //     const users = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
 
-                const random = users[Math.floor(Math.random()*users.length)];
-                let suggestions = await mb.getMicroBlogFollowing(mbToken, random.username, false);
-                suggestions = suggestions.reverse().slice(0, 5);
+            //     const random = users[Math.floor(Math.random()*users.length)];
+            //     let suggestions = await mb.getMicroBlogFollowing(mbToken, random.username, false);
+            //     suggestions = suggestions.reverse().slice(0, 5);
 
-                console.log(suggestions)
+            //     console.log(suggestions)
 
-                return new Response(suggestions.map(s => {
-                    return `<div class="tile">
-                    <div class="tile-icon">
-                        <figure class="avatar avatar-lg"><img src="${s.avatar}" alt="Avatar"></figure>
-                    </div>
-                    <div class="tile-content">
-                        <p class="tile-title">${s.name}<br /><span class="tile-subtitle text-gray"><a href="/timeline/user/${s.username}">@${s.username}</a></span></p>
+            //     return new Response(suggestions.map(s => {
+            //         return `<div class="tile">
+            //         <div class="tile-icon">
+            //             <figure class="avatar avatar-lg"><img src="${s.avatar}" alt="Avatar"></figure>
+            //         </div>
+            //         <div class="tile-content">
+            //             <p class="tile-title">${s.name}<br /><span class="tile-subtitle text-gray"><a href="/timeline/user/${s.username}">@${s.username}</a></span></p>
                         
-                    </div>
-                    </div>`}).join(''),HTMLHeaders(nonce));
-            }
+            //         </div>
+            //         </div>`}).join(''),HTMLHeaders(nonce));
+            // }
 
             if(((new URLPattern({ pathname: "/timeline/discover/feed" })).exec(req.url))) {
                 const posts = await mb.getMicroBlogDiscoverPosts(mbToken);
@@ -279,14 +279,20 @@ Deno.serve(async (req) => {
                 return new Response(html,HTMLHeaders(nonce));
             }
 
-            if(((new URLPattern({ pathname: "/timeline/discover/photos" })).exec(req.url))) {
-                const posts = await mb.getMicroBlogDiscoverPhotoPosts(mbToken);
-                const html = posts.map((p, index) => index < 9 ? `<li>
-                    <img src="${p.image}" alt="Image 1" class="img-responsive">
-                </li>` : '').join('');
-
-                return new Response(`<ul class="discover-gallery">${html}</ul>`,HTMLHeaders(nonce));
+            if((new URLPattern({ pathname: "/timeline/discover" })).exec(req.url) && user) {
+                const layout = new TextDecoder().decode(await Deno.readFile("discover.html"));
+                return new Response(layout.replaceAll('{{nonce}}', nonce),
+                  HTMLHeaders(nonce));
             }
+
+            // if(((new URLPattern({ pathname: "/timeline/discover/photos" })).exec(req.url))) {
+            //     const posts = await mb.getMicroBlogDiscoverPhotoPosts(mbToken);
+            //     const html = posts.map((p, index) => index < 9 ? `<li>
+            //         <img src="${p.image}" alt="Image 1" class="img-responsive">
+            //     </li>` : '').join('');
+
+            //     return new Response(`<ul class="discover-gallery">${html}</ul>`,HTMLHeaders(nonce));
+            // }
 
             const CHECK_ROUTE = new URLPattern({ pathname: "/timeline/check/:id" });
             if(CHECK_ROUTE.exec(req.url)) {

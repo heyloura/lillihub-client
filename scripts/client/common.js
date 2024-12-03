@@ -48,3 +48,37 @@ function removeHash() {
         document.body.scrollLeft = scrollH;
     }
 }
+function buildCarousel(id, imageArray) 
+{
+    let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
+    let column1 = '<div class="masonry-column-1">';
+    let column2 = '<div class="masonry-column-2">';
+    for(var i = 0; i < imageArray.length; i++) {
+        let column = i % 2;
+        if(column == 0) {
+            column1 += '<img data-id="'+id+'" src="'+imageArray[i]+'">';
+        }
+        if(column == 1) {
+            column2 += '<img data-id="'+id+'" src="'+imageArray[i]+'">';
+        } 
+    }
+    return grid + column1 + '</div>' + column2 + '</div>' + '</div>';
+}
+function buildCarousels() {
+    let galleries = document.querySelectorAll('.gallery');
+
+    for(let i = 0; i < galleries.length; i++) {
+        let loaded = galleries[i].getAttribute('data-loaded');
+        if(!loaded) {
+            let id = galleries[i].getAttribute('data-id');
+            let imgs = document.querySelectorAll('[data-gallery="'+id+'"]');
+            let imageArray = [];
+            for(let j = 0; j < imgs.length; j++) {
+                imageArray.push(imgs[j].getAttribute('src'));
+                imgs[j].remove();
+            }
+            galleries[i].innerHTML = buildCarousel(id, imageArray);
+            galleries[i].setAttribute('data-loaded', 'true');
+        }
+    }
+}
