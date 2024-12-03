@@ -218,13 +218,13 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         fetch("/timeline/discover/custom", { method: "get" })
             .then(response => response.text())
             .then(data => {
-                document.getElementById('discover-feed').innerHTML = data;
+                document.getElementById('discover-thread').innerHTML = data;
             });
     } else {
         fetch("/timeline/discover/feed", { method: "get" })
             .then(response => response.text())
             .then(data => {
-                document.getElementById('discover-feed').innerHTML = data;
+                document.getElementById('discover-thread').innerHTML = data;
             });
     }
 
