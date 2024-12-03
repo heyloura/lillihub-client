@@ -273,9 +273,12 @@ Deno.serve(async (req) => {
 
             if(((new URLPattern({ pathname: "/timeline/discover/custom" })).exec(req.url))) {
                 const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
-                console.log(posts);
-                const html = posts.map(post => postHTML(post)).join('');
-
+                const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username)).map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
+                const html = posts.map(post => {
+                    const stranger = follows.filter(f => f.username == post.username);
+                    const result = postHTML(i, null, stranger.length == 0);
+                    return result;
+                }).join('');
                 return new Response(html,HTMLHeaders(nonce));
             }
 
@@ -858,7 +861,10 @@ function postHTML(post, marker, stranger) {
                 <div class="card-top">
                     <div class="card-title h5">${post.name}</div>
                     <div class="card-subtitle">
-                        <a href="/timeline/user/${post.username}" class="text-gray">@${post.username}${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}</a> · <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
+                        <a href="/timeline/user/${post.username}" class="text-gray">@${post.username}
+                        ${stranger ? '&nbsp;<i class="icon icon-people text-gray"></i>' : ''}</a> · 
+                        <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
+                        ${post.conversation ? '&nbsp;·&nbsp;<i class="icon icon-message text-gray"></i>' : ''}
                     </div>           
                 </div>
                 <!--<div class="card-buttons">
