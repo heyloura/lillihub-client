@@ -383,6 +383,32 @@ Deno.serve(async (req) => {
                     ,HTMLHeaders(undefined,nonce));
             }
 
+            if(new URLPattern({ pathname: "/timeline/following" }).exec(req.url) && user) {
+                let fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let results = await fetching.json();
+        
+                const users = results.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0)).map((item) =>
+                    `<tr>
+                        <td><figure class="avatar avatar-lg" data-initial="${item.username.substring(0,1)}">
+                                <img src="${item.avatar}" loading="lazy">
+                            </figure>
+                        </td>
+                        <td>
+                            <div class="card-title">${item.name}</div>
+                            <div class="card-subtitle"><a href="/user/${item.username}" class="text-gray">@${item.username}</a></div>  
+                        </td>
+                        <td>${item.username.split('@').length == 1 ? '<span class="chip">Micro.blog</span>' : '<span class="chip">Other</span>'}</td>
+                    </tr>
+                    `
+                ).join('');
+        
+                const layout = new TextDecoder().decode(await Deno.readFile("following.html"));
+
+                return new Response(layout.replaceAll('{{nonce}}', nonce)
+                    .replaceAll('{{users}}', users)
+                    ,HTMLHeaders(nonce));
+            } 
+
             const TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
             if(TIMELINE_ROUTE.exec(req.url)) {
                 const id = TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
