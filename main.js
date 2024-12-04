@@ -854,7 +854,7 @@ function postHTML(post, marker, stranger) {
                     <div class="card-title h5">${post.name}</div>
                     <div class="card-subtitle">
                         <a href="/timeline/user/${post.username}" class="text-gray">
-                            ${stranger ? '<i class="icon icon-people text-gray"></i>&nbsp;·&nbsp;' : ''}
+                            ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
                             @${post.username}
                         </a> · 
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
