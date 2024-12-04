@@ -6219,6 +6219,8 @@ main img,main video {
   max-width: 100%;
   max-height: 500px;
   width: unset;
+  margin: 0px auto;
+  display: block;
 }
 
 h1, h2, h3, h4, h5, h6 {

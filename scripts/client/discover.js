@@ -27,8 +27,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
 
     //grab the discover posts
-    if(window.location.pathname.includes('/discover/')) {
-        fetch("/timeline/posts" + window.location.pathname, { method: "get" })
+    if(window.location.pathname.includes('/timeline/discover/')) {
+        console.log("/timeline/posts" + window.location.pathname.replace("/timeline/discover/",""))
+        fetch("/timeline/posts" + window.location.pathname.replace("/timeline/discover/",""), { method: "get" })
             .then(response => response.text())
             .then(data => {
                 document.getElementById('add-0').innerHTML = data;
