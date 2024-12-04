@@ -1,3 +1,68 @@
+function flattenedNote(note) {
+    return {
+        id: note ? note.id: 0,
+        title: note ? note.title: "",
+        content_text: note ? note.content_text: "",
+        content_html: note ? note.content_html: "",
+        url: note ? note.url: "",
+        published: note ? note.date_published: "",
+        modified: note ? note.date_modified: "",
+        encrypted: note && note._microblog ? note._microblog.is_encrypted : false,
+        shared: note && note._microblog ? note._microblog.is_shared : false,
+        shared_url: note && note._microblog ? note._microblog.shared_url : '',
+    }
+}
+
+export function noteHTML(note, notebookId) {
+    let n = flattenedNote(note);
+    return `
+        <article class="card parent" data-id="${n.id}" data-url="${n.url}" data-published="${n.published}" data-modified="${n.modified}" >
+            <header class="card-header">
+                <div class="card-top">
+                    <div id="title-${n.id}" class="card-title h5"></div> 
+                    <div class="card-subtitle">
+                        ${n.shared ? `<a target="_blank" class="text-gray" href="${n.shared_url}">${n.shared_url}</a>` : ''}
+                        ${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}
+                        <div class="d-inline" id="tags-${n.id}"></div>
+                    </div> 
+                </div>
+                <div class="card-buttons">
+                    <a class="btn btn-link" href="/notebooks/${notebookId}/edit/${n.id}"><i data-id="${n.id}" class="icon icon-edit"></i></a>
+                    <button data-id="${n.id}" class="btn btn-link openDetailsBtn float-right"><i data-id="${n.id}" class="icon icon-more-vert openDetailsBtn"></i></button>
+                </div>
+            </header>
+            <main>
+                <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>
+            </main>
+        </article>
+        <div class="modal" id="details-${n.id}">
+            <div data-id="${n.id}" class="modal-overlay closeDetailsBtn" aria-label="Close"></div>
+            <div class="modal-container">
+                <div class="modal-header">
+                    <button data-id="${n.id}" class="btn btn-clear float-right closeDetailsBtn" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <dl>
+                        <dt>id</dt>
+                        <dd>${n.id}</dd>
+                        <dt>url</dt>
+                        <dd>${n.url}</dd>
+                        <dt>modified</dt>
+                        <dd>${n.modified}</dd>
+                        <dt>encrypted</dt>
+                        <dd>${n.encrypted}</dd>
+                        <dt>shared</dt>
+                        <dd>${n.shared}</dd>
+                        <dt>metadata</dt>
+                        <dd id="metadata-${n.id}"></dd>
+                    </dl>
+                    <button data-id="${n.id}" data-notebookid="${notebookId}" class="btn btn-error deleteNote">Delete Note</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function flattenedBookmark(post) {
     return {
         id: post.id ? post.id : 0,

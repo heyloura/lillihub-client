@@ -577,8 +577,7 @@ Deno.serve(async (req) => {
                 if(NOTEBOOK_ROUTE.exec(req.url)) {
                     id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
                 }
-                
-                const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
+                        
                 let fetching = await fetch(`https://micro.blog/notes/notebooks${id ? '/' + id : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let results = await fetching.json();
 
@@ -586,6 +585,7 @@ Deno.serve(async (req) => {
                     return new Response(JSON.stringify(results),HTMLHeaders(nonce));
                 }
 
+                const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
                 const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
                     `<li class="menu-item ${id && item.title == id ? 'active' : ''}"><a class="${id && item.title == id ? 'text-secondary' : ''}" href="/notebooks/${item.id}">${item.title}</a></span>`
                 ).join('');
