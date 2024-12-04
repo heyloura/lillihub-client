@@ -583,15 +583,6 @@ Deno.serve(async (req) => {
                         id = results.items[0].id;
                     }
                 }
-                
-                console.log(id);
-
-                if(id) {
-                    console.log(results);
-                    fetching = await fetch(`https://micro.blog/notes/notebooks${id ? '/' + id : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    results = await fetching.json();
-                    return new Response(results.items.map(i => utility.noteHTML(i, id)).join(''),HTMLHeaders(nonce));
-                }
 
                 const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
                 const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
@@ -600,6 +591,27 @@ Deno.serve(async (req) => {
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
                     .replaceAll('{{notebooks}}', notebooks),
                     HTMLHeaders(nonce));
+            }
+
+            const NOTEBOOK_API_ROUTE = new URLPattern({ pathname: "/notebooks/notebooks/:id" });
+            if(((new URLPattern({ pathname: "/notebooks/notebooks/" }).exec(req.url)) || NOTEBOOK_API_ROUTE.exec(req.url)) && user) {
+                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let results = await fetching.json();
+
+                let id = '';
+                if(NOTEBOOK_API_ROUTE.exec(req.url)) {
+                    id = NOTEBOOK_API_ROUTE.exec(req.url).pathname.groups.id;
+                    if(id == 0) {
+                        id = results.items[0].id;
+                    }
+                }
+                
+                if(id) {
+                    console.log(results);
+                    fetching = await fetch(`https://micro.blog/notes/notebooks${id ? '/' + id : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    results = await fetching.json();
+                    return new Response(results.items.map(i => utility.noteHTML(i, id)).join(''),HTMLHeaders(nonce));
+                }
             }
 
 

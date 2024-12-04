@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         return base64_encoded;
     }
     
-    let loaded = false;
     if(localStorage.getItem('mbKey') && localStorage.getItem('starting_notebook')){
         fetch("/bookmarks/bookmarks", { method: "get" })
             .then(response => response.text())
@@ -61,48 +60,49 @@ document.addEventListener("DOMContentLoaded", async (event) => {
                 document.getElementById('add-0').innerHTML = data;
             });
     } else if(localStorage.getItem('mbKey')) {
-        fetch("/notebooks/0", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
+        fetch("/notebooks/notebooks/0", { method: "get" })
+            .then(async response => response.text())
+            .then(async data => {
                 document.getElementById('add-0').innerHTML = data;
+                await displayNotes();
             });
     } else {
         document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
-    }
-
-    if(loaded) {
-        const converter = new showdown.Converter({metadata: true, openLinksInNewWindow: true, strikethrough:true, tables:true, tasklists:true, emoji:true });
-        const notes = document.querySelectorAll('.decryptMe');
-        let tags = new Set();
-        for (var i = 0; i < notes.length; i++) {
-            var markdown = await decryptWithKey(notes[i].innerHTML);
-            notes[i].innerHTML = converter.makeHtml(markdown);
-            var metadata = converter.getMetadata();
-            let id = notes[i].getAttribute('data-id');
-            if(metadata) {
-                if(metadata.title) {
-                    document.getElementById('title-' + id).innerHTML = metadata.title;
-                }
-                if(metadata.tags) {
-                    document.getElementById('tags-' + id).innerHTML = metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ');
-                    metadata.tags.substring(1,metadata.tags.length - 1).split(',').forEach(t => tags.add(t));
-                    }
-                document.getElementById('metadata-' + id).innerHTML = JSON.stringify(metadata,null,2);
-            }
-        }
-        hljs.highlightAll();
-        const tables = document.querySelectorAll('table');
-        for (var i = 0; i < tables.length; i++) {
-            tables[i].classList.add('table');
-            tables[i].classList.add('table-striped');
-        }
-        if(Array.from(tags).length > 0) {
-            document.getElementById('noteTags').innerHTML = Array.from(tags).map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span> ').join('')
-        }
     }
 });
 
 document.addEventListener("click", (item) => {
 
 });
+
+async function displayNotes() {
+    const converter = new showdown.Converter({metadata: true, openLinksInNewWindow: true, strikethrough:true, tables:true, tasklists:true, emoji:true });
+    const notes = document.querySelectorAll('.decryptMe');
+    let tags = new Set();
+    for (var i = 0; i < notes.length; i++) {
+        var markdown = await decryptWithKey(notes[i].innerHTML);
+        notes[i].innerHTML = converter.makeHtml(markdown);
+        var metadata = converter.getMetadata();
+        let id = notes[i].getAttribute('data-id');
+        if(metadata) {
+            if(metadata.title) {
+                document.getElementById('title-' + id).innerHTML = metadata.title;
+            }
+            if(metadata.tags) {
+                document.getElementById('tags-' + id).innerHTML = metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ');
+                metadata.tags.substring(1,metadata.tags.length - 1).split(',').forEach(t => tags.add(t));
+                }
+            document.getElementById('metadata-' + id).innerHTML = JSON.stringify(metadata,null,2);
+        }
+    }
+    hljs.highlightAll();
+    const tables = document.querySelectorAll('table');
+    for (var i = 0; i < tables.length; i++) {
+        tables[i].classList.add('table');
+        tables[i].classList.add('table-striped');
+    }
+    if(Array.from(tags).length > 0) {
+        document.getElementById('noteTags').innerHTML = Array.from(tags).map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span> ').join('')
+    }
+}
 
