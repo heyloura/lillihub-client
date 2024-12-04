@@ -1363,15 +1363,15 @@ dl dd {
 }
 
 .table.table-striped tbody tr:nth-of-type(odd) {
-  background: #f7f8f9
+  background: var(--background-shade-4);
 }
 
 .table tbody tr.active,.table.table-striped tbody tr.active {
-  background: #eef0f3
+  background: var(--background-shade-3);
 }
 
 .table.table-hover tbody tr:hover {
-  background: #eef0f3
+  background: var(--background-shade-3);
 }
 
 .table.table-scroll {
@@ -1382,7 +1382,7 @@ dl dd {
 }
 
 .table td,.table th {
-  border-bottom: .05rem solid #dadee4;
+  border-bottom: .05rem solid var(--background-shade-4);;
   padding: .6rem .4rem
 }
 
