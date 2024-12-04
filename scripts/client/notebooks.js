@@ -51,7 +51,7 @@ document.addEventListener("click", (item) => {
         if(item.target.tagName.toLowerCase() == "a"){
             return;
         }
-        const id = parentHasClassRipple != 0 ?  parentHasClassRipple : item.target.getAttribute('data-id');
+        const id = parentHasClassRipple && parentHasClassRipple != 0 ?  parentHasClassRipple : item.target.getAttribute('data-id');
         redirectToAnchor(`#${id}`);
     }
 });
