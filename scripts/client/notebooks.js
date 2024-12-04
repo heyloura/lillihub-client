@@ -47,9 +47,15 @@ document.addEventListener("input", (event) => {
     if(event.target.classList.contains('search')) {
         // hide the default section...
         // show the rest?
-        liveSearch('tr', 'search');
-        liveSearch('section', 'search');
-        document.querySelector('main').classList.remove('pages');
+        if(document.getElementById(searchboxId).value != '') {
+            liveSearch('section', 'search');
+            document.querySelector('main').classList.remove('pages');
+            document.querySelector('table').classList.add('d-hide');
+        } else {
+            document.querySelector('main').classList.add('pages');
+            document.querySelector('table').classList.remove('d-hide');
+        }
+
     }
 });
 
@@ -170,7 +176,7 @@ async function displayNotes(notes) {
         // }
     }
     document.getElementById('add-0').innerHTML = result + '</table>';
-    // hljs.highlightAll();
+    hljs.highlightAll();
     // const tables = document.querySelectorAll('table');
     // for (var i = 0; i < tables.length; i++) {
     //     tables[i].classList.add('table');
