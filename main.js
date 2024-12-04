@@ -254,7 +254,7 @@ Deno.serve(async (req) => {
             }
 
             const DISCOVER_ROUTE = new URLPattern({ pathname: "/timeline/discover/:id" });
-            if((new URLPattern({ pathname: "/discover" }).exec(req.url)) || DISCOVER_ROUTE.exec(req.url) && user) {
+            if(((new URLPattern({ pathname: "/timeline/discover" }).exec(req.url)) || DISCOVER_ROUTE.exec(req.url)) && user) {
                 let id = '';
                 if(DISCOVER_ROUTE.exec(req.url)) {
                     id = DISCOVER_ROUTE.exec(req.url).pathname.groups.id;
