@@ -231,27 +231,6 @@ Deno.serve(async (req) => {
                 });
             }
 
-            // if(((new URLPattern({ pathname: "/timeline/suggestions" })).exec(req.url))) {
-            //     const users = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
-
-            //     const random = users[Math.floor(Math.random()*users.length)];
-            //     let suggestions = await mb.getMicroBlogFollowing(mbToken, random.username, false);
-            //     suggestions = suggestions.reverse().slice(0, 5);
-
-            //     console.log(suggestions)
-
-            //     return new Response(suggestions.map(s => {
-            //         return `<div class="tile">
-            //         <div class="tile-icon">
-            //             <figure class="avatar avatar-lg"><img src="${s.avatar}" alt="Avatar"></figure>
-            //         </div>
-            //         <div class="tile-content">
-            //             <p class="tile-title">${s.name}<br /><span class="tile-subtitle text-gray"><a href="/timeline/user/${s.username}">@${s.username}</a></span></p>
-                        
-            //         </div>
-            //         </div>`}).join(''),HTMLHeaders(nonce));
-            // }
-
             if(((new URLPattern({ pathname: "/timeline/discover/feed" })).exec(req.url))) {
                 const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
                 const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));
@@ -276,6 +255,23 @@ Deno.serve(async (req) => {
 
             if((new URLPattern({ pathname: "/timeline/discover" })).exec(req.url) && user) {
                 const layout = new TextDecoder().decode(await Deno.readFile("discover.html"));
+                return new Response(layout.replaceAll('{{nonce}}', nonce),
+                  HTMLHeaders(nonce));
+            }
+
+            // if(((new URLPattern({ pathname: "/timeline/mentions/mentions" })).exec(req.url))) {
+            //     const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
+            //     const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));
+            //     const html = posts.map(post => {
+            //         const stranger = following.filter(f => f.username == post.username);
+            //         const result = postHTML(post, null, stranger.length == 0);
+            //         return result;
+            //     }).join('');
+            //     return new Response(html,HTMLHeaders(nonce));
+            // }
+
+            if((new URLPattern({ pathname: "/timeline/mentions" })).exec(req.url) && user) {
+                const layout = new TextDecoder().decode(await Deno.readFile("mentions.html"));
                 return new Response(layout.replaceAll('{{nonce}}', nonce),
                   HTMLHeaders(nonce));
             }
@@ -315,7 +311,13 @@ Deno.serve(async (req) => {
             if((POSTS_ROUTE.exec(req.url) || TAGMOJI_ROUTE.exec(req.url)) && user) {
                 const id = POSTS_ROUTE.exec(req.url) ? POSTS_ROUTE.exec(req.url).pathname.groups.id : 'discover/' + TAGMOJI_ROUTE.exec(req.url).pathname.groups.id;
                 const posts = await mb.getMicroBlogUserOrTagmojiPosts(mbToken, id);
-                return new Response(posts.map(post => postHTML(post)).join(''),HTMLHeaders());
+                const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));
+                const html = posts.map(post => {
+                    const stranger = following.filter(f => f.username == post.username);
+                    const result = postHTML(post, null, stranger.length == 0);
+                    return result;
+                }).join('');
+                return new Response(html,HTMLHeaders(nonce));
             }
 
             const CONVERSATION_ROUTE = new URLPattern({ pathname: "/timeline/conversation/:id" });
