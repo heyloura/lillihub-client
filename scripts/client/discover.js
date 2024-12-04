@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     //grab the discover posts
     if(window.location.pathname.includes('/timeline/discover/')) {
-        console.log("/timeline/posts" + window.location.pathname.replace("/timeline/discover",""))
-        fetch("/timeline/posts" + window.location.pathname.replace("/timeline/discover",""), { method: "get" })
+        console.log("/timeline/posts" + window.location.pathname.replace("/timeline",""))
+        fetch("/timeline/posts" + window.location.pathname.replace("/timeline",""), { method: "get" })
             .then(response => response.text())
             .then(data => {
                 document.getElementById('add-0').innerHTML = data;
