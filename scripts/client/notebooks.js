@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
             .then(async data => {
                 console.log(data)
                 if(data && data.length > 0) {
-                    document.querySelector('notebook-' + data[0].notebook_id).classList.add('active');
+                    document.querySelector('.notebook-' + data[0].notebook_id).classList.add('active');
                 }
                 //document.getElementById('add-0').innerHTML = data;
                 await displayNotes(data);
