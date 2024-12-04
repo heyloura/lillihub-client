@@ -1,5 +1,27 @@
 document.addEventListener("DOMContentLoaded", async (event) => {
-    //grab the notebooks
+    if(localStorage.getItem('mbKey') && localStorage.getItem('starting_notebook')){
+        fetch("/bookmarks/bookmarks", { method: "get" })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('add-0').innerHTML = data;
+            });
+    } else if(localStorage.getItem('mbKey')) {
+        fetch("/notebooks/notebooks/0", { method: "get" })
+            .then(async response => response.text())
+            .then(async data => {
+                document.getElementById('add-0').innerHTML = data;
+                await displayNotes();
+            });
+    } else {
+        document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
+    }
+});
+
+document.addEventListener("click", (item) => {
+
+});
+
+async function displayNotes() {
     const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importKey(
         'raw',
         hexStringToArrayBuffer(localStorage.getItem("mbKey").substr(4)),
@@ -53,29 +75,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         return base64_encoded;
     }
     
-    if(localStorage.getItem('mbKey') && localStorage.getItem('starting_notebook')){
-        fetch("/bookmarks/bookmarks", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('add-0').innerHTML = data;
-            });
-    } else if(localStorage.getItem('mbKey')) {
-        fetch("/notebooks/notebooks/0", { method: "get" })
-            .then(async response => response.text())
-            .then(async data => {
-                document.getElementById('add-0').innerHTML = data;
-                await displayNotes();
-            });
-    } else {
-        document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
-    }
-});
-
-document.addEventListener("click", (item) => {
-
-});
-
-async function displayNotes() {
     const converter = new showdown.Converter({metadata: true, openLinksInNewWindow: true, strikethrough:true, tables:true, tasklists:true, emoji:true });
     const notes = document.querySelectorAll('.decryptMe');
     let tags = new Set();
