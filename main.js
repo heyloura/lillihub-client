@@ -590,7 +590,7 @@ Deno.serve(async (req) => {
                     console.log(results);
                     fetching = await fetch(`https://micro.blog/notes/notebooks${id ? '/' + id : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     results = await fetching.json();
-                    return new Response(results.items.map(i => noteHTML(i, id)).join(''),HTMLHeaders(nonce));
+                    return new Response(results.items.map(i => utility.noteHTML(i, id)).join(''),HTMLHeaders(nonce));
                 }
 
                 const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
