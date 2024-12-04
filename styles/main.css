@@ -1382,7 +1382,7 @@ dl dd {
 }
 
 .table td,.table th {
-  border-bottom: .05rem solid var(--background-shade-4);;
+  border-bottom: .05rem solid var(--background-tint-3);;
   padding: .6rem .4rem
 }
 
