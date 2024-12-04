@@ -47,7 +47,7 @@ document.addEventListener("input", (event) => {
     if(event.target.classList.contains('search')) {
         // hide the default section...
         // show the rest?
-        if(document.getElementById(searchboxId).value != '') {
+        if(document.getElementById('search').value != '') {
             liveSearch('section', 'search');
             document.querySelector('main').classList.remove('pages');
             document.querySelector('table').classList.add('d-hide');
