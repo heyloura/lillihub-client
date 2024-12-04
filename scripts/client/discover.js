@@ -27,7 +27,14 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
 
     //grab the discover posts
-    if(localStorage.getItem('discover_setting') === 'custom') {
+    if(window.location.pathname.includes('/discover/')) {
+        fetch("/timeline/posts" + window.location.pathname, { method: "get" })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('add-0').innerHTML = data;
+                buildCarousels();
+            });
+    } else if(localStorage.getItem('discover_setting') === 'custom') {
         fetch("/timeline/discover/custom", { method: "get" })
             .then(response => response.text())
             .then(data => {
