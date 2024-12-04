@@ -1363,15 +1363,15 @@ dl dd {
 }
 
 .table.table-striped tbody tr:nth-of-type(odd) {
-  background: var(--background-shade-4);
+  background: var(--background-tint-4);
 }
 
 .table tbody tr.active,.table.table-striped tbody tr.active {
-  background: var(--background-shade-3);
+  background: var(--background-tint-3);
 }
 
 .table.table-hover tbody tr:hover {
-  background: var(--background-shade-3);
+  background: var(--background-tint-3);
 }
 
 .table.table-scroll {
