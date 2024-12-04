@@ -1,3 +1,28 @@
+// set up gesture navigation
+let touchstartX = 0
+let touchendX = 0
+    
+function checkDirection() {
+  if (touchendX < touchstartX - 50) {
+    history.back();
+  }
+  if (touchendX > touchstartX) return;
+}
+
+document.getElementById('conversation').addEventListener('touchstart', e => {
+  touchstartX = e.changedTouches[0].screenX
+})
+
+document.getElementById('conversation').addEventListener('touchend', e => {
+  touchendX = e.changedTouches[0].screenX
+  checkDirection()
+})
+
+
+if(window.location.hash) {
+    removeHash();
+}
+
 document.addEventListener("DOMContentLoaded", async (event) => {
     if(localStorage.getItem('mbKey') && localStorage.getItem('starting_notebook')){
         document.getElementById('add-0').innerHTML = 'not ready yet........';
@@ -19,8 +44,15 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 });
 
 document.addEventListener("click", (item) => {
-    if(item.target.classList.contains('ripple')) {
-        redirectToAnchor(`#${item.target.getAttribute('data-id')}`);
+    var parentHasClassRipple = findParentHasClassReturnId(item.target, 'ripple')
+    if(parentHasClassRipple != 0 || item.target.classList.contains('ripple')) {
+        //check if item is an anchor... if yes, bail...
+        console.log(item.target.tagName);
+        if(item.target.tagName.toLowerCase() == "a"){
+            return;
+        }
+        const id = parentHasClassRipple != 0 ?  parentHasClassRipple : item.target.getAttribute('data-id');
+        redirectToAnchor(`#${id}`);
     }
 });
 
