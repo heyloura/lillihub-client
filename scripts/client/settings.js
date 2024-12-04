@@ -10,6 +10,10 @@ document.addEventListener("DOMContentLoaded", event => {
         document.querySelector(`input[value="${localStorage.getItem('discover_setting')}"]`).checked = true;
     }
 
+    if(localStorage.getItem('mbKey')){
+        document.getElementById('mbKey').value = localStorage.getItem('mbKey');
+    }
+
 });
 document.addEventListener("click", (item) => { 
     // Posting settings
