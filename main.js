@@ -255,7 +255,17 @@ Deno.serve(async (req) => {
 
             if((new URLPattern({ pathname: "/timeline/discover" })).exec(req.url) && user) {
                 const layout = new TextDecoder().decode(await Deno.readFile("discover.html"));
-                return new Response(layout.replaceAll('{{nonce}}', nonce),
+                let fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let results = await fetching.json();
+                const tagmojiChips = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                    `<span class="chip ${id && item.name == id ? 'bg-primary' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                ).join('');
+                const tagmojiMenu = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                    `<li class="menu-item ${id && item.name == id ? 'active' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                ).join('');
+                return new Response(layout.replaceAll('{{nonce}}', nonce)
+                    .replaceAll('{{tagmojiChips}}', tagmojiChips)
+                    .replaceAll('{{tagmojiMenu}}', tagmojiMenu),
                   HTMLHeaders(nonce));
             }
 
