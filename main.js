@@ -253,28 +253,19 @@ Deno.serve(async (req) => {
             // }
 
             if(((new URLPattern({ pathname: "/timeline/discover/feed" })).exec(req.url))) {
-                const posts = await mb.getMicroBlogDiscoverPosts(mbToken);
-                const html = posts.map(p => !p.image ? `
-                    <div class="tile">
-                        <div class="tile-icon">
-                            ${getAvatar(p, 'sm')}
-                        </div>
-                        <div class="tile-content">
-                            <p class="tile-title text-bold">
-                                ${p.username}
-                            </p>
-                            <p class="tile-subtitle">${p.content}</p>
-                        </div>
-                    </div>
-                ` : '').join('');
-
+                const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
+                const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));
+                const html = posts.map(post => {
+                    const stranger = following.filter(f => f.username == post.username);
+                    const result = postHTML(post, null, stranger.length == 0);
+                    return result;
+                }).join('');
                 return new Response(html,HTMLHeaders(nonce));
             }
 
             if(((new URLPattern({ pathname: "/timeline/discover/custom" })).exec(req.url))) {
                 const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
-                const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));//.map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
-                //const follows = following.map(f => {return JSON.parse(f)});
+                const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));
                 const html = posts.map(post => {
                     const stranger = following.filter(f => f.username == post.username);
                     const result = postHTML(post, null, stranger.length == 0);
@@ -863,9 +854,9 @@ function postHTML(post, marker, stranger) {
                     <div class="card-title h5">${post.name}</div>
                     <div class="card-subtitle">
                         <a href="/timeline/user/${post.username}" class="text-gray">@${post.username}
-                        ${stranger ? '&nbsp;<i class="icon icon-people text-gray"></i>' : ''}</a> · 
+                        ${stranger ? '&nbsp;·&nbsp;<i class="icon icon-people text-gray"></i>' : ''}</a> · 
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
-                        ${post.conversation ? '&nbsp;·&nbsp;<i class="icon icon-message text-gray"></i>' : ''}
+                        ${post.conversation && !post.mention ? '&nbsp;·&nbsp;<i class="icon icon-message text-gray"></i>' : ''}
                     </div>           
                 </div>
                 <!--<div class="card-buttons">
