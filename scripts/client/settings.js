@@ -44,4 +44,18 @@ document.addEventListener("click", (item) => {
     if(item.target.classList.contains('dismissSaveDiscoverSettingToast')) {
         document.getElementById('saveDiscoverSettingToast').classList.add("hide");
     }
+    if(item.target.classList.contains('savePrivateNotesKey')) {
+        localStorage.setItem('mbKey',document.getElementById('mbKey').value)
+        document.getElementById('savePrivateNotesKeyToast').classList.remove("hide");
+    }
+    if(item.target.classList.contains('dismissSavePrivateNotesKeyToast')) {
+        document.getElementById('savePrivateNotesKeyToast').classList.add("hide");
+    }
+    if(item.target.classList.contains('deletePrivateNotesKey')) {
+        localStorage.removeItemItem('mbKey')
+        document.getElementById('deletePrivateNotesKeyToast').classList.remove("hide");
+    }
+    if(item.target.classList.contains('dismissDeletePrivateNotesKeyToast')) {
+        document.getElementById('deletePrivateNotesKeyToast').classList.add("hide");
+    }
 });

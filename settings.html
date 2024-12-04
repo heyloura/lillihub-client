@@ -80,6 +80,37 @@
                     <div class="card mb-2">
                         <div class="card-body">
                             <div id="posting">
+                                <h2>Display Options</h2>
+                                <div class="form-group">
+                                    <label class="form-checkbox">
+                                      <input type="checkbox" id="showBlog" checked>
+                                      <i class="form-icon"></i> Show the 'Blog' link
+                                    </label><br/>
+                                    <label class="form-checkbox">
+                                        <input type="checkbox" id="showBlog" checked>
+                                        <i class="form-icon"></i> Show the 'Bookmarks' link
+                                    </label><br/>
+                                    <label class="form-checkbox">
+                                        <input type="checkbox" id="showBlog" checked>
+                                        <i class="form-icon"></i> Show the 'Bookshelves' link
+                                    </label><br/>
+                                    <label class="form-checkbox">
+                                        <input type="checkbox" id="showBlog" checked>
+                                        <i class="form-icon"></i> Show the 'Notes' link
+                                    </label><br/>
+                                  </div>
+                                <button class="btn btn-primary savePostingSettings">Save</button>
+                                <div id="saveDisplaySettings" class="toast toast-dark hide">
+                                    <button class="btn btn-clear float-right saveDisplaySettings"></button>
+                                    Settings have been saved.
+                                </div>  
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div id="posting">
                                 <h2>Discovery Options</h2>
                                 <p>
                                     Micro.blog has a person-curated discover feed of posts by Micro.blog users.
@@ -107,31 +138,23 @@
                     </div>
                     <div class="card mb-2">
                         <div class="card-body">
-                            <div id="posting">
-                                <h2>Display Options</h2>
-                                <div class="form-group">
-                                    <label class="form-checkbox">
-                                      <input type="checkbox" id="showBlog" checked>
-                                      <i class="form-icon"></i> Show the 'Blog' link
-                                    </label><br/>
-                                    <label class="form-checkbox">
-                                        <input type="checkbox" id="showBlog" checked>
-                                        <i class="form-icon"></i> Show the 'Bookmarks' link
-                                    </label><br/>
-                                    <label class="form-checkbox">
-                                        <input type="checkbox" id="showBlog" checked>
-                                        <i class="form-icon"></i> Show the 'Bookshelves' link
-                                    </label><br/>
-                                    <label class="form-checkbox">
-                                        <input type="checkbox" id="showBlog" checked>
-                                        <i class="form-icon"></i> Show the 'Notes' link
-                                    </label><br/>
-                                  </div>
-                                <button class="btn btn-primary savePostingSettings">Save</button>
-                                <div id="saveDisplaySettings" class="toast toast-dark hide">
-                                    <button class="btn btn-clear float-right saveDisplaySettings"></button>
-                                    Settings have been saved.
+                            <div id="note">
+                                <h2>Micro.blog Private Notes</h2>
+                                <p>
+                                    Micro.blog has private notes. If you haven't signed up yet, go here.
+                                    Save you notebook key here:
+                                </p>
+                                <input type="password" id="mbKey">
+                                <button class="btn btn-danger deletePrivateNotesKey">Delete</button>
+                                <button class="btn btn-primary savePrivateNotesKey">Save</button>
+                                <div id="savePrivateNotesKeyToast" class="toast toast-dark hide">
+                                    <button class="btn btn-clear float-right dismissSavePrivateNotesKeyToast"></button>
+                                    Private Key have been saved.
                                 </div>  
+                                <div id="deletePrivateNotesKeyToast" class="toast toast-dark hide">
+                                    <button class="btn btn-clear float-right dismissDeletePrivateNotesKeyToast"></button>
+                                    Private Key have been removed.
+                                </div>
                             </div>
 
                         </div>
