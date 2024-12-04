@@ -726,7 +726,7 @@ Deno.serve(async (req) => {
                   const layout = new TextDecoder().decode(await Deno.readFile("loggingIn.html"));
                   return new Response(layout.replaceAll('{{nonce}}', nonce)
                         .replace('{{year}}', new Date().getFullYear()),
-                    HTMLHeaders(nonce,`atoken=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`));
+                    HTMLHeaders(nonce,`atoken=${accessToken};SameSite=Lax;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`));
                 }
 
                 return returnBadGateway(`Micro.blog indieauth did not return a token. ${response.error} ${response.access_token}`); 
