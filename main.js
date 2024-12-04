@@ -583,13 +583,11 @@ Deno.serve(async (req) => {
                 let results = await fetching.json();
 
                 console.log(results);
-                // const tagmojiChips = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                //     `<span class="chip ${id && item.name == id ? 'bg-primary' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
-                // ).join('');
-                // const tagmojiMenu = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                //     `<li class="menu-item ${id && item.name == id ? 'active' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
-                // ).join('');
-                return new Response(layout.replaceAll('{{nonce}}', nonce),
+                const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
+                    `<li class="menu-item ${id && item.title == id ? 'active' : ''}"><a class="${id && item.title == id ? 'text-secondary' : ''}" href="/notebooks/${item.id}">${item.title}</a></span>`
+                ).join('');
+                return new Response(layout.replaceAll('{{nonce}}', nonce)
+                    .replaceAll('{{notebooks}}', notebooks),
                     HTMLHeaders(nonce));
             }
 
