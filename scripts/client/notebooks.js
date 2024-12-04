@@ -45,9 +45,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
 document.addEventListener("click", (item) => {
     var parentHasClassRipple = findParentHasClassReturnId(item.target, 'ripple')
-    if(parentHasClassRipple != 0 || item.target.classList.contains('ripple')) {
+    if(parentHasClassRipple != 0 || item.target.classList.contains('ripple'), item.target.getAttribute('data-id')) {
         //check if item is an anchor... if yes, bail...
-        console.log(item.target.tagName);
+        console.log(item.target.tagName, parentHasClassRipple, );
         if(item.target.tagName.toLowerCase() == "a"){
             return;
         }
