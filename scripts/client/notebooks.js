@@ -43,6 +43,15 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     }
 });
 
+document.addEventListener("input", (event) => {  
+    if(event.target.classList.contains('search')) {
+        // hide the default section...
+        // show the rest?
+        liveSearch('tr', 'search');
+        liveSearch('section', 'search');
+    }
+});
+
 document.addEventListener("click", (item) => {
     var parentHasClassRipple = findParentHasClassReturnId(item.target, 'ripple')
     if(parentHasClassRipple != 0 || item.target.classList.contains('ripple'), item.target.getAttribute('data-id')) {
