@@ -584,7 +584,7 @@ Deno.serve(async (req) => {
                 fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 results = await fetching.json();
                 //console.log(results.items);
-                return new Response(JSON.stringify(results.items), JSONHeaders());
+                return new Response(JSON.stringify(results.items.map(i => i.notebook_id = id)), JSONHeaders());
                 //return new Response(results.items.map(i => utility.noteHTML(i, id)).join(''),HTMLHeaders(nonce));
             }
 

@@ -6,8 +6,11 @@ document.addEventListener("DOMContentLoaded", async (event) => {
             .then(async response => response.json())
             .then(async data => {
                 console.log(data)
+                if(data && data.length > 0) {
+                    document.querySelector('notebook-' + data[0].notebook_id).classList.add('active');
+                }
                 //document.getElementById('add-0').innerHTML = data;
-                //await displayNotes();
+                await displayNotes(data);
             });
     } else {
         document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
@@ -18,7 +21,7 @@ document.addEventListener("click", (item) => {
 
 });
 
-async function displayNotes() {
+async function displayNotes(notes) {
     const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importKey(
         'raw',
         hexStringToArrayBuffer(localStorage.getItem("mbKey").substr(4)),
@@ -73,32 +76,53 @@ async function displayNotes() {
     }
 
     const converter = new showdown.Converter({metadata: true, openLinksInNewWindow: true, strikethrough:true, tables:true, tasklists:true, emoji:true });
-    const notes = document.querySelectorAll('.decryptMe');
     let tags = new Set();
+    let result = '<table class="table table-striped">'
     for (var i = 0; i < notes.length; i++) {
-        var markdown = await decryptWithKey(notes[i].innerHTML);
-        notes[i].innerHTML = converter.makeHtml(markdown);
-        var metadata = converter.getMetadata();
-        let id = notes[i].getAttribute('data-id');
-        if(metadata) {
-            if(metadata.title) {
-                document.getElementById('title-' + id).innerHTML = metadata.title;
+        let note = notes[i];
+        result += '<tr>'
+        if(!note._microblog.is_shared) {
+            var markdown = converter.makeHtml(await decryptWithKey(note.content_text));
+            var metadata = converter.getMetadata();
+            if(metadata && metadata.title && metadata.tags) {
+                result += `<td>${metadata.title}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
+            } else if(metadata && metadata.title) {
+                result += `<td>${metadata.title}</td>`;
+            } else if(metadata && metadata.tags) {
+                result += `<td>${note.id}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
+            } else {
+                result += `<td>${note.id}</td>`;
             }
-            if(metadata.tags) {
-                document.getElementById('tags-' + id).innerHTML = metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ');
-                metadata.tags.substring(1,metadata.tags.length - 1).split(',').forEach(t => tags.add(t));
-                }
-            document.getElementById('metadata-' + id).innerHTML = JSON.stringify(metadata,null,2);
+            
+        } else {
+            result += '<td>shared note found....</td>';
         }
+
+        result += '</tr>'
+        
+        // notes[i].innerHTML = converter.makeHtml(markdown);
+        // var metadata = converter.getMetadata();
+        // let id = notes[i].getAttribute('data-id');
+        // if(metadata) {
+        //     if(metadata.title) {
+        //         document.getElementById('title-' + id).innerHTML = metadata.title;
+        //     }
+        //     if(metadata.tags) {
+        //         document.getElementById('tags-' + id).innerHTML = metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ');
+        //         metadata.tags.substring(1,metadata.tags.length - 1).split(',').forEach(t => tags.add(t));
+        //         }
+        //     document.getElementById('metadata-' + id).innerHTML = JSON.stringify(metadata,null,2);
+        // }
     }
-    hljs.highlightAll();
-    const tables = document.querySelectorAll('table');
-    for (var i = 0; i < tables.length; i++) {
-        tables[i].classList.add('table');
-        tables[i].classList.add('table-striped');
-    }
-    if(Array.from(tags).length > 0) {
-        document.getElementById('noteTags').innerHTML = Array.from(tags).map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span> ').join('')
-    }
+    document.getElementById('add-0').innerHTML = result + '</table>';
+    // hljs.highlightAll();
+    // const tables = document.querySelectorAll('table');
+    // for (var i = 0; i < tables.length; i++) {
+    //     tables[i].classList.add('table');
+    //     tables[i].classList.add('table-striped');
+    // }
+    // if(Array.from(tags).length > 0) {
+    //     document.getElementById('noteTags').innerHTML = Array.from(tags).map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span> ').join('')
+    // }
 }
 
