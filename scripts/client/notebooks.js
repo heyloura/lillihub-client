@@ -2,7 +2,8 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     if(localStorage.getItem('mbKey') && localStorage.getItem('starting_notebook')){
         document.getElementById('add-0').innerHTML = 'not ready yet........';
     } else if(localStorage.getItem('mbKey')) {
-        fetch("/notebooks/0", { method: "get" })
+        let id = document.getElementById('notebook_id').value;
+        fetch(`/notebooks/${id}`, { method: "get" })
             .then(async response => response.json())
             .then(async data => {
                 console.log(data)

@@ -571,12 +571,12 @@ Deno.serve(async (req) => {
 
 
 
-            const NOTEBOOK_ROUTE = new URLPattern({ pathname: "/notebooks/:id" });
-            if(NOTEBOOK_ROUTE.exec(req.url)) {
+            const NOTEBOOK_FETCH_ROUTE = new URLPattern({ pathname: "/notebooks/notebooks/:id" });
+            if(NOTEBOOK_FETCH_ROUTE.exec(req.url)) {
                 let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let results = await fetching.json();
 
-                let id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
+                let id = NOTEBOOK_FETCH_ROUTE.exec(req.url).pathname.groups.id;
                 if(id == 0) {
                     id = results.items[0].id;
                 }
@@ -588,16 +588,23 @@ Deno.serve(async (req) => {
                 //return new Response(results.items.map(i => utility.noteHTML(i, id)).join(''),HTMLHeaders(nonce));
             }
 
-            if(new URLPattern({ pathname: "/notebooks" }).exec(req.url)) {
+            const NOTEBOOK_ROUTE = new URLPattern({ pathname: "/notebooks/:id" });
+            if(new URLPattern({ pathname: "/notebooks" }).exec(req.url) || NOTEBOOK_ROUTE.exec(req.url)) {
                 let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let results = await fetching.json();
 
+                let id = results.items[0].id;
+                if(NOTEBOOK_ROUTE.exec(req.url)) {
+                    id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
+                }
+
                 const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
                 const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
-                    `<li class="menu-item notebook-${item.id}"><a class="notebook-${item.id}-text" href="/notebooks/${item.id}">${item.title}</a></span>`
+                    `<li class="menu-item"><a class="notebook-${item.id}" href="/notebooks/${item.id}">${item.title}</a></span>`
                 ).join('');
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
-                    .replaceAll('{{notebooks}}', notebooks),
+                    .replaceAll('{{notebooks}}', notebooks)
+                    .replaceAll('{{notebookId}}', id),
                     HTMLHeaders(nonce));
             }
 
