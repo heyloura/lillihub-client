@@ -99,4 +99,9 @@ document.addEventListener("click", (item) => {
         const target = item.target.getAttribute('data-target');
         document.getElementById(target).value = document.getElementById(target).value + '@' + username + ' ';
     }
+    if(item.target.classList.contains('searchPost')) {
+        var term = document.getElementById('searchPost').value;
+        alert(term);
+        //window.location.href = '/posts/search?q=' + encodeURIComponent(term);
+    }
 });
