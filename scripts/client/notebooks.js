@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
                 document.getElementById('add-0').innerHTML = data;
             });
     } else if(localStorage.getItem('mbKey')) {
-        fetch("/notebooks/id", { method: "get" })
+        fetch("/notebooks/0", { method: "get" })
             .then(response => response.text())
             .then(data => {
                 document.getElementById('add-0').innerHTML = data;

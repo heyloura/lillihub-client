@@ -573,18 +573,23 @@ Deno.serve(async (req) => {
 
             const NOTEBOOK_ROUTE = new URLPattern({ pathname: "/notebooks/:id" });
             if(((new URLPattern({ pathname: "/notebooks" }).exec(req.url)) || NOTEBOOK_ROUTE.exec(req.url)) && user) {
+                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let results = await fetching.json();
+
                 let id = '';
                 if(NOTEBOOK_ROUTE.exec(req.url)) {
                     id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
+                    if(id == 0) {
+                        id = results.items[0].id;
+                    }
                 }
                 
                 console.log(id);
 
-                let fetching = await fetch(`https://micro.blog/notes/notebooks${id && id != '/' && id != null && id != undefined ? '/' + id : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                let results = await fetching.json();
-
                 if(id) {
                     console.log(results);
+                    fetching = await fetch(`https://micro.blog/notes/notebooks${id ? '/' + id : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    results = await fetching.json();
                     return new Response(results.items.map(i => noteHTML(i, id)).join(''),HTMLHeaders(nonce));
                 }
 
