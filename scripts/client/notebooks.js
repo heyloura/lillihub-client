@@ -49,6 +49,7 @@ document.addEventListener("input", (event) => {
         // show the rest?
         liveSearch('tr', 'search');
         liveSearch('section', 'search');
+        document.querySelector('main').classList.remove('pages');
     }
 });
 

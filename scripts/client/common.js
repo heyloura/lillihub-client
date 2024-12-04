@@ -5,7 +5,7 @@ function liveSearch(selector, searchboxId) {
     let cards = document.querySelectorAll(selector)
     let search_query = document.getElementById(searchboxId).value;
     for (var i = 0; i < cards.length; i++) {
-        if(cards[i].innerText.toLowerCase().includes(search_query.toLowerCase())) {
+        if(cards[i].textContent.toLowerCase().includes(search_query.toLowerCase())) {
             cards[i].classList.remove("d-hide");
         } else {
             cards[i].classList.add("d-hide");
