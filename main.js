@@ -253,7 +253,13 @@ Deno.serve(async (req) => {
                 return new Response(html,HTMLHeaders(nonce));
             }
 
-            if((new URLPattern({ pathname: "/timeline/discover" })).exec(req.url) && user) {
+            const DISCOVER_ROUTE = new URLPattern({ pathname: "/timeline/discover/:id" });
+            if((new URLPattern({ pathname: "/discover" }).exec(req.url)) || DISCOVER_ROUTE.exec(req.url) && user) {
+                let id = '';
+                if(DISCOVER_ROUTE.exec(req.url)) {
+                    id = DISCOVER_ROUTE.exec(req.url).pathname.groups.id;
+                }
+                
                 const layout = new TextDecoder().decode(await Deno.readFile("discover.html"));
                 let fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let results = await fetching.json();
