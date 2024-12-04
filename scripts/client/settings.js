@@ -57,7 +57,7 @@ document.addEventListener("click", (item) => {
     }
     if(item.target.classList.contains('deletePrivateNotesKey')) {
         if(confirm('You are about to remove your private key, are you sure?')){
-            localStorage.removeItemItem('mbKey')
+            localStorage.removeItem('mbKey')
             document.getElementById('deletePrivateNotesKeyToast').classList.remove("hide");
         }
     }

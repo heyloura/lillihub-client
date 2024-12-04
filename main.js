@@ -571,7 +571,27 @@ Deno.serve(async (req) => {
 
 
 
+            const NOTEBOOK_ROUTE = new URLPattern({ pathname: "/notebooks/:id" });
+            if(((new URLPattern({ pathname: "/notebooks" }).exec(req.url)) || NOTEBOOK_ROUTE.exec(req.url)) && user) {
+                let id = '';
+                if(NOTEBOOK_ROUTE.exec(req.url)) {
+                    id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
+                }
+                
+                const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
+                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let results = await fetching.json();
 
+                console.log(results);
+                // const tagmojiChips = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                //     `<span class="chip ${id && item.name == id ? 'bg-primary' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                // ).join('');
+                // const tagmojiMenu = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                //     `<li class="menu-item ${id && item.name == id ? 'active' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                // ).join('');
+                return new Response(layout.replaceAll('{{nonce}}', nonce),
+                    HTMLHeaders(nonce));
+            }
 
 
 
