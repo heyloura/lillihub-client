@@ -397,7 +397,7 @@ Deno.serve(async (req) => {
                     .replaceAll('{{posts}}', results.map(post => postHTML(post)).join(''))
                     .replaceAll('{{showIfFollowing}}', !stranger ? '' : 'hide')
                     .replaceAll('{{showIfStranger}}', stranger ? '' : 'hide')
-                    ,HTMLHeaders(undefined,nonce));
+                    ,HTMLHeaders(nonce));
             }
 
             if(new URLPattern({ pathname: "/timeline/following" }).exec(req.url) && user) {
@@ -579,10 +579,13 @@ Deno.serve(async (req) => {
                 }
                 
                 const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
-                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let fetching = await fetch(`https://micro.blog/notes/notebooks${id ? '/' + id : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let results = await fetching.json();
 
-                console.log(results);
+                if(id) {
+                    return new Response(JSON.stringify(results),HTMLHeaders(nonce));
+                }
+
                 const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
                     `<li class="menu-item ${id && item.title == id ? 'active' : ''}"><a class="${id && item.title == id ? 'text-secondary' : ''}" href="/notebooks/${item.id}">${item.title}</a></span>`
                 ).join('');
