@@ -56,8 +56,10 @@ document.addEventListener("click", (item) => {
         document.getElementById('savePrivateNotesKeyToast').classList.add("hide");
     }
     if(item.target.classList.contains('deletePrivateNotesKey')) {
-        localStorage.removeItemItem('mbKey')
-        document.getElementById('deletePrivateNotesKeyToast').classList.remove("hide");
+        if(confirm('You are about to remove your private key, are you sure?')){
+            localStorage.removeItemItem('mbKey')
+            document.getElementById('deletePrivateNotesKeyToast').classList.remove("hide");
+        }
     }
     if(item.target.classList.contains('dismissDeletePrivateNotesKeyToast')) {
         document.getElementById('deletePrivateNotesKeyToast').classList.add("hide");
