@@ -48,7 +48,7 @@ document.addEventListener("input", (event) => {
         // hide the default section...
         // show the rest?
         if(document.getElementById('search').value != '') {
-            liveSearch('section', 'search');
+            liveSearch('article', 'search');
             document.querySelector('main').classList.remove('pages');
             document.querySelector('table').classList.add('d-hide');
         } else {
@@ -132,7 +132,7 @@ async function displayNotes(notes) {
     
     for (var i = 0; i < notes.length; i++) {
         let note = notes[i];
-        let noteSection = `<section id=${note.id} class="card">`;
+        let noteSection = `<article id=${note.id} class="card">`;
         result += `<tr data-id="${note.id}" class="ripple">`
         if(!note._microblog.is_shared) {
             var html = converter.makeHtml(await decryptWithKey(note.content_text));
@@ -156,7 +156,7 @@ async function displayNotes(notes) {
         }
 
         result += '</tr>';
-        noteSection += `</section>`;
+        noteSection += `</article>`;
         document.getElementById('notes').insertAdjacentHTML( 'afterbegin', noteSection);
 
         //notes
