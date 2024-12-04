@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 });
 
 document.addEventListener("click", (item) => {
-
+    if(item.target.classList.contains('ripple')) {
+        redirectToAnchor(`#${item.target.getAttribute('data-id')}`);
+    }
 });
 
 async function displayNotes(notes) {
@@ -83,7 +85,7 @@ async function displayNotes(notes) {
     for (var i = 0; i < notes.length; i++) {
         let note = notes[i];
         let noteSection = `<section id=${note.id}>`;
-        result += '<tr class="ripple">'
+        result += `<tr data-id="${note.id}" class="ripple">`
         if(!note._microblog.is_shared) {
             var html = converter.makeHtml(await decryptWithKey(note.content_text));
             var metadata = converter.getMetadata();
