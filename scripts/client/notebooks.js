@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         document.getElementById('add-0').innerHTML = 'not ready yet........';
     } else if(localStorage.getItem('mbKey')) {
         let id = document.getElementById('notebook_id').value;
-        fetch(`/notebooks/${id}`, { method: "get" })
+        fetch(`/notebooks/notebooks/${id}`, { method: "get" })
             .then(async response => response.json())
             .then(async data => {
                 console.log(data)
