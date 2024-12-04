@@ -9,11 +9,11 @@ function checkDirection() {
   if (touchendX > touchstartX) return;
 }
 
-document.getElementById('conversation').addEventListener('touchstart', e => {
+document.getElementById('notes').addEventListener('touchstart', e => {
   touchstartX = e.changedTouches[0].screenX
 })
 
-document.getElementById('conversation').addEventListener('touchend', e => {
+document.getElementById('notes').addEventListener('touchend', e => {
   touchendX = e.changedTouches[0].screenX
   checkDirection()
 })
