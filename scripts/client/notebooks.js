@@ -78,20 +78,26 @@ async function displayNotes(notes) {
 
     const converter = new showdown.Converter({metadata: true, openLinksInNewWindow: true, strikethrough:true, tables:true, tasklists:true, emoji:true });
     let tags = new Set();
-    let result = '<table class="table table-striped">'
+    let result = '<table class="table">';
+    
     for (var i = 0; i < notes.length; i++) {
         let note = notes[i];
-        result += '<tr>'
+        let noteSection = `<section id=${note.id}>`;
+        result += '<tr class="ripple">'
         if(!note._microblog.is_shared) {
-            var markdown = converter.makeHtml(await decryptWithKey(note.content_text));
+            var html = converter.makeHtml(await decryptWithKey(note.content_text));
             var metadata = converter.getMetadata();
             if(metadata && metadata.title && metadata.tags) {
+                noteSection += `<h1>${metadata.title}</h1><p>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</p>${html}`;
                 result += `<td>${metadata.title}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
             } else if(metadata && metadata.title) {
                 result += `<td>${metadata.title}</td>`;
+                noteSection += `<h1>${metadata.title}</h1>${html}`;
             } else if(metadata && metadata.tags) {
+                noteSection += `<p>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</p>${html}`;
                 result += `<td>${note.id}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
             } else {
+                noteSection += html;
                 result += `<td>${note.id}</td>`;
             }
             
@@ -99,7 +105,11 @@ async function displayNotes(notes) {
             result += '<td>shared note found....</td>';
         }
 
-        result += '</tr>'
+        result += '</tr>';
+        noteSection += `</section>`;
+        document.getElementById('notes').insertAdjacentHTML( 'afterbegin', noteSection);
+
+        //notes
         
         // notes[i].innerHTML = converter.makeHtml(markdown);
         // var metadata = converter.getMetadata();
