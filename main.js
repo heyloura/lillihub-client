@@ -572,47 +572,36 @@ Deno.serve(async (req) => {
 
 
             const NOTEBOOK_ROUTE = new URLPattern({ pathname: "/notebooks/:id" });
-            if(((new URLPattern({ pathname: "/notebooks" }).exec(req.url)) || NOTEBOOK_ROUTE.exec(req.url)) && user) {
+            if(NOTEBOOK_ROUTE.exec(req.url)) {
                 let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let results = await fetching.json();
 
-                let id = '';
-                if(NOTEBOOK_ROUTE.exec(req.url)) {
-                    id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
-                    if(id == 0) {
-                        id = results.items[0].id;
-                    }
+                let id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
+                if(id == 0) {
+                    id = results.items[0].id;
                 }
+                
+                fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                results = await fetching.json();
+                //console.log(results.items);
+                return new Response(results.items, JSONHeaders());
+                //return new Response(results.items.map(i => utility.noteHTML(i, id)).join(''),HTMLHeaders(nonce));
+            }
+
+            if(new URLPattern({ pathname: "/notebooks" }).exec(req.url)) {
+                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let results = await fetching.json();
 
                 const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
                 const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
-                    `<li class="menu-item ${id && item.title == id ? 'active' : ''}"><a class="${id && item.title == id ? 'text-secondary' : ''}" href="/notebooks/${item.id}">${item.title}</a></span>`
+                    `<li class="menu-item notebook-${item.id}"><a class="notebook-${item.id}-text" href="/notebooks/${item.id}">${item.title}</a></span>`
                 ).join('');
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
                     .replaceAll('{{notebooks}}', notebooks),
                     HTMLHeaders(nonce));
             }
 
-            const NOTEBOOK_API_ROUTE = new URLPattern({ pathname: "/notebooks/notebooks/:id" });
-            if(((new URLPattern({ pathname: "/notebooks/notebooks/" }).exec(req.url)) || NOTEBOOK_API_ROUTE.exec(req.url)) && user) {
-                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                let results = await fetching.json();
 
-                let id = '';
-                if(NOTEBOOK_API_ROUTE.exec(req.url)) {
-                    id = NOTEBOOK_API_ROUTE.exec(req.url).pathname.groups.id;
-                    if(id == 0) {
-                        id = results.items[0].id;
-                    }
-                }
-                
-                if(id) {
-                    fetching = await fetch(`https://micro.blog/notes/notebooks${id ? '/' + id : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    results = await fetching.json();
-                    console.log(results.items);
-                    return new Response(results.items.map(i => utility.noteHTML(i, id)).join(''),HTMLHeaders(nonce));
-                }
-            }
 
 
 

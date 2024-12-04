@@ -1,16 +1,13 @@
 document.addEventListener("DOMContentLoaded", async (event) => {
     if(localStorage.getItem('mbKey') && localStorage.getItem('starting_notebook')){
-        fetch("/bookmarks/bookmarks", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('add-0').innerHTML = data;
-            });
+        document.getElementById('add-0').innerHTML = 'not ready yet........';
     } else if(localStorage.getItem('mbKey')) {
-        fetch("/notebooks/notebooks/0", { method: "get" })
-            .then(async response => response.text())
+        fetch("/notebooks/0", { method: "get" })
+            .then(async response => response.json())
             .then(async data => {
-                document.getElementById('add-0').innerHTML = data;
-                await displayNotes();
+                console.log(data)
+                //document.getElementById('add-0').innerHTML = data;
+                //await displayNotes();
             });
     } else {
         document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
@@ -74,7 +71,7 @@ async function displayNotes() {
         const base64_encoded = btoa(String.fromCharCode(...encrypted_data));
         return base64_encoded;
     }
-    
+
     const converter = new showdown.Converter({metadata: true, openLinksInNewWindow: true, strikethrough:true, tables:true, tasklists:true, emoji:true });
     const notes = document.querySelectorAll('.decryptMe');
     let tags = new Set();
