@@ -116,23 +116,23 @@ async function displayNotes(notes) {
     
     for (var i = 0; i < notes.length; i++) {
         let note = notes[i];
-        let noteSection = `<section id=${note.id}>`;
+        let noteSection = `<section id=${note.id} class="card">`;
         result += `<tr data-id="${note.id}" class="ripple">`
         if(!note._microblog.is_shared) {
             var html = converter.makeHtml(await decryptWithKey(note.content_text));
             var metadata = converter.getMetadata();
             if(metadata && metadata.title && metadata.tags) {
                 noteSection += `<h1>${metadata.title}</h1><p>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</p>${html}`;
-                result += `<td>${metadata.title}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
+                result += `<td data-id="${note.id}">${metadata.title}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
             } else if(metadata && metadata.title) {
-                result += `<td>${metadata.title}</td>`;
+                result += `<td data-id="${note.id}">${metadata.title}</td>`;
                 noteSection += `<h1>${metadata.title}</h1>${html}`;
             } else if(metadata && metadata.tags) {
                 noteSection += `<p>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</p>${html}`;
-                result += `<td>${note.id}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
+                result += `<td data-id="${note.id}">${note.id}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
             } else {
                 noteSection += html;
-                result += `<td>${note.id}</td>`;
+                result += `<td data-id="${note.id}">${note.id}</td>`;
             }
             
         } else {
