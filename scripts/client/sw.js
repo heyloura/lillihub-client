@@ -1,4 +1,4 @@
-const version = '0.0.24';
+const version = '0.0.25';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;

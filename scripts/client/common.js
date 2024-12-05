@@ -82,3 +82,46 @@ function buildCarousels() {
         }
     }
 }
+if ('storage' in navigator && 'estimate' in navigator.storage) {
+    navigator.storage.estimate().then(({usage, quota}) => {
+      console.log(`Using ${usage} out of ${quota} bytes.`);
+    }).catch(error => {
+      console.error('Loading storage estimate failed:');
+      console.log(error.stack);
+    });
+  } else {
+    console.error('navigator.storage.estimate API unavailable.');
+}
+function isReachable(url) {
+    return fetch(url, { method: 'HEAD', mode: 'no-cors' })
+      .then(function(resp) {
+        return resp && (resp.ok || resp.type === 'opaque');
+      })
+      .catch(function(err) {
+        console.warn('[conn test failure]:', err);
+      });
+}
+function getServerUrl() {
+    return window.location.origin;
+}
+window.addEventListener('online', handleConnection);
+window.addEventListener('offline', handleConnection);
+function handleConnection() {
+  if (navigator.onLine) {
+    isReachable(getServerUrl()).then(function(online) {
+      if (online) {
+        // handle online status
+        console.log('online');
+        _online = true;
+      } else {
+        console.log('no connectivity');
+        _online = false;
+      }
+    });
+  } else {
+    // handle offline status
+    console.log('offline');
+    _online = false;
+  }
+}
+var _online = false;
