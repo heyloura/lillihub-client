@@ -1,4 +1,4 @@
-const version = '0.0.04';
+const version = '0.0.05';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;

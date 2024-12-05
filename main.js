@@ -98,6 +98,16 @@ Deno.serve(async (req) => {
         });
     }
 
+    if(new URLPattern({ pathname: "/sw.js" }).exec(req.url))
+    {
+        return new Response(await Deno.readFile("scripts/client/sw.js"), {
+            status: 200,
+            headers: {
+                "content-type": "text/javascript",
+            },
+        });
+    }
+
     const CHECK_SCRIPT_ROUTE = new URLPattern({ pathname: "/scripts/:id" });
     if(CHECK_SCRIPT_ROUTE.exec(req.url))
     {

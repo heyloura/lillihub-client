@@ -13,7 +13,7 @@
         <link rel="manifest" href="/manifest.webmanifest">
         <title>Lillihub: Notes</title>
         <noscript><style nonce="{{nonce}}">.hide-if-user-has-no-javascript{ display: none }</style></noscript>
-        <script nonce="{{nonce}}">if('serviceWorker' in navigator){ navigator.serviceWorker.register('/scripts/sw.js') }</script>
+        <script nonce="{{nonce}}">if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js', { scope: "/" }) }</script>
         <script nonce="{{nonce}}">document.write('<style nonce="{{nonce}}">.hide-if-user-has-javascript{display:none}</style>');</script>
         <link rel="stylesheet" href="/styles/main.css">  
     </head>
