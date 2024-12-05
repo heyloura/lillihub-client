@@ -1,4 +1,4 @@
-const version = '0.0.17';
+const version = '0.0.18';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -72,10 +72,9 @@ self.addEventListener('activate', function (event) {
 });
 
 async function handleRequest(request) {
-    var request = request;
-    if (request.cache === 'only-if-cached' && request.mode !== 'same-origin') return;
+    if (request.cache === 'only-if-cached' && request.mode !== 'same-origin') return request;
 
-    if(request.url.includes('timeline/check') || request.url.includes('timeline/mark')) return;
+    if(request.url.includes('timeline/check') || request.url.includes('timeline/mark')) return request;
     
     caches.match(request.url, {ignoreVary: true}).then(function (response) {
         return response || fetch(request).then(function (response) {
