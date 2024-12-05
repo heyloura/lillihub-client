@@ -1,4 +1,4 @@
-const version = '0.0.21';
+const version = '0.0.22';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -98,13 +98,13 @@ self.addEventListener('fetch', async function (event) {
         
         if (event.request.headers.get('Accept').includes('image')) {
             let cache = await caches.open(imageID);
-            await cache.put(request, copy);
+            await cache.put(event.request, copy);
             // caches.open(imageID).then(function (cache) {
             //     return cache.put(request, copy);
             // })
-        } else {
+        } else if (request.headers.get('Accept').includes('text/html')) {
             let cache = await caches.open(pageID);
-            await cache.put(request, copy);
+            await cache.put(event.request, copy);
             // caches.open(pageID).then(function (cache) {
             //     return cache.put(request, copy);
             // })
