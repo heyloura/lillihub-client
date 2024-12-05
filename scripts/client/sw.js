@@ -1,4 +1,4 @@
-const version = '0.0.01';
+const version = '0.0.02';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
@@ -9,13 +9,40 @@ self.addEventListener('install', function(event) {
 
     // Cache the offline core
     event.waitUntil(caches.open(coreID).then(function (cache) {
-        //cache.add(new Request('./fragments/_calendar.html'));
+        // javascript
+        cache.add(new Request('/scripts/timeline.js'));
+        cache.add(new Request('/scripts/showdown.js'));
+        cache.add(new Request('/scripts/settings.js'));
+        cache.add(new Request('/scripts/notebooks.js'));
+        cache.add(new Request('/scripts/mentions.js'));
+        cache.add(new Request('/scripts/highlight.js'));
+        cache.add(new Request('/scripts/following.js'));
+        cache.add(new Request('/scripts/discover.js'));
+        cache.add(new Request('/scripts/easymde.min.js'));
+        cache.add(new Request('/scripts/compressor.min.js'));
+        cache.add(new Request('/scripts/common.js'));
+        cache.add(new Request('/scripts/bookmarks.js'));
+
+        //styles
+        cache.add(new Request('/styles/main.css'));
+
+        //static
+        cache.add(new Request('/manifest.webmanifest'));
+        cache.add(new Request('/favicon.ico'));
+        cache.add(new Request('/logo.png'));
         return cache;
     }));
 
     // Cache the offline pages
     event.waitUntil(caches.open(pageID).then(function (cache) {
-        //cache.add(new Request('settings.html'));
+        cache.add(new Request('/'));
+        cache.add(new Request('/timeline'));
+        cache.add(new Request('/discover'));
+        cache.add(new Request('/mention'));
+        cache.add(new Request('/following'));
+        cache.add(new Request('/bookmarks'));
+        cache.add(new Request('/notebooks'));
+        cache.add(new Request('/settings'));
         return cache;
     }));
 });
@@ -38,5 +65,48 @@ self.addEventListener('activate', function (event) {
 });
     
 self.addEventListener('fetch', function(event) {
+  event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+            console.log(event.request.url);
+            if (cachedResponse) {
+                console.log('found it! returning cache')
+                return cachedResponse;
+            }
+    
+            console.log('fetch resource & save in cache')
+            return fetch(event.request).then((fetchedResponse) => {
+                caches.open(pageID).then(function (cache) {
+                    cache.put(event.request, fetchedResponse.clone());
+                });
+                return fetchedResponse;
+            });
+        })
+    // fetch(event.request).catch(function() {
+    //   console.log(event.request)
+    //   if(event.request.url.substring('/notebooks/')){
+    //     cache.put(event.request, fetchedResponse.clone());
 
+    //   }
+    //   return caches.match(event.request);
+    // })
+  );
 });
+
+// event.respondWith(caches.open(cacheName).then((cache) => {
+//     // Go to the cache first
+//     return cache.match(event.request.url).then((cachedResponse) => {
+//       // Return a cached response if we have one
+//       if (cachedResponse) {
+//         return cachedResponse;
+//       }
+
+//       // Otherwise, hit the network
+//       return fetch(event.request).then((fetchedResponse) => {
+//         // Add the network response to the cache for later visits
+//         cache.put(event.request, fetchedResponse.clone());
+
+//         // Return the network response
+//         return fetchedResponse;
+//       });
+//     });
+//   }));
