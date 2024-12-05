@@ -1,4 +1,4 @@
-const version = '0.0.30';
+const version = '0.0.31';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -99,11 +99,11 @@ self.addEventListener('fetch', async function (event) {
                     let cache = await caches.open(pageID);
                     await cache.put(event.request, copy);
                 }
+
+                return response;
             } catch {
                 throw new Error("Fetch failed, offline?");
             }
-            
-            return response;
         })());
     } catch {
         self.console.log('offline?');
