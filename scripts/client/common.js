@@ -107,6 +107,9 @@ function getServerUrl() {
 window.addEventListener('online', handleConnection);
 window.addEventListener('offline', handleConnection);
 function handleConnection() {
+  if(document.getElementById('offline-notice')) {
+    document.getElementById('offline-notice').remove();
+  }
   if (navigator.onLine) {
     isReachable(getServerUrl()).then(function(online) {
       if (online) {
@@ -116,12 +119,18 @@ function handleConnection() {
       } else {
         console.log('no connectivity');
         _online = false;
+        document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
+            Looks like you are offline.
+        </div>`);
       }
     });
   } else {
     // handle offline status
     console.log('offline');
     _online = false;
+    document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
+        Looks like you are offline.
+    </div>`);
   }
 }
 var _online = false;
