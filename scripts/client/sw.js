@@ -1,4 +1,4 @@
-const version = '0.0.02';
+const version = '0.0.03';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
@@ -63,34 +63,50 @@ self.addEventListener('activate', function (event) {
         return self.clients.claim();
     }));
 });
-    
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            console.log(event.request.url);
-            if (cachedResponse) {
-                console.log('found it! returning cache')
-                return cachedResponse;
-            }
-    
-            console.log('fetch resource & save in cache')
-            return fetch(event.request).then((fetchedResponse) => {
-                caches.open(pageID).then(function (cache) {
-                    cache.put(event.request, fetchedResponse.clone());
-                });
-                return fetchedResponse;
-            });
-        })
-    // fetch(event.request).catch(function() {
-    //   console.log(event.request)
-    //   if(event.request.url.substring('/notebooks/')){
-    //     cache.put(event.request, fetchedResponse.clone());
 
-    //   }
-    //   return caches.match(event.request);
-    // })
-  );
+self.addEventListener('fetch', function (event) {
+	// Get the request
+	var request = event.request;
+    console.log(request);
+
+	caches.match(request).then(function (response) {
+        return response || fetch(request).then(function (response) {
+            var copy = response.clone();
+            event.waitUntil(caches.open(pageID).then(function (cache) {
+                return cache.put(request, copy);
+            }));
+            return response;
+        });
+    })
 });
+    
+// self.addEventListener('fetch', function(event) {
+//   event.respondWith(
+//         caches.match(event.request).then((cachedResponse) => {
+//             console.log(event.request.url);
+//             if (cachedResponse) {
+//                 console.log('found it! returning cache')
+//                 return cachedResponse;
+//             }
+    
+//             console.log('fetch resource & save in cache')
+//             return fetch(event.request).then((fetchedResponse) => {
+//                 caches.open(pageID).then(function (cache) {
+//                     cache.put(event.request, fetchedResponse.clone());
+//                 });
+//                 return fetchedResponse;
+//             });
+//         })
+//     // fetch(event.request).catch(function() {
+//     //   console.log(event.request)
+//     //   if(event.request.url.substring('/notebooks/')){
+//     //     cache.put(event.request, fetchedResponse.clone());
+
+//     //   }
+//     //   return caches.match(event.request);
+//     // })
+//   );
+// });
 
 // event.respondWith(caches.open(cacheName).then((cache) => {
 //     // Go to the cache first
