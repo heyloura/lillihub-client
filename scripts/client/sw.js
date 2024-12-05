@@ -1,4 +1,4 @@
-const version = '0.0.39';
+const version = '0.0.40';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -46,6 +46,9 @@ self.addEventListener('install', function(event) {
         cache.add(new Request(`${url}notebooks`));
         cache.add(new Request(`${url}settings`));
         cache.add(new Request(`/`));
+        cache.add(new Request(`offline/`));
+        cache.add(new Request(`offline`));
+        cache.add(new Request(`/offline/`));
         cache.add(new Request(`${url}timeline/`));
         cache.add(new Request(`${url}discover/`));
         cache.add(new Request(`${url}mention/`));

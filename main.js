@@ -207,6 +207,11 @@ Deno.serve(async (req) => {
 
             //const kv = await Deno.openKv();
 
+            if(new URLPattern({ pathname: "/offline" }).exec(req.url)) {
+                return new Response(layout.replaceAll('{{nonce}}', nonce),
+                  HTMLHeaders(nonce));
+            }
+
             /********************************
                 TIMELINE BASED ROUTES
             *********************************/
