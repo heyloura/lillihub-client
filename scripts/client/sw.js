@@ -1,4 +1,4 @@
-const version = '0.0.16';
+const version = '0.0.17';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -78,7 +78,7 @@ async function handleRequest(request) {
     if(request.url.includes('timeline/check') || request.url.includes('timeline/mark')) return;
     
     caches.match(request.url, {ignoreVary: true}).then(function (response) {
-        return response || fetch(request).then(async function (response) {
+        return response || fetch(request).then(function (response) {
             var copy = response.clone();
             self.console.log('fetching:' + request.url);
 
