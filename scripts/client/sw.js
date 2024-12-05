@@ -1,8 +1,9 @@
-const version = '0.0.06';
+const version = '0.0.07';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
-const cacheIDs = [coreID, pageID];
+const imageID = `${version}_images`;
+const cacheIDs = [coreID, pageID, imageID];
 
 self.addEventListener('install', function(event) {
     self.skipWaiting();
@@ -77,9 +78,16 @@ self.addEventListener('fetch', function (event) {
         return response || fetch(request).then(function (response) {
             var copy = response.clone();
             // event.waitUntil();
-            caches.open(pageID).then(function (cache) {
-                return cache.put(request, copy);
-            })
+
+            if (request.headers.get('Accept').includes('image')) {
+                caches.open(imageID).then(function (cache) {
+                    return cache.put(request, copy);
+                })
+            } else {
+                caches.open(pageID).then(function (cache) {
+                    return cache.put(request, copy);
+                })
+            }
             return response;
         });
     })
