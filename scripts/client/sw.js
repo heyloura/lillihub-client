@@ -1,4 +1,4 @@
-const version = '0.0.05';
+const version = '0.0.06';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
@@ -67,16 +67,19 @@ self.addEventListener('activate', function (event) {
 self.addEventListener('fetch', function (event) {
 	// Get the request
 	var request = event.request;
-    self.console.log(request);
-
     if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
+
+    if(event.request.url.contains('timeline/check') || event.request.url.contains('timeline/mark')) return;
+
+    self.console.log(request);
 
 	caches.match(request).then(function (response) {
         return response || fetch(request).then(function (response) {
             var copy = response.clone();
-            event.waitUntil(caches.open(pageID).then(function (cache) {
+            // event.waitUntil();
+            caches.open(pageID).then(function (cache) {
                 return cache.put(request, copy);
-            }));
+            })
             return response;
         });
     })
