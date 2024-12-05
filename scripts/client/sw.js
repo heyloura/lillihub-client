@@ -1,4 +1,4 @@
-const version = '0.0.33';
+const version = '0.0.34';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -81,7 +81,7 @@ self.addEventListener('fetch', async function (event) {
 
     try {
         event.respondWith((async () => {
-            const cached = await caches.match(event.request);
+            const cached = await caches.match(event.request.url);
             if (cached) {
                 return cached;
             }
