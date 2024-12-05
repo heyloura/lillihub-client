@@ -1,4 +1,4 @@
-const version = '0.0.08';
+const version = '0.0.09';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
@@ -79,7 +79,7 @@ self.addEventListener('fetch', function (event) {
 
     self.console.log(request);
 
-	caches.match(request).then(function (response) {
+	caches.match(request, {ignoreVary: true}).then(function (response) {
         return response || fetch(request).then(function (response) {
             var copy = response.clone();
             // event.waitUntil();
