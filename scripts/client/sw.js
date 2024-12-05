@@ -1,4 +1,4 @@
-const version = '0.0.09';
+const version = '0.0.10';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
@@ -77,9 +77,9 @@ self.addEventListener('fetch', function (event) {
 
     if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
 
-    self.console.log(request);
+    self.console.log(event.request.url);
 
-	caches.match(request, {ignoreVary: true}).then(function (response) {
+	caches.match(event.request.url, {ignoreVary: true}).then(function (response) {
         return response || fetch(request).then(function (response) {
             var copy = response.clone();
             // event.waitUntil();
