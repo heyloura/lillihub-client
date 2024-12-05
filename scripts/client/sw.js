@@ -1,4 +1,4 @@
-const version = '0.0.20';
+const version = '0.0.21';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -78,6 +78,8 @@ self.addEventListener('activate', function (event) {
 
 
 self.addEventListener('fetch', async function (event) {
+
+    self.console.log(event.request);
 
     if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
 
