@@ -1,4 +1,4 @@
-const version = '0.0.19';
+const version = '0.0.20';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -78,31 +78,73 @@ self.addEventListener('activate', function (event) {
 
 
 self.addEventListener('fetch', async function (event) {
-    event.respondWith(() => {
-        let request = event.request;
-        self.console.log(request);
-        if (request.cache === 'only-if-cached' && request.mode !== 'same-origin') return;
 
-        if(request.url.includes('timeline/check') || request.url.includes('timeline/mark')) return;
+    if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
+
+    if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
+
+    event.respondWith((async () => {
+        const cached = await caches.match(event.request);
+        if (cached) {
+          return cached;
+        }
+      
+        const response = await fetch(event.request);
+        var copy = response.clone();
         
-        caches.match(request.url, {ignoreVary: true}).then(function (response) {
-            return response || fetch(request).then(function (response) {
-                var copy = response.clone();
-                self.console.log('fetching:' + request.url);
+        if (event.request.headers.get('Accept').includes('image')) {
+            let cache = await caches.open(imageID);
+            await cache.put(request, copy);
+            // caches.open(imageID).then(function (cache) {
+            //     return cache.put(request, copy);
+            // })
+        } else {
+            let cache = await caches.open(pageID);
+            await cache.put(request, copy);
+            // caches.open(pageID).then(function (cache) {
+            //     return cache.put(request, copy);
+            // })
+        }
+      
+        // if (!response || response.status !== 200 || response.type !== 'basic') {
+        //   return response;
+        // }
+      
+        // if (ENABLE_DYNAMIC_CACHING) {
+        //   const responseToCache = response.clone();
+        //   const cache = await caches.open(DYNAMIC_CACHE)
+        //   await cache.put(event.request, response.clone());
+        // }
+      
+        return response;
+      })());
+
+
+    // event.respondWith(() => {
+    //     let request = event.request;
+    //     self.console.log(request);
+    //     if (request.cache === 'only-if-cached' && request.mode !== 'same-origin') return;
+
+    //     if(request.url.includes('timeline/check') || request.url.includes('timeline/mark')) return;
+        
+    //     caches.match(request.url, {ignoreVary: true}).then(function (response) {
+    //         return response || fetch(request).then(function (response) {
+    //             var copy = response.clone();
+    //             self.console.log('fetching:' + request.url);
     
-                if (request.headers.get('Accept').includes('image')) {
-                    caches.open(imageID).then(function (cache) {
-                        return cache.put(request, copy);
-                    })
-                } else {
-                    caches.open(pageID).then(function (cache) {
-                        return cache.put(request, copy);
-                    })
-                }
-                return response;
-            });
-        });
-    });
+    //             if (request.headers.get('Accept').includes('image')) {
+    //                 caches.open(imageID).then(function (cache) {
+    //                     return cache.put(request, copy);
+    //                 })
+    //             } else {
+    //                 caches.open(pageID).then(function (cache) {
+    //                     return cache.put(request, copy);
+    //                 })
+    //             }
+    //             return response;
+    //         });
+    //     });
+    // });
 
 
 
