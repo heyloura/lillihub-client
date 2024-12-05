@@ -1,4 +1,4 @@
-const version = '0.0.07';
+const version = '0.0.08';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
@@ -46,6 +46,11 @@ self.addEventListener('install', function(event) {
         cache.add(new Request('/settings'));
         return cache;
     }));
+
+    event.waitUntil(caches.open(imageID).then(function (cache) {
+
+        return cache;
+    }));
 });
 
 // On version update, remove old cached files
@@ -70,7 +75,7 @@ self.addEventListener('fetch', function (event) {
 	var request = event.request;
     if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
 
-    if(event.request.url.contains('timeline/check') || event.request.url.contains('timeline/mark')) return;
+    if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
 
     self.console.log(request);
 
