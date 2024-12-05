@@ -1,4 +1,4 @@
-const version = '0.0.23';
+const version = '0.0.24';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -79,8 +79,6 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', async function (event) {
 
-    self.console.log(event.request);
-
     if(event.request.redirect != 'follow') return;
 
     if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
@@ -95,6 +93,9 @@ self.addEventListener('fetch', async function (event) {
       
         const response = await fetch(event.request);
         var copy = response.clone();
+
+        self.console.log('Not in cache ------------------');
+        self.console.log(event.request.url);
         
         if (event.request.headers.get('Accept').includes('image')) {
             let cache = await caches.open(imageID);
