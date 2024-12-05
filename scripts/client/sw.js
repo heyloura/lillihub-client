@@ -1,4 +1,5 @@
-const version = '0.0.10';
+const version = '0.0.11';
+const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
@@ -11,39 +12,39 @@ self.addEventListener('install', function(event) {
     // Cache the offline core
     event.waitUntil(caches.open(coreID).then(function (cache) {
         // javascript
-        cache.add(new Request('/scripts/timeline.js'));
-        cache.add(new Request('/scripts/showdown.js'));
-        cache.add(new Request('/scripts/settings.js'));
-        cache.add(new Request('/scripts/notebooks.js'));
-        cache.add(new Request('/scripts/mentions.js'));
-        cache.add(new Request('/scripts/highlight.js'));
-        cache.add(new Request('/scripts/following.js'));
-        cache.add(new Request('/scripts/discover.js'));
-        cache.add(new Request('/scripts/easymde.min.js'));
-        cache.add(new Request('/scripts/compressor.min.js'));
-        cache.add(new Request('/scripts/common.js'));
-        cache.add(new Request('/scripts/bookmarks.js'));
+        cache.add(new Request(`${url}/scripts/timeline.js`));
+        cache.add(new Request(`${url}/scripts/showdown.js`));
+        cache.add(new Request(`${url}/scripts/settings.js`));
+        cache.add(new Request(`${url}/scripts/notebooks.js`));
+        cache.add(new Request(`${url}/scripts/mentions.js`));
+        cache.add(new Request(`${url}/scripts/highlight.js`));
+        cache.add(new Request(`${url}/scripts/following.js`));
+        cache.add(new Request(`${url}/scripts/discover.js`));
+        cache.add(new Request(`${url}/scripts/easymde.min.js`));
+        cache.add(new Request(`${url}/scripts/compressor.min.js`));
+        cache.add(new Request(`${url}/scripts/common.js`));
+        cache.add(new Request(`${url}/scripts/bookmarks.js`));
 
         //styles
-        cache.add(new Request('/styles/main.css'));
+        cache.add(new Request(`${url}/styles/main.css`));
 
         //static
-        cache.add(new Request('/manifest.webmanifest'));
-        cache.add(new Request('/favicon.ico'));
-        cache.add(new Request('/logo.png'));
+        cache.add(new Request(`${url}/manifest.webmanifest`));
+        cache.add(new Request(`${url}/favicon.ico`));
+        cache.add(new Request(`${url}/logo.png`));
         return cache;
     }));
 
     // Cache the offline pages
     event.waitUntil(caches.open(pageID).then(function (cache) {
-        cache.add(new Request('/'));
-        cache.add(new Request('/timeline'));
-        cache.add(new Request('/discover'));
-        cache.add(new Request('/mention'));
-        cache.add(new Request('/following'));
-        cache.add(new Request('/bookmarks'));
-        cache.add(new Request('/notebooks'));
-        cache.add(new Request('/settings'));
+        cache.add(new Request(`${url}/`));
+        cache.add(new Request(`${url}/timeline`));
+        cache.add(new Request(`${url}/discover`));
+        cache.add(new Request(`${url}/mention`));
+        cache.add(new Request(`${url}/following`));
+        cache.add(new Request(`${url}/bookmarks`));
+        cache.add(new Request(`${url}/notebooks`));
+        cache.add(new Request(`${url}/settings`));
         return cache;
     }));
 
