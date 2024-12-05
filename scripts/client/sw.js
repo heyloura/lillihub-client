@@ -81,6 +81,8 @@ self.addEventListener('fetch', async function (event) {
 
     self.console.log(event.request);
 
+    if(event.request.redirect != 'follow') return;
+
     if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
 
     if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
