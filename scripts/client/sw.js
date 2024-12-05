@@ -1,4 +1,4 @@
-const version = '0.0.12';
+const version = '0.0.13';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -78,27 +78,50 @@ self.addEventListener('fetch', function (event) {
 
     if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
 
+    // caches.match(event.request.url, {ignoreVary: true}).then(function (response) {
+    //     console.log('match found:' + event.request.url)
+    //     return response;
+    // });
+
     caches.match(event.request.url, {ignoreVary: true}).then(function (response) {
-        console.log('match found:' + event.request.url)
-    });
-
-	caches.match(event.request.url, {ignoreVary: true}).then(function (response) {
-        return response || fetch(request).then(function (response) {
-            var copy = response.clone();
-            self.console.log('fetching:' + event.request.url);
-
-            if (request.headers.get('Accept').includes('image')) {
-                caches.open(imageID).then(function (cache) {
-                    return cache.put(request, copy);
-                })
-            } else {
-                caches.open(pageID).then(function (cache) {
-                    return cache.put(request, copy);
-                })
-            }
-            return response;
-        });
+        return response || event.respondWith(async function() {
+            const promiseChain = fetch(request).then(function (response) {
+                var copy = response.clone();
+                self.console.log('fetching:' + event.request.url);
+    
+                if (request.headers.get('Accept').includes('image')) {
+                    caches.open(imageID).then(function (cache) {
+                        return cache.put(request, copy);
+                    })
+                } else {
+                    caches.open(pageID).then(function (cache) {
+                        return cache.put(request, copy);
+                    })
+                }
+                return response;
+            });
+            event.waitUntil(promiseChain);
+            return promiseChain;
+        }());
     })
+
+	// caches.match(event.request.url, {ignoreVary: true}).then(function (response) {
+    //     return response || fetch(request).then(function (response) {
+    //         var copy = response.clone();
+    //         self.console.log('fetching:' + event.request.url);
+
+    //         if (request.headers.get('Accept').includes('image')) {
+    //             caches.open(imageID).then(function (cache) {
+    //                 return cache.put(request, copy);
+    //             })
+    //         } else {
+    //             caches.open(pageID).then(function (cache) {
+    //                 return cache.put(request, copy);
+    //             })
+    //         }
+    //         return response;
+    //     });
+    // })
 });
     
 // self.addEventListener('fetch', function(event) {
