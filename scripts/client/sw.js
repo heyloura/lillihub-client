@@ -1,4 +1,4 @@
-const version = '0.0.14';
+const version = '0.0.15';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -85,7 +85,7 @@ self.addEventListener('fetch', async function (event) {
 
     await caches.match(event.request.url, {ignoreVary: true}).then(async function (response) {
         return response || event.respondWith(async function() {
-            const promiseChain = fetch(request).then(function (response) {
+            const promiseChain = await fetch(request).then(async function (response) {
                 var copy = response.clone();
                 self.console.log('fetching:' + event.request.url);
     
