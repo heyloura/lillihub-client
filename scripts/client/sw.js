@@ -1,4 +1,4 @@
-const version = '0.0.34';
+const version = '0.0.35';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -81,7 +81,7 @@ self.addEventListener('fetch', async function (event) {
 
     try {
         event.respondWith((async () => {
-            const cached = await caches.match(event.request.url);
+            const cached = await caches.match(event.request, {ignoreVary: true});
             if (cached) {
                 return cached;
             }
@@ -102,11 +102,11 @@ self.addEventListener('fetch', async function (event) {
 
                 return response;
             } catch {
-                return caches.match('/timeline');
+                return caches.match('/timeline', {ignoreVary: true});
             }
         })());
     } catch {
         self.console.log('offline?');
-        return caches.match('/timeline');
+        return caches.match('/timeline', {ignoreVary: true});
     }
 });
