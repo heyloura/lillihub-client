@@ -1,4 +1,4 @@
-const version = '0.0.38';
+const version = '0.0.39';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -12,39 +12,47 @@ self.addEventListener('install', function(event) {
     // Cache the offline core
     event.waitUntil(caches.open(coreID).then(function (cache) {
         // javascript
-        cache.add(new Request(`${url}/scripts/timeline.js`));
-        cache.add(new Request(`${url}/scripts/showdown.js`));
-        cache.add(new Request(`${url}/scripts/settings.js`));
-        cache.add(new Request(`${url}/scripts/notebooks.js`));
-        cache.add(new Request(`${url}/scripts/mentions.js`));
-        cache.add(new Request(`${url}/scripts/highlight.js`));
-        cache.add(new Request(`${url}/scripts/following.js`));
-        cache.add(new Request(`${url}/scripts/discover.js`));
-        cache.add(new Request(`${url}/scripts/easymde.min.js`));
-        cache.add(new Request(`${url}/scripts/compressor.min.js`));
-        cache.add(new Request(`${url}/scripts/common.js`));
-        cache.add(new Request(`${url}/scripts/bookmarks.js`));
+        cache.add(new Request(`${url}scripts/timeline.js`));
+        cache.add(new Request(`${url}scripts/showdown.js`));
+        cache.add(new Request(`${url}scripts/settings.js`));
+        cache.add(new Request(`${url}scripts/notebooks.js`));
+        cache.add(new Request(`${url}scripts/mentions.js`));
+        cache.add(new Request(`${url}scripts/highlight.js`));
+        cache.add(new Request(`${url}scripts/following.js`));
+        cache.add(new Request(`${url}scripts/discover.js`));
+        cache.add(new Request(`${url}scripts/easymde.min.js`));
+        cache.add(new Request(`${url}scripts/compressor.min.js`));
+        cache.add(new Request(`${url}scripts/common.js`));
+        cache.add(new Request(`${url}scripts/bookmarks.js`));
 
         //styles
-        cache.add(new Request(`${url}/styles/main.css`));
+        cache.add(new Request(`${url}styles/main.css`));
 
         //static
-        cache.add(new Request(`${url}/manifest.webmanifest`));
-        cache.add(new Request(`${url}/favicon.ico`));
-        cache.add(new Request(`${url}/logo.png`));
+        cache.add(new Request(`${url}manifest.webmanifest`));
+        cache.add(new Request(`${url}favicon.ico`));
+        cache.add(new Request(`${url}logo.png`));
         return cache;
     }));
 
     // Cache the offline pages
     event.waitUntil(caches.open(pageID).then(function (cache) {
-        cache.add(new Request(`${url}/`));
-        cache.add(new Request(`${url}/timeline`));
-        cache.add(new Request(`${url}/discover`));
-        cache.add(new Request(`${url}/mention`));
-        cache.add(new Request(`${url}/following`));
-        cache.add(new Request(`${url}/bookmarks`));
-        cache.add(new Request(`${url}/notebooks`));
-        cache.add(new Request(`${url}/settings`));
+        cache.add(new Request(`${url}`));
+        cache.add(new Request(`${url}timeline`));
+        cache.add(new Request(`${url}discover`));
+        cache.add(new Request(`${url}mention`));
+        cache.add(new Request(`${url}following`));
+        cache.add(new Request(`${url}bookmarks`));
+        cache.add(new Request(`${url}notebooks`));
+        cache.add(new Request(`${url}settings`));
+        cache.add(new Request(`/`));
+        cache.add(new Request(`${url}timeline/`));
+        cache.add(new Request(`${url}discover/`));
+        cache.add(new Request(`${url}mention/`));
+        cache.add(new Request(`${url}following/`));
+        cache.add(new Request(`${url}bookmarks/`));
+        cache.add(new Request(`${url}notebooks/`));
+        cache.add(new Request(`${url}settings/`));
         return cache;
     }));
 
