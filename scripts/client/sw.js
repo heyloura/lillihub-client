@@ -1,4 +1,4 @@
-const version = '0.0.25';
+const version = '0.0.27';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -71,12 +71,6 @@ self.addEventListener('activate', function (event) {
     }));
 });
 
-// async function handleRequest(request) {
-
-// }
-
-
-
 self.addEventListener('fetch', async function (event) {
 
     if(event.request.redirect != 'follow') return;
@@ -90,163 +84,24 @@ self.addEventListener('fetch', async function (event) {
         if (cached) {
           return cached;
         }
-      
-        const response = await fetch(event.request);
-        var copy = response.clone();
 
-        self.console.log('Not in cache ------------------');
-        self.console.log(event.request.url);
-        
-        if (event.request.headers.get('Accept').includes('image')) {
-            let cache = await caches.open(imageID);
-            await cache.put(event.request, copy);
-            // caches.open(imageID).then(function (cache) {
-            //     return cache.put(request, copy);
-            // })
-        } else if (event.request.headers.get('Accept').includes('text/html')) {
-            let cache = await caches.open(pageID);
-            await cache.put(event.request, copy);
-            // caches.open(pageID).then(function (cache) {
-            //     return cache.put(request, copy);
-            // })
+        try {
+            const response = await fetch(event.request);
+            var copy = response.clone();
+
+            self.console.log(event.request.url);
+            
+            if (event.request.headers.get('Accept').includes('image')) {
+                let cache = await caches.open(imageID);
+                await cache.put(event.request, copy);
+            } else if (event.request.headers.get('Accept').includes('text/html')) {
+                let cache = await caches.open(pageID);
+                await cache.put(event.request, copy);
+            }
+         
+            return response;
+        } catch(exception) {
+            return;
         }
-      
-        // if (!response || response.status !== 200 || response.type !== 'basic') {
-        //   return response;
-        // }
-      
-        // if (ENABLE_DYNAMIC_CACHING) {
-        //   const responseToCache = response.clone();
-        //   const cache = await caches.open(DYNAMIC_CACHE)
-        //   await cache.put(event.request, response.clone());
-        // }
-      
-        return response;
       })());
-
-
-    // event.respondWith(() => {
-    //     let request = event.request;
-    //     self.console.log(request);
-    //     if (request.cache === 'only-if-cached' && request.mode !== 'same-origin') return;
-
-    //     if(request.url.includes('timeline/check') || request.url.includes('timeline/mark')) return;
-        
-    //     caches.match(request.url, {ignoreVary: true}).then(function (response) {
-    //         return response || fetch(request).then(function (response) {
-    //             var copy = response.clone();
-    //             self.console.log('fetching:' + request.url);
-    
-    //             if (request.headers.get('Accept').includes('image')) {
-    //                 caches.open(imageID).then(function (cache) {
-    //                     return cache.put(request, copy);
-    //                 })
-    //             } else {
-    //                 caches.open(pageID).then(function (cache) {
-    //                     return cache.put(request, copy);
-    //                 })
-    //             }
-    //             return response;
-    //         });
-    //     });
-    // });
-
-
-
-
-
-	// // Get the request
-
-
-    // // caches.match(event.request.url, {ignoreVary: true}).then(function (response) {
-    // //     console.log('match found:' + event.request.url)
-    // //     return response;
-    // // });
-
-    // await caches.match(event.request.url, {ignoreVary: true}).then(async function (response) {
-    //     return response || event.respondWith(async function() {
-    //         const promiseChain = await fetch(request).then(async function (response) {
-    //             var copy = response.clone();
-    //             self.console.log('fetching:' + event.request.url);
-    
-    //             if (request.headers.get('Accept').includes('image')) {
-    //                 caches.open(imageID).then(function (cache) {
-    //                     return cache.put(request, copy);
-    //                 })
-    //             } else {
-    //                 caches.open(pageID).then(function (cache) {
-    //                     return cache.put(request, copy);
-    //                 })
-    //             }
-    //             return response;
-    //         });
-    //         event.waitUntil(promiseChain);
-    //         return promiseChain;
-    //     }());
-    // })
-
-	// // caches.match(event.request.url, {ignoreVary: true}).then(function (response) {
-    // //     return response || fetch(request).then(function (response) {
-    // //         var copy = response.clone();
-    // //         self.console.log('fetching:' + event.request.url);
-
-    // //         if (request.headers.get('Accept').includes('image')) {
-    // //             caches.open(imageID).then(function (cache) {
-    // //                 return cache.put(request, copy);
-    // //             })
-    // //         } else {
-    // //             caches.open(pageID).then(function (cache) {
-    // //                 return cache.put(request, copy);
-    // //             })
-    // //         }
-    // //         return response;
-    // //     });
-    // // })
 });
-    
-// self.addEventListener('fetch', function(event) {
-//   event.respondWith(
-//         caches.match(event.request).then((cachedResponse) => {
-//             console.log(event.request.url);
-//             if (cachedResponse) {
-//                 console.log('found it! returning cache')
-//                 return cachedResponse;
-//             }
-    
-//             console.log('fetch resource & save in cache')
-//             return fetch(event.request).then((fetchedResponse) => {
-//                 caches.open(pageID).then(function (cache) {
-//                     cache.put(event.request, fetchedResponse.clone());
-//                 });
-//                 return fetchedResponse;
-//             });
-//         })
-//     // fetch(event.request).catch(function() {
-//     //   console.log(event.request)
-//     //   if(event.request.url.substring('/notebooks/')){
-//     //     cache.put(event.request, fetchedResponse.clone());
-
-//     //   }
-//     //   return caches.match(event.request);
-//     // })
-//   );
-// });
-
-// event.respondWith(caches.open(cacheName).then((cache) => {
-//     // Go to the cache first
-//     return cache.match(event.request.url).then((cachedResponse) => {
-//       // Return a cached response if we have one
-//       if (cachedResponse) {
-//         return cachedResponse;
-//       }
-
-//       // Otherwise, hit the network
-//       return fetch(event.request).then((fetchedResponse) => {
-//         // Add the network response to the cache for later visits
-//         cache.put(event.request, fetchedResponse.clone());
-
-//         // Return the network response
-//         return fetchedResponse;
-//       });
-//     });
-//   }));
