@@ -1,4 +1,4 @@
-const version = '0.0.29';
+const version = '0.0.30';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -86,17 +86,21 @@ self.addEventListener('fetch', async function (event) {
             return cached;
             }
 
-            const response = await fetch(event.request);
-            var copy = response.clone();
+            try {
+                const response = await fetch(event.request);
+                var copy = response.clone();
 
-            self.console.log(event.request.url);
-            
-            if (event.request.headers.get('Accept').includes('image')) {
-                let cache = await caches.open(imageID);
-                await cache.put(event.request, copy);
-            } else if (event.request.headers.get('Accept').includes('text/html')) {
-                let cache = await caches.open(pageID);
-                await cache.put(event.request, copy);
+                self.console.log(event.request.url);
+                
+                if (event.request.headers.get('Accept').includes('image')) {
+                    let cache = await caches.open(imageID);
+                    await cache.put(event.request, copy);
+                } else if (event.request.headers.get('Accept').includes('text/html')) {
+                    let cache = await caches.open(pageID);
+                    await cache.put(event.request, copy);
+                }
+            } catch {
+                throw new Error("Fetch failed, offline?");
             }
             
             return response;
