@@ -1,4 +1,4 @@
-const version = '0.0.28';
+const version = '0.0.29';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -79,25 +79,30 @@ self.addEventListener('fetch', async function (event) {
 
     if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
 
-    event.respondWith((async () => {
-        const cached = await caches.match(event.request);
-        if (cached) {
-          return cached;
-        }
+    try {
+        event.respondWith((async () => {
+            const cached = await caches.match(event.request);
+            if (cached) {
+            return cached;
+            }
 
-        const response = await fetch(event.request);
-        var copy = response.clone();
+            const response = await fetch(event.request);
+            var copy = response.clone();
 
-        self.console.log(event.request.url);
-        
-        if (event.request.headers.get('Accept').includes('image')) {
-            let cache = await caches.open(imageID);
-            await cache.put(event.request, copy);
-        } else if (event.request.headers.get('Accept').includes('text/html')) {
-            let cache = await caches.open(pageID);
-            await cache.put(event.request, copy);
-        }
-        
-        return response;
-      })()).catch();
+            self.console.log(event.request.url);
+            
+            if (event.request.headers.get('Accept').includes('image')) {
+                let cache = await caches.open(imageID);
+                await cache.put(event.request, copy);
+            } else if (event.request.headers.get('Accept').includes('text/html')) {
+                let cache = await caches.open(pageID);
+                await cache.put(event.request, copy);
+            }
+            
+            return response;
+        })());
+    } catch {
+        self.console.log('offline?');
+        return;
+    }
 });
