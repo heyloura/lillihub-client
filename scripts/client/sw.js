@@ -1,4 +1,4 @@
-const version = '0.0.42';
+const version = '0.0.43';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -107,13 +107,13 @@ self.addEventListener('fetch', async function (event) {
                     let cache = await caches.open(imageID);
                     await cache.put(event.request, copy);
                 } else {
-                    let cache = await caches.open(pageID);
-                    await cache.put(event.request, copy);
+                    //let cache = await caches.open(pageID);
+                    //await cache.put(event.request, copy);
                 }
 
                 return response;
             } catch {
-                self.console.log('fetch issue, os offline cache it is');
+                self.console.log('fetch issue, is offline cache it is');
                 return caches.match(`${url}/timeline/`, {ignoreVary: true});
             }
         })());
