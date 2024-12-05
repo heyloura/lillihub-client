@@ -1,4 +1,4 @@
-const version = '0.0.40';
+const version = '0.0.41';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -92,6 +92,7 @@ self.addEventListener('fetch', async function (event) {
 
     try {
         event.respondWith((async () => {
+            self.console.log(event.request);
             const cached = await caches.match(event.request, {ignoreVary: true});
             if (cached) {
                 return cached;
@@ -114,11 +115,11 @@ self.addEventListener('fetch', async function (event) {
                 return response;
             } catch {
                 self.console.log('fetch issue, os offline cache it is');
-                return caches.match(`${url}/timeline`, {ignoreVary: true});
+                return caches.match(`${url}/timeline/`, {ignoreVary: true});
             }
         })());
     } catch {
         self.console.log('event.respondWith issue so....');
-        return caches.match(`${url}/timeline`, {ignoreVary: true});
+        return caches.match(`${url}/timeline/`, {ignoreVary: true});
     }
 });
