@@ -1,4 +1,4 @@
-const version = '0.0.44';
+const version = '0.0.45';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -107,7 +107,8 @@ self.addEventListener('fetch', async function (event) {
                     let cache = await caches.open(imageID);
                     await cache.put(event.request, copy);
                 } else {
-                    self.console.log('not caching: ' + event.request.url);
+                    self.console.log('not caching: ');
+                    self.console.log(event.request);
                     //let cache = await caches.open(pageID);
                     //await cache.put(event.request, copy);
                 }
