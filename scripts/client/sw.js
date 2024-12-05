@@ -1,4 +1,4 @@
-const version = '0.0.18';
+const version = '0.0.19';
 const url = 'https://sad-bee-43--version3.deno.dev'
 
 const coreID = `${version}_core`;
@@ -71,34 +71,38 @@ self.addEventListener('activate', function (event) {
     }));
 });
 
-async function handleRequest(request) {
-    if (request.cache === 'only-if-cached' && request.mode !== 'same-origin') return request;
+// async function handleRequest(request) {
 
-    if(request.url.includes('timeline/check') || request.url.includes('timeline/mark')) return request;
-    
-    caches.match(request.url, {ignoreVary: true}).then(function (response) {
-        return response || fetch(request).then(function (response) {
-            var copy = response.clone();
-            self.console.log('fetching:' + request.url);
-
-            if (request.headers.get('Accept').includes('image')) {
-                caches.open(imageID).then(function (cache) {
-                    return cache.put(request, copy);
-                })
-            } else {
-                caches.open(pageID).then(function (cache) {
-                    return cache.put(request, copy);
-                })
-            }
-            return response;
-        });
-    });
-}
+// }
 
 
 
 self.addEventListener('fetch', async function (event) {
-    event.respondWith(handleRequest(event.request));
+    event.respondWith(() => {
+        let request = event.request;
+        self.console.log(request);
+        if (request.cache === 'only-if-cached' && request.mode !== 'same-origin') return;
+
+        if(request.url.includes('timeline/check') || request.url.includes('timeline/mark')) return;
+        
+        caches.match(request.url, {ignoreVary: true}).then(function (response) {
+            return response || fetch(request).then(function (response) {
+                var copy = response.clone();
+                self.console.log('fetching:' + request.url);
+    
+                if (request.headers.get('Accept').includes('image')) {
+                    caches.open(imageID).then(function (cache) {
+                        return cache.put(request, copy);
+                    })
+                } else {
+                    caches.open(pageID).then(function (cache) {
+                        return cache.put(request, copy);
+                    })
+                }
+                return response;
+            });
+        });
+    });
 
 
 
