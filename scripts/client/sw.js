@@ -1,4 +1,4 @@
-const version = '0.0.03';
+const version = '0.0.04';
 
 const coreID = `${version}_core`;
 const pageID = `${version}_pages`;
@@ -67,7 +67,9 @@ self.addEventListener('activate', function (event) {
 self.addEventListener('fetch', function (event) {
 	// Get the request
 	var request = event.request;
-    console.log(request);
+    self.console.log(request);
+
+    if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
 
 	caches.match(request).then(function (response) {
         return response || fetch(request).then(function (response) {
