@@ -24,20 +24,19 @@ if(window.location.hash) {
 }
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-    if(localStorage.getItem('mbKey') && localStorage.getItem('starting_notebook')){
-        document.getElementById('add-0').innerHTML = 'not ready yet........';
-    } else if(localStorage.getItem('mbKey')) {
-        let id = document.getElementById('notebook_id').value;
-        fetch(`/notebooks/notebooks/${id}`, { method: "get" })
-            .then(async response => response.json())
-            .then(async data => {
-                console.log(data)
-                if(data && data.length > 0) {
-                    document.querySelector('.notebook-' + data[0].notebook_id).classList.add('active');
-                }
-                //document.getElementById('add-0').innerHTML = data;
-                await displayNotes(data);
-            });
+    if (localStorage.getItem('mbKey')) {
+        // let id = document.getElementById('notebook_id').value;
+        // fetch(`/notebooks/notebooks/${id}`, { method: "get" })
+        //     .then(async response => response.json())
+        //     .then(async data => {
+        //         console.log(data)
+        //         if(data && data.length > 0) {
+        //             document.querySelector('.notebook-' + data[0].notebook_id).classList.add('active');
+        //         }
+        //         //document.getElementById('add-0').innerHTML = data;
+        //         await displayNotes(data);
+        //     });
+        document.getElementById('add-0').innerHTML = 'noe go fetch... mwahahahahh';
     } else {
         document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
     }

@@ -589,25 +589,25 @@ Deno.serve(async (req) => {
                 //return new Response(results.items.map(i => utility.noteHTML(i, id)).join(''),HTMLHeaders(nonce));
             }
 
-            const NOTEBOOK_ROUTE = new URLPattern({ pathname: "/notebooks/:id" });
-            if(new URLPattern({ pathname: "/notebooks" }).exec(req.url) || NOTEBOOK_ROUTE.exec(req.url)) {
-                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                let results = await fetching.json();
+            // const NOTEBOOK_ROUTE = new URLPattern({ pathname: "/notebooks/:id" });
+            // if(new URLPattern({ pathname: "/notebooks" }).exec(req.url) || NOTEBOOK_ROUTE.exec(req.url)) {
+            //     let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            //     let results = await fetching.json();
 
-                let id = results.items[0].id;
-                if(NOTEBOOK_ROUTE.exec(req.url)) {
-                    id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
-                }
+            //     let id = results.items[0].id;
+            //     if(NOTEBOOK_ROUTE.exec(req.url)) {
+            //         id = NOTEBOOK_ROUTE.exec(req.url).pathname.groups.id;
+            //     }
 
-                const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
-                const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
-                    `<li class="menu-item"><a class="notebook-${item.id}" href="/notebooks/${item.id}">${item.title}</a></span>`
-                ).join('');
-                return new Response(layout.replaceAll('{{nonce}}', nonce)
-                    .replaceAll('{{notebooks}}', notebooks)
-                    .replaceAll('{{notebookId}}', id),
-                    HTMLHeaders(nonce));
-            }
+            //     const layout = new TextDecoder().decode(await Deno.readFile("notebooks.html"));
+            //     const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
+            //         `<li class="menu-item"><a class="notebook-${item.id}" href="/notebooks/${item.id}">${item.title}</a></span>`
+            //     ).join('');
+            //     return new Response(layout.replaceAll('{{nonce}}', nonce)
+            //         .replaceAll('{{notebooks}}', notebooks)
+            //         .replaceAll('{{notebookId}}', id),
+            //         HTMLHeaders(nonce));
+            // }
 
 
 
@@ -718,17 +718,37 @@ Deno.serve(async (req) => {
 
 
             // -----------------------------------------------------
-            // Home page
+            // All other pages
             // -----------------------------------------------------
-            const parts = req.url.split('/');
-            const name = parts[parts.length - 1];
-            console.log(name);
-            const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
-            //console.log(layout);
-            return new Response(layout.replaceAll('{{nonce}}', nonce)
+
+            const pages = ["notebooks"]
+            if (pages.some(v => req.url.includes(v))) {
+                const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
+                const parts = req.url.split('/');
+                const name = parts[parts.length - 1].split('?')[0];
+                let id = null;
+
+                // check for notebooks route
+                if(req.url.includes("notebooks"))
+                {
+                    id = name;
+                    name = "notebooks";
+                }
+                
+                return new Response(layout.replaceAll('{{nonce}}', nonce)
+                    .replaceAll('{{pages}}', new TextDecoder().decode(await Deno.readFile(`${name}.html`)) )
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name ? `<script src="/scripts/${name}.js" type="text/javascript"></script>` : ''),
                 HTMLHeaders(nonce));
+            }
+
+            return new Response(new TextDecoder().decode(await Deno.readFile("notfound.html")),
+            {
+                headers: {
+                    "content-type": "text/html",
+                    status: 404,
+                },
+            });
 
         } else {
             return returnBadGateway('Micro.blog did not return a user from the provided token.')
@@ -855,7 +875,7 @@ async function decryptMe(encrypted)
 // can set a cookie if provided
 // the uuid is set per request to set a nonce
 function HTMLHeaders(uuid, cookie) {
-    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com *.previewbox.link 'nonce-${uuid}';media-src *;img-src *`;
+    const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com 'nonce-${uuid}';media-src *;img-src *`;
     if(!cookie) {
         return {
             headers: {
