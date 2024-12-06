@@ -132,16 +132,12 @@ Deno.serve(async (req) => {
         });
     }
 
+    const nonce = crypto.randomUUID(); // this is to protect us from scripts and css
     const CHECK_HTML_ROUTE = new URLPattern({ pathname: "*.html" });
     if(CHECK_HTML_ROUTE.exec(req.url))
     {
         const parts = req.url.split('/');
-        return new Response(await Deno.readFile(parts[parts.length - 1 ]), {
-            status: 200,
-            headers: {
-                "content-type": "text/html",
-            },
-        });
+        return new Response(await Deno.readFile(parts[parts.length - 1]),HTMLHeaders(nonce));
     }
 
     // const CHECK_FONT_ROUTE = new URLPattern({ pathname: "/font/:id" });
@@ -195,7 +191,6 @@ Deno.serve(async (req) => {
     // Now let's see if we have a user or if someone needs to 
     // login
     //********************************************************
-    const nonce = crypto.randomUUID(); // this is to protect our scripts and css
     const mbTokenCookie = getCookieValue(req, 'atoken');
     const mbToken = mbTokenCookie ? await decryptMe(getCookieValue(req, 'atoken')) : undefined;
 
@@ -301,33 +296,12 @@ Deno.serve(async (req) => {
                     .replaceAll('{{tagmojiMenu}}', tagmojiMenu),
                   HTMLHeaders(nonce));
             }
-            
-
-            // if(((new URLPattern({ pathname: "/timeline/mentions/mentions" })).exec(req.url))) {
-            //     const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
-            //     const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));
-            //     const html = posts.map(post => {
-            //         const stranger = following.filter(f => f.username == post.username);
-            //         const result = postHTML(post, null, stranger.length == 0);
-            //         return result;
-            //     }).join('');
-            //     return new Response(html,HTMLHeaders(nonce));
-            // }
 
             if((new URLPattern({ pathname: "/timeline/mentions" })).exec(req.url) && user) {
                 const layout = new TextDecoder().decode(await Deno.readFile("mentions.html"));
                 return new Response(layout.replaceAll('{{nonce}}', nonce),
                   HTMLHeaders(nonce));
             }
-
-            // if(((new URLPattern({ pathname: "/timeline/discover/photos" })).exec(req.url))) {
-            //     const posts = await mb.getMicroBlogDiscoverPhotoPosts(mbToken);
-            //     const html = posts.map((p, index) => index < 9 ? `<li>
-            //         <img src="${p.image}" alt="Image 1" class="img-responsive">
-            //     </li>` : '').join('');
-
-            //     return new Response(`<ul class="discover-gallery">${html}</ul>`,HTMLHeaders(nonce));
-            // }
 
             const CHECK_ROUTE = new URLPattern({ pathname: "/timeline/check/:id" });
             if(CHECK_ROUTE.exec(req.url)) {
@@ -746,7 +720,14 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // Home page
             // -----------------------------------------------------
-            return Response.redirect(`${deployURL}timeline`);
+            const parts = req.url.split('/');
+            const name = parts[parts.length - 1];
+            console.log(name);
+            const layout = await Deno.readFile("layout.html");
+            return new Response(layout.replaceAll('{{nonce}}', nonce)
+                    .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
+                    .replaceAll('{{scriptLink}}', name ? `<script src="/scripts/${name}.js" type="text/javascript"></script>` : ''),
+                HTMLHeaders(nonce));
 
         } else {
             return returnBadGateway('Micro.blog did not return a user from the provided token.')
