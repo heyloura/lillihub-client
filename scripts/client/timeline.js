@@ -174,6 +174,7 @@ function load() {
 }
 
 function offline() {
+    document.getElementById('mainPost').classList.add('hide');
     document.getElementById('add-0').innerHTML = `
         <div class="empty">
             <div class="empty-icon">
