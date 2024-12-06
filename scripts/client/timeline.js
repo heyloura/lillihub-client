@@ -118,6 +118,7 @@ if(window.location.hash) {
 document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
     
+    console.log(_online);
     if(_online) {
         if(localStorage.getItem('post_setting'))
             {
