@@ -104,36 +104,23 @@ function isReachable(url) {
 function getServerUrl() {
     return window.location.origin;
 }
-window.addEventListener('online', handleConnection);
-window.addEventListener('offline', handleConnection);
-function handleConnection() {
+function handleConnection(callback) {
   if(document.getElementById('offline-notice')) {
     document.getElementById('offline-notice').remove();
   }
   if (navigator.onLine) {
     isReachable(getServerUrl()).then(function(online) {
       if (online) {
-        // handle online status
-        console.log('online');
-        _online = true;
+        callback();
       } else {
-        console.log('no connectivity');
-        _online = false;
         document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
             Looks like you are offline.
         </div>`);
       }
     });
   } else {
-    // handle offline status
-    console.log('offline');
-    _online = false;
     document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
         Looks like you are offline.
     </div>`);
   }
 }
-document.addEventListener("DOMContentLoaded", async (event) => { 
-    handleConnection();
-});
-var _online = false;
