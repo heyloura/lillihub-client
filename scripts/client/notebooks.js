@@ -160,16 +160,24 @@ async function displayNotes(notes) {
         let noteSection = `<div id=${note.id} class="container">
                         <div class="columns">
                             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                                <div id="details-sidebar">
-                                    <div class="mt-2">
-                                        <p>Title management</p>
+                                <ul class="menu mb-2">
+                                    <li class="divider" data-content="Note Details"></li>
+                                    <li class="menu-item">
+                                        <a href="/timeline" class="btn btn-primary">Edit Note</a>
+                                    </li>
+                                    <li class="menu-item">
                                         ${title}
-                                        <p>Tag management</p>
+                                    </li>
+                                    <li class="menu-item">
                                         ${tags}
-                                        <p>Bookmarks</p>
-                                        soon.
-                                    </div>
-                                </div>
+                                    </li>
+                                </ul>
+                                <ul class="menu mb-2">
+                                    <li class="divider" data-content="Related Bookmarks"></li>
+                                    <li class="menu-item">
+                                        <a href="/timeline">Bookmark title here....</a>
+                                    </li>
+                                </ul>
                             </div>
                             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                                 ${!note._microblog.is_shared ? html : note.content_html}
