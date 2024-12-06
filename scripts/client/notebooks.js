@@ -131,22 +131,24 @@ async function displayNotes(notes) {
     
     for (var i = 0; i < notes.length; i++) {
         let note = notes[i];
-        let noteSection = `<article id=${note.id} class="card">`;
+        let title = '';
+        let tags = '';
+
         result += `<tr data-id="${note.id}" class="ripple">`
         if(!note._microblog.is_shared) {
             var html = converter.makeHtml(await decryptWithKey(note.content_text));
             var metadata = converter.getMetadata();
             if(metadata && metadata.title && metadata.tags) {
-                noteSection += `<h1>${metadata.title}</h1><p>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</p>${html}`;
+                title = metadata.title;
+                tags = metadata.tags;
                 result += `<td data-id="${note.id}">${metadata.title}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
             } else if(metadata && metadata.title) {
+                title = metadata.title;
                 result += `<td data-id="${note.id}">${metadata.title}</td>`;
-                noteSection += `<h1>${metadata.title}</h1>${html}`;
             } else if(metadata && metadata.tags) {
-                noteSection += `<p>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</p>${html}`;
+                tags = metadata.tags;
                 result += `<td data-id="${note.id}">${note.id}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
             } else {
-                noteSection += html;
                 result += `<td data-id="${note.id}">${note.id}</td>`;
             }
             
@@ -155,7 +157,25 @@ async function displayNotes(notes) {
         }
 
         result += '</tr>';
-        noteSection += `</article>`;
+        let noteSection = `<div id=${note.id} class="container">
+                        <div class="columns">
+                            <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                                <div id="details-sidebar">
+                                    <div class="mt-2">
+                                        <p>Title management</p>
+                                        ${title}
+                                        <p>Tag management</p>
+                                        ${tags}
+                                        <p>Bookmarks</p>
+                                        soon.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                                ${!note._microblog.is_shared ? html : note.content_html}
+                            </div>
+                        </div>
+                    </div>`;
         document.getElementById('Notebooks').insertAdjacentHTML( 'afterbegin', noteSection);
 
         //notes
