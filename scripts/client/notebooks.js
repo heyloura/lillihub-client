@@ -149,7 +149,7 @@ async function displayNotes(notes) {
                 tags = metadata.tags;
                 result += `<td data-id="${note.id}">${note.id}<br/>${metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ')}</td>`;
             } else {
-                result += `<td data-id="${note.id}">${note.id}</td>`;
+                result += `<td data-id="${note.id}">${truncate(html, 100)}</td>`;
             }
             
         } else {
@@ -185,32 +185,47 @@ async function displayNotes(notes) {
                         </div>
                     </div>`;
         document.getElementById('Notebooks').insertAdjacentHTML( 'afterbegin', noteSection);
-
-        //notes
-        
-        // notes[i].innerHTML = converter.makeHtml(markdown);
-        // var metadata = converter.getMetadata();
-        // let id = notes[i].getAttribute('data-id');
-        // if(metadata) {
-        //     if(metadata.title) {
-        //         document.getElementById('title-' + id).innerHTML = metadata.title;
-        //     }
-        //     if(metadata.tags) {
-        //         document.getElementById('tags-' + id).innerHTML = metadata.tags.substring(1,metadata.tags.length - 1).split(',').map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span>').join(' ');
-        //         metadata.tags.substring(1,metadata.tags.length - 1).split(',').forEach(t => tags.add(t));
-        //         }
-        //     document.getElementById('metadata-' + id).innerHTML = JSON.stringify(metadata,null,2);
-        // }
     }
     document.getElementById('add-0').innerHTML = result + '</table>';
     hljs.highlightAll();
-    // const tables = document.querySelectorAll('table');
-    // for (var i = 0; i < tables.length; i++) {
-    //     tables[i].classList.add('table');
-    //     tables[i].classList.add('table-striped');
-    // }
-    // if(Array.from(tags).length > 0) {
-    //     document.getElementById('noteTags').innerHTML = Array.from(tags).map(t => '<span data-id="'+t+'" class="chip noteTag">'+t+'</span> ').join('')
-    // }
 }
 
+function truncate(rootNode, max){
+    //Text method for cross browser compatibility
+    var text = ('innerText' in rootNode)? 'innerText' : 'textContent';
+
+    //If total length of characters is less that the limit, short circuit
+    if(rootNode[text].length <= max){ return; }
+
+    var cloneNode = rootNode.cloneNode(true),
+        currentNode = cloneNode,
+        //Create DOM iterator to loop only through text nodes
+        ni = document.createNodeIterator(currentNode, NodeFilter.SHOW_TEXT),
+        frag = document.createDocumentFragment(),
+        len = 0;
+
+    //loop through text nodes
+    while (currentNode = ni.nextNode()) {
+        //if nodes parent is the rootNode, then we are okay to truncate
+        if (currentNode.parentNode === cloneNode) {
+            //if we are in the root textNode and the character length exceeds the maximum, truncate the text, add to the fragment and break out of the loop
+            if (len + currentNode[text].length > max){
+                currentNode[text] = currentNode[text].substring(0, max - len);
+                frag.appendChild(currentNode);
+                break;
+            }
+            else{
+                frag.appendChild(currentNode);
+            }
+        }
+        //If not, simply add the node to the fragment
+        else{
+            frag.appendChild(currentNode.parentNode);
+        }
+        //Track current character length
+        len += currentNode[text].length;
+    }
+
+    rootNode.innerHTML = '';
+    rootNode.appendChild(frag);
+}
