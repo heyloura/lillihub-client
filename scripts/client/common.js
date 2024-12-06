@@ -104,23 +104,19 @@ function isReachable(url) {
 function getServerUrl() {
     return window.location.origin;
 }
-function handleConnection(callback) {
+function handleConnection(online, offline) {
   if(document.getElementById('offline-notice')) {
     document.getElementById('offline-notice').remove();
   }
   if (navigator.onLine) {
     isReachable(getServerUrl()).then(function(online) {
       if (online) {
-        callback();
+        online();
       } else {
-        document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
-            Looks like you are offline.
-        </div>`);
+        offline();
       }
     });
   } else {
-    document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
-        Looks like you are offline.
-    </div>`);
+    offline();
   }
 }

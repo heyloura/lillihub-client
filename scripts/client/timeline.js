@@ -117,64 +117,84 @@ if(window.location.hash) {
 // }
 window.addEventListener('online', handleConnection);
 window.addEventListener('offline', handleConnection);
+
+function load() {
+    if(localStorage.getItem('post_setting'))
+    {
+        if(localStorage.getItem('post_setting') === 'none') {
+            document.getElementById('mainPost').classList.add('hide');
+        } else {
+            if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
+            {
+                document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
+                document.getElementById('postingType').value = localStorage.getItem('post_setting');
+                document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
+                document.getElementById('omgApi').value = localStorage.getItem('omg_api');
+            } else if(localStorage.getItem('post_setting') === 'micropub') {
+                document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
+                document.getElementById('postingType').value = 'micropub';
+                document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
+                document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
+            } else {
+                document.getElementById('postingType').value = 'mb';
+            }
+        }
+    }
+
+    //grab the timeline posts
+    fetch("/timeline/0", { method: "get" })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('add-0').innerHTML = data;
+            const article = document.querySelector('article:first-child');
+            const id = article.getAttribute('id');
+            let checks = 0;
+            const timerID = setInterval(function() {
+                fetch("/timeline/check/" + id, { method: "get" })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.count > 0) {
+                            document.getElementById('morePostsToast').classList.remove('hide');
+                            document.getElementById('showPostCount').innerHTML = data.count;
+                            console.log(data);
+                            document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
+                        }     
+                    });
+                checks++;
+                if(checks > 10) {
+                    clearInterval(timerID);
+                }
+            }, 60 * 1000); 
+            fetch("/timeline/mark/" + id, { method: "get" })
+                .then(response => response.text())
+                .then(_data => {});
+
+            buildCarousels();
+        });
+}
+
+function offline() {
+    document.getElementById('add-0').innerHTML = `
+        <div class="empty">
+            <div class="empty-icon">
+                <img src="/logo.png" width="100px">
+            </div>
+            <p class="empty-title h5">Looks like you're offline</p>
+            <p class="empty-subtitle">You could</p>
+            <ul>
+                <li>Manage your <a href="/blog">blog</a>.</li>
+                <li>Take a look at your <a href="/bookmarks">bookmarks</a>.</li>
+                <li>Peruse your <a href="/bookshelves">bookshelves</a>.</li>
+                <li>Start jotting down <a href="/notebooks">notes</a>.</li>
+            </ul>
+        </div>
+    `;
+}
+
 document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
     
-    handleConnection(() => {
-        if(localStorage.getItem('post_setting'))
-        {
-            if(localStorage.getItem('post_setting') === 'none') {
-                document.getElementById('mainPost').classList.add('hide');
-            } else {
-                if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
-                {
-                    document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
-                    document.getElementById('postingType').value = localStorage.getItem('post_setting');
-                    document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
-                    document.getElementById('omgApi').value = localStorage.getItem('omg_api');
-                } else if(localStorage.getItem('post_setting') === 'micropub') {
-                    document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
-                    document.getElementById('postingType').value = 'micropub';
-                    document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
-                    document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
-                } else {
-                    document.getElementById('postingType').value = 'mb';
-                }
-            }
-        }
-    
-        //grab the timeline posts
-        fetch("/timeline/0", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('add-0').innerHTML = data;
-                const article = document.querySelector('article:first-child');
-                const id = article.getAttribute('id');
-                let checks = 0;
-                const timerID = setInterval(function() {
-                    fetch("/timeline/check/" + id, { method: "get" })
-                        .then(response => response.json())
-                        .then(data => {
-                            if(data.count > 0) {
-                                document.getElementById('morePostsToast').classList.remove('hide');
-                                document.getElementById('showPostCount').innerHTML = data.count;
-                                console.log(data);
-                                document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
-                            }     
-                        });
-                    checks++;
-                    if(checks > 10) {
-                        clearInterval(timerID);
-                    }
-                }, 60 * 1000); 
-                fetch("/timeline/mark/" + id, { method: "get" })
-                    .then(response => response.text())
-                    .then(_data => {});
-    
-                buildCarousels();
-                //loadConversations();
-            });
-    });
+    handleConnection(load,offline);
 });
 
 
