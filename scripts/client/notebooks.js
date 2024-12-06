@@ -9,11 +9,11 @@ function checkDirection() {
   if (touchendX > touchstartX) return;
 }
 
-document.getElementById('notes').addEventListener('touchstart', e => {
+document.getElementById('Notebooks').addEventListener('touchstart', e => {
   touchstartX = e.changedTouches[0].screenX
 })
 
-document.getElementById('notes').addEventListener('touchend', e => {
+document.getElementById('Notebooks').addEventListener('touchend', e => {
   touchendX = e.changedTouches[0].screenX
   checkDirection()
 })
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         //         //document.getElementById('add-0').innerHTML = data;
         //         await displayNotes(data);
         //     });
-        document.getElementById('add-0').innerHTML = 'noe go fetch... mwahahahahh';
+        document.getElementById('add-0').innerHTML = 'now go fetch... mwahahahahh';
     } else {
         document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
     }
