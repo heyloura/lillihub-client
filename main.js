@@ -717,6 +717,19 @@ Deno.serve(async (req) => {
             }
 
 
+            
+            // -----------------------------------------------------
+            // API endpoints
+            // -----------------------------------------------------
+
+            if(new URLPattern({ pathname: "/api/notebooks" }).exec(req.url)) {
+                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let results = await fetching.json();
+                return new Response(JSON.stringify(results),
+                    HTMLHeaders(nonce));
+                
+            }
+
             // -----------------------------------------------------
             // All other pages
             // -----------------------------------------------------
