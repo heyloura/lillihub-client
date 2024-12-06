@@ -133,7 +133,7 @@ fetch(`/api/notebooks`, { method: "get" })
 .then(async response => response.json())
 .then(async data => {
     console.log(data);
-    data.items.forEach(element => {
+    data.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).forEach(element => {
         document.getElementById('notebooks').insertAdjacentHTML( 'beforeend', `<li class="menu-item"><a class="notebook-${element.id}" href="/notebooks/${element.id}">${element.title}</a></li>`); 
     });
 });

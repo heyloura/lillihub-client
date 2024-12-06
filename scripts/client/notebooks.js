@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         fetch(`/api/notebooks/${id}`, { method: "get" })
             .then(async response => response.json())
             .then(async data => {
-                console.log(data)
+                console.log(data);
                 // if(data && data.items.length > 0) {
                 //     document.querySelector('.notebook-' + data.items[0].notebook_id).classList.add('active');
                 // }

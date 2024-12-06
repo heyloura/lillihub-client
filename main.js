@@ -730,6 +730,7 @@ Deno.serve(async (req) => {
 
             const NOTEBOOK_API_FETCH_ROUTE = new URLPattern({ pathname: "/api/notebooks/:id" });
             if(NOTEBOOK_API_FETCH_ROUTE.exec(req.url)) {
+                let id = NOTEBOOK_API_FETCH_ROUTE.exec(req.url).pathname.groups.id;
                 let fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let results = await fetching.json();
                 return new Response(JSON.stringify(results.items.map(i => {i.notebook_id = id; return i;})), JSONHeaders());
