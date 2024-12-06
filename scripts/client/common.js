@@ -114,15 +114,17 @@ function handleConnection(load, offline) {
         load();
       } else {
         offline();
+        document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
+            Looks like you are offline.
+        </div>`);
       }
     });
   } else {
     offline();
+    document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
+        Looks like you are offline.
+    </div>`);
   }
 }
-window.addEventListener('online', handleConnection(() => {},() => {document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
-    Looks like you are offline.
-</div>`);}));
-window.addEventListener('offline', handleConnection(() => {},() => {document.querySelector('header').insertAdjacentHTML( 'afterbegin', `<div id="offline-notice" class="toast toast-error">
-    Looks like you are offline.
-</div>`);}));
+window.addEventListener('online', handleConnection(function(){},function(){}));
+window.addEventListener('offline', handleConnection(function(){},function(){}));
