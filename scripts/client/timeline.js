@@ -117,75 +117,68 @@ if(window.location.hash) {
 // }
 document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
-    if(localStorage.getItem('post_setting'))
-    {
-        if(localStorage.getItem('post_setting') === 'none') {
-            document.getElementById('mainPost').classList.add('hide');
-        } else {
-            if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
+    
+    if(_online) {
+        if(localStorage.getItem('post_setting'))
             {
-                document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
-                document.getElementById('postingType').value = localStorage.getItem('post_setting');
-                document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
-                document.getElementById('omgApi').value = localStorage.getItem('omg_api');
-            } else if(localStorage.getItem('post_setting') === 'micropub') {
-                document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
-                document.getElementById('postingType').value = 'micropub';
-                document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
-                document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
-            } else {
-                document.getElementById('postingType').value = 'mb';
-            }
-        }
-    }
-
-    //grab the timeline posts
-    fetch("/timeline/0", { method: "get" })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('add-0').innerHTML = data;
-            const article = document.querySelector('article:first-child');
-            const id = article.getAttribute('id');
-            let checks = 0;
-            const timerID = setInterval(function() {
-                fetch("/timeline/check/" + id, { method: "get" })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.count > 0) {
-                            document.getElementById('morePostsToast').classList.remove('hide');
-                            document.getElementById('showPostCount').innerHTML = data.count;
-                            console.log(data);
-                            document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
-                        }     
-                    });
-                checks++;
-                if(checks > 10) {
-                    clearInterval(timerID);
+                if(localStorage.getItem('post_setting') === 'none') {
+                    document.getElementById('mainPost').classList.add('hide');
+                } else {
+                    if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
+                    {
+                        document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
+                        document.getElementById('postingType').value = localStorage.getItem('post_setting');
+                        document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
+                        document.getElementById('omgApi').value = localStorage.getItem('omg_api');
+                    } else if(localStorage.getItem('post_setting') === 'micropub') {
+                        document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
+                        document.getElementById('postingType').value = 'micropub';
+                        document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
+                        document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
+                    } else {
+                        document.getElementById('postingType').value = 'mb';
+                    }
                 }
-            }, 60 * 1000); 
-            fetch("/timeline/mark/" + id, { method: "get" })
+            }
+        
+            //grab the timeline posts
+            fetch("/timeline/0", { method: "get" })
                 .then(response => response.text())
-                .then(_data => {});
+                .then(data => {
+                    document.getElementById('add-0').innerHTML = data;
+                    const article = document.querySelector('article:first-child');
+                    const id = article.getAttribute('id');
+                    let checks = 0;
+                    const timerID = setInterval(function() {
+                        fetch("/timeline/check/" + id, { method: "get" })
+                            .then(response => response.json())
+                            .then(data => {
+                                if(data.count > 0) {
+                                    document.getElementById('morePostsToast').classList.remove('hide');
+                                    document.getElementById('showPostCount').innerHTML = data.count;
+                                    console.log(data);
+                                    document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
+                                }     
+                            });
+                        checks++;
+                        if(checks > 10) {
+                            clearInterval(timerID);
+                        }
+                    }, 60 * 1000); 
+                    fetch("/timeline/mark/" + id, { method: "get" })
+                        .then(response => response.text())
+                        .then(_data => {});
+        
+                    buildCarousels();
+                    //loadConversations();
+                });
+    }
+        
 
-            buildCarousels();
-            //loadConversations();
-        });
-
-    // //fetch the discover photos
-    // fetch("/timeline/discover/photos", { method: "get" })
-    //     .then(response => response.text())
-    //     .then(data => {
-    //         document.getElementById('discover-photos').innerHTML = data;
-    //     });
-
-
-    // //suggestions
-    // fetch("/timeline/suggestions", { method: "get" })
-    //     .then(response => response.text())
-    //     .then(data => {
-    //         document.getElementById('suggestions').innerHTML = data;
-    //     });
 });
+
+
+
 // document.addEventListener("change", (event) => {
 //     if(event.target.classList.contains('countCheckedCategory')) {
 //         countChecked('category[]', 'categoriesDropdown');

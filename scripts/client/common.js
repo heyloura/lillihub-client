@@ -133,4 +133,7 @@ function handleConnection() {
     </div>`);
   }
 }
+document.addEventListener("DOMContentLoaded", async (event) => { 
+    handleConnection();
+});
 var _online = false;
