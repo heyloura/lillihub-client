@@ -3,11 +3,10 @@ function growTextArea(el) {
     highlightTextarea(el, el.parentNode);
 }
 function highlightTextarea(inputEl, highlightEl) {
-    const highlighted = hljs.highlight(
-        "markdown",
-        inputEl.value
-      ).value;
-      //highlightEl.innerHTML = highlighted;
+    const highlighted = hljs.highlight(inputEl.value, { language: "markdown"}).value;
+    console.log(highlighted)     
+    
+    highlightEl.querySelector('code').innerHTML = highlighted;
 }
 function liveSearch(selector, searchboxId) {
     let cards = document.querySelectorAll(selector)

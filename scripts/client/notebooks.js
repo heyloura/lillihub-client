@@ -187,7 +187,7 @@ async function displayNotes(notes) {
                     </div>
                     <div id="${note.id}-edit" class="card">
                         <div class="card-body">
-                            <pre class="grow-wrap">
+                            <pre class="grow-wrap" data-replicated-value="${markdown}">
                                 <textarea id="${note.id}-textarea" class="form-input grow-me" rows="15">${markdown}</textarea>
                                 <code class="language-markdown highlighted"></code>
                             </pre>
