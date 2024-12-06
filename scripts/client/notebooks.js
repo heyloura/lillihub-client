@@ -25,19 +25,19 @@ if(window.location.hash) {
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     if (localStorage.getItem('mbKey')) {
-        console.log(window.location.pathname.split('/'));
-        // let id = document.getElementById('notebook_id').value;
-        // fetch(`/notebooks/notebooks/${id}`, { method: "get" })
-        //     .then(async response => response.json())
-        //     .then(async data => {
-        //         console.log(data)
-        //         if(data && data.length > 0) {
-        //             document.querySelector('.notebook-' + data[0].notebook_id).classList.add('active');
-        //         }
-        //         //document.getElementById('add-0').innerHTML = data;
-        //         await displayNotes(data);
-        //     });
-        document.getElementById('add-0').innerHTML = 'now go fetch... mwahahahahh';
+        let parts = window.location.pathname.split('/');
+        let id = parts[parts - 1];
+
+        fetch(`/api/notebooks/${id}`, { method: "get" })
+            .then(async response => response.json())
+            .then(async data => {
+                console.log(data)
+                if(data && data.length > 0) {
+                    document.querySelector('.notebook-' + data[0].notebook_id).classList.add('active');
+                }
+                document.getElementById('add-0').innerHTML = data;
+                await displayNotes(data);
+            });
     } else {
         document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
     }
