@@ -25,6 +25,7 @@ if(window.location.hash) {
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     if (localStorage.getItem('mbKey')) {
+        console.log(window.location.pathname.split('/'));
         // let id = document.getElementById('notebook_id').value;
         // fetch(`/notebooks/notebooks/${id}`, { method: "get" })
         //     .then(async response => response.json())
