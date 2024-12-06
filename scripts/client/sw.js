@@ -1,4 +1,4 @@
-const version = '0.0.72';
+const version = '0.0.73';
 const url = ''
 
 const coreID = `${version}_core`;

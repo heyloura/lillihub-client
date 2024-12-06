@@ -193,25 +193,29 @@ async function displayNotes(notes) {
     hljs.highlightAll();
 }
 
-function truncate(str, len) {
-    // Convert the string to a HTMLString
-    var htmlStr = new HTMLString.String(str);
-
-    // Check the string needs truncating
-    if (htmlStr.length() <= len) {
-        return str;
-    }
-
-    // Find the closing tag for the character we are truncating to
-    var tags = htmlStr.characters[len - 1].tags();
-    var closingTag = tags[tags.length - 1];
-
-    // Find the last character to contain this tag
-    for (var index = len; index < htmlStr.length(); index++) {
-        if (!htmlStr.characters[index].hasTags(closingTag)) {
-            break;
+function truncate(s, approxNumChars) {
+    var taggish = /<[^>]+>/g;
+    var s = s.slice(0, approxNumChars); // ignores tag lengths for solution brevity
+    s = s.replace(/<[^>]*$/, '');  // rm any trailing partial tags
+    tags = s.match(taggish);
+    
+    // find out which tags are unmatched
+    var openTagsSeen = [];
+    for (tag_i in tags) {
+        var tag = tags[tag_i];
+        if (tag.match(/<[^>]+>/) !== null) {
+        openTagsSeen.push(tag);
+        }
+        else {
+        // quick version that assumes your HTML is correctly formatted (alas) -- else we would have to check the content inside for matches and loop through the opentags
+        openTagsSeen.pop();
         }
     }
-
-    return htmlStr.slice(0, index);
+    
+    // reverse and close unmatched tags
+    openTagsSeen.reverse();
+    for (tag_i in openTagsSeen) {
+        s += ('<\\' + openTagsSeen[tag_i].match(/\w+/)[0] + '>');
+    }
+    return s + '...';
 }
