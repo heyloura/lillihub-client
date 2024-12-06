@@ -115,9 +115,6 @@ if(window.location.hash) {
 
 //     }
 // }
-window.addEventListener('online', handleConnection(load,offline));
-window.addEventListener('offline', handleConnection(load,offline));
-
 function load() {
     if(localStorage.getItem('post_setting'))
     {
