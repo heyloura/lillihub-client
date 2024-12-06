@@ -136,7 +136,8 @@ async function displayNotes(notes) {
 
         result += `<tr data-id="${note.id}" class="ripple">`
         if(!note._microblog.is_shared) {
-            var html = converter.makeHtml(await decryptWithKey(note.content_text));
+            var markdown = await decryptWithKey(note.content_text);
+            var html = converter.makeHtml(markdown);
             var metadata = converter.getMetadata();
             if(metadata && metadata.title && metadata.tags) {
                 title = metadata.title;
@@ -157,13 +158,13 @@ async function displayNotes(notes) {
         }
 
         result += '</tr>';
-        let noteSection = `<div id=${note.id} class="container">
+        let noteSection = `<div id="${note.id}" class="container">
                         <div class="columns">
                             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                                 <ul class="menu mb-2">
                                     <li class="divider" data-content="Note Details"></li>
                                     <li class="menu-item">
-                                        <a href="/timeline" class="btn btn-primary">Edit Note</a>
+                                        <a href="#${note.id}-edit" class="btn btn-primary">Edit Note</a>
                                     </li>
                                     <li class="menu-item">
                                         ${title}
@@ -183,49 +184,34 @@ async function displayNotes(notes) {
                                 ${!note._microblog.is_shared ? html : note.content_html}
                             </div>
                         </div>
-                    </div>`;
+                    </div><div id="${note.id}-edit"><div class="grow-wrap">
+                                    <textarea id="${note.id}-textarea" class="form-input grow-me" rows="3">${markdown}</textarea>
+                                </div></div>`;
         document.getElementById('Notebooks').insertAdjacentHTML( 'afterbegin', noteSection);
     }
     document.getElementById('add-0').innerHTML = result + '</table>';
     hljs.highlightAll();
 }
 
-function truncate(rootNode, max){
-    //Text method for cross browser compatibility
-    var text = ('innerText' in rootNode)? 'innerText' : 'textContent';
+function truncate(str, len) {
+    // Convert the string to a HTMLString
+    var htmlStr = new HTMLString.String(str);
 
-    //If total length of characters is less that the limit, short circuit
-    if(rootNode[text].length <= max){ return; }
-
-    var cloneNode = rootNode.cloneNode(true),
-        currentNode = cloneNode,
-        //Create DOM iterator to loop only through text nodes
-        ni = document.createNodeIterator(currentNode, NodeFilter.SHOW_TEXT),
-        frag = document.createDocumentFragment(),
-        len = 0;
-
-    //loop through text nodes
-    while (currentNode = ni.nextNode()) {
-        //if nodes parent is the rootNode, then we are okay to truncate
-        if (currentNode.parentNode === cloneNode) {
-            //if we are in the root textNode and the character length exceeds the maximum, truncate the text, add to the fragment and break out of the loop
-            if (len + currentNode[text].length > max){
-                currentNode[text] = currentNode[text].substring(0, max - len);
-                frag.appendChild(currentNode);
-                break;
-            }
-            else{
-                frag.appendChild(currentNode);
-            }
-        }
-        //If not, simply add the node to the fragment
-        else{
-            frag.appendChild(currentNode.parentNode);
-        }
-        //Track current character length
-        len += currentNode[text].length;
+    // Check the string needs truncating
+    if (htmlStr.length() <= len) {
+        return str;
     }
 
-    rootNode.innerHTML = '';
-    rootNode.appendChild(frag);
+    // Find the closing tag for the character we are truncating to
+    var tags = htmlStr.characters[len - 1].tags();
+    var closingTag = tags[tags.length - 1];
+
+    // Find the last character to contain this tag
+    for (var index = len; index < htmlStr.length(); index++) {
+        if (!htmlStr.characters[index].hasTags(closingTag)) {
+            break;
+        }
+    }
+
+    return htmlStr.slice(0, index);
 }
