@@ -723,7 +723,8 @@ Deno.serve(async (req) => {
             const parts = req.url.split('/');
             const name = parts[parts.length - 1];
             console.log(name);
-            const layout = await Deno.readFile("layout.html");
+            const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
+            //console.log(layout);
             return new Response(layout.replaceAll('{{nonce}}', nonce)
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name ? `<script src="/scripts/${name}.js" type="text/javascript"></script>` : ''),
