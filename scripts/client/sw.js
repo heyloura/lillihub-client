@@ -1,4 +1,4 @@
-const version = '0.0.45';
+const version = '0.0.46';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -82,7 +82,7 @@ self.addEventListener('activate', function (event) {
 });
 
 self.addEventListener('fetch', async function (event) {
-
+    self.console.log(event.request);
     if(event.request.redirect != 'follow') return;
 
     if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
