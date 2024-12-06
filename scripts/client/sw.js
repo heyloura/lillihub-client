@@ -49,7 +49,8 @@ self.addEventListener('install', function(event) {
         // cache.add(new Request(`offline/`));
         // cache.add(new Request(`offline`));
         // cache.add(new Request(`/offline/`));
-        // cache.add(new Request(`${url}timeline/`));
+        cache.add(new Request(`/timeline.html`));
+        cache.add(new Request(`timeline.html`));
         // cache.add(new Request(`${url}discover/`));
         // cache.add(new Request(`${url}mention/`));
         // cache.add(new Request(`${url}following/`));
