@@ -104,14 +104,14 @@ function isReachable(url) {
 function getServerUrl() {
     return window.location.origin;
 }
-function handleConnection(online, offline) {
+function handleConnection(load, offline) {
   if(document.getElementById('offline-notice')) {
     document.getElementById('offline-notice').remove();
   }
   if (navigator.onLine) {
     isReachable(getServerUrl()).then(function(online) {
       if (online) {
-        online();
+        load();
       } else {
         offline();
       }
