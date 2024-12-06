@@ -135,7 +135,8 @@ Deno.serve(async (req) => {
     const CHECK_HTML_ROUTE = new URLPattern({ pathname: "*.html" });
     if(CHECK_HTML_ROUTE.exec(req.url))
     {
-        return new Response(await Deno.readFile(CHECK_HTML_ROUTE.pathname), {
+        const parts = req.url.split('/');
+        return new Response(await Deno.readFile(parts[parts.length - 1 ]), {
             status: 200,
             headers: {
                 "content-type": "text/html",
