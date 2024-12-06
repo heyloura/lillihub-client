@@ -1,4 +1,4 @@
-const version = '0.0.48';
+const version = '0.0.49';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -50,7 +50,6 @@ self.addEventListener('install', function(event) {
         // cache.add(new Request(`offline`));
         // cache.add(new Request(`/offline/`));
         cache.add(new Request(`/timeline.html`));
-        cache.add(new Request(`timeline.html`));
         // cache.add(new Request(`${url}discover/`));
         // cache.add(new Request(`${url}mention/`));
         // cache.add(new Request(`${url}following/`));
@@ -87,11 +86,11 @@ self.addEventListener('fetch', async function (event) {
         self.console.log(event.request);
     }
     
-    if(event.request.redirect != 'follow') return;
+    // if(event.request.redirect != 'follow') return;
 
-    if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
+    // if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') return;
 
-    if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
+    // if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
 
     try {
         event.respondWith((async () => {
