@@ -137,3 +137,9 @@ fetch(`/api/notebooks`, { method: "get" })
         document.getElementById('notebooks').insertAdjacentHTML( 'beforeend', `<li class="menu-item"><a class="notebook-${element.id}" href="/notebooks/${element.id}">${element.title}</a></li>`); 
     });
 });
+
+document.addEventListener("input", (event) => {
+    if(event.target.classList.contains('grow-me')) {
+        growTextArea(event.target);
+    }
+});

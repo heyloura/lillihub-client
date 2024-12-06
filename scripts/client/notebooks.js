@@ -184,9 +184,21 @@ async function displayNotes(notes) {
                                 ${!note._microblog.is_shared ? html : note.content_html}
                             </div>
                         </div>
-                    </div><div id="${note.id}-edit"><div class="grow-wrap">
-                                    <textarea id="${note.id}-textarea" class="form-input grow-me" rows="3">${markdown}</textarea>
-                                </div></div>`;
+                    </div>
+                    <div id="${note.id}-edit" class="card">
+                        <div class="card-body">
+                            <div class="grow-wrap">
+                                <textarea id="${note.id}-textarea" class="form-input grow-me" rows="15">${markdown}</textarea>
+                            </div>
+                        </div>
+                        <div class="card-footer mb-2">
+                            <div class="btn-group float-right">
+                                <button type="button" class="btn btn-link uploadPhoto"><i class="icon icon-photo"></i></button>
+                                <button type="button" class="btn btn-link linkPhoto"><i class="icon icon-link"></i></button>
+                                <button type="button" class="btn btn-primary"><i class="icon icon-check"></i> Save</button>
+                            </div> 
+                        </div>
+                    </div>`;
         document.getElementById('Notebooks').insertAdjacentHTML( 'afterbegin', noteSection);
     }
     document.getElementById('add-0').innerHTML = result + '</table>';
