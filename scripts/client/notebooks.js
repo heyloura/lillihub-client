@@ -187,9 +187,10 @@ async function displayNotes(notes) {
                     </div>
                     <div id="${note.id}-edit" class="card">
                         <div class="card-body">
-                            <div class="grow-wrap">
+                            <pre class="grow-wrap">
                                 <textarea id="${note.id}-textarea" class="form-input grow-me" rows="15">${markdown}</textarea>
-                            </div>
+                                <code class="language-markdown highlighted"></code>
+                            </pre>
                         </div>
                         <div class="card-footer mb-2">
                             <div class="btn-group float-right">

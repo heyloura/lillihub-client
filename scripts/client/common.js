@@ -1,5 +1,13 @@
 function growTextArea(el) {
     el.parentNode.dataset.replicatedValue = el.value;
+    highlightTextarea(el, el.parentNode);
+}
+function highlightTextarea(inputEl, highlightEl) {
+    const highlighted = hljs.highlight(
+        "markdown",
+        inputEl.value
+      ).value;
+      //highlightEl.innerHTML = highlighted;
 }
 function liveSearch(selector, searchboxId) {
     let cards = document.querySelectorAll(selector)
