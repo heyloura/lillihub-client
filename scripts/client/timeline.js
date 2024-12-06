@@ -115,8 +115,8 @@ if(window.location.hash) {
 
 //     }
 // }
-window.addEventListener('online', handleConnection);
-window.addEventListener('offline', handleConnection);
+window.addEventListener('online', handleConnection(load,offline));
+window.addEventListener('offline', handleConnection(load,offline));
 
 function load() {
     if(localStorage.getItem('post_setting'))
@@ -193,7 +193,6 @@ function offline() {
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
-    
     handleConnection(load,offline);
 });
 
