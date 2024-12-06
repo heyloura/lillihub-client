@@ -185,12 +185,11 @@ async function displayNotes(notes) {
                             </div>
                         </div>
                     </div>
-                    <div id="${note.id}-edit" class="card">
+                    <div id="${note.id}-edit" class="">
                         <div class="card-body">
-                            <pre class="grow-wrap" data-replicated-value="${markdown}">
+                            <div class="grow-wrap" data-replicated-value="${markdown}">
                                 <textarea id="${note.id}-textarea" class="form-input grow-me" rows="15">${markdown}</textarea>
-                                <code class="language-markdown highlighted"></code>
-                            </pre>
+                            </div>
                         </div>
                         <div class="card-footer mb-2">
                             <div class="btn-group float-right">
@@ -204,6 +203,10 @@ async function displayNotes(notes) {
     }
     document.getElementById('add-0').innerHTML = result + '</table>';
     hljs.highlightAll();
+    document.querySelectorAll('grow-me').forEach(function(element) {
+        growTextArea(element);
+    });
+    
 }
 
 function truncate(s, approxNumChars) {

@@ -1,12 +1,5 @@
 function growTextArea(el) {
     el.parentNode.dataset.replicatedValue = el.value;
-    highlightTextarea(el, el.parentNode);
-}
-function highlightTextarea(inputEl, highlightEl) {
-    const highlighted = hljs.highlight(inputEl.value, { language: "markdown"}).value;
-    console.log(highlighted)     
-    
-    highlightEl.querySelector('code').innerHTML = highlighted;
 }
 function liveSearch(selector, searchboxId) {
     let cards = document.querySelectorAll(selector)
@@ -144,7 +137,6 @@ fetch(`/api/notebooks`, { method: "get" })
         document.getElementById('notebooks').insertAdjacentHTML( 'beforeend', `<li class="menu-item"><a class="notebook-${element.id}" href="/notebooks/${element.id}">${element.title}</a></li>`); 
     });
 });
-
 document.addEventListener("input", (event) => {
     if(event.target.classList.contains('grow-me')) {
         growTextArea(event.target);
