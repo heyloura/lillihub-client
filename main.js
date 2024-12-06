@@ -132,52 +132,63 @@ Deno.serve(async (req) => {
         });
     }
 
-    const CHECK_FONT_ROUTE = new URLPattern({ pathname: "/font/:id" });
-    if(CHECK_FONT_ROUTE.exec(req.url))
+    const CHECK_HTML_ROUTE = new URLPattern({ pathname: "*.html" });
+    if(CHECK_HTML_ROUTE.exec(req.url))
     {
-        const id = CHECK_FONT_ROUTE.exec(req.url).pathname.groups.id;
+        return new Response(await Deno.readFile(CHECK_HTML_ROUTE.pathname), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+            },
+        });
+    }
 
-        if(id.includes('.eot')) {
-            return new Response(await Deno.readFile("static/font/" + id), {
-                status: 200,
-                headers: {
-                    "content-type": "application/vnd.ms-fontobject",
-                },
-            });
-        }
-        if(id.includes('.svg')) {
-            return new Response(await Deno.readFile("static/font/" + id), {
-                status: 200,
-                headers: {
-                    "content-type": "image/svg+xml",
-                },
-            });
-        }
-        if(id.includes('.ttf')) {
-            return new Response(await Deno.readFile("static/font/" + id), {
-                status: 200,
-                headers: {
-                    "content-type": "font/ttf",
-                },
-            });
-        }
-        if(id.includes('.woff2')) {
-            return new Response(await Deno.readFile("static/font/" + id), {
-                status: 200,
-                headers: {
-                    "content-type": "font/woff2",
-                },
-            });
-        }
-        if(id.includes('.woff')) {
-            return new Response(await Deno.readFile("static/font/" + id), {
-                status: 200,
-                headers: {
-                    "content-type": "font/woff",
-                },
-            });
-        }
-    } // end font route 
+    // const CHECK_FONT_ROUTE = new URLPattern({ pathname: "/font/:id" });
+    // if(CHECK_FONT_ROUTE.exec(req.url))
+    // {
+    //     const id = CHECK_FONT_ROUTE.exec(req.url).pathname.groups.id;
+
+    //     if(id.includes('.eot')) {
+    //         return new Response(await Deno.readFile("static/font/" + id), {
+    //             status: 200,
+    //             headers: {
+    //                 "content-type": "application/vnd.ms-fontobject",
+    //             },
+    //         });
+    //     }
+    //     if(id.includes('.svg')) {
+    //         return new Response(await Deno.readFile("static/font/" + id), {
+    //             status: 200,
+    //             headers: {
+    //                 "content-type": "image/svg+xml",
+    //             },
+    //         });
+    //     }
+    //     if(id.includes('.ttf')) {
+    //         return new Response(await Deno.readFile("static/font/" + id), {
+    //             status: 200,
+    //             headers: {
+    //                 "content-type": "font/ttf",
+    //             },
+    //         });
+    //     }
+    //     if(id.includes('.woff2')) {
+    //         return new Response(await Deno.readFile("static/font/" + id), {
+    //             status: 200,
+    //             headers: {
+    //                 "content-type": "font/woff2",
+    //             },
+    //         });
+    //     }
+    //     if(id.includes('.woff')) {
+    //         return new Response(await Deno.readFile("static/font/" + id), {
+    //             status: 200,
+    //             headers: {
+    //                 "content-type": "font/woff",
+    //             },
+    //         });
+    //     }
+    // } // end font route 
 
     //********************************************************
     // Now let's see if we have a user or if someone needs to 
