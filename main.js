@@ -725,7 +725,7 @@ Deno.serve(async (req) => {
             if (pages.some(v => req.url.includes(v))) {
                 const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
-                const name = parts[parts.length - 1].split('?')[0];
+                let name = parts[parts.length - 1].split('?')[0];
                 let id = null;
 
                 // check for notebooks route
