@@ -32,11 +32,10 @@ document.addEventListener("DOMContentLoaded", async (event) => {
             .then(async response => response.json())
             .then(async data => {
                 console.log(data);
-                // if(data && data.items.length > 0) {
-                //     document.querySelector('.notebook-' + data.items[0].notebook_id).classList.add('active');
-                // }
-                // document.getElementById('add-0').innerHTML = data;
-                // await displayNotes(data);
+                if(data && data.length > 0) {
+                    document.querySelector('.notebook-' + data[0].notebook_id).classList.add('active');
+                }
+                await displayNotes(data);
             });
     } else {
         document.getElementById('add-0').innerHTML = 'you need to configure your mb key....';
@@ -157,7 +156,7 @@ async function displayNotes(notes) {
 
         result += '</tr>';
         noteSection += `</article>`;
-        document.getElementById('notes').insertAdjacentHTML( 'afterbegin', noteSection);
+        document.getElementById('Notebooks').insertAdjacentHTML( 'afterbegin', noteSection);
 
         //notes
         
