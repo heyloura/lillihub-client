@@ -92,6 +92,10 @@ if ('storage' in navigator && 'estimate' in navigator.storage) {
   } else {
     console.error('navigator.storage.estimate API unavailable.');
 }
+
+/***********************
+** HANDLE OFFLINE STUFF
+************************/
 function isReachable(url) {
     return fetch(url, { method: 'HEAD', mode: 'no-cors' })
       .then(function(resp) {
@@ -129,14 +133,68 @@ function handleConnection(load, offline) {
 window.addEventListener('online', handleConnection(function(){},function(){}));
 window.addEventListener('offline', handleConnection(function(){},function(){}));
 
-fetch(`/api/notebooks`, { method: "get" })
-.then(async response => response.json())
-.then(async data => {
-    console.log(data);
-    data.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).forEach(element => {
-        document.getElementById('notebooks').insertAdjacentHTML( 'beforeend', `<li class="menu-item"><a class="notebook-${element.id}" href="/notebooks/${element.id}">${element.title}</a></li>`); 
-    });
-});
+
+/************************************************************
+** Swap
+** Facilitates AJAX-style navigation in web pages 
+** MIT Licence - https://github.com/josephernest/Swap
+** UPDATED - https://news.ycombinator.com/item?id=36008516
+*************************************************************/
+var Swap = (() => {
+    "use strict";
+    var loaders = {}, unloaders = {};
+    register_links();
+    new MutationObserver(dom_changes).observe(document.querySelector("html"), { childList: true, subtree: true });
+    window.addEventListener("popstate", () => update(location.href, "[swap-history-restore]", false, "body"));
+    window.addEventListener("DOMContentLoaded", dom_load);
+    function update(href, target, pushstate, fallback = null) {
+        fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
+            var tmp = document.createElement('html');
+            tmp.innerHTML = html;
+            (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
+            if (pushstate)
+                history.pushState({}, "", href);
+            register_links();  
+        });
+    }
+    function register_links() {
+        for (const elt of document.querySelectorAll('*[swap-target]')) {
+            elt.onclick = e => {
+                update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
+                e.preventDefault();
+            }
+        }
+    }
+    function dom_changes(mutations) {
+        for (var selector in unloaders)
+            for (var m of mutations)
+                for (var n of m.removedNodes)
+                    if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector))) {
+                        unloaders[selector]();
+                        delete unloaders[selector];
+                    }
+        for (var selector in loaders)
+            for (var m of mutations)
+                for (var n of m.addedNodes) 
+                    if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector)))
+                            unloaders[selector] = loaders[selector]();
+    }
+    function dom_load() {
+        for (var selector in loaders)
+            if (document.querySelector(selector))
+                    unloaders[selector] = loaders[selector]();
+    }
+    return {loaders: loaders};
+})();
+
+// fetch(`/api/notebooks`, { method: "get" })
+// .then(async response => response.json())
+// .then(async data => {
+//     const links = data.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element => {
+//         `<li class="menu-item"><a class="notebook-${element.id}" href="/notebook/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`
+//     }).join('');
+//     document.getElementById('notebooks').insertAdjacentHTML('beforeend', links); 
+// });
 document.addEventListener("input", (event) => {
     if(event.target.classList.contains('grow-me')) {
         growTextArea(event.target);

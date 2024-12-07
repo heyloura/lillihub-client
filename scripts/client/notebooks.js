@@ -44,8 +44,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
 document.addEventListener("input", (event) => {  
     if(event.target.classList.contains('search')) {
-        // hide the default section...
-        // show the rest?
         if(document.getElementById('search').value != '') {
             liveSearch('article', 'search');
             document.querySelector('main').classList.remove('pages');

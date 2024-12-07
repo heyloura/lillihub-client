@@ -36,8 +36,8 @@
             </section>
         </header>
           <div class="container grid-xl mt-2">
-            <div class="columns page">
-                <div id="{{pageName}}" class="pages column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+            <div class="columns">
+                <div id="main" class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     {{pages}}
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
@@ -84,16 +84,10 @@
                                                 <a href="/highlights" class="{{highlightsClass}}">Highlights</a>
                                             </li>
                                         </ul> 
-                                        <ul id="notebooks" class="menu mb-2">
+                                        <ul class="menu mb-2">
                                             <li class="divider" data-content="Micro.blog Notes"></li>
+                                            {{notebooks}}
                                         </ul> 
-                                        <!-- <ul class="menu mb-2 mt-2 show-md">
-                                            <li class="divider" data-content="Lillihub apps"></li>
-                                            <li class="menu-item blogLink"><a href="/blog">Blog</a></li>
-                                            <li class="menu-item bookshelvesLink"><a href="/bookshelves">Bookshelves</a></li>
-                                            <li class="menu-item notesLink"><a href="/notebooks">Notes</a></li>
-                                            <li class="menu-item timelineLink"><a href="/timeline">Timeline</a></li>
-                                        </ul> -->
                                         <ul class="menu mt-2 mb-2 show-md">
                                             <li class="divider" data-content="Lillihub"></li>
                                             <li class="menu-item"><a href="/settings">Settings</a></li>
