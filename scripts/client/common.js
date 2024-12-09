@@ -501,12 +501,12 @@ document.addEventListener("click", async (item) => {
                         if(data.ai) {
                             document.getElementById('editor-status').innerHTML = `<span class="loading pr-2 mr-2"></span> getting alt text...`;
                         } else {
-                            document.getElementById("content").innerHTML += `![image alt text](${data.url})`;
+                            document.getElementById("content").value += `![image alt text](${data.url})`;
                         }
                     } 
                     else 
                     {
-                        document.getElementById("content").innerHTML += `[link text](${data.url})`;
+                        document.getElementById("content").value += `[link text](${data.url})`;
                     }
 
                     if(!el.files[0].type.includes('image') || !data.ai) {
@@ -521,7 +521,7 @@ document.addEventListener("click", async (item) => {
                                 .then(response => response.json())
                                 .then(data => {
                                     document.getElementById('editor-status').innerHTML = `done.`;
-                                    document.getElementById("content").innerHTML += `![${data.alt}](${data.url})`;
+                                    document.getElementById("content").value += `![${data.alt}](${data.url})`;
                                     console.log(data);
                                 });
                         }, 30 * 1000);
@@ -537,7 +537,7 @@ document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('saveNote')) {
         console.log('saveNote');
         const parts = window.location.pathname.split('/');
-        let note = document.getElementById('content').innerHTML;
+        let note = document.getElementById("content").value;
 
         console.log(note);
 
