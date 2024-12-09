@@ -207,6 +207,10 @@ export function postHTML(post, stranger, isConvo) {
 
     post.content.replaceAll('<script', `<div`);
     post.content.replaceAll('</script', `</div`);
+
+    if(isConvo) {
+        console.log(isConvo,post.id)
+    }
     
     return ` 
         ${isConvo ? `<div class="timeline-item bordered">
@@ -224,7 +228,6 @@ export function postHTML(post, stranger, isConvo) {
                             @${post.username}
                         </a> · 
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
-                        ${!isConvo && (post.conversation || post.mention) ? `&nbsp;·&nbsp;<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}"><i class="icon icon-message text-gray mr-2"></i> View conversation</a>` : ''}
                     </div>           
                 </div>
                  <div class="card-buttons">
