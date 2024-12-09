@@ -6505,8 +6505,6 @@ textarea {
 
 .highlight {
   background-color: var(--background-tint-4);
-  padding: 0 0.8rem;
-  margin: 0 -0.8rem;
 }
 
 .navbar a:hover {
