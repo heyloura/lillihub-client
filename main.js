@@ -276,27 +276,27 @@ Deno.serve(async (req) => {
             //     return new Response(html,HTMLHeaders(nonce));
             // }
 
-            const DISCOVER_ROUTE = new URLPattern({ pathname: "/timeline/discover/:id" });
-            if(((new URLPattern({ pathname: "/timeline/discover" }).exec(req.url)) || DISCOVER_ROUTE.exec(req.url)) && user) {
-                let id = '';
-                if(DISCOVER_ROUTE.exec(req.url)) {
-                    id = DISCOVER_ROUTE.exec(req.url).pathname.groups.id;
-                }
+            // const DISCOVER_ROUTE = new URLPattern({ pathname: "/timeline/discover/:id" });
+            // if(((new URLPattern({ pathname: "/timeline/discover" }).exec(req.url)) || DISCOVER_ROUTE.exec(req.url)) && user) {
+            //     let id = '';
+            //     if(DISCOVER_ROUTE.exec(req.url)) {
+            //         id = DISCOVER_ROUTE.exec(req.url).pathname.groups.id;
+            //     }
                 
-                const layout = new TextDecoder().decode(await Deno.readFile("discover.html"));
-                let fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                let results = await fetching.json();
-                const tagmojiChips = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                    `<span class="chip ${id && item.name == id ? 'bg-primary' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
-                ).join('');
-                const tagmojiMenu = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                    `<li class="menu-item ${id && item.name == id ? 'active' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
-                ).join('');
-                return new Response(layout.replaceAll('{{nonce}}', nonce)
-                    .replaceAll('{{tagmojiChips}}', tagmojiChips)
-                    .replaceAll('{{tagmojiMenu}}', tagmojiMenu),
-                  HTMLHeaders(nonce));
-            }
+            //     const layout = new TextDecoder().decode(await Deno.readFile("discover.html"));
+            //     let fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            //     let results = await fetching.json();
+            //     const tagmojiChips = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+            //         `<span class="chip ${id && item.name == id ? 'bg-primary' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+            //     ).join('');
+            //     const tagmojiMenu = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+            //         `<li class="menu-item ${id && item.name == id ? 'active' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" href="/timeline/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+            //     ).join('');
+            //     return new Response(layout.replaceAll('{{nonce}}', nonce)
+            //         .replaceAll('{{tagmojiChips}}', tagmojiChips)
+            //         .replaceAll('{{tagmojiMenu}}', tagmojiMenu),
+            //       HTMLHeaders(nonce));
+            // }
 
             if((new URLPattern({ pathname: "/timeline/mentions" })).exec(req.url) && user) {
                 const layout = new TextDecoder().decode(await Deno.readFile("mentions.html"));
@@ -845,6 +845,10 @@ Deno.serve(async (req) => {
                 fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let following = await fetching.json();
 
+                // tagmoji
+                fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let tagmoji = await fetching.json();
+
                 // get editor
 
                 // check for notebooks route
@@ -853,13 +857,14 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
                     const posts = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="discover-posts" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
+                    content = `<div id="discover-custom-posts" class="mt-2">${discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
                 } else if(req.url.includes("discover")) {
+                    id = name;
                     name = "discover";
-                    fetching = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+                    fetching = await fetch(`https://micro.blog/posts/discover${id != "discover" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
                     const posts = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="discover-posts" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
+                    content = `<div id="discover-posts" class="mt-2">${discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
                 } else if(req.url.includes("users")) {
                     id = name;
                     name = "users";

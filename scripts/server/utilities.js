@@ -1,3 +1,37 @@
+export function discoverHTML(posts, tagmoji, id) {
+    return `
+        <div class="container">
+            <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                    <div class="form-group">
+                        <label class="form-label">Search for featured posts.</label>
+                        <div class="input-group">
+                            <input id="searchPost" type="text" class="form-input" placeholder="...">
+                            <button class="btn btn-primary input-group-btn searchPost"><i class="icon icon-search searchPost"></i></button>
+                        </div>
+                    </div>
+                    <div class="show-lg">
+                    ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                        `<span class="chip ${id && item.name == id ? 'bg-primary' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                    ).join('')}
+                    </div>
+                    <div class="hide-lg">
+                        <ul class="menu">
+                            <li class="divider" data-content="Discover Tagmoji"></li>
+                            ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                                    `<li class="menu-item ${id && item.name == id ? 'active' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                                ).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    ${posts.items.map(n => postHTML(n)).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function flattenedNote(note) {
     return {
         id: note ? note.id: 0,
@@ -219,8 +253,8 @@ export function postHTML(post, stranger, isConvo, convoId) {
             <header class="card-header">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
-                    <div class="card-title h5">${post.name}</div>
-                    <div class="card-subtitle">
+                    <div class="card-title h5 ${isConvo ? 'd-inline' : ''}">${post.name}</div>
+                    <div class="card-subtitle ${isConvo ? 'd-inline' : ''}">
                         <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
                             ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
                             @${post.username}
