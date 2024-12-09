@@ -857,14 +857,14 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
                     const posts = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="discover-custom-posts" class="mt-2">${discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
+                    content = `<div id="discover-custom-posts" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
                 } else if(req.url.includes("discover")) {
                     id = name;
                     name = "discover";
                     fetching = await fetch(`https://micro.blog/posts/discover${id != "discover" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
                     const posts = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="discover-posts" class="mt-2">${discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
+                    content = `<div id="discover-posts" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
                 } else if(req.url.includes("users")) {
                     id = name;
                     name = "users";
