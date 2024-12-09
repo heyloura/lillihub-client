@@ -449,7 +449,7 @@ document.addEventListener("input", (event) => {
     }
 });
 
-document.addEventListener("click", (item) => {
+document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('editor-upload') && document.getElementById("editor-container")) {
         var el = window._protected_reference = document.createElement("INPUT");
         el.type = "file";
@@ -520,6 +520,29 @@ document.addEventListener("click", (item) => {
         });
       
         el.click(); // open
+    }
+
+    // save a private note.
+    if(item.target.classList.contains('saveNote') && document.getElementById('content')) {
+        let note = document.getElementById('content').innerHTML;
+        let id = document.getElementById('noteId').value;
+        let notebookId = document.getElementById('notebookId').value;
+        const eNote = await encryptWithKey(note, imported_key);
+        const form = new URLSearchParams();
+        form.append("text", eNote);
+        form.append("notebook_id", notebookId);
+        if(id != 0) {
+            form.append("id", id);
+        }    
+        const posting = await fetch('/notebooks/note/update', {
+            method: "POST",
+            body: form.toString(),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+            }
+        });
+        //should exit edit mode....
+        //window.location.href = '/notebooks/${notebook}';
     }
 });
 

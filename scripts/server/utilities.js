@@ -13,7 +13,7 @@ function flattenedNote(note) {
     }
 }
 
-export function noteHTML(note, notebookId) {
+export function noteHTML(note, notebookId, versions) {
     const n = flattenedNote(note);
     return `
         <div class="container">
@@ -34,57 +34,63 @@ export function noteHTML(note, notebookId) {
                                 <dt>shared_url</dt><dd>${n.shared_url}</dd>
                             </dl>
                         </div>
-                        <p>Versions</p>
+                        <div class="divider" data-content="Versions"></div>
+                        <textarea>${JSON.stringify(versions,null,2)}</textarea>
                         <div class="divider" data-content="Related Bookmarks"></div>
                     </div>
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <input data-id="${n.id}" id="noteContent" class="${n.shared ? '' : 'decryptMe'}" type="hidden" value="${!n.shared ? n.content_text : n.content_text}" />
                     <div class="card bordered pages">
-                        <form id="edit" class="card">
-                            <div id="editor-container" class="card-body">
-                                <div id="mainReplyBox" class="hide">{{replyBox}}</div>
-                                <div class="grow-wrap">
-                                    <textarea id="content" placeholder="Your note is loading...." id="post" class="form-input grow-me" rows="10"></textarea>
-                                </div>
-                            </div>
-                            <div class="card-footer mb-2">
-                                <button type="button" class="btn btn-link editor-bold"><b>b</b></button>
-                                <button type="button" class="btn btn-link editor-italic"><em>i</em></button>
-                                <button type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
-                                <button type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
-                                <div class="dropdown">
-                                    <a href="javascript:void(0)" class="btn btn-link dropdown-toggle" tabindex="0">
-                                        <i class="icon icon-link"></i></i>
-                                    </a>
-                                    <ul class="menu">
-                                        <li class="menu-item"><a href="javascript:void(0)">Markdown image</a></li>
-                                        <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
-                                        <li class="divider"></li>
-                                        <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
-                                        <li class="menu-item"><a href="javascript:void(0)">Item 2</a></li>
-                                        <li class="menu-item"><a href="javascript:void(0)">Item 3</a></li>
-                                    </ul>
-                                </div>
-                                <div class="btn-group float-right">
-
-                                    <button type="button" class="btn btn-primary saveNote">Save changes</button>
-                                </div> 
-                                <br/>
-                                <p id="editor-status"></p>
-                                <p><b>Note:</b> file upload is limited to 3MB.</p>
-                            </div>
-                            <div id="postToast" class="toast toast-dark hide mt-2">
-                                <button class="btn btn-clear float-right dismissPostToast"></button>
-                                <div id="postToastMessage"></div>
-                            </div>  
-                            
-                        </form>
+                        ${getNoteEditor(notebookId,n)}
                         <a class="fakeAnchor" href="#edit"><div id="preview" class="card-body"></div></a>
                     </div>
                 </div>
             </div>
         </div>
+    `;
+}
+
+function getNoteEditor(notebookId, n) {
+    return `
+        <input data-id="${ n ? n.id : 'newNote'}" id="noteContent" class="${n && n.shared ? '' : 'decryptMe'}" type="hidden" value="${n ? n.content_text : ''}" />
+        <input id="noteId" type="hidden" value="${n ? n.id : 0}" />
+        <input id="notebookId" type="hidden" value="${notebookId}" />
+        <form id="edit" class="card">
+            <div id="editor-container" class="card-body">
+                <div class="grow-wrap">
+                    <textarea id="content" placeholder="Your note is loading...." id="post" class="form-input grow-me" rows="10"></textarea>
+                </div>
+            </div>
+            <div class="card-footer mb-2">
+                <button type="button" class="btn btn-link editor-bold"><b>b</b></button>
+                <button type="button" class="btn btn-link editor-italic"><em>i</em></button>
+                <button type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
+                <button type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
+                <div class="dropdown">
+                    <a href="javascript:void(0)" class="btn btn-link dropdown-toggle" tabindex="0">
+                        <i class="icon icon-link"></i></i>
+                    </a>
+                    <ul class="menu">
+                        <li class="menu-item"><a href="javascript:void(0)">Markdown image</a></li>
+                        <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
+                        <li class="divider"></li>
+                        <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
+                        <li class="menu-item"><a href="javascript:void(0)">Item 2</a></li>
+                        <li class="menu-item"><a href="javascript:void(0)">Item 3</a></li>
+                    </ul>
+                </div>
+                <div class="btn-group float-right">
+                    <button type="button" class="btn btn-primary saveNote">Save changes</button>
+                </div> 
+                <br/>
+                <p id="editor-status"></p>
+                <p><b>Note:</b> file upload is limited to 3MB.</p>
+            </div>
+            <div id="note-toast" class="toast toast-dark hide mt-2">
+                <button data-toast-id="note-toast" class="btn btn-clear float-right dismissToast"></button>
+                <div id="note-toast-message"></div>
+            </div>     
+        </form>
     `;
 }
 
@@ -204,7 +210,7 @@ export function postHTML(post, stranger, isConvo) {
     post.content.replaceAll('</script', `</div`);
     
     return ` 
-        <article id="${post.id}" class="card ripple parent" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        <article id="${post.id}" class="card parent" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
             <header class="card-header">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
@@ -215,13 +221,13 @@ export function postHTML(post, stranger, isConvo) {
                             @${post.username}
                         </a> · 
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
-                        ${!isConvo && (post.conversation || post.mention) ? `&nbsp;·&nbsp;<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" swap-history="true"><i class="icon icon-message text-gray"></i> View conversation</a>` : ''}
+                        ${!isConvo && (post.conversation || post.mention) ? `&nbsp;·&nbsp;<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" swap-history="true"><i class="icon icon-message text-gray mr-2"></i> View conversation</a>` : ''}
                     </div>           
                 </div>
             </header>
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
-            <details class="accordion" open>
+            <details class="accordion card-body">
                 <summary class="accordion-header c-hand">
                     <i class="icon icon-arrow-right mr-1"></i>
                     Reply

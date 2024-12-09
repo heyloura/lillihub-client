@@ -638,6 +638,10 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // POSTING endpoints
             // -----------------------------------------------------
+            
+            //-------------
+            // Post to blog
+            //-------------
             if((new URLPattern({ pathname: "/post/add" })).exec(req.url) && user) {
                 const value = await req.formData();
                 const destination = value.get('destination');
@@ -703,6 +707,10 @@ Deno.serve(async (req) => {
         
                 //return Response.redirect(req.url.replaceAll('/post/add', status == 'draft' ? `/blog?status=draft&destination=${destination}` : `/blog?status=published&destination=${destination}`));
             }
+
+            //-------------
+            // Upload media
+            //-------------
             if((new URLPattern({ pathname: "/media/upload" })).exec(req.url)) {
                 const value = await req.formData();
                 let destination = '';
@@ -737,21 +745,42 @@ Deno.serve(async (req) => {
                 result.url = uploaded.url,
                 result.ai = user.ai;
 
-                // if(user.ai) {
-                //     setTimeout(async () => {
-
-                //         fetching = await fetch(`${mediaEndpoint}?q=source&url=${encodeURIComponent(uploaded.url)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                //         const media = await fetching.json();
-                //         console.log(media.items[0])
-                //         result.alt = media.items[0].alt;
-                //         return new Response(JSON.stringify(result), JSONHeaders());
-
-                //     }, 500);
-
-                // } else {
-                // }
                 return new Response(JSON.stringify(result), JSONHeaders());
+            }
 
+            //----------
+            // save Note
+            //----------
+            const NOTEBOOKS_UPDATE_ROUTE = new URLPattern({ pathname: "/notebooks/note/update" });
+            if(NOTEBOOKS_UPDATE_ROUTE.exec(req.url) && user) {
+                const value = await req.formData();
+                const text = value.get('text');
+                const notebook_id = value.get('notebook_id');
+                const id = value.get('id');
+        
+                const form = new URLSearchParams();
+                form.append("text", text);
+                form.append("notebook_id", notebook_id);
+        
+                if(id) {
+                    form.append("id", id);
+                }
+                               
+                const posting = await fetch('https://micro.blog/notes', {
+                    method: "POST",
+                    body: form.toString(),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                        "Authorization": "Bearer " + mbToken
+                    }
+                });
+        
+                return new Response('note updated', {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });
             }
 
 
@@ -790,21 +819,6 @@ Deno.serve(async (req) => {
             }
 
 
-            // if(new URLPattern({ pathname: "/api/notebooks" }).exec(req.url)) {
-            //     let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-            //     let results = await fetching.json();
-            //     return new Response(JSON.stringify(results),
-            //         JSONHeaders());   
-            // }
-
-            // const NOTEBOOK_API_FETCH_ROUTE = new URLPattern({ pathname: "/api/notebooks/:id" });
-            // if(NOTEBOOK_API_FETCH_ROUTE.exec(req.url)) {
-            //     let id = NOTEBOOK_API_FETCH_ROUTE.exec(req.url).pathname.groups.id;
-            //     let fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-            //     let results = await fetching.json();
-            //     return new Response(JSON.stringify(results.items.map(i => {i.notebook_id = id; return i;})), JSONHeaders());
-            // }
-
             // -----------------------------------------------------
             // All other pages
             // -----------------------------------------------------
@@ -828,8 +842,11 @@ Deno.serve(async (req) => {
                     name = "note";
                     fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const note = await fetching.json();
+                    fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const versions = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="note" class="mt-2">${utility.noteHTML(note,id)}</div>`;
+                    console.log(versions)
+                    content = `<div id="note" class="mt-2">${utility.noteHTML(note,id,versions)}</div>`;
                 } else if(req.url.includes("notebooks")) {
                     id = name;
                     name = "notebook";
