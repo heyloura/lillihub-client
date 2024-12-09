@@ -14,52 +14,101 @@ function flattenedNote(note) {
 }
 
 export function noteHTML(note, notebookId) {
-    let n = flattenedNote(note);
+    const n = flattenedNote(note);
     return `
-        <article class="card parent" data-id="${n.id}" data-url="${n.url}" data-published="${n.published}" data-modified="${n.modified}" >
-            <header class="card-header">
-                <div class="card-top">
-                    <div id="title-${n.id}" class="card-title h5"></div> 
-                    <div class="card-subtitle">
-                        ${n.shared ? `<a target="_blank" class="text-gray" href="${n.shared_url}">${n.shared_url}</a>` : ''}
-                        ${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}
-                        <div class="d-inline" id="tags-${n.id}"></div>
-                    </div> 
+        <div class="container">
+            <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                    <div class="card bordered p-2">
+                        <div class="divider" data-content="Note Details"></div>
+                        <!--<a href="/notebooks/${notebookId}/notes/${n.id}/edit-form" swap-target="#main" swap-history="true" class="btn btn-primary">Edit Note</a>-->
+                        <div id="metadata-${n.id}"></div>
+                        <div>
+                            <dl>
+                                <dt>id</dt><dd>${n.id}</dd>
+                                <dt>url</dt><dd>${n.url}</dd>
+                                <dt>published</dt><dd>${n.published}</dd>
+                                <dt>modified</dt><dd>${n.modified}</dd>
+                                <dt>encrypted</dt><dd>${n.encrypted}</dd>
+                                <dt>shared</dt><dd>${n.shared}</dd>
+                                <dt>shared_url</dt><dd>${n.shared_url}</dd>
+                            </dl>
+                        </div>
+                        <p>Versions</p>
+                        <div class="divider" data-content="Related Bookmarks"></div>
+                    </div>
                 </div>
-                <div class="card-buttons">
-                    <a class="btn btn-link" href="/notebooks/${notebookId}/edit/${n.id}"><i data-id="${n.id}" class="icon icon-edit"></i></a>
-                    <button data-id="${n.id}" class="btn btn-link openDetailsBtn float-right"><i data-id="${n.id}" class="icon icon-more-vert openDetailsBtn"></i></button>
-                </div>
-            </header>
-            <main>
-                <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>
-            </main>
-        </article>
-        <div class="modal" id="details-${n.id}">
-            <div data-id="${n.id}" class="modal-overlay closeDetailsBtn" aria-label="Close"></div>
-            <div class="modal-container">
-                <div class="modal-header">
-                    <button data-id="${n.id}" class="btn btn-clear float-right closeDetailsBtn" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <dl>
-                        <dt>id</dt>
-                        <dd>${n.id}</dd>
-                        <dt>url</dt>
-                        <dd>${n.url}</dd>
-                        <dt>modified</dt>
-                        <dd>${n.modified}</dd>
-                        <dt>encrypted</dt>
-                        <dd>${n.encrypted}</dd>
-                        <dt>shared</dt>
-                        <dd>${n.shared}</dd>
-                        <dt>metadata</dt>
-                        <dd id="metadata-${n.id}"></dd>
-                    </dl>
-                    <button data-id="${n.id}" data-notebookid="${notebookId}" class="btn btn-error deleteNote">Delete Note</button>
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    <input data-id="${n.id}" id="noteContent" class="${n.shared ? '' : 'decryptMe'}" type="hidden" value="${!n.shared ? n.content_text : n.content_text}" />
+                    <div class="card bordered pages">
+                        <form id="edit" class="card">
+                            <div id="editor-container" class="card-body">
+                                <div id="mainReplyBox" class="hide">{{replyBox}}</div>
+                                <div class="grow-wrap">
+                                    <textarea id="content" placeholder="Your note is loading...." id="post" class="form-input grow-me" rows="10"></textarea>
+                                </div>
+                            </div>
+                            <div class="card-footer mb-2">
+                                <button type="button" class="btn btn-link editor-bold"><b>b</b></button>
+                                <button type="button" class="btn btn-link editor-italic"><em>i</em></button>
+                                <button type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
+                                <button type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
+                                <div class="dropdown">
+                                    <a href="javascript:void(0)" class="btn btn-link dropdown-toggle" tabindex="0">
+                                        <i class="icon icon-link"></i></i>
+                                    </a>
+                                    <ul class="menu">
+                                        <li class="menu-item"><a href="javascript:void(0)">Markdown image</a></li>
+                                        <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
+                                        <li class="divider"></li>
+                                        <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
+                                        <li class="menu-item"><a href="javascript:void(0)">Item 2</a></li>
+                                        <li class="menu-item"><a href="javascript:void(0)">Item 3</a></li>
+                                    </ul>
+                                </div>
+                                <div class="btn-group float-right">
+
+                                    <button type="button" class="btn btn-primary saveNote">Save changes</button>
+                                </div> 
+                                <br/>
+                                <p id="editor-status"></p>
+                                <p><b>Note:</b> file upload is limited to 3MB.</p>
+                            </div>
+                            <div id="postToast" class="toast toast-dark hide mt-2">
+                                <button class="btn btn-clear float-right dismissPostToast"></button>
+                                <div id="postToastMessage"></div>
+                            </div>  
+                            
+                        </form>
+                        <a class="fakeAnchor" href="#edit"><div id="preview" class="card-body"></div></a>
+                    </div>
                 </div>
             </div>
         </div>
+    `;
+}
+
+export function notesHTML(note, notebookId) {
+    const n = flattenedNote(note);
+    return `
+        <a rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true" class="fakeAnchor">
+            <article class="note bordered p-2" 
+                data-id="${n.id}" 
+                data-url="${n.url}" 
+                data-published="${n.published}" 
+                data-modified="${n.modified}"
+                data-shared="${n.shared}" >
+                <div class="divider" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}"></div>
+                <div id="title-${n.id}" class="card-title h5"></div> 
+                <div class="card-subtitle">
+                    ${n.shared ? `<a target="_blank" class="text-gray" href="${n.shared_url}">${n.shared_url}</a>` : ''}
+                    <div class="d-inline" id="tags-${n.id}"></div>
+                </div> 
+                <main class="ripple">
+                    <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>
+                </main>
+            </article>
+        </a>
     `;
 }
 
@@ -115,159 +164,152 @@ export function bookmarkHTML(bookmark) {
     `;
 }
 
+function getAvatar(p, size) {
+    return `<figure class="avatar ${size}" data-initial="${p.username.substring(0,1)}">
+            <img src="${p.avatar}" loading="lazy">
+        </figure>`;
+}
 
+function flattenedMicroBlogPost(post) {
+    return {
+        id: post && post.id ? post.id : 0,
+        content: post &&  post.content_html ? post.content_html : '',
+        url: post &&  post.url ? post.url : '',
+        published: post &&  post.date_published ? post.date_published : '',
+        name: post &&  post.author && post.author.name ? post.author.name : '',
+        authorUrl: post &&  post.author && post.author.url ? post.author.url : '',
+        avatar: post &&  post.author && post.author.avatar ? post.author.avatar : '',
+        username: post &&  post.author && post.author._microblog && post.author._microblog.username ? post.author._microblog.username : '',
+        relative: post &&  post._microblog && post._microblog.date_relative ? post._microblog.date_relative : '',
+        timestamp: post &&  post._microblog && post._microblog.date_timestamp ? post._microblog.date_timestamp : '',
+        favorite: post &&  post._microblog && post._microblog.is_favorite ? post._microblog.is_favorite : false,
+        bookmark: post &&  post._microblog && post._microblog.is_bookmark ? post._microblog.is_bookmark : false,
+        deletable: post &&  post._microblog && post._microblog.is_deletable ? post._microblog.is_deletable : false,
+        conversation: post &&  post._microblog && post._microblog.is_conversation ? post._microblog.is_conversation : false,
+        linkpost: post && post._microblog && post._microblog.is_linkpost ? post._microblog.is_linkpost : false,
+        mention: post && post._microblog && post._microblog.is_mention ? post._microblog.is_mention : false,
+        bio: post && post._microblog && post._microblog.bio ? post._microblog.bio : ''
+    };
+}
 
-// import { DOMParser } from "https://esm.sh/linkedom@0.16.8";
-// import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
-// await ammonia.init();
+export function postHTML(post, stranger, isConvo) {
+    post = flattenedMicroBlogPost(post);
+    const multipleImgs = !post.linkpost && post.content.split('<img').length > 2;
 
-// const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
+    if(multipleImgs) {
+        post.content = post.content.replaceAll('<img', `<img data-gallery='${post.id}'`);
+    }
 
-// export function getCookieValue(req, name) {
-//     const cookies = req.headers.get("cookie") ? req.headers.get("cookie").split('; ') : [];
-//     let cookieValue = cookies.filter(cookie => cookie.includes(`${name}=`));
-//     cookieValue = cookieValue.length > 0 ? cookieValue[0].split('=')[1] : '';
-//     return cookieValue;
-// }
-
-// export async function encryptMe(decrypted)
-// {
-//     const iv = await crypto.getRandomValues(new Uint8Array(16));
-//     const key = await crypto.subtle.importKey("jwk", _appSecret, "AES-CBC", true, ["encrypt", "decrypt"]);
-//     const encrypted = await crypto.subtle.encrypt({name: "AES-CBC", iv}, key, new TextEncoder().encode(decrypted));
-//     const encryptedBytes = new Uint8Array(encrypted);
-
-//     return `${iv.toString()}|${encryptedBytes.toString()}`;
-// }
-
-// export async function decryptMe(encrypted)
-// {
-//     const key = await crypto.subtle.importKey("jwk", _appSecret, "AES-CBC", true, ["encrypt", "decrypt"]);
-//     const ivPart = encrypted.split('|')[0];
-//     const encryptedPart = encrypted.split('|')[1];
-
-//     const encryptedBytes = Uint8Array.from(encryptedPart.split(',').map(num => parseInt(num)));
-//     const iv = Uint8Array.from(ivPart.split(',').map(num => parseInt(num)));
-   
-//     const decrypted = await crypto.subtle.decrypt({name: "AES-CBC", iv}, key, encryptedBytes);
-//     const decryptedBytes = new Uint8Array(decrypted);
-//     return new TextDecoder().decode(decryptedBytes);
-// }
-
-// export function cleanFormatHTML (str, exclude) {
-//     function resize (html) {
-//         const images = html.querySelectorAll("img");
-//         const parents = [];
-//         for (let i = 0; i < images.length; i++) {
-//             const image = images[i];
-//             if(image.getAttribute('width') == undefined || image.getAttribute('width') == '' || image.getAttribute('width') == '1' || parseInt(image.getAttribute('width')) > 190 )
-//             {
-//                 image.setAttribute('width', '');
-//                 image.setAttribute('height', '');    
-//             }
-//             else
-//             {
-//                 image.setAttribute('class','small-img');
-//             }
-//             if(images.length > 1)
-//             {
-//                 let parent;
-//                 if (image.parentNode.nodeName.toLowerCase() == "a"){
-//                     parent = image.parentNode;             
-//                 } else {
-//                     parent = image;
-//                 }
-//                 parents.push(parent);
-//             }
-//         }
-//         //let's assemble the swipeable images
-//         if(parents.length > 0) {
-//             try {
-//                 const container = html.createElement('sl-carousel');
-//                 container.setAttribute('pagination','');
-//                 container.setAttribute('mouse-dragging','');
-//                 container.setAttribute('loop','');
-//                 container.setAttribute('style','--aspect-ratio: auto;');
-//                 container.setAttribute('class','aspect-ratio');
-//                 for(let i = 0; i < parents.length; i++)
-//                 {
-//                     parents[i].parentNode.removeChild(parents[i]);
-//                     const item = html.createElement('sl-carousel-item');
-//                     item.appendChild(parents[i]);
-//                     container.appendChild(item);
-//                 }
-//                 html.appendChild(container);
-//             } catch {
-//                 // continue on without messing with the images
-//             }
-//         }
-//         const videos = html.querySelectorAll("video");
-//         for (let i = 0; i < videos.length; i++) {
-//             const video = videos[i];
-//             if(video.getAttribute('width') == undefined || video.getAttribute('width') == '' || parseInt(video.getAttribute('width')) > 190 )
-//             {
-//                 video.setAttribute('width', '');
-//                 video.setAttribute('height', '');
-//             }
-//             video.setAttribute('loading', 'lazy');
-//         }
-
-//     }
+    post.content.replaceAll('<script', `<div`);
+    post.content.replaceAll('</script', `</div`);
     
-//     function microBlogLinks (html) {
-//         const anchors = html.querySelectorAll("a");
-//         for (let i = 0; i < anchors.length; i++) {
-//             const anchor = anchors[i];
-//             if(anchor.innerText.charAt(0) == '@' && anchor.getAttribute('href').includes('https://micro.blog/'))
-//             {
-//                 const newLink = anchor.getAttribute('href').replace("https://micro.blog/", "/user/")
-//                 anchor.setAttribute('href', newLink);
-//             }
-//         }
-//     }   
+    return ` 
+        <article id="${post.id}" class="card ripple parent" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+            <header class="card-header">
+                ${getAvatar(post, 'avatar-lg')}
+                <div class="card-top">
+                    <div class="card-title h5">${post.name}</div>
+                    <div class="card-subtitle">
+                        <a href="/timeline/user/${post.username}" class="text-gray">
+                            ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
+                            @${post.username}
+                        </a> · 
+                        <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
+                        ${post.conversation && !post.mention ? '&nbsp;·&nbsp;<i class="icon icon-message text-gray"></i>' : ''}
+                    </div>           
+                </div>
+            </header>
+            <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
+            ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
+            <p class="">Reply · ${ !isConvo ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" swap-history="true">View post</a>` : ''}</p>
+        </article>
+    `;
+}
 
-//     function escapeCodeBlocks (html) {
-//         const codes = html.querySelectorAll("code");
-//         for (let i = 0; i < codes.length; i++) {
-//             const code = codes[i];
-//             code.innerHTML = code.innerHTML.replaceAll('<','&lt;').replaceAll('>','&gt;');
-//         }
-//     }
+// export function conversationHTML(post, stranger, parent) {
+//     const p = post;
 
-//     function escapeCharacters(html) {
-//         const paras = html.querySelectorAll("p");
-//         for (let i = 0; i < paras.length; i++) {
-//             const para = paras[i];
-//             para.innerHTML = para.innerHTML.replaceAll('&amp;nbsp;',' ');
-//             para.innerHTML = para.innerHTML.replaceAll('&nbsp;', ' ');
-//         }
-//     }
-   
-//     const builder = new ammonia.AmmoniaBuilder();
-//     builder.tags.add("video");
-//     builder.tagAttributes.set("video", new Set(["src","width","height","controls","poster"]));
-//     const cleaner = builder.build();
-//     const cleaned = cleaner.clean(str);
-//     const parser = new DOMParser();
-   
-//     const doc = parser.parseFromString(cleaned);
-//     resize(doc);
-//     microBlogLinks(doc);
-//     escapeCodeBlocks(doc);
-//     escapeCharacters(doc);
+//     const multipleImgs = !p.linkpost && p.content.split('<img').length > 2;
 
-//     if(!exclude || !filterOut(exclude, doc.toString())) {
-//     return doc.toString().replaceAll('<div />', '').replaceAll('&amp;nbsp;',' ').replaceAll('&nbsp;', ' ');
+//     if(multipleImgs) {
+//         p.content = p.content.replaceAll('<img', `<img data-gallery='${p.id}-${parent}'`);
 //     }
-//     return '';
+//     return `
+//         <div class="tile mb-2 mt-2 pt-2 ${p.id == parent ? 'highlight' : ''}" id="convo-${p.id}-${parent}" data-id="${p.id}" data-parent="${parent}" data-stranger="${stranger}">
+//             <div class="tile-icon ">
+//                 <figure class="avatar avatar-lg" data-initial="${p.username.substring(0,1)}">
+//                     <img src="${p.avatar}" loading="lazy">
+//                 </figure>
+//             </div>
+//             <div class="tile-content">
+//                 <p class="tile-title">
+//                     ${p.name} <a class="text-gray" href="/timeline/user/${p.username}">@${p.username}</a>
+//                     <br/><a class="text-gray" href="${p.url}">${p.relative}</a>${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}
+//                     <button type="button" class="addToReply btn btn-sm btn-link btn-icon float-right" data-target="replybox-textarea-${parent}" data-id="${p.username}">
+//                         <i data-target="replybox-textarea-${parent}" data-id="${p.username}" class="icon icon-share addToReply"></i>
+//                     </button>
+//                 </p>
+//                 ${p.content}
+//                 ${multipleImgs ? `<div data-id="${p.id}-${parent}" class='gallery'></div>` : ''}
+//             </div>
+//         </div>
+//     `;
 // }
 
-// export function filterOut(contentFilters, content_html) {
-//     if(contentFilters) {
-//         const words = content_html != undefined ? content_html.toLowerCase()
-//             .replace(/[^a-z0-9]/gmi, " ").replace(/\s+/g, " ")
-//             .split(' ') : [];
-//         return contentFilters.split(',').some(filter => filter.trim() != '' && words.includes(filter.toLowerCase().trim()));
-//     }
-//     return false;
-// }
+export function getReplyBox(id, repliers, boxOnly = false) {  
+    if(boxOnly) {
+        return `<div id="replybox-${id}" class="form-group">
+                    <div class="form-autocomplete">
+                    <div id="replybox-input-container-${id}" class="form-autocomplete-input form-input">
+                        <div id="replybox-chips-${id}">
+                        </div>
+                        <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
+                    </div>
+                    <ul id="replybox-menu-${id}" class="menu hide">
+                        ${repliers.map(r => {
+                            const replier = JSON.parse(r);
+                            return `<li class="menu-item" class="hide" data-name="${replier.username}" data-avatar="${replier.avatar}"></li>`}).join('')}
+                    </ul>
+                    </div>
+                </div>
+                ${repliers.map(function (ur) {
+                    const person = JSON.parse(ur);
+                    return `<input id="replybox-checkbox-${id}-${person.username}" class="hide" type='checkbox' name='replyingTo[]' value='${person.username}'/>`
+                }).join(' ')}
+                `;
+    }
+    const author = JSON.parse(repliers[0]);
+    return `
+        <form class="form" id='replybox-form-${id}' data-id="${id}">
+            ${repliers.map(function (ur) {
+                const person = JSON.parse(ur);
+                return `<input id="replybox-checkbox-${id}-${person.username}" class="hide" ${person.username.trim() == author.username.trim() ? 'checked="checked"' : ''} type='checkbox' name='replyingTo[]' value='${person.username}'/>`
+            }).join(' ')}
+            <div id="replybox-${id}" class="form-group">
+                <label class="form-label">Repling to:</label>
+                <div class="form-autocomplete">
+                <div id="replybox-input-container-${id}" class="form-autocomplete-input form-input">
+                    <div id="replybox-chips-${id}">
+                        <span id="chip-${id}-${author.username}" class="chip"><img class="avatar avatar-sm" src="${author.avatar}" />@${author.username}<a data-name="${author.username}" data-id="${id}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>
+                    </div>
+
+                    <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="" value="">
+                </div>
+                <ul id="replybox-menu-${id}" class="menu hide">
+                    ${repliers.map(r => {
+                        const replier = JSON.parse(r);
+                        return `<li class="menu-item" class="hide" data-name="${replier.username}" data-avatar="${replier.avatar}"></li>`}).join('')}
+                </ul>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="input-example-3">Message</label>
+                <div class="grow-wrap"><textarea id="replybox-textarea-${id}" class="form-input grow-me" name="content" rows="3"></textarea></div>
+                <input type="hidden" class="form-input" name="id" value="${id}" />
+            </div>
+            <div class="form-group">
+                <button data-id="${id}" type="button" class="btn btn-primary replyBtn">Send Reply</button>
+            </div>
+        </form>
+    `;
+}

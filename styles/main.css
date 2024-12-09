@@ -1327,7 +1327,7 @@ dl dt {
 }
 
 dl dd {
-  margin: .4rem 0 .8rem 0
+  /* margin: .4rem 0 .8rem 0 */
 }
 
 .lang-zh,.lang-zh-hans,html:lang(zh),html:lang(zh-Hans) {
@@ -4849,7 +4849,7 @@ a.text-error:visited {
   top: 0
 }
 
-.comparison-slider .comparison-after img,.comparison-slider .comparison-before img {
+.comparison-slider .comparison-after section,.comparison-slider .comparison-before section {
   height: 100%;
   object-fit: cover;
   object-position: left center;
@@ -6214,7 +6214,7 @@ body {
   padding: 0.4rem;
 }
 
-main img,main video {
+main img,main video,#preview img,#preview video {
   height: unset;
   max-width: 100%;
   max-height: 500px;
@@ -6652,4 +6652,19 @@ article footer {
 .mini_cover {
   float: left;
   padding-right: 1em;
+}
+
+.note {
+  height: 40ch;
+  max-height: 40ch;
+  overflow: hidden;
+}
+
+.fakeAnchor, .fakeAnchor:hover, .fakeAnchor:visited {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#note-list article {
+  border-radius: 0.5em;
 }

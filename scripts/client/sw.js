@@ -1,4 +1,4 @@
-const version = '0.0.78';
+const version = '0.0.79';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -92,37 +92,37 @@ self.addEventListener('fetch', async function (event) {
 
     // if(event.request.url.includes('timeline/check') || event.request.url.includes('timeline/mark')) return;
 
-    try {
-        event.respondWith((async () => {
-            //self.console.log(event.request);
-            const cached = await caches.match(event.request, {ignoreVary: true});
-            if (cached) {
-                return cached;
-            }
+    // try {
+    //     event.respondWith((async () => {
+    //         //self.console.log(event.request);
+    //         const cached = await caches.match(event.request, {ignoreVary: true});
+    //         if (cached) {
+    //             return cached;
+    //         }
 
-            try {
-                const response = await fetch(event.request);
-                var copy = response.clone();
-                // var headers = new Headers(copy.headers);
-                // headers.append('sw-fetched-on', new Date().getTime());
-                // var body = await copy.blob();
+    //         try {
+    //             const response = await fetch(event.request);
+    //             var copy = response.clone();
+    //             // var headers = new Headers(copy.headers);
+    //             // headers.append('sw-fetched-on', new Date().getTime());
+    //             // var body = await copy.blob();
                 
-                if (event.request.headers.get('Accept').includes('image')) {
-                    let cache = await caches.open(imageID);
-                    await cache.put(event.request, copy);
-                } else if (event.request.destination) {
-                    let cache = await caches.open(pageID);
-                    await cache.put(event.request, copy);
-                }
+    //             if (event.request.headers.get('Accept').includes('image')) {
+    //                 let cache = await caches.open(imageID);
+    //                 await cache.put(event.request, copy);
+    //             } else if (event.request.destination) {
+    //                 let cache = await caches.open(pageID);
+    //                 await cache.put(event.request, copy);
+    //             }
 
-                return response;
-            } catch {
-                self.console.log('fetch issue, is offline cache it is');
-                return caches.match(`${url}/timeline/`, {ignoreVary: true});
-            }
-        })());
-    } catch {
-        self.console.log('event.respondWith issue so....');
-        return caches.match(`${url}/timeline/`, {ignoreVary: true});
-    }
+    //             return response;
+    //         } catch {
+    //             self.console.log('fetch issue, is offline cache it is');
+    //             return caches.match(`${url}/timeline/`, {ignoreVary: true});
+    //         }
+    //     })());
+    // } catch {
+    //     self.console.log('event.respondWith issue so....');
+    //     return caches.match(`${url}/timeline/`, {ignoreVary: true});
+    // }
 });

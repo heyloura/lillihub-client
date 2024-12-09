@@ -92,6 +92,37 @@ if ('storage' in navigator && 'estimate' in navigator.storage) {
   } else {
     console.error('navigator.storage.estimate API unavailable.');
 }
+function objectToDefinitionList(obj) {
+    const definitionList = document.createElement('dl');
+  
+    for (const [key, value] of Object.entries(obj)) {
+      const term = document.createElement('dt');
+      term.textContent = key;
+  
+      const description = document.createElement('dd');
+      description.textContent = value;
+  
+      definitionList.appendChild(term);
+      definitionList.appendChild(description);
+    }
+  
+    return definitionList;
+}
+function previewFile() {
+    var preview = document.querySelector('img');
+    var file    = document.querySelector('input[type=file]').files[0];
+    var reader  = new FileReader();
+  
+    reader.onloadend = function () {
+      preview.src = reader.result;
+    }
+  
+    if (file) {
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = "";
+    }
+  }
 
 /***********************
 ** HANDLE OFFLINE STUFF
@@ -133,7 +164,6 @@ function handleConnection(load, offline) {
 window.addEventListener('online', handleConnection(function(){},function(){}));
 window.addEventListener('offline', handleConnection(function(){},function(){}));
 
-
 /************************************************************
 ** Swap
 ** Facilitates AJAX-style navigation in web pages 
@@ -148,14 +178,16 @@ var Swap = (() => {
     window.addEventListener("popstate", () => update(location.href, "[swap-history-restore]", false, "body"));
     window.addEventListener("DOMContentLoaded", dom_load);
     function update(href, target, pushstate, fallback = null) {
-        fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
-            var tmp = document.createElement('html');
-            tmp.innerHTML = html;
-            (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
-            if (pushstate)
-                history.pushState({}, "", href);
-            register_links();  
-        });
+        if(!href.includes('#')) {
+            fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
+                var tmp = document.createElement('html');
+                tmp.innerHTML = html;
+                (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
+                if (pushstate)
+                    history.pushState({}, "", href);
+                register_links();  
+            });
+        }
     }
     function register_links() {
         for (const elt of document.querySelectorAll('*[swap-target]')) {
@@ -187,16 +219,295 @@ var Swap = (() => {
     return {loaders: loaders};
 })();
 
-// fetch(`/api/notebooks`, { method: "get" })
-// .then(async response => response.json())
-// .then(async data => {
-//     const links = data.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element => {
-//         `<li class="menu-item"><a class="notebook-${element.id}" href="/notebook/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`
-//     }).join('');
-//     document.getElementById('notebooks').insertAdjacentHTML('beforeend', links); 
-// });
-document.addEventListener("input", (event) => {
+/************************************************************
+** Notebooks
+*************************************************************/
+function hexStringToArrayBuffer(hexString) {
+    const length = hexString.length / 2;
+    const array_buffer = new ArrayBuffer(length);
+    const uint8_array = new Uint8Array(array_buffer);
+
+    for (let i = 0; i < length; i++) {
+        const byte = parseInt(hexString.substr(i * 2, 2), 16);
+        uint8_array[i] = byte;
+    }
+
+    return array_buffer;
+}
+
+async function decryptWithKey(encryptedText, imported_key) {
+    const encrypted_data = new Uint8Array(atob(encryptedText).split('').map(char => char.charCodeAt(0)));
+    const iv = encrypted_data.slice(0, 12);
+    const ciphertext = encrypted_data.slice(12);
+
+    const decrypted_buffer = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        imported_key,
+        ciphertext
+    );
+
+    const decoder = new TextDecoder();
+    const decrypted_text = decoder.decode(decrypted_buffer);
+    return decrypted_text;
+}
+
+async function encryptWithKey(text, imported_key) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoder = new TextEncoder();
+    const plaintext_buffer = encoder.encode(text);
+
+    const ciphertext_buffer = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        imported_key,
+        plaintext_buffer
+    );
+
+    const encrypted_data = new Uint8Array([...iv, ...new Uint8Array(ciphertext_buffer)]);
+    const base64_encoded = btoa(String.fromCharCode(...encrypted_data));
+    return base64_encoded;
+}
+
+const converter = new showdown.Converter({	
+    metadata: true,
+	parseImgDimensions: true,
+	strikethrough: true,
+	tables: true,
+	ghCodeBlocks: true,
+	smoothLivePreview: true,
+	simpleLineBreaks: true,
+	emoji: true, 
+});
+const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importKey(
+    'raw',
+    hexStringToArrayBuffer(localStorage.getItem("mbKey").substr(4)),
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
+) : '';
+
+// Loaded the note list
+Swap.loaders['#note-list'] = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const parts = window.location.pathname.split('/');
+    const id = parts[parts.length - 1];
+    loadNotebook();
+
+    return () => {  // unloader function
+        if(document.querySelector(`.notebook-${id}`)) {
+            document.querySelector(`.notebook-${id}`).classList.remove("active");
+        }
+    };  
+}
+
+async function loadNotebook() {
+    const parts = window.location.pathname.split('/');
+    const id = parts[parts.length - 1];
+    if(document.querySelector(`.notebook-${id}`)) {
+        document.querySelector(`.notebook-${id}`).classList.add("active");
+    }
+
+    const decryptMeElements = Array.from(document.querySelectorAll('.decryptMe'));
+    const promises = decryptMeElements.map(async (element) => {
+        const noteId = element.getAttribute('data-id');
+        const markdown = await decryptWithKey(element.innerHTML, imported_key);
+        const html = converter.makeHtml(markdown);
+        const metadata = converter.getMetadata();
+        if(metadata && metadata.color) {
+            element.style.background = metadata.color;
+        }
+        document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : markdown.substring(0,100); 
+        document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? metadata.tags : ''; 
+        element.innerHTML = html;
+    });
+
+    Promise.all(promises)
+    .then(() => {
+        hljs.highlightAll();
+        const macyInstance = Macy({
+            container: '#note-list',
+            trueOrder: false,
+            waitForImages: false,
+            margin: 8,
+            columns: 3,
+            breakAt: {
+                1200: 2,
+                940: 2,
+                520: 1,
+                400: 1
+            }
+        });
+    })
+    .catch((error) => {
+        console.error('Error decrypting elements:', error);
+    });
+}
+
+// Loaded the note
+Swap.loaders['#note'] = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const parts = window.location.pathname.split('/');
+    const id = parts[2];
+    loadNote();
+
+    return () => {  // unloader function
+        if(document.querySelector(`.notebook-${id}`)) {
+            document.querySelector(`.notebook-${id}`).classList.remove("active");
+        }
+    };  
+}
+
+function loadNote() {
+    const parts = window.location.pathname.split('/');
+    const id = parts[2];
+    if(document.querySelector(`.notebook-${id}`)) {
+        document.querySelector(`.notebook-${id}`).classList.add("active");
+    }
+
+    if(document.querySelector('.decryptMe')) {
+        document.querySelectorAll('.decryptMe').forEach(async (element) => {
+            const noteId = element.getAttribute('data-id');
+            const markdown = await decryptWithKey(element.value, imported_key);
+            const html = converter.makeHtml(markdown);
+            const metadata = converter.getMetadata();
+            const metaDef = objectToDefinitionList(metadata);
+            document.getElementById(`metadata-${noteId}`).appendChild(metaDef);
+            document.getElementById('content').innerHTML = markdown;
+            document.getElementById('preview').innerHTML = html;
+            growTextArea(document.getElementById('content'));
+            hljs.highlightAll();
+
+        });
+    } else {
+        document.getElementById('content').innerHTML = document.getElementById("noteContent").value;
+        document.getElementById('preview').innerHTML = html;
+        growTextArea(document.getElementById('content'));
+        hljs.highlightAll();
+    }
+}
+
+Swap.loaders['#post-list'] = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector(`#timelineLink`).classList.add("active");
+    buildCarousels();
+
+    return () => {  // unloader function
+        document.querySelector(`#timelineLink`).classList.remove("active");
+    };  
+}
+
+/************************************************************
+** Events
+*************************************************************/
+document.addEventListener("input", (event) => {  
     if(event.target.classList.contains('grow-me')) {
         growTextArea(event.target);
     }
+    if(event.target.classList.contains('search')) {
+        if(document.getElementById('search').value != '') {
+            liveSearch('article', 'search');
+            //document.querySelector('main').classList.remove('pages');
+            //document.querySelector('table').classList.add('d-hide');
+        } else {
+            //document.querySelector('main').classList.add('pages');
+            //document.querySelector('table').classList.remove('d-hide');
+        }
+
+    }
 });
+
+document.addEventListener("click", (item) => {
+    if(item.target.classList.contains('editor-upload') && document.getElementById("editor-container")) {
+        var el = window._protected_reference = document.createElement("INPUT");
+        el.type = "file";
+        document.getElementById('editor-status').innerHTML = `<span class="loading"></span>`;
+
+        el.addEventListener('change', function(ev2) {
+
+            console.log(el.files);
+            console.log('size: ' + el.files[0].size /1024 /1024 + ' MB');
+            if(el.files[0].size /1024 /1024 > 3) {
+                alert('file must be smaller than 3MB');
+                document.getElementById('editor-status').innerHTML = '';
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < el.files.length; i++) {
+                formData.append('file[]', el.files[i], el.files[i].name);
+            }
+
+            document.getElementById('editor-status').innerHTML = `<span class="loading pr-2"></span> uploading file...`;
+            fetch('/media/upload', { method: "POST", body: formData })
+                .then(response => console.log(response.status) || response)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editor-status').innerHTML = `inserting markdown...`;
+                    if(el.files[0].type.includes('image'))
+                    {
+                        document.getElementById("content").innerHTML += `![image alt text](${data.url})`;
+                        if(data.ai) {
+                            document.getElementById('editor-status').innerHTML = `<span class="loading pr-2"></span> getting alt text...`;
+                        }
+                    } 
+                    else 
+                    {
+                        document.getElementById("content").innerHTML += `[link text](${data.url})`;
+                    }
+
+                    if(!el.files[0].type.includes('image') || !data.ai) {
+                        document.getElementById('editor-status').innerHTML = `done.`;
+                    }
+
+                    if(data.ai && el.files[0].type.includes('image'))
+                    {
+                        setTimeout(async () => {
+                            await fetch('/api/media/latest', { method: "GET" })
+                                .then(response => console.log(response.status) || response)
+                                .then(response => response.json())
+                                .then(data => {
+                                    document.getElementById("content").innerHTML = document.getElementById("content").innerHTML.replace(`![image alt text](${data.url})` , `![${data.alt}](${data.url})`)
+                                    document.getElementById('editor-status').innerHTML = `done.`;
+                                    console.log(data);
+                                });
+                        }, 2000);
+                    }
+                    
+                    // document.getElementById("editor-container").insertAdjacentHTML('beforeend', `
+                    //     <div class="input-group">
+                    //         ${ el.files[0].type.includes('image') ? `<img src="${URL.createObjectURL(el.files[0])}" height="24" alt="Image preview...">` : ''}
+                    //         <input name="hi" class="form-input" type="hidden" value="${body}">
+                    //         <input class="form-input" type="text" placeholder="alt text">
+                    //         <button class="btn btn-link btn-action input-group-btn"><i class="icon icon-refresh"></i></button>
+                    //         <button class="btn btn-link btn-action input-group-btn"><i class="icon icon-cross"></i></button>
+                    //     </div>
+                    // `);
+                    el = window._protected_reference = undefined;
+                });
+        });
+      
+        el.click(); // open
+    }
+});
+
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", async (event) => {
+        if(window.location.pathname.includes('notes')) {
+            loadNote();
+        } else if(window.location.pathname.includes('notebooks')) {
+            loadNotebook();
+        } else if(window.location.pathname.includes('timeline')) {
+            document.querySelector(`#timelineLink`).classList.add("active");
+        }        
+    });
+}
+else
+{
+    if(window.location.pathname.includes('notes')) {
+        loadNote();
+    } else if(window.location.pathname.includes('notebooks')) {
+        loadNotebook();
+    } else if(window.location.pathname.includes('timeline')) {
+        document.querySelector(`#timelineLink`).classList.add("active");
+    } 
+}
