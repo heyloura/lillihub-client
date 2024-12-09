@@ -432,10 +432,11 @@ function loadTimeline() {
     fetch("/api/timeline/mark/" + id, { method: "get" })
         .then(response => response.text())
         .then(_data => {});
+    return timerID;
 }
 
 Swap.loaders['#post-list'] = () => {
-    loadTimeline(); 
+    const timerID = loadTimeline(); 
 
     return () => {  // unloader function
         document.querySelector(`#timelineLink`).classList.remove("active");
