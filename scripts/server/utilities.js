@@ -213,7 +213,7 @@ export function postHTML(post, stranger, isConvo) {
                         <div class="timeline-left">
                             <span class="timeline-icon"></span>
                         </div>` : ''}
-        <article id="post-${post.id}" class="card parent ${isConvo ? 'timeline-content pl-2 ml-2' : 'bordered'} ${isConvo == post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pl-2 ml-2' : 'bordered'} ${isConvo == post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
             <header class="card-header">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">

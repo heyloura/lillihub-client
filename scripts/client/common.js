@@ -410,7 +410,7 @@ function loadTimeline() {
     hljs.highlightAll();
 
     const article = document.querySelector('article:first-child');
-    const id = article.getAttribute('id');
+    const id = article.getAttribute('data-id');
     let checks = 0;
     let count = 0;
     const timerID = setInterval(function() {
