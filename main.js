@@ -753,6 +753,7 @@ Deno.serve(async (req) => {
             //----------
             const NOTEBOOKS_UPDATE_ROUTE = new URLPattern({ pathname: "/notebooks/note/update" });
             if(NOTEBOOKS_UPDATE_ROUTE.exec(req.url) && user) {
+                console.log('saving note')
                 const value = await req.formData();
                 const text = value.get('text');
                 const notebook_id = value.get('notebook_id');
@@ -765,6 +766,8 @@ Deno.serve(async (req) => {
                 if(id) {
                     form.append("id", id);
                 }
+
+                console.log(form)
                                
                 const posting = await fetch('https://micro.blog/notes', {
                     method: "POST",
@@ -823,7 +826,7 @@ Deno.serve(async (req) => {
             // All other pages
             // -----------------------------------------------------
             const pages = ["notebooks", "timeline"]
-            if (pages.some(v => req.url.includes(v))) {
+            if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
                 const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
                 let name = parts[parts.length - 1].split('?')[0];

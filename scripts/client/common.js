@@ -12,42 +12,61 @@ function liveSearch(selector, searchboxId) {
         }
     }
 }
-const findParentHasClassReturnId = (el, className) => {
-    if(!el || !el.parentNode || !el.parentNode.classList) 
-    {
-        return 0;
+let touchstartX = 0;
+let touchendX = 0;
+function checkDirection() {
+    if (touchendX < touchstartX - 50) {
+        history.back();
     }
-    if(el.parentNode.classList.contains(className)) 
-    {
-        return el.parentNode.getAttribute('id');
-    }
-    return findParentHasClassReturnId(el.parentNode, className);
+    if (touchendX > touchstartX) return;
 }
-function redirectToAnchor(anchor, scrollToTop = true) {
-    var delayInMilliseconds = 400;
-    setTimeout(function() {
-        document.location.hash = anchor;
-        if(scrollToTop) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }, delayInMilliseconds);
-}
-function removeHash() { 
-    var scrollV, scrollH, loc = window.location;
-    if ("pushState" in history)
-        history.pushState("", document.title, loc.pathname + loc.search);
-    else {
-        // Prevent scrolling by storing the page's current scroll offset
-        scrollV = document.body.scrollTop;
-        scrollH = document.body.scrollLeft;
+function gestures(elId) {
+    // set up gesture navigation
+    document.getElementById(elId).addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX
+    })
 
-        loc.hash = "";
-
-        // Restore the scroll offset, should be flicker free
-        document.body.scrollTop = scrollV;
-        document.body.scrollLeft = scrollH;
-    }
+    document.getElementById(elId).addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX
+        checkDirection()
+    })
 }
+// const findParentHasClassReturnId = (el, className) => {
+//     if(!el || !el.parentNode || !el.parentNode.classList) 
+//     {
+//         return 0;
+//     }
+//     if(el.parentNode.classList.contains(className)) 
+//     {
+//         return el.parentNode.getAttribute('id');
+//     }
+//     return findParentHasClassReturnId(el.parentNode, className);
+// }
+// function redirectToAnchor(anchor, scrollToTop = true) {
+//     var delayInMilliseconds = 400;
+//     setTimeout(function() {
+//         document.location.hash = anchor;
+//         if(scrollToTop) {
+//             window.scrollTo({ top: 0, behavior: 'smooth' });
+//         }
+//     }, delayInMilliseconds);
+// }
+// function removeHash() { 
+//     var scrollV, scrollH, loc = window.location;
+//     if ("pushState" in history)
+//         history.pushState("", document.title, loc.pathname + loc.search);
+//     else {
+//         // Prevent scrolling by storing the page's current scroll offset
+//         scrollV = document.body.scrollTop;
+//         scrollH = document.body.scrollLeft;
+
+//         loc.hash = "";
+
+//         // Restore the scroll offset, should be flicker free
+//         document.body.scrollTop = scrollV;
+//         document.body.scrollLeft = scrollH;
+//     }
+// }
 function buildCarousel(id, imageArray) 
 {
     let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
@@ -506,16 +525,6 @@ document.addEventListener("click", async (item) => {
                                 });
                         }, 30 * 1000);
                     }
-                    
-                    // document.getElementById("editor-container").insertAdjacentHTML('beforeend', `
-                    //     <div class="input-group">
-                    //         ${ el.files[0].type.includes('image') ? `<img src="${URL.createObjectURL(el.files[0])}" height="24" alt="Image preview...">` : ''}
-                    //         <input name="hi" class="form-input" type="hidden" value="${body}">
-                    //         <input class="form-input" type="text" placeholder="alt text">
-                    //         <button class="btn btn-link btn-action input-group-btn"><i class="icon icon-refresh"></i></button>
-                    //         <button class="btn btn-link btn-action input-group-btn"><i class="icon icon-cross"></i></button>
-                    //     </div>
-                    // `);
                     el = window._protected_reference = undefined;
                 });
         });
@@ -536,6 +545,8 @@ document.addEventListener("click", async (item) => {
         if(id != 0) {
             form.append("id", id);
         }    
+
+        console.log(form);
         const posting = await fetch('/notebooks/note/update', {
             method: "POST",
             body: form.toString(),
@@ -551,6 +562,7 @@ document.addEventListener("click", async (item) => {
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", async (event) => {
+        gestures('main');
         if(window.location.pathname.includes('notes')) {
             loadNote();
         } else if(window.location.pathname.includes('notebooks')) {
@@ -562,6 +574,7 @@ if (document.readyState === "loading") {
 }
 else
 {
+    gestures('main');
     if(window.location.pathname.includes('notes')) {
         loadNote();
     } else if(window.location.pathname.includes('notebooks')) {
