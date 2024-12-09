@@ -846,7 +846,7 @@ Deno.serve(async (req) => {
                     const versions = await fetching.json();
                     // put JSON check here or something.....
                     console.log(versions)
-                    content = `<div id="note" class="mt-2">${utility.noteHTML(note,id,versions)}</div>`;
+                    content = `<div id="note" class="mt-2">${utility.noteHTML(note,id,versions.items)}</div>`;
                 } else if(req.url.includes("notebooks")) {
                     id = name;
                     name = "notebook";
@@ -863,7 +863,7 @@ Deno.serve(async (req) => {
                     content = `
                         <div id="toast" class="toast hide mt-2">
                             <button class="btn btn-clear float-right dismissToast"></button>
-                            <a rel="prefetch" href="/timeline" swap-target="#main" swap-history="true"><b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.</a>
+                            <a rel="prefetch" href="/timeline" swap-target="#main"><b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.</a>
                         </div>
                         <div id="post" class="mt-2">${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true)).join('')}</div>`;
                 } else if(req.url.includes("timeline")) {

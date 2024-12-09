@@ -470,7 +470,7 @@ document.addEventListener("click", async (item) => {
                 formData.append('file[]', el.files[i], el.files[i].name);
             }
 
-            document.getElementById('editor-status').innerHTML = `<span class="loading pr-2"></span> uploading file...`;
+            document.getElementById('editor-status').innerHTML = `<span class="loading pr-2 mr-2"></span> uploading file...`;
             fetch('/media/upload', { method: "POST", body: formData })
                 .then(response => console.log(response.status) || response)
                 .then(response => response.json())
@@ -478,9 +478,10 @@ document.addEventListener("click", async (item) => {
                     document.getElementById('editor-status').innerHTML = `inserting markdown...`;
                     if(el.files[0].type.includes('image'))
                     {
-                        document.getElementById("content").innerHTML += `![image alt text](${data.url})`;
                         if(data.ai) {
-                            document.getElementById('editor-status').innerHTML = `<span class="loading pr-2"></span> getting alt text...`;
+                            document.getElementById('editor-status').innerHTML = `<span class="loading pr-2 mr-2"></span> getting alt text...`;
+                        } else {
+                            document.getElementById("content").innerHTML += `![image alt text](${data.url})`;
                         }
                     } 
                     else 
@@ -499,11 +500,11 @@ document.addEventListener("click", async (item) => {
                                 .then(response => console.log(response.status) || response)
                                 .then(response => response.json())
                                 .then(data => {
-                                    document.getElementById("content").innerHTML = document.getElementById("content").innerHTML.replace(`![image alt text](${data.url})` , `![${data.alt}](${data.url})`)
                                     document.getElementById('editor-status').innerHTML = `done.`;
+                                    document.getElementById("content").innerHTML += `![${data.alt}](${data.url})`;
                                     console.log(data);
                                 });
-                        }, 60 * 1000);
+                        }, 30 * 1000);
                     }
                     
                     // document.getElementById("editor-container").insertAdjacentHTML('beforeend', `
@@ -523,7 +524,8 @@ document.addEventListener("click", async (item) => {
     }
 
     // save a private note.
-    if(item.target.classList.contains('saveNote') && document.getElementById('content')) {
+    if(item.target.classList.contains('saveNote')) {
+        console.log('saveNote');
         let note = document.getElementById('content').innerHTML;
         let id = document.getElementById('noteId').value;
         let notebookId = document.getElementById('notebookId').value;
