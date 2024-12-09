@@ -6668,3 +6668,13 @@ article footer {
 #note-list article {
   border-radius: 0.5em;
 }
+
+.timeline .timeline-item:last-child::before {
+  background: #dadee4;
+  content: "";
+  height: 85%;
+  left: 11px;
+  position: absolute;
+  top: 1.2rem;
+  width: 2px;
+}
