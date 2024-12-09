@@ -767,7 +767,7 @@ Deno.serve(async (req) => {
                     form.append("id", id);
                 }
 
-                console.log(form)
+                console.log(form.toString())
                                
                 const posting = await fetch('https://micro.blog/notes', {
                     method: "POST",
@@ -777,6 +777,10 @@ Deno.serve(async (req) => {
                         "Authorization": "Bearer " + mbToken
                     }
                 });
+
+                if (!posting.ok) {
+                    console.log(`${user.username} tried to update a note and ${await posting.text()}`);
+                }
         
                 return new Response('note updated', {
                     status: 200,

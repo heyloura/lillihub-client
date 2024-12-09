@@ -412,6 +412,7 @@ Swap.loaders['#post-list'] = () => {
     const article = document.querySelector('article:first-child');
     const id = article.getAttribute('id');
     let checks = 0;
+    let count = 0;
     const timerID = setInterval(function() {
         fetch("/api/timeline/check/" + id, { method: "get" })
             .then(response => response.json())
@@ -419,11 +420,11 @@ Swap.loaders['#post-list'] = () => {
                 if(data.count > 0) {
                     document.getElementById('toast').classList.remove('hide');
                     document.getElementById('showPostCount').innerHTML = data.count;
-                    document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
+                    count = data.count;
                 }     
             });
         checks++;
-        if(checks > 40 || data.count > 40) {
+        if(checks > 40 || count > 40) {
             clearInterval(timerID);
         }
     }, 60 * 1000); 
@@ -546,7 +547,7 @@ document.addEventListener("click", async (item) => {
             form.append("id", id);
         }    
 
-        console.log(form);
+        console.log(form.toString());
         const posting = await fetch('/notebooks/note/update', {
             method: "POST",
             body: form.toString(),
@@ -560,20 +561,7 @@ document.addEventListener("click", async (item) => {
 });
 
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", async (event) => {
-        gestures('main');
-        if(window.location.pathname.includes('notes')) {
-            loadNote();
-        } else if(window.location.pathname.includes('notebooks')) {
-            loadNotebook();
-        } else if(window.location.pathname.includes('timeline')) {
-            document.querySelector(`#timelineLink`).classList.add("active");
-        }        
-    });
-}
-else
-{
+function loadPage() {
     gestures('main');
     if(window.location.pathname.includes('notes')) {
         loadNote();
@@ -581,5 +569,16 @@ else
         loadNotebook();
     } else if(window.location.pathname.includes('timeline')) {
         document.querySelector(`#timelineLink`).classList.add("active");
-    } 
+    }       
+    buildCarousels();
+    hljs.highlightAll(); 
+}
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", async (event) => {
+        loadPage();
+    });
+}
+else
+{
+    loadPage();
 }
