@@ -209,13 +209,13 @@ export function postHTML(post, stranger, isConvo) {
     post.content.replaceAll('</script', `</div`);
     
     return ` 
-        ${isConvo ? `<div class="timeline-item pl-2 ml-2">
+        ${isConvo ? `<div class="timeline-item pl-2 ml-2 bordered">
                         <div class="timeline-left">
-                            <span class="timeline-icon">${getAvatar(post, 'avatar')}</span>
+                            <span class="timeline-icon"></span>
                         </div>` : ''}
-        <article id="post-${post.id}" class="card parent ${isConvo ? 'timeline-content' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        <article id="post-${post.id}" class="card parent bordered ${isConvo ? 'timeline-content' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
             <header class="card-header">
-                ${!isConvo ? getAvatar(post, 'avatar-lg') : ''}
+                ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
                     <div class="card-title h5">${post.name}</div>
                     <div class="card-subtitle">
@@ -226,6 +226,9 @@ export function postHTML(post, stranger, isConvo) {
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
                         ${!isConvo && (post.conversation || post.mention) ? `&nbsp;·&nbsp;<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}"><i class="icon icon-message text-gray mr-2"></i> View conversation</a>` : ''}
                     </div>           
+                </div>
+                 <div class="card-buttons">
+                 ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link float-right btn-action"><i class="icon icon-message"></i></a>` : ''}
                 </div>
             </header>
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>

@@ -417,6 +417,7 @@ Swap.loaders['#post-list'] = () => {
         fetch("/api/timeline/check/" + id, { method: "get" })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if(data.count > 0) {
                     document.getElementById('toast').classList.remove('hide');
                     document.getElementById('showPostCount').innerHTML = data.count;
