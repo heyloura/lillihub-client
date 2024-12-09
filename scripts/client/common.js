@@ -438,14 +438,14 @@ Swap.loaders['#post-list'] = () => {
     };  
 }
 
-Swap.loaders['#post'] = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.querySelector(`#timelineLink`).classList.add("active");
+Swap.loaders['.post'] = () => {
+    //window.scrollTo({ top: 0, behavior: 'smooth' });
+    //document.querySelector(`#timelineLink`).classList.add("active");
     buildCarousels();
     hljs.highlightAll();
 
     return () => {  // unloader function
-        document.querySelector(`#timelineLink`).classList.remove("active");
+        //document.querySelector(`#timelineLink`).classList.remove("active");
     };  
 }
 

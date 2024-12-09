@@ -867,18 +867,19 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const post = await fetching.json();
                     // put JSON check here or something.....
-                    content = `
-                        <div id="toast" class="toast hide mt-2">
-                            <button class="btn btn-clear float-right dismissToast"></button>
-                            <a rel="prefetch" href="/timeline" swap-target="#main"><b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.</a>
-                        </div>
-                        <div id="post" class="mt-2">${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true)).join('')}</div>`;
+                    var huh = ``
+                    content = `<div id="${id}" class="mt-2 timeline post">${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true)).join('')}</div>`;
                 } else if(req.url.includes("timeline")) {
                     id = name;
                     name = "timeline";
                     fetching = await fetch(`https://micro.blog/posts/timeline${id != "timeline" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
-                    content = `<div id="post-list" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
+                    content = `
+                        <div id="toast" class="toast hide mt-2">
+                            <button class="btn btn-clear float-right dismissToast"></button>
+                            <a rel="prefetch" href="/timeline" swap-target="#main"><b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.</a>
+                        </div>
+                        <div id="post-list" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
 
 
                     // const layout = new TextDecoder().decode(await Deno.readFile("timeline.html"));

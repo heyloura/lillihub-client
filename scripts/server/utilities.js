@@ -209,7 +209,11 @@ export function postHTML(post, stranger, isConvo) {
     post.content.replaceAll('</script', `</div`);
     
     return ` 
-        <article id="${post.id}" class="card parent" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        ${isConvo ? `<div class="timeline-item">
+                        <div class="timeline-left">
+                            <span class="timeline-icon"></span>
+                        </div>` : ''}
+        <article id="${post.id}" class="card parent ${isConvo ? 'timeline-content' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
             <header class="card-header">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
@@ -220,7 +224,7 @@ export function postHTML(post, stranger, isConvo) {
                             @${post.username}
                         </a> · 
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
-                        ${!isConvo && (post.conversation || post.mention) ? `&nbsp;·&nbsp;<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" swap-history="true"><i class="icon icon-message text-gray mr-2"></i> View conversation</a>` : ''}
+                        ${!isConvo && (post.conversation || post.mention) ? `&nbsp;·&nbsp;<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#${post.id}"><i class="icon icon-message text-gray mr-2"></i> View conversation</a>` : ''}
                     </div>           
                 </div>
             </header>
@@ -251,6 +255,7 @@ export function postHTML(post, stranger, isConvo) {
                 </div>
             </details>
         </article>
+        ${isConvo ? `</div>` : '' }
     `;
 }
 
