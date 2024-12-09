@@ -538,6 +538,9 @@ document.addEventListener("click", async (item) => {
         console.log('saveNote');
         const parts = window.location.pathname.split('/');
         let note = document.getElementById('content').innerHTML;
+
+        console.log(note);
+
         let id = document.getElementById('noteId').value;
         let notebookId = parts[2];
         const eNote = await encryptWithKey(note, imported_key);
