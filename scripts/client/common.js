@@ -386,9 +386,43 @@ function loadNote() {
 }
 
 Swap.loaders['#post-list'] = () => {
+    document.querySelector(`#timelineLink`).classList.add("active");
+    buildCarousels();
+    hljs.highlightAll();
+
+    const article = document.querySelector('article:first-child');
+    const id = article.getAttribute('id');
+    let checks = 0;
+    const timerID = setInterval(function() {
+        fetch("/api/timeline/check/" + id, { method: "get" })
+            .then(response => response.json())
+            .then(data => {
+                if(data.count > 0) {
+                    document.getElementById('toast').classList.remove('hide');
+                    document.getElementById('showPostCount').innerHTML = data.count;
+                    document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
+                }     
+            });
+        checks++;
+        if(checks > 40 || data.count > 40) {
+            clearInterval(timerID);
+        }
+    }, 60 * 1000); 
+    fetch("/api/timeline/mark/" + id, { method: "get" })
+        .then(response => response.text())
+        .then(_data => {});
+
+    return () => {  // unloader function
+        document.querySelector(`#timelineLink`).classList.remove("active");
+        clearInterval(timerID);
+    };  
+}
+
+Swap.loaders['#post'] = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.querySelector(`#timelineLink`).classList.add("active");
     buildCarousels();
+    hljs.highlightAll();
 
     return () => {  // unloader function
         document.querySelector(`#timelineLink`).classList.remove("active");
@@ -469,7 +503,7 @@ document.addEventListener("click", (item) => {
                                     document.getElementById('editor-status').innerHTML = `done.`;
                                     console.log(data);
                                 });
-                        }, 2000);
+                        }, 60 * 1000);
                     }
                     
                     // document.getElementById("editor-container").insertAdjacentHTML('beforeend', `

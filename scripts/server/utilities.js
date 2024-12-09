@@ -215,13 +215,36 @@ export function postHTML(post, stranger, isConvo) {
                             @${post.username}
                         </a> · 
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
-                        ${post.conversation && !post.mention ? '&nbsp;·&nbsp;<i class="icon icon-message text-gray"></i>' : ''}
+                        ${!isConvo && (post.conversation || post.mention) ? `&nbsp;·&nbsp;<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" swap-history="true"><i class="icon icon-message text-gray"></i> View conversation</a>` : ''}
                     </div>           
                 </div>
             </header>
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
-            <p class="">Reply · ${ !isConvo ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" swap-history="true">View post</a>` : ''}</p>
+            <details class="accordion" open>
+                <summary class="accordion-header c-hand">
+                    <i class="icon icon-arrow-right mr-1"></i>
+                    Reply
+                </summary>
+                <div class="accordion-body">
+                    <form class="card bordered">
+                        <div class="card-body">
+                            <div class="grow-wrap">
+                                <textarea name="content" id="${post.id}-reply" class="form-input grow-me" rows="3">@${post.username} </textarea>
+                            </div>
+                        </div>
+                        <div class="card-footer mb-2">
+                            <div class="btn-group float-right">
+                                <button type="button" class="btn btn-primary sendReply"><i class="icon icon-message sendReply"></i> Reply</button>
+                            </div> 
+                        </div>
+                        <div id="${post.id}-toast" class="toast toast-dark hide mt-2">
+                            <button data-toast-id="${post.id}-toast" class="btn btn-clear float-right dismissToast"></button>
+                            <div id="${post.id}-toast-message"></div>
+                        </div>  
+                    </form>
+                </div>
+            </details>
         </article>
     `;
 }

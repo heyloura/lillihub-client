@@ -304,25 +304,7 @@ Deno.serve(async (req) => {
                   HTMLHeaders(nonce));
             }
 
-            const CHECK_ROUTE = new URLPattern({ pathname: "/timeline/check/:id" });
-            if(CHECK_ROUTE.exec(req.url)) {
-                const id = CHECK_ROUTE.exec(req.url).pathname.groups.id;
-                const fetching = await fetch(`https://micro.blog/posts/check?since_id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                const results = await fetching.json(); 
-                return new Response(JSON.stringify(results),JSONHeaders());
-            }
 
-            const MARK_TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/mark/:id" });
-            if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
-                const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
-                const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
-                return new Response('Timeline marked', {
-                    status: 200,
-                    headers: {
-                        "content-type": "text/html",
-                    },
-                });
-            }
 
             // this is called from client side JavaScript to get posts
             // const POSTS_ROUTE = new URLPattern({ pathname: "/timeline/posts/:id" });
@@ -428,18 +410,18 @@ Deno.serve(async (req) => {
                     ,HTMLHeaders(nonce));
             } 
 
-            const TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
-            if(TIMELINE_ROUTE.exec(req.url)) {
-                const id = TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
-                const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
-                const html = posts.map(post => postHTML(post)).join('');
+            // const TIMELINE_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
+            // if(TIMELINE_ROUTE.exec(req.url)) {
+            //     const id = TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
+            //     const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
+            //     const html = posts.map(post => postHTML(post)).join('');
 
-                return new Response(`${html}<br/><p class="p-centered">
-                    <button class="btn btn-primary loadTimeline" data-id="${posts[posts.length-1].id}">load more</button>
-                    <div id="add-${posts[posts.length-1] ? posts[posts.length-1].id : 'error'}"></div>
-                    <div class="hide firstPost" data-id="${posts[0].id}"></div>
-                    </p>`,HTMLHeaders(nonce));
-            }
+            //     return new Response(`${html}<br/><p class="p-centered">
+            //         <button class="btn btn-primary loadTimeline" data-id="${posts[posts.length-1].id}">load more</button>
+            //         <div id="add-${posts[posts.length-1] ? posts[posts.length-1].id : 'error'}"></div>
+            //         <div class="hide firstPost" data-id="${posts[0].id}"></div>
+            //         </p>`,HTMLHeaders(nonce));
+            // }
 
 
 
@@ -786,6 +768,28 @@ Deno.serve(async (req) => {
                 const media = await fetching.json();
                 return new Response(JSON.stringify(media.items[0]), JSONHeaders());
             }
+
+            const CHECK_ROUTE = new URLPattern({ pathname: "/api/timeline/check/:id" });
+            if(CHECK_ROUTE.exec(req.url)) {
+                const id = CHECK_ROUTE.exec(req.url).pathname.groups.id;
+                const fetching = await fetch(`https://micro.blog/posts/check?since_id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const results = await fetching.json(); 
+                return new Response(JSON.stringify(results),JSONHeaders());
+            }
+
+            const MARK_TIMELINE_ROUTE = new URLPattern({ pathname: "/api/timeline/mark/:id" });
+            if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
+                const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
+                const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+                return new Response('Timeline marked', {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });
+            }
+
+
             // if(new URLPattern({ pathname: "/api/notebooks" }).exec(req.url)) {
             //     let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
             //     let results = await fetching.json();
@@ -839,7 +843,12 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const post = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="post" class="mt-2">${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true)).join('')}</div>`;
+                    content = `
+                        <div id="toast" class="toast hide mt-2">
+                            <button class="btn btn-clear float-right dismissToast"></button>
+                            <a rel="prefetch" href="/timeline" swap-target="#main" swap-history="true"><b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.</a>
+                        </div>
+                        <div id="post" class="mt-2">${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true)).join('')}</div>`;
                 } else if(req.url.includes("timeline")) {
                     id = name;
                     name = "timeline";
