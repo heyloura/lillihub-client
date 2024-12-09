@@ -868,7 +868,7 @@ Deno.serve(async (req) => {
                     const post = await fetching.json();
                     // put JSON check here or something.....
                     var huh = ``
-                    content = `<div id="${id}" class="mt-2 timeline post">${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true)).join('')}</div>`;
+                    content = `<div id="post-${id}" class="mt-2 timeline post">${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true)).join('')}</div>`;
                 } else if(req.url.includes("timeline")) {
                     id = name;
                     name = "timeline";
