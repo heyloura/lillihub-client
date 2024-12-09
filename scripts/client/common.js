@@ -432,15 +432,13 @@ function loadTimeline() {
     fetch("/api/timeline/mark/" + id, { method: "get" })
         .then(response => response.text())
         .then(_data => {});
-    return timerID;
 }
 
 Swap.loaders['#post-list'] = () => {
-    const timerID = loadTimeline(); 
+    loadTimeline(); 
 
     return () => {  // unloader function
         document.querySelector(`#timelineLink`).classList.remove("active");
-        clearInterval(timerID);
     };  
 }
 
@@ -579,6 +577,9 @@ function loadPage() {
         loadNotebook();
     } else if(window.location.pathname.includes('timeline')) {
         loadTimeline(); 
+    }  
+    else if(window.location.pathname.includes('discover') || window.location.pathname.includes('users')) {
+        buildCarousels();
     }       
     if(localStorage.getItem('discover_setting') === 'custom') {
         let href = document.getElementById('discoverLink').getAttribute('href');
