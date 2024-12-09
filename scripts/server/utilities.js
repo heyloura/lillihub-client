@@ -33,7 +33,7 @@ export function noteHTML(note, notebookId, versions) {
                         </div>
                         <div class="divider" data-content="Versions"></div>
                         ${versions.map(v => `<tr>
-                            <td>${(new Date(v.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td>
+                            <td>${(new Date(v.date_published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td>
                             <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a></td>
                         </tr>`).join('')}
                         <div class="divider" data-content="Related Bookmarks"></div>
