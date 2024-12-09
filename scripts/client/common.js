@@ -404,7 +404,7 @@ function loadNote() {
     }
 }
 
-Swap.loaders['#post-list'] = () => {
+function loadTimeline() {
     document.querySelector(`#timelineLink`).classList.add("active");
     buildCarousels();
     hljs.highlightAll();
@@ -432,6 +432,10 @@ Swap.loaders['#post-list'] = () => {
     fetch("/api/timeline/mark/" + id, { method: "get" })
         .then(response => response.text())
         .then(_data => {});
+}
+
+Swap.loaders['#post-list'] = () => {
+    loadTimeline(); 
 
     return () => {  // unloader function
         document.querySelector(`#timelineLink`).classList.remove("active");
@@ -573,10 +577,9 @@ function loadPage() {
     } else if(window.location.pathname.includes('notebooks')) {
         loadNotebook();
     } else if(window.location.pathname.includes('timeline')) {
-        document.querySelector(`#timelineLink`).classList.add("active");
+        loadTimeline(); 
     }       
-    buildCarousels();
-    hljs.highlightAll(); 
+    //hljs.highlightAll(); 
 }
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", async (event) => {
