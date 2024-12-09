@@ -409,26 +409,26 @@ function loadTimeline() {
     buildCarousels();
     hljs.highlightAll();
 
-    const article = document.querySelector('article:first-child');
-    const id = article.getAttribute('data-id');
-    let checks = 0;
-    let count = 0;
-    const timerID = setInterval(function() {
-        fetch("/api/timeline/check/" + id, { method: "get" })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                if(data.count > 0) {
-                    document.getElementById('toast').classList.remove('hide');
-                    document.getElementById('showPostCount').innerHTML = data.count;
-                    count = data.count;
-                }     
-            });
-        checks++;
-        if(checks > 40 || count > 40) {
-            clearInterval(timerID);
-        }
-    }, 60 * 1000); 
+    // const article = document.querySelector('article:first-child');
+    // const id = article.getAttribute('data-id');
+    // let checks = 0;
+    // let count = 0;
+    // const timerID = setInterval(function() {
+    //     fetch("/api/timeline/check/" + id, { method: "get" })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             console.log(data);
+    //             if(data.count > 0) {
+    //                 document.getElementById('toast').classList.remove('hide');
+    //                 document.getElementById('showPostCount').innerHTML = data.count;
+    //                 count = data.count;
+    //             }     
+    //         });
+    //     checks++;
+    //     if(checks > 40 || count > 40) {
+    //         clearInterval(timerID);
+    //     }
+    // }, 60 * 1000); 
     fetch("/api/timeline/mark/" + id, { method: "get" })
         .then(response => response.text())
         .then(_data => {});

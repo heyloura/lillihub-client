@@ -21,21 +21,21 @@ export function noteHTML(note, notebookId, versions) {
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div class="card bordered p-2">
                         <div class="divider" data-content="Note Details"></div>
-                        <!--<a href="/notebooks/${notebookId}/notes/${n.id}/edit-form" swap-target="#main" swap-history="true" class="btn btn-primary">Edit Note</a>-->
                         <div id="metadata-${n.id}"></div>
                         <div>
-                            <dl>
-                                <dt>id</dt><dd>${n.id}</dd>
-                                <dt>url</dt><dd>${n.url}</dd>
-                                <dt>published</dt><dd>${n.published}</dd>
-                                <dt>modified</dt><dd>${n.modified}</dd>
-                                <dt>encrypted</dt><dd>${n.encrypted}</dd>
-                                <dt>shared</dt><dd>${n.shared}</dd>
-                                <dt>shared_url</dt><dd>${n.shared_url}</dd>
-                            </dl>
+                            <table class="table table-striped">
+                                <tr><td>id</td><td>${n.id}</td></tr>
+                                <tr><td>published</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
+                                <tr><td>modified</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
+                                <tr><td>encrypted</td><td>${n.encrypted}</td></tr>
+                                ${n.shared ? `<tr><td>shared</td><td><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></td></tr>` : ''}
+                            </table>
                         </div>
                         <div class="divider" data-content="Versions"></div>
-                        <textarea>${JSON.stringify(versions,null,2)}</textarea>
+                        ${versions.map(v => `<tr>
+                            <td>${(new Date(v.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td>
+                            <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a></td>
+                        </tr>`).join('')}
                         <div class="divider" data-content="Related Bookmarks"></div>
                     </div>
                 </div>
@@ -208,22 +208,20 @@ export function postHTML(post, stranger, isConvo, convoId) {
     post.content.replaceAll('<script', `<div`);
     post.content.replaceAll('</script', `</div`);
 
-    if(isConvo) {
-        console.log(isConvo,post.id)
-    }
+    console.log(isConvo,post.id,convoId)
     
     return ` 
         ${isConvo ? `<div class="timeline-item bordered">
                         <div class="timeline-left">
                             <span class="timeline-icon"></span>
                         </div>` : ''}
-        <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pl-2 ml-2' : 'bordered'} ${convoId == post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pl-2 ml-2' : 'bordered'} ${convoId && convoId === post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
             <header class="card-header">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
                     <div class="card-title h5">${post.name}</div>
                     <div class="card-subtitle">
-                        <a href="/timeline/user/${post.username}" class="text-gray">
+                        <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
                             ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
                             @${post.username}
                         </a> · 
@@ -264,36 +262,6 @@ export function postHTML(post, stranger, isConvo, convoId) {
         ${isConvo ? `</div>` : '' }
     `;
 }
-
-// export function conversationHTML(post, stranger, parent) {
-//     const p = post;
-
-//     const multipleImgs = !p.linkpost && p.content.split('<img').length > 2;
-
-//     if(multipleImgs) {
-//         p.content = p.content.replaceAll('<img', `<img data-gallery='${p.id}-${parent}'`);
-//     }
-//     return `
-//         <div class="tile mb-2 mt-2 pt-2 ${p.id == parent ? 'highlight' : ''}" id="convo-${p.id}-${parent}" data-id="${p.id}" data-parent="${parent}" data-stranger="${stranger}">
-//             <div class="tile-icon ">
-//                 <figure class="avatar avatar-lg" data-initial="${p.username.substring(0,1)}">
-//                     <img src="${p.avatar}" loading="lazy">
-//                 </figure>
-//             </div>
-//             <div class="tile-content">
-//                 <p class="tile-title">
-//                     ${p.name} <a class="text-gray" href="/timeline/user/${p.username}">@${p.username}</a>
-//                     <br/><a class="text-gray" href="${p.url}">${p.relative}</a>${stranger ? ' <i class="icon icon-people text-gray"></i>' : ''}
-//                     <button type="button" class="addToReply btn btn-sm btn-link btn-icon float-right" data-target="replybox-textarea-${parent}" data-id="${p.username}">
-//                         <i data-target="replybox-textarea-${parent}" data-id="${p.username}" class="icon icon-share addToReply"></i>
-//                     </button>
-//                 </p>
-//                 ${p.content}
-//                 ${multipleImgs ? `<div data-id="${p.id}-${parent}" class='gallery'></div>` : ''}
-//             </div>
-//         </div>
-//     `;
-// }
 
 export function getReplyBox(id, repliers, boxOnly = false) {  
     if(boxOnly) {

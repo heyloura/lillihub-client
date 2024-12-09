@@ -364,25 +364,25 @@ Deno.serve(async (req) => {
                 return new Response(JSON.stringify(data), JSONHeaders());
             }
 
-            const USER_ROUTE = new URLPattern({ pathname: "/timeline/user/:id" });
-            if(USER_ROUTE.exec(req.url) && user) {
-                const id = USER_ROUTE.exec(req.url).pathname.groups.id;
+            // const USER_ROUTE = new URLPattern({ pathname: "/timeline/user/:id" });
+            // if(USER_ROUTE.exec(req.url) && user) {
+            //     const id = USER_ROUTE.exec(req.url).pathname.groups.id;
             
-                const results = await mb.getMicroBlogUserOrTagmojiPosts(mbToken, id);
-                const follows = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
-                const stranger = follows.filter(f => f.username == results.username).length == 0;
+            //     const results = await mb.getMicroBlogUserOrTagmojiPosts(mbToken, id);
+            //     const follows = await mb.getMicroBlogFollowing(mbToken, mbUser.username);
+            //     const stranger = follows.filter(f => f.username == results.username).length == 0;
 
-                const layout = new TextDecoder().decode(await Deno.readFile("user.html"));
+            //     const layout = new TextDecoder().decode(await Deno.readFile("user.html"));
 
-                return new Response(layout.replaceAll('{{results._microblog.username}}', results.username)
-                    .replaceAll('{{results.author.name}}',results.name)
-                    .replaceAll('{{results.author.url}}',results.url)
-                    .replaceAll('{{results._microblog.bio}}', results.bio)
-                    .replaceAll('{{posts}}', results.map(post => postHTML(post)).join(''))
-                    .replaceAll('{{showIfFollowing}}', !stranger ? '' : 'hide')
-                    .replaceAll('{{showIfStranger}}', stranger ? '' : 'hide')
-                    ,HTMLHeaders(nonce));
-            }
+            //     return new Response(layout.replaceAll('{{results._microblog.username}}', results.username)
+            //         .replaceAll('{{results.author.name}}',results.name)
+            //         .replaceAll('{{results.author.url}}',results.url)
+            //         .replaceAll('{{results._microblog.bio}}', results.bio)
+            //         .replaceAll('{{posts}}', results.map(post => postHTML(post)).join(''))
+            //         .replaceAll('{{showIfFollowing}}', !stranger ? '' : 'hide')
+            //         .replaceAll('{{showIfStranger}}', stranger ? '' : 'hide')
+            //         ,HTMLHeaders(nonce));
+            // }
 
             if(new URLPattern({ pathname: "/timeline/following" }).exec(req.url) && user) {
                 let fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -829,7 +829,7 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // All other pages
             // -----------------------------------------------------
-            const pages = ["notebooks", "timeline"]
+            const pages = ["notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks"]
             if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
                 const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
@@ -841,10 +841,21 @@ Deno.serve(async (req) => {
                 let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 const notebooks = await fetching.json();
 
+                // following
+                fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let following = await fetching.json();
+
                 // get editor
 
                 // check for notebooks route
-                if(req.url.includes("notes")) {
+                if(req.url.includes("users")) {
+                    id = name;
+                    name = "users";
+                    fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const posts = await fetching.json();
+                    // put JSON check here or something.....
+                    content = `<div id="user-posts" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
+                } else if(req.url.includes("notes")) {
                     id = name;
                     name = "note";
                     fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -852,7 +863,6 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const versions = await fetching.json();
                     // put JSON check here or something.....
-                    console.log(versions)
                     content = `<div id="note" class="mt-2">${utility.noteHTML(note,null,versions.items)}</div>`;
                 } else if(req.url.includes("notebooks")) {
                     id = name;
@@ -874,12 +884,7 @@ Deno.serve(async (req) => {
                     name = "timeline";
                     fetching = await fetch(`https://micro.blog/posts/timeline${id != "timeline" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
-                    content = `
-                        <div id="toast" class="toast hide mt-2">
-                            <button class="btn btn-clear float-right dismissToast"></button>
-                            <a rel="prefetch" href="/timeline" swap-target="#main"><b class="getNewPosts"><span class="getNewPosts" id="showPostCount">0</span> posts to show</b>. Click here to refresh.</a>
-                        </div>
-                        <div id="post-list" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
+                    content = `<div id="post-list" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
 
 
                     // const layout = new TextDecoder().decode(await Deno.readFile("timeline.html"));
