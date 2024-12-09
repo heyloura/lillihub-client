@@ -23,7 +23,7 @@
                 <a class="show-lg off-canvas-toggle btn btn-link btn-action" href="#sidebar-id">
                     <i class="icon icon-menu"></i>
                 </a>
-                <a href="/"><img src="/logo.png" height="34px" class="hide-lg mr-2"></a>
+                <!-- <a href="/"><img src="/logo.png" height="34px" class="hide-lg mr-2"></a> -->
                 <a href="https://docs.lillihub.com" class="btn btn-link hide-lg">Documentation</a>
                 <a href="/settings" class="btn btn-link hide-lg">Settings</a>
             </section>
@@ -52,16 +52,16 @@
                                         <ul class="menu mb-2">
                                             <li class="divider" data-content="Micro.blog Feed"></li>
                                             <li class="menu-item">
-                                                <a id="timelineLink" href="/timeline">Timeline</a>
+                                                <a rel="prefetch" swap-target="#main" swap-history="true" id="timelineLink" href="/timeline">Timeline</a>
                                             </li>
                                             <li class="menu-item">
-                                                <a href="/timeline/discover" class="{{discoverClass}}">Discover</a>
+                                                <a rel="prefetch" swap-target="#main" swap-history="true" id="discoverLink" href="/discover">Discover</a>
                                             </li>
                                             <li class="menu-item">
-                                                <a href="/timeline/mentions" class="{{mentionsClass}}">Mentions</a>
+                                                <a rel="prefetch" swap-target="#main" swap-history="true" id="mentions" href="/mentions">Mentions</a>
                                             </li>
                                             <li class="menu-item">
-                                                <a href="/timeline/following" class="{{followingClass}}">Following</a>
+                                                <a rel="prefetch" swap-target="#main" swap-history="true" id="following" href="/following">Following</a>
                                             </li>
                                         </ul>
                                         <ul class="menu mb-2">

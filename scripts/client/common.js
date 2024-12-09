@@ -409,8 +409,8 @@ function loadTimeline() {
     buildCarousels();
     hljs.highlightAll();
 
-    // const article = document.querySelector('article:first-child');
-    // const id = article.getAttribute('data-id');
+    const article = document.querySelector('article:first-child');
+    const id = article.getAttribute('data-id');
     // let checks = 0;
     // let count = 0;
     // const timerID = setInterval(function() {
@@ -580,7 +580,10 @@ function loadPage() {
     } else if(window.location.pathname.includes('timeline')) {
         loadTimeline(); 
     }       
-    //hljs.highlightAll(); 
+    if(localStorage.getItem('discover_setting') === 'custom') {
+        let href = document.getElementById('discoverLink').getAttribute('href');
+        document.getElementById('discoverLink').setAttribute('href', href += '/custom');
+    }
 }
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", async (event) => {

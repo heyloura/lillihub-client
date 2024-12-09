@@ -265,16 +265,16 @@ Deno.serve(async (req) => {
                 return new Response(html,HTMLHeaders(nonce));
             }
 
-            if(((new URLPattern({ pathname: "/timeline/discover/custom" })).exec(req.url))) {
-                const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
-                const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));
-                const html = posts.map(post => {
-                    const stranger = following.filter(f => f.username == post.username);
-                    const result = postHTML(post, null, stranger.length == 0);
-                    return result;
-                }).join('');
-                return new Response(html,HTMLHeaders(nonce));
-            }
+            // if(((new URLPattern({ pathname: "/timeline/discover/custom" })).exec(req.url))) {
+            //     const posts = await mb.getMicroBlogTimelinePosts(_lillihubToken, 0);
+            //     const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username));
+            //     const html = posts.map(post => {
+            //         const stranger = following.filter(f => f.username == post.username);
+            //         const result = postHTML(post, null, stranger.length == 0);
+            //         return result;
+            //     }).join('');
+            //     return new Response(html,HTMLHeaders(nonce));
+            // }
 
             const DISCOVER_ROUTE = new URLPattern({ pathname: "/timeline/discover/:id" });
             if(((new URLPattern({ pathname: "/timeline/discover" }).exec(req.url)) || DISCOVER_ROUTE.exec(req.url)) && user) {
@@ -848,7 +848,19 @@ Deno.serve(async (req) => {
                 // get editor
 
                 // check for notebooks route
-                if(req.url.includes("users")) {
+                if(req.url.includes("custom")) {
+                    name = "discover";
+                    fetching = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+                    const posts = await fetching.json();
+                    // put JSON check here or something.....
+                    content = `<div id="discover-posts" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
+                } else if(req.url.includes("discover")) {
+                    name = "discover";
+                    fetching = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+                    const posts = await fetching.json();
+                    // put JSON check here or something.....
+                    content = `<div id="discover-posts" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
+                } else if(req.url.includes("users")) {
                     id = name;
                     name = "users";
                     fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -863,6 +875,7 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const versions = await fetching.json();
                     // put JSON check here or something.....
+                    console.log(versions.items);
                     content = `<div id="note" class="mt-2">${utility.noteHTML(note,null,versions.items)}</div>`;
                 } else if(req.url.includes("notebooks")) {
                     id = name;
