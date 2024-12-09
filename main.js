@@ -853,7 +853,7 @@ Deno.serve(async (req) => {
                     const versions = await fetching.json();
                     // put JSON check here or something.....
                     console.log(versions)
-                    content = `<div id="note" class="mt-2">${utility.noteHTML(note,id,versions.items)}</div>`;
+                    content = `<div id="note" class="mt-2">${utility.noteHTML(note,null,versions.items)}</div>`;
                 } else if(req.url.includes("notebooks")) {
                     id = name;
                     name = "notebook";

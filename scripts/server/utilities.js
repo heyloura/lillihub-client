@@ -54,7 +54,6 @@ function getNoteEditor(notebookId, n) {
     return `
         <input data-id="${ n ? n.id : 'newNote'}" id="noteContent" class="${n && n.shared ? '' : 'decryptMe'}" type="hidden" value="${n ? n.content_text : ''}" />
         <input id="noteId" type="hidden" value="${n ? n.id : 0}" />
-        <input id="notebookId" type="hidden" value="${notebookId}" />
         <form id="edit" class="card">
             <div id="editor-container" class="card-body">
                 <div class="grow-wrap">

@@ -536,9 +536,10 @@ document.addEventListener("click", async (item) => {
     // save a private note.
     if(item.target.classList.contains('saveNote')) {
         console.log('saveNote');
+        const parts = window.location.pathname.split('/');
         let note = document.getElementById('content').innerHTML;
         let id = document.getElementById('noteId').value;
-        let notebookId = document.getElementById('notebookId').value;
+        let notebookId = parts[2];
         const eNote = await encryptWithKey(note, imported_key);
         const form = new URLSearchParams();
         form.append("text", eNote);
