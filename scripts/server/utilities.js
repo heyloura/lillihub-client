@@ -274,7 +274,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
             <header class="card-header pt-1 mt-0 pb-1 mb-0">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
-                    <div class="card-title h5 ${isConvo ? 'd-inline' : ''}">${post.name}</div>
+                    <div class="card-title h5 ${isConvo ? 'd-inline' : ''}">${post.name.split(':')[0]}</div>
                     <div class="card-subtitle ${isConvo ? 'd-inline' : ''}">
                         <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
                             ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
