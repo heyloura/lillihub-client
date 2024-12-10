@@ -96,11 +96,8 @@ export function noteHTML(note, notebookId, versions) {
                     </div>
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <div class="card bordered pages">
+                    <div class="card bordered">
                         ${getNoteEditor(notebookId,n)}
-                        <div>
-                            <div id="preview" class="card-body"></div>
-                        </div>
                     </div>
                     <a
                 </div>
@@ -138,6 +135,7 @@ function getNoteEditor(notebookId, n) {
                     </ul>
                 </div>
                 <div class="btn-group float-right">
+                    <button type="button" class="btn btn-secondary previewNote">Preview</button>
                     <button type="button" class="btn btn-primary saveNote">Save changes</button>
                 </div> 
                 <br/>
@@ -163,8 +161,7 @@ export function notesHTML(note, notebookId) {
                 data-shared="${n.shared}" >
                 <!--<div class="divider  text-center" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}"></div>-->
                 <div class="btn-group btn-group-block">
-                    <a class="btn btn-link" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}#edit" swap-target="#main" swap-history="true">edit</a>                    
-                    <a class="btn btn-link" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}">preview</a>
+                    <a class="btn btn-link text-muted" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">edit</a>                    
                 </div> 
                 <div id="title-${n.id}" class="card-title h5"></div> 
                 <div class="card-subtitle">
