@@ -112,7 +112,7 @@ if ('storage' in navigator && 'estimate' in navigator.storage) {
     console.error('navigator.storage.estimate API unavailable.');
 }
 function objectToTableRows(obj) {
-    const html = '';
+    let html = '';
 
     for (const [key, value] of Object.entries(obj)) {
         html += `<tr><td>${key}</td><td>${value}</td></tr>`;

@@ -887,7 +887,16 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const notes = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="note-list" class="mt-2 note-container">${notes.items.map(n => utility.notesHTML(n,id)).join('')}</div>`;
+                    content = `<div id="note-list" class="mt-2">
+                        <div class="form-group">
+                            <label class="form-label">Search for featured posts.</label>
+                            <div class="input-group">
+                                <input id="searchPost" type="text" class="form-input" placeholder="...">
+                                <button class="btn btn-primary input-group-btn searchPost"><i class="icon icon-search searchPost"></i></button>
+                            </div>
+                        </div>
+                        <div class="note-container">${notes.items.map(n => utility.notesHTML(n,id)).join('')}</div>
+                    </div>`;
                 } else if(req.url.includes("posts")) {
                     id = name;
                     name = "timeline";
