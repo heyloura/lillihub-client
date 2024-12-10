@@ -21,8 +21,8 @@ export function discoverHTML(posts, tagmoji, id) {
                         <ul class="menu">
                             <li class="divider" data-content="Discover Tagmoji"></li>
                             ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                                    `<li class="menu-item>
-                                        <a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">
+                                    `<li class="menu-item">
+                                        <a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}" >
                                             ${item.emoji} ${item.title}
                                         </a>
                                     </li>`
@@ -255,8 +255,8 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         <div class="timeline-left">
                             <span class="timeline-icon"></span>
                         </div>` : ''}
-        <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pl-2 ml-2' : 'bordered'} ${convoId && convoId === post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
-            <header class="card-header">
+        <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pl-2' : 'bordered'} ${convoId && convoId === post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+            <header class="card-header pt-0 mt-0">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
                     <div class="card-title h5 ${isConvo ? 'd-inline' : ''}">${post.name}</div>
@@ -274,7 +274,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
             </header>
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
-            <details class="accordion card-body">
+            <details class="accordion card-body pt-0 mt-0">
                 <summary class="accordion-header c-hand">
                     <i class="icon icon-arrow-right mr-1"></i>
                     Reply
