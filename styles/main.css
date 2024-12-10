@@ -6688,7 +6688,7 @@ article footer {
 .note-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: 20px;
+  grid-gap: 1em;
 }
 
 .note {
@@ -6698,7 +6698,7 @@ article footer {
   overflow: hidden;
 }
 
-.note.expanded {
+/* .note.expanded {
   max-height: 400ch;
 }
 
@@ -6711,6 +6711,16 @@ article footer {
 
 .note-content {
   margin-top: 16px;
+} */
+
+.row:before {
+  content:'';
+  width:100%;
+  height:100%;    
+  position:absolute;
+  left:0;
+  top:0;
+  background:linear-gradient(transparent 150px, white);
 }
 
 /* Dracula Theme v1.2.5
