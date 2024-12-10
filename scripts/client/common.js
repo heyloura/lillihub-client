@@ -198,6 +198,8 @@ var Swap = (() => {
     window.addEventListener("DOMContentLoaded", dom_load);
     function update(href, target, pushstate, fallback = null) {
         if(!href.includes('#')) {
+            // add spinner to body
+            document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="off-canvas-overlay"><span class="loading d-block p-centered"></span></div>`)
             fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
                 var tmp = document.createElement('html');
                 tmp.innerHTML = html;
@@ -205,6 +207,7 @@ var Swap = (() => {
                 if (pushstate)
                     history.pushState({}, "", href);
                 register_links();  
+                document.getElementById('loader').remove();
             });
         }
     }
