@@ -95,9 +95,8 @@ export function noteHTML(note, notebookId, versions) {
                     </div>
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <div class="card bordered pages">
+                    <div class="card bordered">
                         ${getNoteEditor(notebookId,n)}
-                        <a class="fakeAnchor" href="#edit"><div id="preview" class="card-body"></div></a>
                     </div>
                 </div>
             </div>

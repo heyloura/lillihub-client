@@ -127,21 +127,21 @@ function objectToDefinitionList(obj) {
   
     return definitionList;
 }
-function previewFile() {
-    var preview = document.querySelector('img');
-    var file    = document.querySelector('input[type=file]').files[0];
-    var reader  = new FileReader();
+// function previewFile() {
+//     var preview = document.querySelector('img');
+//     var file    = document.querySelector('input[type=file]').files[0];
+//     var reader  = new FileReader();
   
-    reader.onloadend = function () {
-      preview.src = reader.result;
-    }
+//     reader.onloadend = function () {
+//       preview.src = reader.result;
+//     }
   
-    if (file) {
-      reader.readAsDataURL(file);
-    } else {
-      preview.src = "";
-    }
-  }
+//     if (file) {
+//       reader.readAsDataURL(file);
+//     } else {
+//       preview.src = "";
+//     }
+//   }
 
 /***********************
 ** HANDLE OFFLINE STUFF
@@ -398,14 +398,14 @@ function loadNote() {
             const metaDef = objectToDefinitionList(metadata);
             document.getElementById(`metadata-${noteId}`).appendChild(metaDef);
             document.getElementById('content').innerHTML = markdown;
-            document.getElementById('preview').innerHTML = html;
+            //document.getElementById('preview').innerHTML = html;
             growTextArea(document.getElementById('content'));
             hljs.highlightAll();
 
         });
     } else {
         document.getElementById('content').innerHTML = document.getElementById("noteContent").value;
-        document.getElementById('preview').innerHTML = html;
+        //document.getElementById('preview').innerHTML = html;
         growTextArea(document.getElementById('content'));
         hljs.highlightAll();
     }
