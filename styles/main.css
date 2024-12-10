@@ -6253,7 +6253,6 @@ a,pre,code {
   border-bottom: .05rem solid var(--background-tint-4);
   display: flex;
   align-items: center;
-  padding-bottom: 1em !important;
 }
 
 .card-top {
