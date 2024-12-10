@@ -871,7 +871,7 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="user-posts" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
+                    content = `<div id="user-posts" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>`;
                 } else if(req.url.includes("notes")) {
                     id = name;
                     name = "note";
@@ -894,21 +894,13 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const post = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="post-${id}" class="mt-2 timeline post card">${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}</div>`;
+                    content = `<div id="post-${id}" class="mt-2 timeline post card">${utility.timelineHTML(post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join(''))}</div>`;
                 } else if(req.url.includes("timeline")) {
                     id = name;
                     name = "timeline";
                     fetching = await fetch(`https://micro.blog/posts/timeline${id != "timeline" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
-                    content = `<div id="post-list" class="mt-2">${posts.items.map(n => utility.postHTML(n)).join('')}</div>`;
-
-
-                    // const layout = new TextDecoder().decode(await Deno.readFile("timeline.html"));
-                    // const following = (await mb.getMicroBlogFollowing(mbToken, mbUser.username)).map(i => {return JSON.stringify({username: i.username, avatar: i.avatar})});
-                    // return new Response(layout.replaceAll('{{nonce}}', nonce)
-                    //       .replace('{{username}}', mbUser.username)
-                    //       .replace('{{replyBox}}', getReplyBox('main',following, true)),
-                    //   HTMLHeaders(nonce));
+                    content = `<div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>`;
                 }
                 
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
@@ -917,7 +909,6 @@ Deno.serve(async (req) => {
                         `<li class="menu-item"><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join(''))
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name ? `` : '')
-                    //.replaceAll('{{scriptLink}}', name ? `<script src="/scripts/${name}.js" type="text/javascript"></script>` : '')
                 , HTMLHeaders(nonce));
             }
 
