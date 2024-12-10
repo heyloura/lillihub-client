@@ -315,10 +315,12 @@ Swap.loaders['#note-list'] = () => {
         if(document.querySelector(`.notebook-${id}`)) {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
-    };  
+    };   
 }
 
 async function loadNotebook() {
+    document.title = "Lillihub: Notes";
+    document.getElementById("titleBar").innerHTML = "Notes";
     const parts = window.location.pathname.split('/');
     const id = parts[parts.length - 1];
     if(document.querySelector(`.notebook-${id}`)) {
@@ -376,6 +378,8 @@ Swap.loaders['#note'] = () => {
 }
 
 function loadNote() {
+    document.title = "Lillihub: Note";
+    document.getElementById("titleBar").innerHTML = "Note";
     const parts = window.location.pathname.split('/');
     const id = parts[2];
     if(document.querySelector(`.notebook-${id}`)) {
@@ -405,6 +409,8 @@ function loadNote() {
 }
 
 function loadTimeline() {
+    document.title = "Lillihub: Timeline";
+    document.getElementById("titleBar").innerHTML = "Timeline";
     document.querySelector(`#timelineLink`).classList.add("active");
     buildCarousels();
     hljs.highlightAll();
@@ -422,6 +428,9 @@ function loadTimeline() {
     //                 document.getElementById('toast').classList.remove('hide');
     //                 document.getElementById('showPostCount').innerHTML = data.count;
     //                 count = data.count;
+    //                 fetch("/api/timeline/mark/" + document.querySelector('article:first-child').getAttribute('data-id'), { method: "get" })
+    //                     .then(response => response.text())
+    //                     .then(_data => {});
     //             }     
     //         });
     //     checks++;
@@ -443,13 +452,26 @@ Swap.loaders['#post-list'] = () => {
 }
 
 Swap.loaders['.post'] = () => {
-    //window.scrollTo({ top: 0, behavior: 'smooth' });
-    //document.querySelector(`#timelineLink`).classList.add("active");
+    document.title = "Lillihub: Timeline";
+    document.getElementById("titleBar").innerHTML = "Timeline";
+    document.querySelector(`#timelineLink`).classList.add("active");
     buildCarousels();
     hljs.highlightAll();
 
     return () => {  // unloader function
-        //document.querySelector(`#timelineLink`).classList.remove("active");
+        document.querySelector(`#timelineLink`).classList.remove("active");
+    };  
+}
+
+Swap.loaders['#discover'] = () => {
+    document.title = "Lillihub: Discover";
+    document.getElementById("titleBar").innerHTML = "Discover";
+    document.querySelector(`#discoverLink`).classList.add("active");
+    buildCarousels();
+    hljs.highlightAll();
+
+    return () => {  // unloader function
+        document.querySelector(`#discoverLink`).classList.remove("active");
     };  
 }
 
@@ -569,6 +591,9 @@ document.addEventListener("click", async (item) => {
 });
 
 
+//--------------------------------------------
+// For when a user does a manual page refresh
+//--------------------------------------------
 function loadPage() {
     gestures('main');
     if(window.location.pathname.includes('notes')) {
@@ -578,9 +603,18 @@ function loadPage() {
     } else if(window.location.pathname.includes('timeline')) {
         loadTimeline(); 
     }  
-    else if(window.location.pathname.includes('discover') || window.location.pathname.includes('users')) {
+    else if(window.location.pathname.includes('discover')) {
+        document.title = "Lillihub: Discover";
+        document.getElementById("titleBar").innerHTML = "Discover";
+        document.querySelector(`#discoverLink`).classList.add("active");
         buildCarousels();
-    }       
+    } else if(window.location.pathname.includes('users')) {
+        document.title = "Lillihub: Timeline";
+        document.getElementById("titleBar").innerHTML = "Timeline";
+        document.querySelector(`#timelineLink`).classList.add("active");
+        buildCarousels();
+    }
+
     if(localStorage.getItem('discover_setting') === 'custom') {
         let href = document.getElementById('discoverLink').getAttribute('href');
         document.getElementById('discoverLink').setAttribute('href', href += '/custom');

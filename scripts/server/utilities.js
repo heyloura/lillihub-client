@@ -12,14 +12,14 @@ export function discoverHTML(posts, tagmoji, id) {
                     </div>
                     <div class="show-lg">
                     ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                        `<span class="chip ${id && item.name == id ? 'bg-primary' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                        `<span class="chip ${item.name}Link"><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
                     ).join('')}
                     </div>
                     <div class="hide-lg">
                         <ul class="menu">
                             <li class="divider" data-content="Discover Tagmoji"></li>
                             ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                                    `<li class="menu-item ${id && item.name == id ? 'active' : ''}"><a class="${id && item.name == id ? 'text-secondary' : ''}" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                                    `<li class="menu-item><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
                                 ).join('')}
                         </ul>
                     </div>
