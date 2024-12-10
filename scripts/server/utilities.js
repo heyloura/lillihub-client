@@ -157,13 +157,15 @@ export function notesHTML(note, notebookId) {
                 data-published="${n.published}" 
                 data-modified="${n.modified}"
                 data-shared="${n.shared}" >
-                <div class="divider" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}"></div>
+                <div class="divider" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}">
+                    Edit
+                </div>
                 <div id="title-${n.id}" class="card-title h5"></div> 
                 <div class="card-subtitle">
                     ${n.shared ? `<a target="_blank" class="text-gray" href="${n.shared_url}">${n.shared_url}</a>` : ''}
                     <div class="d-inline" id="tags-${n.id}"></div>
                 </div> 
-                <main class="ripple">
+                <main>
                     <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>
                 </main>
                 <a rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true" class="fakeAnchor">

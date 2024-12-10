@@ -590,6 +590,11 @@ document.addEventListener("click", async (item) => {
         //should exit edit mode....
         //window.location.href = '/notebooks/${notebook}';
     }
+
+    // toggle a note
+    if(item.target.classList.contains('noteToggle')) {
+        item.target.classList.toggle('expanded');
+    }
 });
 
 
