@@ -336,10 +336,10 @@ async function loadNotebook() {
         const html = converter.makeHtml(markdown);
         const metadata = converter.getMetadata();
         if(metadata && metadata.color) {
-            element.style.background = metadata.color;
+            document.querySelector(`article[data-id="${noteId}"]`).style.background = metadata.color;
         }
         document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : markdown.substring(0,100); 
-        document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? metadata.tags : ''; 
+        document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? metadata.tags.split(',').map(t => `<span class="chip">${t}</span>`).join('') : ''; 
         element.innerHTML = html;
     });
 
