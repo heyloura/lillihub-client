@@ -284,7 +284,6 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     </div>           
                 </div>
                  <div class="card-buttons">
-                    ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link float-right btn-action"><i class="icon icon-message"></i></a>` : ''}
                     <div class="dropdown">
                         <a href="#" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
                             <i class="icon icon-more-vert"></i>
@@ -296,34 +295,12 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             <li class="menu-item">Open in micro.blog</li>
                         </ul>
                     </div>
+                    <a data-reply="@${post.username}" class="btn btn-link btn-action"><i class="icon icon-edit"></i></a>
+                    ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                 </div>
             </header>
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
-            <details class="accordion card-body pt-0 mt-0">
-                <summary class="accordion-header c-hand">
-                    <i class="icon icon-arrow-right mr-1"></i>
-                    Reply
-                </summary>
-                <div class="accordion-body">
-                    <form class="card bordered">
-                        <div class="card-body">
-                            <div class="grow-wrap">
-                                <textarea name="content" id="${post.id}-reply" class="form-input grow-me" rows="3">@${post.username} </textarea>
-                            </div>
-                        </div>
-                        <div class="card-footer mb-2">
-                            <div class="btn-group float-right">
-                                <button type="button" class="btn btn-primary sendReply"><i class="icon icon-message sendReply"></i> Reply</button>
-                            </div> 
-                        </div>
-                        <div id="${post.id}-toast" class="toast toast-dark hide mt-2">
-                            <button data-toast-id="${post.id}-toast" class="btn btn-clear float-right dismissToast"></button>
-                            <div id="${post.id}-toast-message"></div>
-                        </div>  
-                    </form>
-                </div>
-            </details>
         </article>
         ${isConvo ? `</div>` : '' }
     `;

@@ -854,7 +854,7 @@ Deno.serve(async (req) => {
                 // check for notebooks route
                 if(req.url.includes("custom")) {
                     name = "discover";
-                    fetching = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+                    fetching = await fetch(`https://micro.blog/posts/timeline?count=40`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
                     const posts = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
@@ -898,7 +898,7 @@ Deno.serve(async (req) => {
                 } else if(req.url.includes("timeline")) {
                     id = name;
                     name = "timeline";
-                    fetching = await fetch(`https://micro.blog/posts/timeline${id != "timeline" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
                     content = `<div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>`;
                 }
