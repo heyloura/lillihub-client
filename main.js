@@ -889,10 +889,9 @@ Deno.serve(async (req) => {
                     // put JSON check here or something.....
                     content = `<div id="note-list" class="mt-2">
                         <div class="form-group">
-                            <label class="form-label">Search for featured posts.</label>
+                            <label class="form-label">Search your notes</label>
                             <div class="input-group">
-                                <input id="searchPost" type="text" class="form-input" placeholder="...">
-                                <button class="btn btn-primary input-group-btn searchPost"><i class="icon icon-search searchPost"></i></button>
+                                <input id="search" type="text" class="form-input search" placeholder="...">
                             </div>
                         </div>
                         <div class="note-container">${notes.items.map(n => utility.notesHTML(n,id)).join('')}</div>
