@@ -888,11 +888,13 @@ Deno.serve(async (req) => {
                     const notes = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="note-list" class="mt-2">
-                        <div class="form-group">
+                        <div class="form-group input-group">
                             <label class="form-label">Search your notes</label>
                             <div class="input-group">
-                                <input id="search" type="text" class="form-input search" placeholder="...">
+                                <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
+                                <button class="btn btn-link">Add new note</button>
                             </div>
+                            <datalist id="tags"></datalist>
                         </div>
                         <div class="note-container">${notes.items.map(n => utility.notesHTML(n,id)).join('')}</div>
                     </div>`;

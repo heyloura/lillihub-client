@@ -342,7 +342,14 @@ async function loadNotebook() {
             document.querySelector(`article[data-id="${noteId}"]`).style.color = metadata.color;
         }
         document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : markdown.substring(0,100); 
-        document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',').map(t => `<span class="chip">${t}</span>`).join('') : ''; 
+        let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
+        tags.forEach(function(item){
+            var option = document.createElement('option');
+            option.value = item;
+            document.getElementById('tags').appendChild(option);
+         });
+        document.getElementById('tags').insertAdjacentHTML('beforebegin', tags.map())
+        document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
         element.innerHTML = html;
     });
 
