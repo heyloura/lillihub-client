@@ -157,9 +157,11 @@ export function notesHTML(note, notebookId) {
                 data-published="${n.published}" 
                 data-modified="${n.modified}"
                 data-shared="${n.shared}" >
-                <div class="divider  text-center" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}"></div>
+                <!--<div class="divider  text-center" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}"></div>-->
                 <div class="btn-group btn-group-block">
-                    <button class="btn btn-link"><i class="icon icon-edit"></i> edite</button>
+                    <a class="btn btn-link" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true" class="fakeAnchor">
+                        edit
+                    </a>                    
                     <button class="btn btn-link">preview</button>
                 </div> 
                 <div id="title-${n.id}" class="card-title h5"></div> 
