@@ -344,11 +344,12 @@ async function loadNotebook() {
         document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : markdown.substring(0,100); 
         let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
         tags.forEach(function(item){
-            var option = document.createElement('option');
-            option.value = item;
-            document.getElementById('tags').appendChild(option);
+            if(!Array.from(document.getElementById('tags').options).map(option => option.value).includes(item)) {
+                var option = document.createElement('option');
+                option.value = item;
+                document.getElementById('tags').appendChild(option);
+            }
          });
-        document.getElementById('tags').insertAdjacentHTML('beforebegin', tags.map())
         document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
         element.innerHTML = html;
     });
