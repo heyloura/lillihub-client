@@ -6706,7 +6706,7 @@ article footer {
   position:absolute;
   left:0;
   top:0;
-  background:linear-gradient(transparent 150px, white);
+  background:linear-gradient(transparent 30ch, var(--background-tint-4));
 }
 
 /* .note.expanded {
