@@ -6651,12 +6651,6 @@ article footer {
   padding-right: 1em;
 }
 
-.note {
-  height: 40ch;
-  max-height: 40ch;
-  overflow: hidden;
-}
-
 .fakeAnchor, .fakeAnchor:hover, .fakeAnchor:visited {
   text-decoration: none;
   color: var(--text-color);
@@ -6689,6 +6683,34 @@ article footer {
   position: absolute;
   top: 50%;
   left: 50%;
+}
+
+.note-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 20px;
+}
+
+.note {
+  transition: max-height 0.3s ease-out;
+  height: 40ch;
+  max-height: 40ch;
+  overflow: hidden;
+}
+
+.note.expanded {
+  max-height: 400ch;
+}
+
+.note h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.note-content {
+  margin-top: 16px;
 }
 
 /* Dracula Theme v1.2.5

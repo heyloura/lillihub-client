@@ -75,8 +75,9 @@ export function noteHTML(note, notebookId, versions) {
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div class="card bordered p-2">
+                        <div class="divider" data-content="Note Metadata"></div>
+                        <table class="table table-striped" id="metadata-${n.id}"></table>
                         <div class="divider" data-content="Note Details"></div>
-                        <div id="metadata-${n.id}"></div>
                         <div>
                             <table class="table table-striped">
                                 <tr><td>id</td><td>${n.id}</td></tr>
@@ -150,7 +151,6 @@ function getNoteEditor(notebookId, n) {
 export function notesHTML(note, notebookId) {
     const n = flattenedNote(note);
     return `
-        <a rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true" class="fakeAnchor">
             <article class="note bordered p-2" 
                 data-id="${n.id}" 
                 data-url="${n.url}" 
@@ -166,8 +166,10 @@ export function notesHTML(note, notebookId) {
                 <main class="ripple">
                     <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>
                 </main>
+                <a rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true" class="fakeAnchor">
+                    Edit
+                </a>
             </article>
-        </a>
     `;
 }
 
@@ -283,6 +285,8 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     </div>           
                 </div>
                  <div class="card-buttons">
+                    <a data-reply="@${post.username}" class="btn btn-link btn-action"><i class="icon icon-edit"></i></a>
+                    ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                     <div class="dropdown">
                         <a href="#" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
                             <i class="icon icon-more-vert"></i>
@@ -294,8 +298,6 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             <li class="menu-item">Open in micro.blog</li>
                         </ul>
                     </div>
-                    <a data-reply="@${post.username}" class="btn btn-link btn-action"><i class="icon icon-edit"></i></a>
-                    ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                 </div>
             </header>
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>

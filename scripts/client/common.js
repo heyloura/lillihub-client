@@ -111,21 +111,14 @@ if ('storage' in navigator && 'estimate' in navigator.storage) {
   } else {
     console.error('navigator.storage.estimate API unavailable.');
 }
-function objectToDefinitionList(obj) {
-    const definitionList = document.createElement('dl');
-  
+function objectToTableRows(obj) {
+    const html = '';
+
     for (const [key, value] of Object.entries(obj)) {
-      const term = document.createElement('dt');
-      term.textContent = key;
-  
-      const description = document.createElement('dd');
-      description.textContent = value;
-  
-      definitionList.appendChild(term);
-      definitionList.appendChild(description);
+        html += `<tr><td>${key}</td><td>${value}</td></tr>`;
     }
   
-    return definitionList;
+    return html;
 }
 // function previewFile() {
 //     var preview = document.querySelector('img');
@@ -183,6 +176,12 @@ function handleConnection(load, offline) {
 window.addEventListener('online', handleConnection(function(){},function(){}));
 window.addEventListener('offline', handleConnection(function(){},function(){}));
 
+function clearActiveMenuStyle() {
+    document.querySelectorAll('.menu-item > a').forEach(element => {
+        element.classList.remove('active');
+    });
+}
+
 /************************************************************
 ** Swap
 ** Facilitates AJAX-style navigation in web pages 
@@ -198,7 +197,7 @@ var Swap = (() => {
     window.addEventListener("DOMContentLoaded", dom_load);
     function update(href, target, pushstate, fallback = null) {
         if(!href.includes('#')) {
-            // add spinner to body
+            clearActiveMenuStyle();
             document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
             fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
                 var tmp = document.createElement('html');
@@ -395,8 +394,8 @@ function loadNote() {
             const markdown = await decryptWithKey(element.value, imported_key);
             const html = converter.makeHtml(markdown);
             const metadata = converter.getMetadata();
-            const metaDef = objectToDefinitionList(metadata);
-            document.getElementById(`metadata-${noteId}`).appendChild(metaDef);
+            const metaDef = objectToTableRows(metadata);
+            document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
             //document.getElementById('preview').innerHTML = html;
             growTextArea(document.getElementById('content'));
