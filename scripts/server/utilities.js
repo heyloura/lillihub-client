@@ -11,15 +11,21 @@ export function discoverHTML(posts, tagmoji, id) {
                         </div>
                     </div>
                     <div class="show-lg">
-                    ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                        `<span class="chip ${item.name}Link"><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
-                    ).join('')}
+                        <details><summary>Tagmoji</summary>
+                            ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                                `<span class="chip ${item.name}Link"><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                            ).join('')}
+                        </details>
                     </div>
                     <div class="hide-lg">
                         <ul class="menu">
                             <li class="divider" data-content="Discover Tagmoji"></li>
                             ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                                    `<li class="menu-item><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                                    `<li class="menu-item>
+                                        <a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">
+                                            ${item.emoji} ${item.title}
+                                        </a>
+                                    </li>`
                                 ).join('')}
                         </ul>
                     </div>
