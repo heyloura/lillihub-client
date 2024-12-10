@@ -408,14 +408,14 @@ function loadNote() {
             const metaDef = objectToTableRows(metadata);
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
-            //document.getElementById('preview').innerHTML = html;
+            document.getElementById('preview').innerHTML = html;
             growTextArea(document.getElementById('content'));
             hljs.highlightAll();
 
         });
     } else {
         document.getElementById('content').innerHTML = document.getElementById("noteContent").value;
-        //document.getElementById('preview').innerHTML = html;
+        document.getElementById('preview').innerHTML = html;
         growTextArea(document.getElementById('content'));
         hljs.highlightAll();
     }

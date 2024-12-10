@@ -96,9 +96,13 @@ export function noteHTML(note, notebookId, versions) {
                     </div>
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <div class="card bordered">
+                    <div class="card bordered pages">
                         ${getNoteEditor(notebookId,n)}
+                        <div>
+                            <div id="preview" class="card-body"></div>
+                        </div>
                     </div>
+                    <a
                 </div>
             </div>
         </div>
@@ -159,10 +163,8 @@ export function notesHTML(note, notebookId) {
                 data-shared="${n.shared}" >
                 <!--<div class="divider  text-center" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}"></div>-->
                 <div class="btn-group btn-group-block">
-                    <a class="btn btn-link" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true" class="fakeAnchor">
-                        edit
-                    </a>                    
-                    <button class="btn btn-link">preview</button>
+                    <a class="btn btn-link" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}#edit" swap-target="#main" swap-history="true">edit</a>                    
+                    <a class="btn btn-link" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}">preview</a>
                 </div> 
                 <div id="title-${n.id}" class="card-title h5"></div> 
                 <div class="card-subtitle">
@@ -172,9 +174,6 @@ export function notesHTML(note, notebookId) {
                 <main>
                     <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>
                 </main>
-                <a rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true" class="fakeAnchor">
-                    Edit
-                </a>
             </article>
     `;
 }
