@@ -270,7 +270,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         <div class="timeline-left">
                             <span class="timeline-icon"></span>
                         </div>` : ''}
-        <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content' : 'bordered'} ${convoId && convoId === post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pt-0 mt-0' : 'bordered'} ${convoId && convoId === post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
             <header class="card-header pt-1 mt-0 pb-1 mb-0">
                 ${getAvatar(post, 'avatar-lg')}
                 <div class="card-top">
@@ -284,7 +284,18 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     </div>           
                 </div>
                  <div class="card-buttons">
-                 ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link float-right btn-action"><i class="icon icon-message"></i></a>` : ''}
+                    ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link float-right btn-action"><i class="icon icon-message"></i></a>` : ''}
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
+                            <i class="icon icon-more-vert"></i>
+                        </a>
+                        <ul class="menu">
+                            <li class="menu-item">View</li>
+                            <li class="menu-item">Bookmark</li>
+                            <li class="menu-item">Quote</li>
+                            <li class="menu-item">Open in micro.blog</li>
+                        </ul>
+                    </div>
                 </div>
             </header>
             <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
