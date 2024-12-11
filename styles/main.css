@@ -6658,6 +6658,7 @@ article footer {
 
 #note-list article {
   border-radius: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .timeline .timeline-item:last-child::before {
@@ -6702,9 +6703,9 @@ article footer {
   border-radius: 0.5em;
 } */
 
-#main {
+/* #main {
   border: 2px solid yellow;
-}
+} */
 
 /* .note:before {
   content:'';
