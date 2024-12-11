@@ -67,6 +67,10 @@ function gestures(elId) {
 //         document.body.scrollLeft = scrollH;
 //     }
 // }
+function removeHash() { 
+    history.pushState("", document.title, window.location.pathname
+                                                       + window.location.search);
+}
 function buildCarousel(id, imageArray) 
 {
     let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
@@ -181,7 +185,10 @@ function clearActiveMenuStyle() {
         element.classList.remove('active');
     });
 }
-
+function strip(html){
+    let doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
+ }
 /************************************************************
 ** Swap
 ** Facilitates AJAX-style navigation in web pages 
@@ -207,6 +214,7 @@ var Swap = (() => {
                     history.pushState({}, "", href);
                 register_links();  
                 document.getElementById('loader').remove();
+                removeHash();
             });
         }
     }
@@ -341,7 +349,7 @@ async function loadNotebook() {
         if(metadata && metadata.color) {
             document.querySelector(`article[data-id="${noteId}"]`).style.color = metadata.color;
         }
-        document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : ''; 
+        document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,75); 
         let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
         tags.forEach(function(item){
             if(!Array.from(document.getElementById('tags').options).map(option => option.value).includes(item)) {
@@ -357,17 +365,15 @@ async function loadNotebook() {
     Promise.all(promises)
     .then(() => {
         hljs.highlightAll();
-        let magicGrid = new MagicGrid({
-            container: ".note-container", // Required. Can be a class, id, or an HTMLElement.
-            static: true, // Required for static content.
-            animate: true, // Optional.
-        });
+        // let magicGrid = new MagicGrid({
+        //     container: ".note-container", // Required. Can be a class, id, or an HTMLElement.
+        //     static: true, // Required for static content.
+        //     animate: true, // Optional.
+        // });
 
-        magicGrid.listen();
+        // magicGrid.listen();
     })
-    .catch((error) => {
-        console.error('Error decrypting elements:', error);
-    });
+    .catch((error) => {});
 }
 
 // Loaded the note
