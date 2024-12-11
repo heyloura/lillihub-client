@@ -6698,6 +6698,10 @@ article footer {
   overflow: hidden;
 }
 
+#main {
+  border: 2px solid yellow;
+}
+
 /* .note:before {
   content:'';
   width:100%;
