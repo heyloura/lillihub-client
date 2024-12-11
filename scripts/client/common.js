@@ -188,7 +188,20 @@ function clearActiveMenuStyle() {
 function strip(html){
     let doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || "";
- }
+}
+function getSelectionAndReplace(el,startTag,endTag) // javascript
+{
+    console.log("test");
+    var start = el.selectionStart; //index of the first selected character
+    var finish = el.selectionEnd; //index of the last selected character
+    var allText = el.value;
+
+    var sel = allText.substring(start, finish);
+    var newText = allText.substring(0, start)+startTag+sel+endTag+allText.substring(finish, allText.length);
+
+    console.log(newText);
+    el.value=newText;
+}
 /************************************************************
 ** Swap
 ** Facilitates AJAX-style navigation in web pages 
@@ -606,8 +619,17 @@ document.addEventListener("click", async (item) => {
     }
 
     // toggle a note
-    if(item.target.classList.contains('noteToggle')) {
-        item.target.classList.toggle('expanded');
+    if(item.target.classList.contains('editor-bold')) {
+        getSelectionAndReplace(document.getElementById('content'),'**','**');
+    }
+    if(item.target.classList.contains('editor-italic')) {
+        getSelectionAndReplace(document.getElementById('content'),'**','**');
+    }
+    if(item.target.classList.contains('editor-code')) {
+        getSelectionAndReplace(document.getElementById('content'),'`','`');
+    }
+    if(item.target.classList.contains('editor-image')) {
+        getSelectionAndReplace(document.getElementById('content'),'![alt text](',')');
     }
 });
 

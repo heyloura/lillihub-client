@@ -101,7 +101,7 @@ export function noteHTML(note, notebookId, versions) {
                         <div id="edit">
                             ${getNoteEditor(notebookId,n)}
                         </div>
-                        <div class="p2">
+                        <div class="card-body">
                             <div id="preview"></div>
                         </div>
                     </div>
@@ -131,7 +131,7 @@ function getNoteEditor(notebookId, n) {
                         <i class="icon icon-link"></i></i>
                     </a>
                     <ul class="menu">
-                        <li class="menu-item"><a href="javascript:void(0)">Markdown image</a></li>
+                        <li class="menu-item"><a class="editor-image" href="javascript:void(0)">Markdown image</a></li>
                         <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
                         <li class="divider"></li>
                         <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
