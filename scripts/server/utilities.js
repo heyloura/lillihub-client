@@ -179,15 +179,16 @@ function notesHTML(note, notebookId) {
                 data-modified="${n.modified}"
                 data-shared="${n.shared}" >
                 <!--<div class="divider  text-center" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}"></div>-->
-                <div class="btn-group btn-group-block">
+                <!--<div class="btn-group btn-group-block">
                     <a class="btn btn-link text-muted" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">edit</a>                    
-                </div> 
+                </div>-->
+                <a class="btn btn-link text-muted float-right" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">edit</a>                    
                 <div id="title-${n.id}" class="card-title h5"></div> 
                 <div class="card-subtitle">
                     ${n.shared ? `<a target="_blank" class="text-gray" href="${n.shared_url}">${n.shared_url}</a>` : ''}
                     <div class="d-inline" id="tags-${n.id}"></div>
                 </div> 
-                <main>
+                <main class="hide">
                     <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>
                 </main>
             </article>
