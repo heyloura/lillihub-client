@@ -348,9 +348,49 @@ async function loadNotebook() {
     document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
     document.getElementById("pageName").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
 
+    // we have a key, decrypt the notes
     if(localStorage.getItem("mbKey")) {
         document.getElementById("privateKeyWarning").classList.add("hide");
+
+        const decryptMeElements = Array.from(document.querySelectorAll('.decryptMe'));
+        const promises = decryptMeElements.map(async (element) => {
+            const noteId = element.getAttribute('data-id');
+            const markdown = await decryptWithKey(element.innerHTML, imported_key);
+            const html = converter.makeHtml(markdown);
+            const metadata = converter.getMetadata();
+            if(metadata && metadata.background) {
+                document.querySelector(`article[data-id="${noteId}"]`).style.background = metadata.background;
+            }
+            if(metadata && metadata.color) {
+                document.querySelector(`article[data-id="${noteId}"]`).style.color = metadata.color;
+            }
+            document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,50) + '...'; 
+            let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
+            tags.forEach(function(item){
+                if(!Array.from(document.getElementById('tags').options).map(option => option.value).includes(item)) {
+                    var option = document.createElement('option');
+                    option.value = item;
+                    document.getElementById('tags').appendChild(option);
+                }
+             });
+            document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
+            element.innerHTML = html;
+        });
+    
+        Promise.all(promises)
+            .then(() => {
+                hljs.highlightAll();
+            })
+            .catch((error) => {
+                document.querySelectorAll('.decryptMe').forEach(element => {
+                    document.getElementById("privateKeyWarning").classList.remove("hide");
+                    document.getElementById("privateKeyWarning").innerHTML = "We ran into an issue decrypting your notes."
+                    element.parentNode.classList.remove("hide");
+                });
+            });
+
     } else {
+        // we don't have a key
         document.querySelectorAll('.decryptMe').forEach(element => {
             element.parentNode.classList.remove("hide");
         });
@@ -359,43 +399,6 @@ async function loadNotebook() {
     if(document.querySelector(`.notebook-${id}`)) {
         document.querySelector(`.notebook-${id}`).classList.add("active");
     }
-
-    const decryptMeElements = Array.from(document.querySelectorAll('.decryptMe'));
-    const promises = decryptMeElements.map(async (element) => {
-        const noteId = element.getAttribute('data-id');
-        const markdown = await decryptWithKey(element.innerHTML, imported_key);
-        const html = converter.makeHtml(markdown);
-        const metadata = converter.getMetadata();
-        if(metadata && metadata.background) {
-            document.querySelector(`article[data-id="${noteId}"]`).style.background = metadata.background;
-        }
-        if(metadata && metadata.color) {
-            document.querySelector(`article[data-id="${noteId}"]`).style.color = metadata.color;
-        }
-        document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,50) + '...'; 
-        let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
-        tags.forEach(function(item){
-            if(!Array.from(document.getElementById('tags').options).map(option => option.value).includes(item)) {
-                var option = document.createElement('option');
-                option.value = item;
-                document.getElementById('tags').appendChild(option);
-            }
-         });
-        document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
-        element.innerHTML = html;
-    });
-
-    Promise.all(promises)
-        .then(() => {
-            hljs.highlightAll();
-        })
-        .catch((error) => {
-            document.querySelectorAll('.decryptMe').forEach(element => {
-                document.getElementById("privateKeyWarning").classList.remove("hide");
-                document.getElementById("privateKeyWarning").innerHTML = "We ran into an issue decrypting your notes."
-                element.parentNode.classList.remove("hide");
-            });
-        });
 }
 
 // Loaded the note
