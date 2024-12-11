@@ -147,7 +147,31 @@ function getNoteEditor(notebookId, n) {
     `;
 }
 
-export function notesHTML(note, notebookId) {
+export function getNotebookHTML(notes, notebookId) {
+    return `
+        <div class="container">
+            <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                    
+                </div>
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    <div class="form-group">
+                        <label class="form-label">Search your notebook</label>
+                        <div class="input-group">
+                            <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
+                            <button class="btn btn-primary">Add new note</button>
+                        </div>
+                        <datalist id="tags"></datalist>
+                    </div>
+                    ${notes.map(n => notesHTML(n,notebookId)).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+
+}
+
+function notesHTML(note, notebookId) {
     const n = flattenedNote(note);
     return `
             <article class="note bordered p-2" 

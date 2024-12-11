@@ -6693,14 +6693,14 @@ article footer {
   grid-gap: 1em;
 } */
 
-.note {
-  /* transition: max-height 0.3s ease-out;
+/* .note {
+  transition: max-height 0.3s ease-out;
   height: 40ch;
   max-height: 40ch;
-  overflow: hidden; */
+  overflow: hidden;
   max-width: 40ch;
   border-radius: 0.5em;
-}
+} */
 
 #main {
   border: 2px solid yellow;
