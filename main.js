@@ -555,7 +555,7 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // All other pages
             // -----------------------------------------------------
-            const pages = ["notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks"]
+            const pages = ["notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings"]
             if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
                 const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
