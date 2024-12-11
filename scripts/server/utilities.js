@@ -122,8 +122,8 @@ function getNoteEditor(notebookId, n) {
                 </div>
             </div>
             <div class="card-footer mb-2">
-                <button type="button" class="btn btn-link editor-bold"><b>b</b></button>
-                <button type="button" class="btn btn-link editor-italic"><em>i</em></button>
+                <button type="button" class="btn btn-link editor-bold"><b class="editor-bold">b</b></button>
+                <button type="button" class="btn btn-link editor-italic"><em class="editor-italic">i</em></button>
                 <button type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
                 <button type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
                 <div class="dropdown">
@@ -131,7 +131,7 @@ function getNoteEditor(notebookId, n) {
                         <i class="icon icon-link"></i></i>
                     </a>
                     <ul class="menu">
-                        <li class="menu-item"><a class="editor-image" href="javascript:void(0)">Markdown image</a></li>
+                        <li class="menu-item editor-image"><a class="editor-image" href="javascript:void(0)">Markdown image</a></li>
                         <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
                         <li class="divider"></li>
                         <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
