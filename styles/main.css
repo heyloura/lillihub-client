@@ -6677,26 +6677,28 @@ article footer {
   right: 0;
   bottom: 0;
   background-color: rgba(0,0,0,.5);
+  z-index: 500;
 }
 
 .overlay > span {
   position: absolute;
   top: 50%;
   left: 50%;
+  z-index: 501;
 }
 
 .note-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   grid-gap: 1em;
 }
 
-.note {
+/* .note {
   transition: max-height 0.3s ease-out;
   height: 40ch;
   max-height: 40ch;
   overflow: hidden;
-}
+} */
 
 #main {
   border: 2px solid yellow;
