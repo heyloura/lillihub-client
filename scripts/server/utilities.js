@@ -1,3 +1,204 @@
+export function settingsHTML() {
+    return `
+                            <h1>Settings:</h1>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div id="posting">
+                                <h2>Display Options</h2>
+                                <div class="form-group">
+                                    <label class="form-checkbox">
+                                      <input type="checkbox" id="showBlog" checked>
+                                      <i class="form-icon"></i> Show the 'Blog' link
+                                    </label><br/>
+                                    <label class="form-checkbox">
+                                        <input type="checkbox" id="showBlog" checked>
+                                        <i class="form-icon"></i> Show the 'Bookmarks' link
+                                    </label><br/>
+                                    <label class="form-checkbox">
+                                        <input type="checkbox" id="showBlog" checked>
+                                        <i class="form-icon"></i> Show the 'Bookshelves' link
+                                    </label><br/>
+                                    <label class="form-checkbox">
+                                        <input type="checkbox" id="showBlog" checked>
+                                        <i class="form-icon"></i> Show the 'Notes' link
+                                    </label><br/>
+                                  </div>
+                                <button class="btn btn-primary savePostingSettings">Save</button>
+                                <div id="saveDisplaySettings" class="toast toast-dark hide">
+                                    <button class="btn btn-clear float-right saveDisplaySettings"></button>
+                                    Settings have been saved.
+                                </div>  
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div id="posting">
+                                <h2>Discovery Options</h2>
+                                <p>
+                                    Micro.blog has a person-curated discover feed of posts by Micro.blog users.
+                                    By defualt, Lillihub uses this feed in the discover section. You can change this
+                                    to use Lillihub's custom feed, which is a chronological display of Micro.blog posts.
+                                </p>
+                                <div class="form-group">
+                                    <label class="form-radio">
+                                      <input checked type="radio" id="defaultDiscoverFeed" value="standard" name="discoverOption">
+                                      <i class="form-icon"></i> Default Micro.blog discover feed
+                                    </label>
+                                    <label class="form-radio">
+                                        <input type="radio" id="customDiscoverFeed" value="custom" name="discoverOption">
+                                        <i class="form-icon"></i> Custom discover feed
+                                    </label>
+                                  </div>
+                                <button class="btn btn-primary saveDiscoverSetting">Save</button>
+                                <div id="saveDiscoverSettingToast" class="toast toast-dark hide">
+                                    <button class="btn btn-clear float-right dismissSaveDiscoverSettingToast"></button>
+                                    Settings have been saved.
+                                </div>  
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div id="note">
+                                <h2>Micro.blog Private Notes</h2>
+                                <p>
+                                    Micro.blog has private notes. If you haven't signed up yet, <a target="_blank" href="https://micro.blog/account/notes/settings">go here</a>.
+                                    Save you notebook key here:
+                                </p>
+                                <p>Notes are encrypted in the browser before sending them to the server, so neither Lillihub nor Micro.blog sees the note text.</p>
+                                <input type="password" id="mbKey">
+                                <button class="btn btn-primary savePrivateNotesKey">Save</button><br/>
+                                <button class="btn btn-danger deletePrivateNotesKey">Delete</button>
+                                <div id="savePrivateNotesKeyToast" class="toast toast-dark hide">
+                                    <button class="btn btn-clear float-right dismissSavePrivateNotesKeyToast"></button>
+                                    Private Key have been saved.
+                                </div>  
+                                <div id="deletePrivateNotesKeyToast" class="toast toast-dark hide">
+                                    <button class="btn btn-clear float-right dismissDeletePrivateNotesKeyToast"></button>
+                                    Private Key have been removed.
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card mt-2 mb-2">
+                        <div class="card-body">
+                            <div id="posting">
+                                <h2>Posting Options</h2>
+                                <p>
+                                    Lillihub supports multiple posting options. If choosing a posting option other than
+                                    Micro.blog please select the option below and configure it. For posts to appear on 
+                                    the timeline feed they must be configured as <a href="https://micro.blog/account/feeds">Micro.blog account feeds</a>.
+                                </p>
+                                <div class="form-group">
+                                        <label class="form-radio">
+                                            <input type="radio" name="postWith" value="none" checked>
+                                            <i class="form-icon"></i> None
+                                        </label>
+                                        <label class="form-radio">
+                                            <input type="radio" name="postWith" value="mb" checked>
+                                            <i class="form-icon"></i> Micro.blog
+                                        </label>
+                                        <label class="form-radio">
+                                            <input type="radio" name="postWith" value="statuslog">
+                                            <i class="form-icon"></i> omg.lol statuslog (configure below)
+                                        </label>
+                                        <label class="form-radio">
+                                            <input type="radio" name="postWith" value="weblog">
+                                            <i class="form-icon"></i> omg.lol weblog (configure below)
+                                        </label>
+                                        <label class="form-radio">
+                                            <input type="radio" name="postWith" value="micropub">
+                                            <i class="form-icon"></i> Micropub enabled blog (configure below)
+                                        </label>
+                                </div>
+                                <button class="btn btn-primary savePostingSettings mb-2">Save</button>
+                                <div id="postingSettingsToast" class="toast toast-dark hide mt-2">
+                                    <button class="btn btn-clear float-right dismissPostingSettingsToast"></button>
+                                    Settings have been saved.
+                                </div>  
+                                <br/>
+                                <hr/>
+
+                                <h3 class="mt-2 mb-2">omg.lol services:</h3>
+                                <p>Make sure you have <code>https://[your-address].status.lol/feed</code> wired up with Micro.blog</p>
+                                <div class="form-horizontal mt-2">
+                                    <div class="form-group">
+                                      <div class="col-3 col-sm-12">
+                                        <label class="form-label" for="omg-address">omg.lol address</label>
+                                      </div>
+                                      <div class="col-9 col-sm-12">
+                                        <input class="form-input" type="text" id="omg-address" placeholder="">
+                                      </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-3 col-sm-12">
+                                          <label class="form-label" for="omg-api">omg.lol API key</label>
+                                        </div>
+                                        <div class="col-9 col-sm-12">
+                                          <input class="form-input" type="password" id="omg-api" placeholder="">
+                                        </div>
+                                    </div> 
+                                    <div class="form-group">
+                                        <div class="col-9 col-sm-12 col-ml-auto">
+                                            <button class="btn btn-link deleteOmgStorage">Delete</button>
+                                            <button class="btn btn-primary saveOmgStorage">Save</button>
+                                        </div>
+                                    </div>
+                                    <div id="saveOmgToast" class="toast toast-dark hide">
+                                        <button class="btn btn-clear float-right dismissOmgToast"></button>
+                                        Settings have been saved.
+                                    </div>        
+                                </div>  
+                                <br/>
+                                <hr/>
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <div class="col-3 col-sm-12">
+                                          <label class="form-label" for="indieauth-nickname">Nickname</label>
+                                        </div>
+                                        <div class="col-9 col-sm-12">
+                                          <input class="form-input" type="text" id="indieauth-nickname" placeholder="For UI display purposes...">
+                                        </div>
+                                      </div>
+                                    <div class="form-group">
+                                      <div class="col-3 col-sm-12">
+                                        <label class="form-label" for="indieauth-endpoint">Indieauth endpoint</label>
+                                      </div>
+                                      <div class="col-9 col-sm-12">
+                                        <input class="form-input" type="url" id="indieauth-endpoint" placeholder="https://...">
+                                      </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="hidden" name="client_id" value="{{appURL}}"/>
+                                        <input type="hidden" name="redirect_uri" value="{{appURL}}/auth"/>
+                                        <input type="hidden" name="state" value="{{state}}"/>
+                                        <input type="hidden" name="scope" value="create"/>
+                                        <input type="hidden" name="response_type" value="code"/>                                
+                                        <div class="col-9 col-sm-12 col-ml-auto">
+                                          <button class="btn btn-primary">Check indieauth and get token</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-3 col-sm-12">
+                                          <label class="form-label" for="micropub-endpoint">Micropub endpoint</label>
+                                        </div>
+                                        <div class="col-9 col-sm-12">
+                                          <input class="form-input" type="url" id="micropub-endpoint" placeholder="https://...">
+                                        </div>
+                                    </div>
+                                    
+                                </div>      
+                            </div>
+
+                        </div>
+                    </div>
+    `;
+}
+
 export function discoverHTML(posts, tagmoji, id) {
     return `
         <div class="container">
