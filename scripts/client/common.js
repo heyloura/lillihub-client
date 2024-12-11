@@ -214,7 +214,7 @@ var Swap = (() => {
                     history.pushState({}, "", href);
                 register_links();  
                 document.getElementById('loader').remove();
-                removeHash();
+                document.getElementById('off-canvas-overlay').dispatchEvent(new Event("click"));
             });
         }
     }
