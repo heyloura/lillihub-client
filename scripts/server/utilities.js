@@ -18,7 +18,7 @@ export function discoverHTML(posts, tagmoji, id) {
                         </details>
                     </div>
                     <div class="hide-lg">
-                        <ul class="menu">
+                        <ul class="menu p-0">
                             <li class="divider" data-content="Discover Tagmoji"></li>
                             ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
                                     `<li class="menu-item">
