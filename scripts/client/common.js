@@ -386,17 +386,16 @@ async function loadNotebook() {
     });
 
     Promise.all(promises)
-    .then(() => {
-        hljs.highlightAll();
-        // let magicGrid = new MagicGrid({
-        //     container: ".note-container", // Required. Can be a class, id, or an HTMLElement.
-        //     static: true, // Required for static content.
-        //     animate: true, // Optional.
-        // });
-
-        // magicGrid.listen();
-    })
-    .catch((error) => {});
+        .then(() => {
+            hljs.highlightAll();
+        })
+        .catch((error) => {
+            document.querySelectorAll('.decryptMe').forEach(element => {
+                document.getElementById("privateKeyWarning").classList.remove("hide");
+                document.getElementById("privateKeyWarning").innerHTML = "We ran into an issue decrypting your notes."
+                element.parentNode.classList.remove("hide");
+            });
+        });
 }
 
 // Loaded the note
