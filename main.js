@@ -872,6 +872,15 @@ Deno.serve(async (req) => {
                     const posts = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="user-posts" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>`;
+                } else if(req.url.includes("notes") && req.url.includes("new")) {
+                    id = name;
+                    name = "note";
+                    //fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    // const note = await fetching.json();
+                    // fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    // const versions = await fetching.json();
+                    // // put JSON check here or something.....
+                    //content = `<div id="note" class="mt-2">${utility.noteHTML(note,null,versions.items)}</div>`;
                 } else if(req.url.includes("notes")) {
                     id = name;
                     name = "note";
