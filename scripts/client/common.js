@@ -227,7 +227,7 @@ var Swap = (() => {
                     history.pushState({}, "", href);
                 register_links();  
                 document.getElementById('loader').remove();
-                document.getElementById('off-canvas-overlay').dispatchEvent(new Event("click"));
+                document.querySelector('.off-canvas-overlay').dispatchEvent(new Event("click"));
             });
         }
     }

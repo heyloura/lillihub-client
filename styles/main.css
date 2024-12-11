@@ -1394,7 +1394,7 @@ dl dd {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background: #fff;
+  background: var(--background-tint-1);;
   border: .05rem solid var(--primary);
   border-radius: .1rem;
   color: var(--primary);
@@ -1421,7 +1421,7 @@ dl dd {
 }
 
 .btn:focus,.btn:hover {
-  background: #f1f1fc;
+  background: var(--background-tint-4);;
   border-color: var(--primary);
   text-decoration: none
 }
