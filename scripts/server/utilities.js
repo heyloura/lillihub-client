@@ -94,8 +94,14 @@ export function noteHTML(note, notebookId, versions) {
                     </div>
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <div class="card bordered">
-                        ${getNoteEditor(notebookId,n)}
+                    <div class="card bordered pages">
+                        <div id="edit">
+                            ${getNoteEditor(notebookId,n)}
+                        </div>
+                        <div>
+                            <a href="#edit">edit note</a>
+                            <div id="preview"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -177,13 +183,8 @@ function notesHTML(note, notebookId) {
                 data-url="${n.url}" 
                 data-published="${n.published}" 
                 data-modified="${n.modified}"
-                data-shared="${n.shared}" >
-                <!--<div class="divider  text-center" data-content="${(new Date(n.modified).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}"></div>-->
-                <!--<div class="btn-group btn-group-block">
-                    <a class="btn btn-link text-muted" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">edit</a>                    
-                </div>-->
-                <a class="btn btn-link text-muted float-right" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">edit</a>                    
-                <div id="title-${n.id}" class="card-title h5"></div> 
+                data-shared="${n.shared}" >               
+                <a id="title-${n.id}" class="fakeAnchor" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true"></a> 
                 <div class="card-subtitle">
                     ${n.shared ? `<a target="_blank" class="text-gray" href="${n.shared_url}">${n.shared_url}</a>` : ''}
                     <div class="d-inline" id="tags-${n.id}"></div>
