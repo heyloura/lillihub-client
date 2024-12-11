@@ -352,7 +352,7 @@ async function loadNotebook() {
         document.getElementById("privateKeyWarning").classList.add("hide");
     } else {
         document.querySelectorAll('.decryptMe').forEach(element => {
-            element.classList.remove("hide");
+            element.parentNode.classList.remove("hide");
         });
     }
 
