@@ -74,12 +74,10 @@ export function noteHTML(note, notebookId, versions) {
         <div class="container">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <div class="card bordered p-2">
-                        <div class="divider" data-content="Note Metadata"></div>
-                        <table class="table table-striped" id="metadata-${n.id}"></table>
-                        <div class="divider" data-content="Note Details"></div>
+                    <div>
+                        <div class="divider" data-content="Note Metadata + Details"></div>
                         <div>
-                            <table class="table table-striped">
+                            <table id="metadata-${n.id}" class="table table-striped">
                                 <tr><td>id</td><td>${n.id}</td></tr>
                                 <tr><td>published</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
                                 <tr><td>modified</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
