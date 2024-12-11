@@ -350,6 +350,10 @@ async function loadNotebook() {
 
     if(localStorage.getItem("mbKey")) {
         document.getElementById("privateKeyWarning").classList.add("hide");
+    } else {
+        document.querySelectorAll('.decryptMe').forEach(element => {
+            element.classList.remove("hide");
+        });
     }
 
     if(document.querySelector(`.notebook-${id}`)) {
