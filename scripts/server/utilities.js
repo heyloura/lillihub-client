@@ -97,7 +97,6 @@ export function noteHTML(note, notebookId, versions) {
                     <div class="card bordered">
                         ${getNoteEditor(notebookId,n)}
                     </div>
-                    <a
                 </div>
             </div>
         </div>
