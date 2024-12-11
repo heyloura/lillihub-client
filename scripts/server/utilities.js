@@ -160,14 +160,14 @@ export function getNotebookHTML(notes, notebookId) {
         <div class="container">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <p><b id="notebookName"></b></p>
+                    <p class=""><b id="notebookName"></b></p>
                     <div class="divider"></div>
                     <div class="form-group">
                         <label class="form-label">Search your notebook</label>
                         <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
                         <datalist id="tags"></datalist>
                     </div>
-                    <div class="btn-group btn-group-block">
+                    <div class="btn-group btn-group-block show-md">
                         <button class="btn btn-primary">Add new note</button>
                     </div>
                     <details class="accordion">
@@ -178,7 +178,11 @@ export function getNotebookHTML(notes, notebookId) {
                         <div class="accordion-body">
                             <div class="btn-group btn-group-block">
                                 <button class="btn btn-link">update name</button>
+                            </div>
+                            <div class="btn-group btn-group-block">
                                 <button class="btn btn-link">export notes</button>
+                            </div>
+                            <div class="btn-group btn-group-block">
                                 <button class="btn btn-link">delete?</button>
                             </div>
                         </div>
@@ -313,7 +317,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             <span class="timeline-icon"></span>
                         </div>` : ''}
         <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pt-0 mt-0' : 'bordered'} ${convoId && convoId === post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
-            <header class="card-header pt-1 mt-0 pb-1 mb-0 pl-0 pr-0">
+            <header class="card-header pt-1 mt-0 pb-1 mb-0 pl-1 pr-0">
                 ${getAvatar(post, isConvo ? '' : 'avatar-lg')}
                 <div class="card-top">
                     <div class="card-title h5 ${isConvo ? 'd-inline' : ''}">${post.name.split(':')[0]}</div>
@@ -341,7 +345,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     </div>
                 </div>
             </header>
-            <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
+            <main  class="card-header pl-1 pr-1" id="main-${post.id}" data-id="${post.id}">${post.content}</main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
         </article>
         ${isConvo ? `</div>` : '' }
