@@ -61,7 +61,7 @@ export function settingsHTML() {
         </div>
         <div class="card mb-2">
             <div class="card-body">
-                <div id="note">
+                <div id="private-notes">
                     <h2>Micro.blog Private Notes</h2>
                     <p>
                         Micro.blog has private notes. If you haven't configured them yet you will need
