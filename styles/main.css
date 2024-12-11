@@ -6687,11 +6687,11 @@ article footer {
   z-index: 501;
 }
 
-.note-container {
+/* .note-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 1em;
-}
+} */
 
 /* .note {
   transition: max-height 0.3s ease-out;

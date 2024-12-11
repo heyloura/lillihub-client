@@ -354,26 +354,20 @@ async function loadNotebook() {
         element.innerHTML = html;
     });
 
-    // Promise.all(promises)
-    // .then(() => {
-    //     hljs.highlightAll();
-    //     const macyInstance = Macy({
-    //         container: '#note-list',
-    //         trueOrder: false,
-    //         waitForImages: false,
-    //         margin: 8,
-    //         columns: 3,
-    //         breakAt: {
-    //             1200: 2,
-    //             940: 2,
-    //             520: 1,
-    //             400: 1
-    //         }
-    //     });
-    // })
-    // .catch((error) => {
-    //     console.error('Error decrypting elements:', error);
-    // });
+    Promise.all(promises)
+    .then(() => {
+        hljs.highlightAll();
+        let magicGrid = new MagicGrid({
+            container: ".note-container", // Required. Can be a class, id, or an HTMLElement.
+            static: true, // Required for static content.
+            animate: true, // Optional.
+        });
+
+        magicGrid.listen();
+    })
+    .catch((error) => {
+        console.error('Error decrypting elements:', error);
+    });
 }
 
 // Loaded the note
