@@ -160,14 +160,12 @@ export function getNotebookHTML(notes, notebookId) {
         <div class="container">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <p class=""><b id="notebookName"></b></p>
-                    <div class="divider"></div>
                     <div class="form-group">
                         <label class="form-label">Search your notebook</label>
                         <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
                         <datalist id="tags"></datalist>
                     </div>
-                    <div class="btn-group btn-group-block show-md">
+                    <div class="btn-group btn-group-block hide-lg">
                         <button class="btn btn-primary">Add new note</button>
                     </div>
                     <details class="accordion">
