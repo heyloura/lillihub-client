@@ -152,17 +152,15 @@ export function getNotebookHTML(notes, notebookId) {
         <div class="container">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    
-                </div>
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    <button class="btn btn-primary">Add new note</button>
                     <div class="form-group">
                         <label class="form-label">Search your notebook</label>
-                        <div class="input-group">
-                            <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
-                            <button class="btn btn-primary">Add new note</button>
-                        </div>
+                        <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
                         <datalist id="tags"></datalist>
                     </div>
+                    <button class="btn btn-link">Manage notebook</button>
+                </div>
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     ${notes.map(n => notesHTML(n,notebookId)).join('')}
                 </div>
             </div>
