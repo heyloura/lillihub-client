@@ -313,7 +313,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             <span class="timeline-icon"></span>
                         </div>` : ''}
         <article id="post-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pt-0 mt-0' : 'bordered'} ${convoId && convoId === post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
-            <header class="card-header pt-1 mt-0 pb-1 mb-0">
+            <header class="card-header pt-1 mt-0 pb-1 mb-0 pl-0 pr-0">
                 ${getAvatar(post, isConvo ? '' : 'avatar-lg')}
                 <div class="card-top">
                     <div class="card-title h5 ${isConvo ? 'd-inline' : ''}">${post.name.split(':')[0]}</div>

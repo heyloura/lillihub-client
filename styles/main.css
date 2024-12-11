@@ -5413,7 +5413,7 @@ a.text-error:visited {
 .timeline .timeline-item .timeline-content {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
-  padding: 2px 0 2px .8rem
+  /* padding: 2px 0 2px .8rem */
 }
 
 .timeline .timeline-item .timeline-icon {
