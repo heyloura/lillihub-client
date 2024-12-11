@@ -390,6 +390,10 @@ export function getNotebookHTML(notes, notebookId) {
                     </details>
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    <p id="privateKeyWarning">
+                        Looks like you don't have your secret key set up in Lillihub.
+                        Please add it under <a rel="prefetch" swap-target="#main" swap-history="true" href="/settings">settings</a> and then return to this page.
+                    </p>
                     ${notes.map(n => notesHTML(n,notebookId)).join('')}
                 </div>
             </div>

@@ -345,9 +345,13 @@ async function loadNotebook() {
     document.title = "Lillihub: Notes";
     const parts = window.location.pathname.split('/');
     const id = parts[parts.length - 1];
-    document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;;
-    document.getElementById("pageName").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;;
-    //document.getElementById('notebookName').innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
+    document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
+    document.getElementById("pageName").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
+
+    if(localStorage.getItem("mbKey")) {
+        document.getElementById("privateKeyWarning").classList.add("hide");
+    }
+
     if(document.querySelector(`.notebook-${id}`)) {
         document.querySelector(`.notebook-${id}`).classList.add("active");
     }
