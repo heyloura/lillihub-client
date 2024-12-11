@@ -75,6 +75,9 @@ export function noteHTML(note, notebookId, versions) {
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div>
+                        <div class="btn-group btn-group-block">
+                            <a class="btn btn-link" href="#edit">edit note</a>
+                        </div>
                         <div class="divider" data-content="Note Metadata + Details"></div>
                         <div>
                             <table id="metadata-${n.id}" class="table table-striped">
@@ -98,8 +101,7 @@ export function noteHTML(note, notebookId, versions) {
                         <div id="edit">
                             ${getNoteEditor(notebookId,n)}
                         </div>
-                        <div>
-                            <a href="#edit">edit note</a>
+                        <div class="p2">
                             <div id="preview"></div>
                         </div>
                     </div>

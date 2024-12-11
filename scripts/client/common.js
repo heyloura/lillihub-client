@@ -349,7 +349,7 @@ async function loadNotebook() {
         if(metadata && metadata.color) {
             document.querySelector(`article[data-id="${noteId}"]`).style.color = metadata.color;
         }
-        document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,75); 
+        document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,50) + '...'; 
         let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
         tags.forEach(function(item){
             if(!Array.from(document.getElementById('tags').options).map(option => option.value).includes(item)) {
