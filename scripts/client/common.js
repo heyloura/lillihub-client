@@ -333,7 +333,7 @@ async function loadNotebook() {
     document.getElementById("titleBar").innerHTML = "Notes";
     const parts = window.location.pathname.split('/');
     const id = parts[parts.length - 1];
-    document.getElementById('#notebookName').innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
+    document.getElementById('notebookName').innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
     if(document.querySelector(`.notebook-${id}`)) {
         document.querySelector(`.notebook-${id}`).classList.add("active");
     }
