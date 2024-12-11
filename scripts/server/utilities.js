@@ -136,7 +136,7 @@ function getNoteEditor(notebookId, n) {
                 </div>
                 <div class="btn-group float-right">
                     <button type="button" class="btn btn-secondary previewNote">Preview</button>
-                    <button type="button" class="btn btn-primary saveNote">Save changes</button>
+                    <button type="button" class="btn btn-primary saveNote">Save</button>
                 </div> 
                 <br/>
                 <p id="editor-status"></p>
