@@ -68,7 +68,7 @@ export function settingsHTML() {
                         to do so at <a target="_blank" href="https://micro.blog/account/notes/settings">https://micro.blog/account/notes/settings</a>.
                         Once you have your secret key you will need to share it with Lillihub to sync your notes.
                         Lillihub saves this key in your browser's storage and it is never passed to the server. You can verify this
-                        by viewing Liliihub's source code on <a href="https://github.com/heyloura/lillihub-client">Github</a>
+                        by viewing the source code.
                     </p>
                     <p>Notes are encrypted in the browser before sending them to the server, so neither Lillihub nor Micro.blog sees the note text.</p>
                     <input type="password" id="mbKey">
@@ -535,18 +535,20 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     </div>           
                 </div>
                  <div class="card-buttons">
-                    <a data-reply="@${post.username}" class="btn btn-link btn-action"><i class="icon icon-edit"></i></a>
-                    ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
-                    <div class="dropdown">
-                        <a href="#" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
-                            <i class="icon icon-more-vert"></i>
-                        </a>
-                        <ul class="menu">
-                            <li class="menu-item">View</li>
-                            <li class="menu-item">Bookmark</li>
-                            <li class="menu-item">Quote</li>
-                            <li class="menu-item">Open in micro.blog</li>
-                        </ul>
+                    <div class="btn-group">
+                        <a data-reply="@${post.username}" class="btn btn-link btn-action"><i class="icon icon-edit"></i></a>
+                        ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
+                        <div class="dropdown">
+                            <a href="#" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
+                                <i class="icon icon-more-vert"></i>
+                            </a>
+                            <ul class="menu">
+                                <li class="menu-item">View</li>
+                                <li class="menu-item">Bookmark</li>
+                                <li class="menu-item">Quote</li>
+                                <li class="menu-item">Open in micro.blog</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </header>

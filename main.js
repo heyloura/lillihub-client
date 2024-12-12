@@ -638,7 +638,8 @@ Deno.serve(async (req) => {
                     name = "timeline";
                     fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
-                    content = `<div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>`;
+                    content = `<div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>
+                        <p class="p-centered"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${posts.items[posts.items.length -1].id}">Load More</a></p>`;
                 }
                 
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
