@@ -6741,6 +6741,25 @@ article footer {
   background:linear-gradient(transparent 150px, white);
 }
 
+:root {
+  --red: #de324c;
+  --redorange: #E95E56;
+  --orange: #f4895f;
+  --orangeyellow: #F6B567;
+  --yellow: #f8e16f;
+  --yellowgreen: #C7D881;
+  --green: #95cf92;
+  --greenblue: #66B5AF;
+  --blue: #369acc;
+  --bluepurple: #6678B7;
+  --purple: #9656a2;
+  --purplered: #BA4477;
+}
+
+.btn-green {
+  color: var(--green);
+}
+
 /* Dracula Theme v1.2.5
  *
  * https://github.com/dracula/highlightjs
