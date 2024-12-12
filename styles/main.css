@@ -6219,7 +6219,6 @@ main img,main video,#preview img,#preview video {
   max-width: 100%;
   max-height: 500px;
   width: unset;
-  margin: 0px auto;
   display: block;
 }
 
@@ -6265,9 +6264,9 @@ a,pre,code {
   overflow-wrap: anywhere;
 }
 
-/* .card-buttons {
-  min-width: 80px;
-} */
+.card-buttons {
+  min-width: 107px;
+}
 
 article main {
   padding: 1em;

@@ -486,6 +486,7 @@ function loadTimeline() {
 }
 
 Swap.loaders['#post-list'] = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     loadTimeline(); 
 
     return () => {  // unloader function
@@ -494,6 +495,7 @@ Swap.loaders['#post-list'] = () => {
 }
 
 Swap.loaders['.post'] = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
     document.getElementById("pageName").innerHTML = "Timeline";
@@ -507,6 +509,7 @@ Swap.loaders['.post'] = () => {
 }
 
 Swap.loaders['#discover'] = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     document.title = "Lillihub: Discover";
     document.getElementById("titleBar").innerHTML = "Discover";
     document.getElementById("pageName").innerHTML = "Discover";

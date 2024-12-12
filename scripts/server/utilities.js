@@ -250,7 +250,7 @@ export function timelineHTML(posts, lastId) {
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     ${posts}
-                    <p class="p-centered"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
+                    <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
                 </div>
             </div>
         </div>
