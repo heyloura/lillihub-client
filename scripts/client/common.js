@@ -495,7 +495,6 @@ Swap.loaders['#post-list'] = () => {
 }
 
 Swap.loaders['.post'] = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
     document.getElementById("pageName").innerHTML = "Timeline";
