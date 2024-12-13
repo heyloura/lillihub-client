@@ -367,45 +367,59 @@ function getNoteEditor(notebookId, n) {
 
 export function getNotebookHTML(notes, notebookId) {
     return `
-        <div class="container">
-            <div class="columns">
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <p id="privateKeyWarning">
-                        Looks like you don't have your secret key set up in Lillihub.
-                        Please add it under <a rel="prefetch" swap-target="#main" swap-history="true" href="/settings">settings</a> and then return to this page.
-                    </p>
-                    ${notes.map(n => notesHTML(n,notebookId)).join('')}
-                </div>
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <div class="form-group">
-                        <label class="form-label">Search your notebook</label>
-                        <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
-                        <datalist id="tags"></datalist>
-                    </div>
-                    <div class="btn-group btn-group-block hide-lg">
-                        <button class="btn btn-primary">Add new note</button>
-                    </div>
-                    <details class="accordion">
-                        <summary class="accordion-header">
-                            <i class="icon icon-arrow-right mr-1"></i>
-                            Manage notebook
-                        </summary>
-                        <div class="accordion-body">
-                            <div class="btn-group btn-group-block">
-                                <button class="btn btn-link">update name</button>
-                            </div>
-                            <div class="btn-group btn-group-block">
-                                <button class="btn btn-link">export notes</button>
-                            </div>
-                            <div class="btn-group btn-group-block">
-                                <button class="btn btn-link">delete?</button>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
+    <div>
+        <p id="privateKeyWarning">
+            Looks like you don't have your secret key set up in Lillihub.
+            Please add it under <a rel="prefetch" swap-target="#main" swap-history="true" href="/settings">settings</a> and then return to this page.
+        </p>
+        <div class="form-group">
+            <label class="form-label">Search your notebook</label>
+            <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
+            <datalist id="tags"></datalist>
         </div>
+        ${notes.map(n => notesHTML(n,notebookId)).join('')}
+    </div>
     `;
+    // return `
+    //     <div class="container">
+    //         <div class="columns">
+    //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+    //                 <p id="privateKeyWarning">
+    //                     Looks like you don't have your secret key set up in Lillihub.
+    //                     Please add it under <a rel="prefetch" swap-target="#main" swap-history="true" href="/settings">settings</a> and then return to this page.
+    //                 </p>
+    //                 <div class="form-group">
+    //                     <label class="form-label">Search your notebook</label>
+    //                     <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
+    //                     <datalist id="tags"></datalist>
+    //                 </div>
+    //                 ${notes.map(n => notesHTML(n,notebookId)).join('')}
+    //             </div>
+    //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+    //                 <div class="btn-group btn-group-block hide-lg">
+    //                     <button class="btn btn-primary">Add new note</button>
+    //                 </div>
+    //                 <details class="accordion">
+    //                     <summary class="accordion-header">
+    //                         <i class="icon icon-arrow-right mr-1"></i>
+    //                         Manage notebook
+    //                     </summary>
+    //                     <div class="accordion-body">
+    //                         <div class="btn-group btn-group-block">
+    //                             <button class="btn btn-link">update name</button>
+    //                         </div>
+    //                         <div class="btn-group btn-group-block">
+    //                             <button class="btn btn-link">export notes</button>
+    //                         </div>
+    //                         <div class="btn-group btn-group-block">
+    //                             <button class="btn btn-link">delete?</button>
+    //                         </div>
+    //                     </div>
+    //                 </details>
+    //             </div>
+    //         </div>
+    //     </div>
+    // `;
 
 }
 
