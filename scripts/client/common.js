@@ -205,8 +205,11 @@ function loadEditor(type) {
         document.getElementById('modalTitle').appendChild(fragment);
     }
     
+    console.log('getting editor ready')
+
     if(localStorage.getItem('post_setting'))
     {
+        console.log(localStorage.getItem('post_setting'))
         if(localStorage.getItem('post_setting') === 'none') {
             if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
             {
@@ -217,6 +220,7 @@ function loadEditor(type) {
 
                 document.getElementById('markdownBtns').classList.add("hide");
                 document.getElementById('postingBtns').classList.add("hide");
+                console.log('done with statuslog set up')
             } else if(localStorage.getItem('post_setting') === 'micropub') {
                 document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
                 document.getElementById('postingType').value = 'micropub';
