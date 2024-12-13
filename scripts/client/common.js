@@ -124,21 +124,6 @@ function objectToTableRows(obj) {
   
     return html;
 }
-// function previewFile() {
-//     var preview = document.querySelector('img');
-//     var file    = document.querySelector('input[type=file]').files[0];
-//     var reader  = new FileReader();
-  
-//     reader.onloadend = function () {
-//       preview.src = reader.result;
-//     }
-  
-//     if (file) {
-//       reader.readAsDataURL(file);
-//     } else {
-//       preview.src = "";
-//     }
-//   }
 
 /***********************
 ** HANDLE OFFLINE STUFF
@@ -539,6 +524,45 @@ document.addEventListener("input", (event) => {
         }
 
     }
+    if(event.target.classList.contains('replierInput')) {
+        let menu = document.getElementById('replybox-menu'); 
+        menu.classList.remove('hide');
+        var menuItems = menu.children;
+        if(!event.target.value)
+        {
+            menu.classList.add('hide');
+        }
+        for (var i = 0; i < menuItems.length; i++) {
+            var item = menuItems[i];
+            if(event.target.value && ('@' + item.getAttribute('data-name')).toLowerCase().includes(event.target.value.toLowerCase())) {
+                item.classList.remove('hide');
+                item.innerHTML = `
+                    <a  data-avatar="${item.getAttribute('data-avatar')}" 
+                        data-name="${item.getAttribute('data-name')}" 
+                        class="addUserToReplyBox" href="#">
+                            <div data-avatar="${item.getAttribute('data-avatar')}" 
+                                data-name="${item.getAttribute('data-name')}" 
+                                class="tile tile-centered addUserToReplyBox">
+                                    <div data-avatar="${item.getAttribute('data-avatar')}" 
+                                        data-name="${item.getAttribute('data-name')}" 
+                                        class="tile-icon addUserToReplyBox">
+                                            <img data-avatar="${item.getAttribute('data-avatar')}" 
+                                                data-name="${item.getAttribute('data-name')}" 
+                                                class="avatar avatar-sm addUserToReplyBox" 
+                                                src="${item.getAttribute('data-avatar')}">
+                                    </div>
+                                    <div data-avatar="${item.getAttribute('data-avatar')}" 
+                                        data-name="${item.getAttribute('data-name')}" 
+                                        class="tile-content addUserToReplyBox">@${item.getAttribute('data-name').replaceAll(event.target.value, '<mark>' + event.target.value + '</mark>')}
+                                    </div>
+                            </div>
+                    </a>
+                `;
+            } else {
+                item.classList.add('hide');
+            }
+        }
+    }
 });
 
 document.addEventListener("click", async (item) => {
@@ -668,6 +692,17 @@ document.addEventListener("click", async (item) => {
         } else if(window.location.pathname.includes('users')) {
             // the action is to follow (if not already)?
         }
+    }
+    if(item.target.classList.contains('toggleMainReplyBox')) {
+        // need to clear values if toggled
+        document.getElementById('replybox').classList.toggle('hide');
+        document.getElementById('replybox').classList.add('mb-2');
+    }
+    if(item.target.classList.contains('closeModal')) {
+        document.getElementById('modalTitle').innerHTML = '';
+        document.getElementById('modalContent').innerHTML = '';
+        document.getElementById('modalFooter').innerHTML = '';
+        document.getElementById('modal').classList.remove("active");
     }
     if(item.target.classList.contains('savePost')) {
         item.preventDefault();

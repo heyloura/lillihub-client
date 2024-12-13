@@ -337,7 +337,7 @@ export function getEditor(repliers) {
             <input type="hidden" name="omgAddess" id="omgAddess" />
             <input type="hidden" name="indieToken" id="indieToken" />
             <input type="hidden" name="microPub" id="microPub" />
-            <div id="editor-container" class="card-body">
+            <div id="editor-container">
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
                 <div class="grow-wrap">
                     <textarea id="content" id="post" class="form-input grow-me"></textarea>
@@ -362,7 +362,7 @@ export function getEditor(repliers) {
                     </ul>
                 </div>
                 <div class="btn-group float-right">
-                    <button type="button" class="btn btn-secondary previewNote">Preview</button>
+                    <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button>
                     <button type="button" class="btn btn-primary saveNote">Save</button>
                 </div> 
                 <br/>
