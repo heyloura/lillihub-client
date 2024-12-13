@@ -6716,6 +6716,10 @@ article footer {
   vertical-align: middle;
 }
 
+#pageAction {
+  z-index: 500;
+}
+
 /* Dracula Theme v1.2.5
  *
  * https://github.com/dracula/highlightjs
