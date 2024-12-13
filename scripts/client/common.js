@@ -835,6 +835,7 @@ document.addEventListener("click", async (item) => {
         }
     }
     if(item.target.classList.contains('replierRemoveChip')) {
+        item.preventDefault();
         let name = item.target.getAttribute('data-name');
         let id = item.target.getAttribute('data-id');
 
