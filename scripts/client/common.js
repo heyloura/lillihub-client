@@ -595,8 +595,6 @@ document.addEventListener("input", (event) => {
         } else {
             menu = document.getElementById('replybox-menu'); 
         }
-
-        console.log(id, menu)
         
         menu.classList.remove('hide');
         var menuItems = menu.children;
@@ -642,10 +640,11 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("click", async (item) => {
-    if(item.target.classList.contains('editor-upload') && document.getElementById("editor-container")) {
+    if(item.target.classList.contains('editor-upload')) {
+        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
         var el = window._protected_reference = document.createElement("INPUT");
         el.type = "file";
-        document.getElementById('editor-status').innerHTML = `<span class="loading"></span>`;
+        document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `<span class="loading"></span>`;
 
         el.addEventListener('change', function(ev2) {
 
@@ -653,7 +652,7 @@ document.addEventListener("click", async (item) => {
             console.log('size: ' + el.files[0].size /1024 /1024 + ' MB');
             if(el.files[0].size /1024 /1024 > 3) {
                 alert('file must be smaller than 3MB');
-                document.getElementById('editor-status').innerHTML = '';
+                document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = '';
                 return;
             }
 
@@ -662,27 +661,27 @@ document.addEventListener("click", async (item) => {
                 formData.append('file[]', el.files[i], el.files[i].name);
             }
 
-            document.getElementById('editor-status').innerHTML = `<span class="loading pr-2 mr-2"></span> uploading file...`;
+            document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `<span class="loading pr-2 mr-2"></span> uploading file...`;
             fetch('/media/upload', { method: "POST", body: formData })
                 .then(response => console.log(response.status) || response)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('editor-status').innerHTML = `inserting markdown...`;
+                    document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `inserting markdown...`;
                     if(el.files[0].type.includes('image'))
                     {
                         if(data.ai) {
-                            document.getElementById('editor-status').innerHTML = `<span class="loading pr-2 mr-2"></span> getting alt text...`;
+                            document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `<span class="loading pr-2 mr-2"></span> getting alt text...`;
                         } else {
-                            document.getElementById("content").value += `![image alt text](${data.url})`;
+                            document.getElementById(id ? id + '-content' : 'content').value += `![image alt text](${data.url})`;
                         }
                     } 
                     else 
                     {
-                        document.getElementById("content").value += `[link text](${data.url})`;
+                        document.getElementById(id ? id + '-content' : 'content').value += `[link text](${data.url})`;
                     }
 
                     if(!el.files[0].type.includes('image') || !data.ai) {
-                        document.getElementById('editor-status').innerHTML = `done.`;
+                        document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `done.`;
                     }
 
                     if(data.ai && el.files[0].type.includes('image'))
@@ -692,8 +691,8 @@ document.addEventListener("click", async (item) => {
                                 .then(response => console.log(response.status) || response)
                                 .then(response => response.json())
                                 .then(data => {
-                                    document.getElementById('editor-status').innerHTML = `done.`;
-                                    document.getElementById("content").value += `![${data.alt}](${data.url})`;
+                                    document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `done.`;
+                                    document.getElementById(id ? id + '-content' : 'content').value += `![${data.alt}](${data.url})`;
                                     console.log(data);
                                 });
                         }, 30 * 1000);
@@ -737,16 +736,20 @@ document.addEventListener("click", async (item) => {
 
     // toggle a note
     if(item.target.classList.contains('editor-bold')) {
-        getSelectionAndReplace(document.getElementById('content'),'**','**');
+        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'**','**');
     }
     if(item.target.classList.contains('editor-italic')) {
-        getSelectionAndReplace(document.getElementById('content'),'**','**');
+        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'*','*');
     }
     if(item.target.classList.contains('editor-code')) {
-        getSelectionAndReplace(document.getElementById('content'),'`','`');
+        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'`','`');
     }
     if(item.target.classList.contains('editor-image')) {
-        getSelectionAndReplace(document.getElementById('content'),'![alt text](',')');
+        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'![alt text](',')');
     }
     if(item.target.classList.contains('replyBtn')){
         let name = item.target.getAttribute('data-name');
@@ -776,9 +779,6 @@ document.addEventListener("click", async (item) => {
         document.getElementById(id + '-editor-action').classList.add('sendReply');
         document.getElementById(id + '-editor-action').setAttribute('data-id', id);
         document.getElementById(id + '-editor-action').innerHTML = 'Send';
-        // document.getElementById('modalContent').insertAdjacentHTML('afterbegin',`
-        //     ${document.getElementById('header-' + id).innerHTML}<br/>
-        //     ${document.getElementById('main-' + id).innerHTML}`);
     }
     if(item.target.classList.contains('sendReply')){
         let id = item.target.getAttribute('data-id');

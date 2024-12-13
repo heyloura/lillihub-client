@@ -348,17 +348,17 @@ export function getEditor(repliers, username) {
             </div>
             <div id="editor-footer" class="card-footer mb-2">
                 <div id="markdownBtns" class="btn-group"> 
-                    <button type="button" class="btn btn-link editor-bold"><b class="editor-bold">b</b></button>
-                    <button type="button" class="btn btn-link editor-italic"><em class="editor-italic">i</em></button>
-                    <button type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
-                    <button type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
+                    <button id="editor-bold-btn" type="button" class="btn btn-link editor-bold"><b class="editor-bold">b</b></button>
+                    <button id="editor-italic-btn" type="button" class="btn btn-link editor-italic"><em class="editor-italic">i</em></button>
+                    <button id="editor-code-btn" type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
+                    <button id="editor-upload-btn" type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
                     <div class="dropdown">
                         <a href="javascript:void(0)" class="btn btn-link dropdown-toggle" tabindex="0">
                             <i class="icon icon-link"></i></i>
                         </a>
                         <ul class="menu menu-above">
-                            <li class="menu-item editor-image"><a class="editor-image" href="javascript:void(0)">Markdown image</a></li>
-                            <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
+                            <li class="menu-item editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="javascript:void(0)">Markdown image</a></li>
+                            <li class="menu-item"><a id="editor-link-markdown-btn" href="javascript:void(0)">Markdown link</a></li>
                             <li class="divider"></li>
                             <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
                             <li class="menu-item"><a href="javascript:void(0)">Item 2</a></li>
@@ -389,8 +389,8 @@ export function getEditor(repliers, username) {
                     </div>
                     <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button> 
                     <div id="postingBtns" class="btn-group"> 
-                        <button type="button" class="btn btn-link"><i class="icon icon-bookmark"></i></button>
-                        <button type="button" class="btn btn-link"><i class="icon icon-copy"></i></button>
+                        <button id="editor-categories-btn" type="button" class="btn btn-link"><i class="icon icon-bookmark"></i></button>
+                        <button id="editor-crosspost-btn" type="button" class="btn btn-link"><i class="icon icon-copy"></i></button>
                     </div>
                 </div>
                 <br/>
