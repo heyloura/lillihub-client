@@ -749,7 +749,7 @@ document.addEventListener("click", async (item) => {
         document.getElementById('postingBtns').classList.add("hide");
         document.getElementById('postName').classList.add("hide");
         document.getElementById('postStatus').classList.add("hide");
-        document.getElementById('editor-replybox').classList.remove('hide');
+        document.getElementById('editor-'+id+'-replybox').classList.remove('hide');
         document.getElementById('topBarBtns').classList.add("hide");
 
         chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
@@ -759,14 +759,15 @@ document.addEventListener("click", async (item) => {
         document.getElementById('replybox-menu').classList.add('hide');
         document.getElementById('replybox-checkbox-' + name).checked = true; 
         document.getElementById('editor-'+id+'-action').classList.add('sendReply');
-        document.getElementById('editor-'+id+'-action').classList.add('sendReply');
+        document.getElementById('editor-'+id+'-action').setAttribute('data-id', id);
         document.getElementById('editor-'+id+'-action').innerHTML = 'Send';
         // document.getElementById('modalContent').insertAdjacentHTML('afterbegin',`
         //     ${document.getElementById('header-' + id).innerHTML}<br/>
         //     ${document.getElementById('main-' + id).innerHTML}`);
     }
     if(item.target.classList.contains('sendReply')){
-        let form = document.getElementById('editor'); 
+        let id = item.target.getAttribute('data-id');
+        let form = document.getElementById('editor-' + id); 
         fetch("/timeline/reply", { body: new FormData(form), method: "post" })
             .then(response => response.text())
             .then(data => {
