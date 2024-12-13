@@ -220,6 +220,10 @@ function loadEditor(type) {
 
                 document.getElementById('markdownBtns').classList.add("hide");
                 document.getElementById('postingBtns').classList.add("hide");
+                document.getElementById('postName').classList.add("hide");
+                document.getElementById('postStatus').classList.add("hide");
+
+
                 console.log('done with statuslog set up')
             } else if(localStorage.getItem('post_setting') === 'micropub') {
                 document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;

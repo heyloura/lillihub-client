@@ -365,9 +365,9 @@ export function getEditor(repliers, username) {
                     </div>
                 </div>
                 <div class="btn-group float-right">
-                    <select class="form-select">
-                        <option>Publish</option>
-                        <option>Draft</option>
+                    <select id="postStatus" name="status" class="form-select">
+                        <option value="publish">Publish</option>
+                        <option value="draft">Draft</option>
                     </select>
                     <button id="editor-action" type="button" class="btn btn-primary saveNote">Post</button>
                 </div>
