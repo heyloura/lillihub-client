@@ -568,7 +568,7 @@ Deno.serve(async (req) => {
                 const notebooks = await fetching.json();
 
                 // following
-                fetching = await fetch(`https://micro.blog/users/following`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                fetching = await fetch(`https://micro.blog/users/following/${mbUser.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let following = await fetching.json();
 
                 console.log(following);
