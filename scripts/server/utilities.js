@@ -361,9 +361,15 @@ export function getEditor(repliers, username) {
                         <li class="menu-item"><a href="javascript:void(0)">Item 3</a></li>
                     </ul>
                 </div>
-                <br/>
                 <div class="btn-group float-right">
-                    <div class="dropdown">
+                    <select class="form-select">
+                        <option>Publish</option>
+                        <option>Draft</option>
+                    </select>
+                    <button id="editor-action" type="button" class="btn btn-primary saveNote">Post</button>
+                </div>
+                <div id="topBarBtns" class="btn-group">
+                    <div id="editor-postingAs" class="dropdown">
                         <a href="#editor" class="btn btn-link dropdown-toggle" tabindex="0">
                             <span id="postingName">${username}</span> <i class="icon icon-caret"></i>
                         </a>
@@ -376,9 +382,8 @@ export function getEditor(repliers, username) {
                             </li>
                         </ul>
                     </div>
-                    <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button>
-                    <button type="button" class="btn btn-primary saveNote">Save</button>
-                </div> 
+                    <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button> 
+                </div>
                 <br/>
                 <p id="editor-status"></p>
                 <!--<p><b>Note:</b> file upload is limited to 3MB.</p>-->

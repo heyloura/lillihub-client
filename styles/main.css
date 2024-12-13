@@ -2027,7 +2027,7 @@ textarea.form-input,textarea.form-input.input-lg,textarea.form-input.input-sm {
 }
 
 .form-input.is-success,.form-select.is-success,.has-success .form-input,.has-success .form-select {
-  background: #f9fdfa;
+  background: var(--background-tint-1);
   border-color: #32b643
 }
 
@@ -2036,7 +2036,7 @@ textarea.form-input,textarea.form-input.input-lg,textarea.form-input.input-sm {
 }
 
 .form-input.is-error,.form-select.is-error,.has-error .form-input,.has-error .form-select {
-  background: #fffaf7;
+  background: var(--background-tint-1);
   border-color: #e85600
 }
 
@@ -3286,7 +3286,7 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .modal.active .modal-overlay,.modal:target .modal-overlay {
-  background: rgba(247,248,249,.75);
+  background: rgba(0,0,0,.75);
   bottom: 0;
   cursor: default;
   display: block;

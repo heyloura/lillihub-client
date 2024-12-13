@@ -200,6 +200,9 @@ function loadEditor(type) {
 
     } else {
         // generic post
+        var fragment = document.createDocumentFragment();
+        fragment.appendChild(document.getElementById('topBarBtns'));
+        document.getElementById('modalTitle').appendChild(fragment);
     }
     
     if(localStorage.getItem('post_setting'))
