@@ -205,6 +205,9 @@ export function discoverHTML(posts, tagmoji, id) {
     return `
         <div class="container">
             <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    ${posts.items.map(n => postHTML(n)).join('')}
+                </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div class="form-group">
                         <label class="form-label">Search for featured posts.</label>
@@ -232,9 +235,6 @@ export function discoverHTML(posts, tagmoji, id) {
                                 ).join('')}
                         </ul>
                     </div>
-                </div>
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    ${posts.items.map(n => postHTML(n)).join('')}
                 </div>
             </div>
         </div>
@@ -283,6 +283,16 @@ export function noteHTML(note, notebookId, versions) {
     return `
         <div class="container">
             <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    <div class="card bordered pages">
+                        <div id="edit">
+                            ${getNoteEditor(notebookId,n)}
+                        </div>
+                        <div class="card-body">
+                            <div id="preview"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div>
                         <div class="btn-group btn-group-block">
@@ -304,16 +314,6 @@ export function noteHTML(note, notebookId, versions) {
                             <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a></td>
                         </tr>`).join('')}
                         <div class="divider" data-content="Related Bookmarks"></div>
-                    </div>
-                </div>
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <div class="card bordered pages">
-                        <div id="edit">
-                            ${getNoteEditor(notebookId,n)}
-                        </div>
-                        <div class="card-body">
-                            <div id="preview"></div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -369,6 +369,13 @@ export function getNotebookHTML(notes, notebookId) {
     return `
         <div class="container">
             <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    <p id="privateKeyWarning">
+                        Looks like you don't have your secret key set up in Lillihub.
+                        Please add it under <a rel="prefetch" swap-target="#main" swap-history="true" href="/settings">settings</a> and then return to this page.
+                    </p>
+                    ${notes.map(n => notesHTML(n,notebookId)).join('')}
+                </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div class="form-group">
                         <label class="form-label">Search your notebook</label>
@@ -395,13 +402,6 @@ export function getNotebookHTML(notes, notebookId) {
                             </div>
                         </div>
                     </details>
-                </div>
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <p id="privateKeyWarning">
-                        Looks like you don't have your secret key set up in Lillihub.
-                        Please add it under <a rel="prefetch" swap-target="#main" swap-history="true" href="/settings">settings</a> and then return to this page.
-                    </p>
-                    ${notes.map(n => notesHTML(n,notebookId)).join('')}
                 </div>
             </div>
         </div>
