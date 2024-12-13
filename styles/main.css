@@ -6494,7 +6494,7 @@ textarea {
 
 .navbar {
   padding: 0.25em;
-  background-color: var(--background-tint-1);
+  /* background-color: var(--background-tint-1); */
 }
 
 .navbar .active {

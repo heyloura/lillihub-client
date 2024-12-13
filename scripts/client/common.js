@@ -346,7 +346,7 @@ async function loadNotebook() {
     const parts = window.location.pathname.split('/');
     const id = parts[parts.length - 1];
     document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
-    document.getElementById("pageName").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
+    //document.getElementById("pageName").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
 
     // we have a key, decrypt the notes
     if(localStorage.getItem("mbKey")) {
@@ -418,7 +418,7 @@ Swap.loaders['#note'] = () => {
 function loadNote() {
     document.title = "Lillihub: Note";
     document.getElementById("titleBar").innerHTML = "Note";
-    document.getElementById("pageName").innerHTML = "Note";
+    //document.getElementById("pageName").innerHTML = "Note";
     const parts = window.location.pathname.split('/');
     const id = parts[2];
     if(document.querySelector(`.notebook-${id}`)) {
@@ -452,7 +452,7 @@ function loadNote() {
 function loadTimeline() {
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
-    document.getElementById("pageName").innerHTML = "Timeline";
+    //document.getElementById("pageName").innerHTML = "Timeline";
     document.querySelector(`#timelineLink`).classList.add("active");
     buildCarousels();
     hljs.highlightAll();
@@ -497,7 +497,7 @@ Swap.loaders['#post-list'] = () => {
 Swap.loaders['.post'] = () => {
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
-    document.getElementById("pageName").innerHTML = "Timeline";
+    //document.getElementById("pageName").innerHTML = "Timeline";
     document.querySelector(`#timelineLink`).classList.add("active");
     buildCarousels();
     hljs.highlightAll();
@@ -511,7 +511,7 @@ Swap.loaders['#discover'] = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.title = "Lillihub: Discover";
     document.getElementById("titleBar").innerHTML = "Discover";
-    document.getElementById("pageName").innerHTML = "Discover";
+    //document.getElementById("pageName").innerHTML = "Discover";
     document.querySelector(`#discoverLink`).classList.add("active");
     buildCarousels();
     hljs.highlightAll();

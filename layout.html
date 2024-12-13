@@ -24,22 +24,31 @@
                     <i class="icon icon-menu"></i>
                 </a>
                 <!-- <a href="/"><img src="/logo.png" height="34px" class="hide-lg mr-2"></a> -->
-                <span id="pageName" class="hide-lg hide">{{pageName}}</span>
+                <!-- <span id="pageName" class="hide-lg hide">{{pageName}}</span> -->
             </section>
             <section class="navbar-center text-light">
                 <!-- <span id="titleBar" class="show-sm">{{pageName}}</span> -->
-                <span id="titleBar">{{pageName}}</span>
-                <button class="btn btn-link btn-action settings-action"><i class="icon icon-caret settings-action"></i></button>
+                <!-- <span id="titleBar">{{pageName}}</span>
+                <button class="btn btn-link btn-action pageAction"><i class="icon icon-caret pageAction"></i></button> -->
+                <div class="dropdown">
+                    <a href="javascript:void(0)" class="btn dropdown-toggle" tabindex="0">
+                        <span id="titleBar">{{pageName}}</span> <i class="icon icon-caret"></i>
+                    </a>
+                    <!-- menu component -->
+                    <ul class="menu" id="pageActions">
+                    
+                    </ul>
+                </div>
             </section>
             <section class="navbar-section">
-                <button class="btn btn-link btn-action plus-action"><i class="icon icon-plus plus-action"></i></button>
+                <button class="btn actionBtn"><i class="icon icon-plus actionBtn"></i><span id="actionText">Add</span></button>
             </section>
         </header>
         <div class="off-canvas off-canvas-sidebar-show">                
             <div id="sidebar-id" class="off-canvas-sidebar">
                 <div class="sidebar">
-                    <div class="text-center show-md">
-                        <img src="/logo.png" width="100px">
+                    <div class="text-center">
+                        <img src="/logo.png" width="50px">
                     </div>
                     <div class="pt-0">
                         <ul class="menu mb-2">
