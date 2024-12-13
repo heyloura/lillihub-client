@@ -696,8 +696,8 @@ document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('toggleMainReplyBox')) {
         // need to clear values if toggled
         alert('toggleMainReplyBox btn click');
-        document.getElementById('replybox').classList.toggle('hide');
-        document.getElementById('replybox').classList.add('mb-2');
+        document.getElementById('editor-replybox').classList.toggle('hide');
+        document.getElementById('editor-replybox').classList.add('mb-2');
     }
     if(item.target.classList.contains('closeModal')) {
         document.getElementById('modalTitle').innerHTML = '';
