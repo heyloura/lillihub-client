@@ -741,10 +741,10 @@ document.addEventListener("click", async (item) => {
         let avatar = item.target.getAttribute('data-avatar');
         let chips = document.getElementById('replybox-chips'); 
 
-        //loadEditor('reply');
+        console.log(name, id, avatar);
     
         // Set up the reply area
-        document.getElementById('main-' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML);
+        document.getElementById('main-' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML.replaceAll('id="editor','id="editor-' + id));
         document.getElementById('postingName').classList.add('hide');
         document.getElementById('postingBtns').classList.add("hide");
         document.getElementById('postName').classList.add("hide");
@@ -758,8 +758,9 @@ document.addEventListener("click", async (item) => {
         document.getElementById('replybox-input').focus();
         document.getElementById('replybox-menu').classList.add('hide');
         document.getElementById('replybox-checkbox-' + name).checked = true; 
-        document.getElementById('editor-action').classList.add('sendReply');
-        document.getElementById('editor-action').innerHTML = 'Send';
+        document.getElementById('editor-'+id+'-action').classList.add('sendReply');
+        document.getElementById('editor-'+id+'-action').classList.add('sendReply');
+        document.getElementById('editor-'+id+'-action').innerHTML = 'Send';
         // document.getElementById('modalContent').insertAdjacentHTML('afterbegin',`
         //     ${document.getElementById('header-' + id).innerHTML}<br/>
         //     ${document.getElementById('main-' + id).innerHTML}`);
