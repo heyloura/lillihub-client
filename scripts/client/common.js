@@ -739,28 +739,32 @@ document.addEventListener("click", async (item) => {
         let name = item.target.getAttribute('data-name');
         let id = item.target.getAttribute('data-id');
         let avatar = item.target.getAttribute('data-avatar');
-        let chips = document.getElementById('replybox-chips'); 
-
+    
         console.log(name, id, avatar);
     
         // Set up the reply area
-        document.getElementById('main-' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML.replaceAll('id="editor','id="editor-' + id));
-        document.getElementById('postingName').classList.add('hide');
-        document.getElementById('postingBtns').classList.add("hide");
-        document.getElementById('postName').classList.add("hide");
-        document.getElementById('postStatus').classList.add("hide");
-        document.getElementById('editor-'+id+'-replybox').classList.remove('hide');
-        document.getElementById('topBarBtns').classList.add("hide");
+        document.getElementById('main-' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML.replaceAll('id="',`id="${id}-`));
+        let chips = document.getElementById(id + '-replybox-chips'); 
 
-        chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
-        document.getElementById('postId').value = item.target.getAttribute('data-id');
-        document.getElementById('replybox-input').value = '';
-        document.getElementById('replybox-input').focus();
-        document.getElementById('replybox-menu').classList.add('hide');
-        document.getElementById('replybox-checkbox-' + name).checked = true; 
-        document.getElementById('editor-'+id+'-action').classList.add('sendReply');
-        document.getElementById('editor-'+id+'-action').setAttribute('data-id', id);
-        document.getElementById('editor-'+id+'-action').innerHTML = 'Send';
+        document.getElementById(id + '-postingName').classList.add('hide');
+        document.getElementById(id + '-postingBtns').classList.add("hide");
+        document.getElementById(id + '-postName').classList.add("hide");
+        document.getElementById(id + '-postStatus').classList.add("hide");
+        document.getElementById(id + '-editor-replybox').classList.remove('hide');
+        document.getElementById(id + '-topBarBtns').classList.add("hide");
+
+        chips.innerHTML = chips.innerHTML + `<span id="${id}-chip-${name}" class="chip">
+                <img class="avatar avatar-sm" src="${avatar}" />@${name}
+                <a data-id="${id}" data-name="${name}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a>
+            </span>`;                    
+        document.getElementById(id + '-postId').value = item.target.getAttribute('data-id');
+        document.getElementById(id + '-replybox-input').value = '';
+        document.getElementById(id + '-replybox-input').focus();
+        document.getElementById(id + '-replybox-menu').classList.add('hide');
+        document.getElementById(id + '-replybox-checkbox-' + name).checked = true; 
+        document.getElementById(id + '-editor-action').classList.add('sendReply');
+        document.getElementById(id + '-editor-action').setAttribute('data-id', id);
+        document.getElementById(id + '-editor-action').innerHTML = 'Send';
         // document.getElementById('modalContent').insertAdjacentHTML('afterbegin',`
         //     ${document.getElementById('header-' + id).innerHTML}<br/>
         //     ${document.getElementById('main-' + id).innerHTML}`);
