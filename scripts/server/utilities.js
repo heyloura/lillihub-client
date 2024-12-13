@@ -358,7 +358,7 @@ export function getEditor(repliers, username) {
                         </a>
                         <ul class="menu menu-above">
                             <li class="menu-item editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="javascript:void(0)">Markdown image</a></li>
-                            <li class="menu-item"><a id="editor-link-markdown-btn" href="javascript:void(0)">Markdown link</a></li>
+                            <li class="menu-item"><a id="editor-link-markdown-btn" class="editor-link" href="javascript:void(0)">Markdown link</a></li>
                             <li class="divider"></li>
                             <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
                             <li class="menu-item"><a href="javascript:void(0)">Item 2</a></li>

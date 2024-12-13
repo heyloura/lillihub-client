@@ -641,7 +641,7 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('editor-upload')) {
-        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        let id = event.target.getAttribute('id') === 'editor-upload-btn' ? null : event.target.getAttribute('id').split('-')[0];
         var el = window._protected_reference = document.createElement("INPUT");
         el.type = "file";
         document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `<span class="loading"></span>`;
@@ -736,19 +736,23 @@ document.addEventListener("click", async (item) => {
 
     // toggle a note
     if(item.target.classList.contains('editor-bold')) {
-        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        let id = event.target.getAttribute('id') === 'editor-bold-btn' ? null : event.target.getAttribute('id').split('-')[0];
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'**','**');
     }
     if(item.target.classList.contains('editor-italic')) {
-        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        let id = event.target.getAttribute('id') === 'editor-italic-btn' ? null : event.target.getAttribute('id').split('-')[0];
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'*','*');
     }
     if(item.target.classList.contains('editor-code')) {
-        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        let id = event.target.getAttribute('id') === 'editor-code-btn' ? null : event.target.getAttribute('id').split('-')[0];
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'`','`');
     }
     if(item.target.classList.contains('editor-image')) {
-        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
+        let id = event.target.getAttribute('id') === 'editor-image-markdown-btn' ? null : event.target.getAttribute('id').split('-')[0];
+        getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'![alt text](',')');
+    }
+    if(item.target.classList.contains('editor-link')) {
+        let id = event.target.getAttribute('id') === 'editor-link-markdown-btn' ? null : event.target.getAttribute('id').split('-')[0];
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'![alt text](',')');
     }
     if(item.target.classList.contains('replyBtn')){
