@@ -523,7 +523,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     <div class="card-subtitle d-block pl-1">
                             <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
                                 ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
-                                @${post.username}
+                                @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? '' : '<i class="icon icon-location"></i>'}
                             </a> · 
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
                     </div>

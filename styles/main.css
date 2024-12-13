@@ -3346,7 +3346,7 @@ summary.accordion-header::-webkit-details-marker {
 
 .modal-container .modal-footer {
   padding: .8rem;
-  text-align: right
+  /* text-align: right */
 }
 
 .nav {

@@ -187,6 +187,52 @@ function getSelectionAndReplace(el,startTag,endTag) // javascript
     console.log(newText);
     el.value=newText;
 }
+
+function loadEditor() {
+    document.getElementById('modalTitle').innerHTML = `
+        <div class="dropdown">
+            <a href="#editor" class="btn btn-link dropdown-toggle" tabindex="0">
+                <span id="postingName"></span> <i class="icon icon-caret"></i>
+            </a>
+            <!-- menu component -->
+            <ul class="menu">
+                <li class="menu-item">
+                    <a class="checkForChanges" href="/settings#posting">
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+    `;
+    document.getElementById('modalContent').innerHTML = document.getElementById('editorTemplate').innerHTML;
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(document.getElementById('editor-footer'));
+    document.getElementById('modalFooter').appendChild(fragment);
+
+    if(localStorage.getItem('post_setting'))
+    {
+        if(localStorage.getItem('post_setting') === 'none') {
+            document.getElementById('mainPost').classList.add('hide');
+        } else {
+            if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
+            {
+                document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
+                document.getElementById('postingType').value = localStorage.getItem('post_setting');
+                document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
+                document.getElementById('omgApi').value = localStorage.getItem('omg_api');
+            } else if(localStorage.getItem('post_setting') === 'micropub') {
+                document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
+                document.getElementById('postingType').value = 'micropub';
+                document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
+                document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
+            } else {
+                document.getElementById('postingType').value = 'mb';
+            }
+        }
+    }
+
+    document.getElementById('modal').classList.add("active");
+}
 /************************************************************
 ** Swap
 ** Facilitates AJAX-style navigation in web pages 
@@ -681,12 +727,7 @@ document.addEventListener("click", async (item) => {
             // the action is to add a note
         } else if(window.location.pathname.includes('timeline')) {
             // the action is to add a post 
-            document.getElementById('modalTitle').innerHTML = 'New post';
-            document.getElementById('modalContent').innerHTML = document.getElementById('editorTemplate').innerHTML;
-            var fragment = document.createDocumentFragment();
-            fragment.appendChild(document.getElementById('editor-footer'));
-            document.getElementById('modalFooter').appendChild(fragment);
-            document.getElementById('modal').classList.add("active");
+            loadEditor();
         }  else if(window.location.pathname.includes('discover')) {
             // the action is to add a post 
         } else if(window.location.pathname.includes('users')) {
