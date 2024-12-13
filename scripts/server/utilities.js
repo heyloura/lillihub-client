@@ -581,7 +581,7 @@ function getReplyBox(repliers) {
         <div id="replybox-input-container grid-xl" class="form-autocomplete-input form-input">
             <div id="replybox-chips">
             </div>
-            <input id="replybox-input" data-id="replybox" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
+            <input id="replybox-input" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
         </div>
         <ul id="replybox-menu" class="menu hide">
             ${!repliers ? '' : repliers.map(r => {

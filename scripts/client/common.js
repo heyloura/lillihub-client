@@ -588,13 +588,15 @@ document.addEventListener("input", (event) => {
 
     }
     if(event.target.classList.contains('replierInput')) {
-        let id = event.target.getAttribute('data-id');
+        let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
         let menu;
         if(id) {
             menu = document.getElementById(id + '-replybox-menu'); 
         } else {
             menu = document.getElementById('replybox-menu'); 
         }
+
+        console.log(id, menu)
         
         menu.classList.remove('hide');
         var menuItems = menu.children;
