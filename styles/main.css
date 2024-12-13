@@ -3316,16 +3316,16 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .modal-container {
-  background: #fff;
+  background: var(--background-tint-1);
   border-radius: .1rem;
   box-shadow: 0 .2rem .5rem rgba(48,55,66,.3);
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
   flex-direction: column;
-  max-height: 75vh;
+  max-height: 97.5vh;
   max-width: 640px;
-  padding: 0 .8rem;
+  /* padding: 0 .8rem; */
   width: 100%
 }
 
