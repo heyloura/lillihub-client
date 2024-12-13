@@ -339,9 +339,9 @@ export function getEditor(repliers, username) {
             <input type="hidden" name="microPub" id="microPub" />
             <div id="editor-container">
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
-                <input type="text" class="form-input" name="name" id="postName" />
+                <input type="text" placeholder="title (optional)" class="form-input mb-2" name="name" id="postName" />
                 <div class="grow-wrap">
-                    <textarea rows="15" id="content" id="post" class="form-input grow-me"></textarea>
+                    <textarea rows="10" id="content" id="post" class="form-input grow-me"></textarea>
                 </div>
             </div>
             <div id="editor-footer" class="card-footer mb-2">
