@@ -127,6 +127,7 @@ export function settingsHTML() {
 
                     <h3 class="mt-2 mb-2">omg.lol services:</h3>
                     <p>Make sure you have <code>https://[your-address].status.lol/feed</code> wired up with Micro.blog</p>
+                    <p>Note: your address does NOT include the '@omg.lol' portion</p>
                     <div class="form-horizontal mt-2">
                         <div class="form-group">
                             <div class="col-3 col-sm-12">
@@ -337,6 +338,7 @@ export function getEditor(repliers, username) {
             <input type="hidden" name="omgAddess" id="omgAddess" />
             <input type="hidden" name="indieToken" id="indieToken" />
             <input type="hidden" name="microPub" id="microPub" />
+            <input type="hidden" name="id" id="postId" />
             <div id="editor-container">
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
                 <input type="text" placeholder="title (optional)" class="form-input mb-2" name="name" id="postName" />
@@ -369,7 +371,7 @@ export function getEditor(repliers, username) {
                         <option value="publish">Publish</option>
                         <option value="draft">Draft</option>
                     </select>
-                    <button id="editor-action" type="button" class="btn btn-primary saveNote">Post</button>
+                    <button id="editor-action" type="button" class="btn btn-primary">Post</button>
                 </div>
                 <div id="topBarBtns" class="btn-group">
                     <div class="dropdown">
@@ -394,11 +396,7 @@ export function getEditor(repliers, username) {
                 <br/>
                 <p id="editor-status"></p>
                 <!--<p><b>Note:</b> file upload is limited to 3MB.</p>-->
-            </div>
-            <div id="editor-toast" class="toast toast-dark hide mt-2">
-                <button data-toast-id="editor-toast" class="btn btn-clear float-right dismiss"></button>
-                <div id="editor-toast-message"></div>
-            </div>     
+            </div>   
         </form>
     `;
 }
@@ -531,8 +529,6 @@ export function postHTML(post, stranger, isConvo, convoId) {
 
     post.content.replaceAll('<script', `<div`);
     post.content.replaceAll('</script', `</div`);
-
-    console.log(isConvo,post.id,convoId)
     
     return ` 
         ${isConvo ? `<div class="timeline-item bordered">
@@ -556,7 +552,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                 </div>
                  <div class="card-buttons postBtns text-right">
                     <div class="btn-group">
-                        <a data-reply="@${post.username}" class="btn btn-link btn-action"><i class="icon icon-edit"></i></a>
+                        <a data-avatar="${post.avatar}" data-id="${post.id}" data-reply="@${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-reply="@${post.username}" class="replyBtn icon icon-edit"></i></a>
                         ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                         <div class="dropdown">
                             <a href="#" class="btn btn-link btn-action dropdown-toggle" tabindex="0">

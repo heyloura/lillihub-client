@@ -124,7 +124,12 @@ function objectToTableRows(obj) {
   
     return html;
 }
-
+function closeEditorModal() {
+    document.getElementById('modalTitle').innerHTML = '';
+    document.getElementById('modalContent').innerHTML = '';
+    document.getElementById('modalFooter').innerHTML = '';
+    document.getElementById('modal').classList.remove("active");
+}
 /***********************
 ** HANDLE OFFLINE STUFF
 ************************/
@@ -195,6 +200,10 @@ function loadEditor(type) {
     document.getElementById('modalFooter').appendChild(fragment);
 
     if(type == "reply") {
+        document.getElementById('postingName').classList.add('hide');
+        document.getElementById('postingBtns').classList.add("hide");
+        document.getElementById('postName').classList.add("hide");
+        document.getElementById('postStatus').classList.add("hide");
 
     } else if(type == "note") {
 
@@ -204,12 +213,9 @@ function loadEditor(type) {
         fragment.appendChild(document.getElementById('topBarBtns'));
         document.getElementById('modalTitle').appendChild(fragment);
     }
-    
-    console.log('getting editor ready')
 
     if(localStorage.getItem('post_setting'))
     {
-        console.log(localStorage.getItem('post_setting'))
         if(localStorage.getItem('post_setting') != 'none') {
             if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
             {
@@ -223,8 +229,6 @@ function loadEditor(type) {
                 document.getElementById('postName').classList.add("hide");
                 document.getElementById('postStatus').classList.add("hide");
 
-
-                console.log('done with statuslog set up')
             } else if(localStorage.getItem('post_setting') === 'micropub') {
                 document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
                 document.getElementById('postingType').value = 'micropub';
@@ -263,7 +267,7 @@ var Swap = (() => {
                     history.pushState({}, "", href);
                 register_links();  
                 document.getElementById('loader').remove();
-                document.querySelector('.off-canvas-overlay').dispatchEvent(new Event("click"));
+                //document.querySelector('.off-canvas-overlay').dispatchEvent(new Event("click"));
             });
         }
     }
@@ -730,6 +734,28 @@ document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('editor-image')) {
         getSelectionAndReplace(document.getElementById('content'),'![alt text](',')');
     }
+    if(item.target.classList.contains('replyBtn')){
+        loadEditor('reply');
+        let name = item.target.getAttribute('data-name');
+        let avatar = item.target.getAttribute('data-avatar');
+        let chips = document.getElementById('replybox-chips'); 
+        chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
+        document.getElementById('postId').value = item.target.getAttribute('data-id');
+        document.getElementById('replybox-input').value = '';
+        document.getElementById('replybox-input').focus();
+        document.getElementById('replybox-menu').classList.add('hide');
+        document.getElementById('replybox-checkbox-' + name).checked = true; 
+        document.getElementById('editor-action').classList.add('sendReply');
+        document.getElementById('editor-action').innerHTML = 'Send';
+    }
+    if(item.target.classList.contains('sendReply')){
+        let form = document.getElementById('editor'); 
+        fetch("/timeline/reply", { body: formData, method: "post" })
+            .then(response => response.text())
+            .then(data => {
+                closeEditorModal();
+            });
+    }
     if(item.target.classList.contains('actionBtn')) {
         //alert('action btn click:' + window.location.pathname);
         // here we vary by page...
@@ -770,10 +796,7 @@ document.addEventListener("click", async (item) => {
         document.getElementById('replybox-checkbox-' + name).checked = false; 
     }
     if(item.target.classList.contains('closeModal')) {
-        document.getElementById('modalTitle').innerHTML = '';
-        document.getElementById('modalContent').innerHTML = '';
-        document.getElementById('modalFooter').innerHTML = '';
-        document.getElementById('modal').classList.remove("active");
+        closeEditorModal();
     }
     if(item.target.classList.contains('savePost')) {
         item.preventDefault();

@@ -171,26 +171,31 @@ Deno.serve(async (req) => {
             *********************************/
             if(new URLPattern({ pathname: "/timeline/reply" }).exec(req.url)) {
                 const value = await req.formData();
+
+                console.log(value);
+
                 const id = value.get('id');
                 const replyingTo = value.getAll('replyingTo[]');
                 let content = value.get('content');
+
+                console.log(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`);
         
-                if(content != null && content != undefined && content != '' && content != 'null' && content != 'undefined') {
-                    const replies = replyingTo.map(function (reply, i) { return '@' + reply }).join(' ');
-                    content = replies + ' ' + content;
+                // if(content != null && content != undefined && content != '' && content != 'null' && content != 'undefined') {
+                //     const replies = replyingTo.map(function (reply, i) { return '@' + reply }).join(' ');
+                //     content = replies + ' ' + content;
         
-                    const posting = await fetch(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
-                    if (!posting.ok) {
-                        console.log(`${user.username} tried to add a reply and ${await posting.text()}`);
-                    }
+                //     const posting = await fetch(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+                //     if (!posting.ok) {
+                //         console.log(`${user.username} tried to add a reply and ${await posting.text()}`);
+                //     }
         
-                    return new Response('Reply was sent.', {
-                        status: 200,
-                        headers: {
-                            "content-type": "text/html",
-                        },
-                    });
-                }
+                //     return new Response('Reply was sent.', {
+                //         status: 200,
+                //         headers: {
+                //             "content-type": "text/html",
+                //         },
+                //     });
+                // }
         
                 return new Response('Something went wrong sending the reply.', {
                     status: 200,
