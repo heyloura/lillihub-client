@@ -588,7 +588,14 @@ document.addEventListener("input", (event) => {
 
     }
     if(event.target.classList.contains('replierInput')) {
-        let menu = document.getElementById('replybox-menu'); 
+        let id = event.target.getAttribute('data-id');
+        let menu;
+        if(id) {
+            menu = document.getElementById(id + '-replybox-menu'); 
+        } else {
+            menu = document.getElementById('replybox-menu'); 
+        }
+        
         menu.classList.remove('hide');
         var menuItems = menu.children;
         if(!event.target.value)
@@ -603,18 +610,22 @@ document.addEventListener("input", (event) => {
                     <a  data-avatar="${item.getAttribute('data-avatar')}" 
                         data-name="${item.getAttribute('data-name')}" 
                         class="addUserToReplyBox" href="#">
-                            <div data-avatar="${item.getAttribute('data-avatar')}" 
+                            <div ${id ? `data-id="${id}"` : ''}
+                                data-avatar="${item.getAttribute('data-avatar')}" 
                                 data-name="${item.getAttribute('data-name')}" 
                                 class="tile tile-centered addUserToReplyBox">
-                                    <div data-avatar="${item.getAttribute('data-avatar')}" 
+                                    <div ${id ? `data-id="${id}"` : ''} 
+                                        data-avatar="${item.getAttribute('data-avatar')}" 
                                         data-name="${item.getAttribute('data-name')}" 
                                         class="tile-icon addUserToReplyBox">
-                                            <img data-avatar="${item.getAttribute('data-avatar')}" 
+                                            <img ${id ? `data-id="${id}"` : ''} 
+                                                data-avatar="${item.getAttribute('data-avatar')}" 
                                                 data-name="${item.getAttribute('data-name')}" 
                                                 class="avatar avatar-sm addUserToReplyBox" 
                                                 src="${item.getAttribute('data-avatar')}">
                                     </div>
-                                    <div data-avatar="${item.getAttribute('data-avatar')}" 
+                                    <div ${id ? `data-id="${id}"` : ''} 
+                                        data-avatar="${item.getAttribute('data-avatar')}" 
                                         data-name="${item.getAttribute('data-name')}" 
                                         class="tile-content addUserToReplyBox">@${item.getAttribute('data-name').replaceAll(event.target.value, '<mark>' + event.target.value + '</mark>')}
                                     </div>
@@ -739,8 +750,6 @@ document.addEventListener("click", async (item) => {
         let name = item.target.getAttribute('data-name');
         let id = item.target.getAttribute('data-id');
         let avatar = item.target.getAttribute('data-avatar');
-    
-        console.log(name, id, avatar);
     
         // Set up the reply area
         document.getElementById('main-' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML.replaceAll('id="',`id="${id}-`));
