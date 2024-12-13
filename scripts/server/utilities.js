@@ -352,7 +352,7 @@ export function getEditor(repliers) {
                     <a href="javascript:void(0)" class="btn btn-link dropdown-toggle" tabindex="0">
                         <i class="icon icon-link"></i></i>
                     </a>
-                    <ul class="menu">
+                    <ul class="menu menu-above">
                         <li class="menu-item editor-image"><a class="editor-image" href="javascript:void(0)">Markdown image</a></li>
                         <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
                         <li class="divider"></li>

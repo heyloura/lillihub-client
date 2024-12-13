@@ -6726,6 +6726,11 @@ article footer {
   margin: 0px auto;
 }
 
+.menu-above {
+  top: auto;
+  bottom: 100%;
+}
+
 /* Dracula Theme v1.2.5
  *
  * https://github.com/dracula/highlightjs
