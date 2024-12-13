@@ -6580,7 +6580,7 @@ article footer {
   margin-top: -0.5em;
 }
 .page {
-  padding-top: 3em;
+  padding-top: 2em !important;
 }
 .ripple {
   background-position: center;
