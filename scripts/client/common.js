@@ -188,32 +188,23 @@ function getSelectionAndReplace(el,startTag,endTag) // javascript
     el.value=newText;
 }
 
-function loadEditor() {
-    document.getElementById('modalTitle').innerHTML = `
-        <div class="dropdown">
-            <a href="#editor" class="btn btn-link dropdown-toggle" tabindex="0">
-                <span id="postingName"></span> <i class="icon icon-caret"></i>
-            </a>
-            <!-- menu component -->
-            <ul class="menu">
-                <li class="menu-item">
-                    <a class="checkForChanges" href="/settings#posting">
-                        Settings
-                    </a>
-                </li>
-            </ul>
-        </div>
-    `;
+function loadEditor(type) {
     document.getElementById('modalContent').innerHTML = document.getElementById('editorTemplate').innerHTML;
     var fragment = document.createDocumentFragment();
     fragment.appendChild(document.getElementById('editor-footer'));
     document.getElementById('modalFooter').appendChild(fragment);
 
+    if(type == "reply") {
+
+    } else if(type == "note") {
+
+    } else {
+        // generic post
+    }
+    
     if(localStorage.getItem('post_setting'))
     {
         if(localStorage.getItem('post_setting') === 'none') {
-            document.getElementById('mainPost').classList.add('hide');
-        } else {
             if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
             {
                 document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
@@ -488,6 +479,10 @@ function loadTimeline() {
     buildMasonry();
     hljs.highlightAll();
 
+    if(localStorage.getItem('post_setting') === 'none') {
+        document.getElementById('actionBtn').classList.add('hide');
+    }
+
     const article = document.querySelector('article:first-child');
     const id = article.getAttribute('data-id');
     // let checks = 0;
@@ -522,6 +517,9 @@ Swap.loaders['#post-list'] = () => {
 
     return () => {  // unloader function
         document.querySelector(`#timelineLink`).classList.remove("active");
+        if(localStorage.getItem('post_setting') === 'none') {
+            document.getElementById('actionBtn').classList.remove('hide');
+        }
     };  
 }
 

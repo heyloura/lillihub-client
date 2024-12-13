@@ -329,7 +329,7 @@ function getNoteEditor(notebookId, n) {
     `;
 }
 
-export function getEditor(repliers) {
+export function getEditor(repliers, username) {
     return `
         <form id="editor" class="card">
             <input type="hidden" name="postingType" id="postingType" />
@@ -361,13 +361,27 @@ export function getEditor(repliers) {
                         <li class="menu-item"><a href="javascript:void(0)">Item 3</a></li>
                     </ul>
                 </div>
+                <br/>
                 <div class="btn-group float-right">
+                    <div class="dropdown">
+                        <a href="#editor" class="btn btn-link dropdown-toggle" tabindex="0">
+                            <span id="postingName">${username}</span> <i class="icon icon-caret"></i>
+                        </a>
+                        <!-- menu component -->
+                        <ul class="menu">
+                            <li class="menu-item">
+                                <a class="checkForChanges" href="/settings#posting">
+                                    Settings
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                     <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button>
                     <button type="button" class="btn btn-primary saveNote">Save</button>
                 </div> 
                 <br/>
                 <p id="editor-status"></p>
-                <p><b>Note:</b> file upload is limited to 3MB.</p>
+                <!--<p><b>Note:</b> file upload is limited to 3MB.</p>-->
             </div>
             <div id="editor-toast" class="toast toast-dark hide mt-2">
                 <button data-toast-id="editor-toast" class="btn btn-clear float-right dismiss"></button>
@@ -523,7 +537,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     <div class="card-subtitle d-block pl-1">
                             <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
                                 ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
-                                @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? '' : '<i class="icon icon-location"></i>'}
+                                @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
                             </a> · 
                         <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
                     </div>

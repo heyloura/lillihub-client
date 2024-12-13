@@ -407,11 +407,11 @@ Deno.serve(async (req) => {
                         formBody.append("mp-syndicate-to[]", "");
                     }
                     
-                    const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
-                    if (!posting.ok) {
-                        console.log(`${user.username} tried to add a post and ${await posting.text()}`);
-                    }
-                    return new Response(JSON.stringify({"response":{"message":"Post was sent."}}), JSONHeaders());
+                    //const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
+                    //if (!posting.ok) {
+                    //    console.log(`${user.username} tried to add a post and ${await posting.text()}`);
+                    //}
+                    //return new Response(JSON.stringify({"response":{"message":"Post was sent."}}), JSONHeaders());
 
                 } else if(postingType === 'statuslog') {
                     const posting = await fetch(`https://api.omg.lol/address/${omgAddess}/statuses/`, { method: "POST", body: JSON.stringify({"status": content}), headers: { "Authorization": "Bearer " + omgApi } });
@@ -649,7 +649,7 @@ Deno.serve(async (req) => {
                         `<li class="menu-item"><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join(''))
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
-                    .replaceAll('{{editor}}', utility.getEditor(following))
+                    .replaceAll('{{editor}}', utility.getEditor(following, mbUser.username))
                 , HTMLHeaders(nonce));
             }
 
