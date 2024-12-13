@@ -200,12 +200,12 @@ function loadEditor(type) {
     document.getElementById('modalFooter').appendChild(fragment);
 
     if(type == "reply") {
-        document.getElementById('postingName').classList.add('hide');
-        document.getElementById('postingBtns').classList.add("hide");
-        document.getElementById('postName').classList.add("hide");
-        document.getElementById('postStatus').classList.add("hide");
-        document.getElementById('editor-replybox').classList.remove('hide');
-        document.getElementById('topBarBtns').classList.add("hide");
+        // document.getElementById('postingName').classList.add('hide');
+        // document.getElementById('postingBtns').classList.add("hide");
+        // document.getElementById('postName').classList.add("hide");
+        // document.getElementById('postStatus').classList.add("hide");
+        // document.getElementById('editor-replybox').classList.remove('hide');
+        // document.getElementById('topBarBtns').classList.add("hide");
     } else if(type == "note") {
 
     } else {
@@ -736,11 +736,22 @@ document.addEventListener("click", async (item) => {
         getSelectionAndReplace(document.getElementById('content'),'![alt text](',')');
     }
     if(item.target.classList.contains('replyBtn')){
-        loadEditor('reply');
         let name = item.target.getAttribute('data-name');
         let id = item.target.getAttribute('data-id');
         let avatar = item.target.getAttribute('data-avatar');
         let chips = document.getElementById('replybox-chips'); 
+
+        //loadEditor('reply');
+    
+        // Set up the reply area
+        document.getElementById('main' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML);
+        document.getElementById('postingName').classList.add('hide');
+        document.getElementById('postingBtns').classList.add("hide");
+        document.getElementById('postName').classList.add("hide");
+        document.getElementById('postStatus').classList.add("hide");
+        document.getElementById('editor-replybox').classList.remove('hide');
+        document.getElementById('topBarBtns').classList.add("hide");
+
         chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
         document.getElementById('postId').value = item.target.getAttribute('data-id');
         document.getElementById('replybox-input').value = '';
@@ -749,13 +760,13 @@ document.addEventListener("click", async (item) => {
         document.getElementById('replybox-checkbox-' + name).checked = true; 
         document.getElementById('editor-action').classList.add('sendReply');
         document.getElementById('editor-action').innerHTML = 'Send';
-        document.getElementById('modalContent').insertAdjacentHTML('afterbegin',`
-            ${document.getElementById('header-' + id).innerHTML}<br/>
-            ${document.getElementById('main-' + id).innerHTML}`);
+        // document.getElementById('modalContent').insertAdjacentHTML('afterbegin',`
+        //     ${document.getElementById('header-' + id).innerHTML}<br/>
+        //     ${document.getElementById('main-' + id).innerHTML}`);
     }
     if(item.target.classList.contains('sendReply')){
         let form = document.getElementById('editor'); 
-        fetch("/timeline/reply", { body: formData, method: "post" })
+        fetch("/timeline/reply", { body: new FormData(form), method: "post" })
             .then(response => response.text())
             .then(data => {
                 closeEditorModal();
