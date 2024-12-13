@@ -6708,6 +6708,10 @@ article footer {
   color: var(--green);
 }
 
+.postBtns {
+  margin-left: auto;
+}
+
 /* Dracula Theme v1.2.5
  *
  * https://github.com/dracula/highlightjs
