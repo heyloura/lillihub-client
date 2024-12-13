@@ -659,6 +659,9 @@ document.addEventListener("click", async (item) => {
             // the action is to add a post 
             document.getElementById('modalTitle').innerHTML = 'New post';
             document.getElementById('modalContent').innerHTML = document.getElementById('editorTemplate').innerHTML;
+            var fragment = document.createDocumentFragment();
+            fragment.appendChild(document.getElementById('editor-footer'));
+            document.getElementById('modalFooter').appendChild(fragment);
             document.getElementById('modal').classList.add("active");
         }  else if(window.location.pathname.includes('discover')) {
             // the action is to add a post 

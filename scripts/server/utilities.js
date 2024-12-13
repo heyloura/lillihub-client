@@ -343,7 +343,7 @@ export function getEditor(repliers) {
                     <textarea id="content" id="post" class="form-input grow-me"></textarea>
                 </div>
             </div>
-            <div class="card-footer mb-2">
+            <div id="editor-footer" class="card-footer mb-2">
                 <button type="button" class="btn btn-link editor-bold"><b class="editor-bold">b</b></button>
                 <button type="button" class="btn btn-link editor-italic"><em class="editor-italic">i</em></button>
                 <button type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
