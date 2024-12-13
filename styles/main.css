@@ -5084,7 +5084,7 @@ a.text-error:visited {
 
 .off-canvas .off-canvas-sidebar.active~.off-canvas-overlay,.off-canvas .off-canvas-sidebar:target~.off-canvas-overlay {
   display: block;
-  z-index: 100
+  z-index: 299
 }
 
 @media (min-width: 960px) {
@@ -6717,7 +6717,7 @@ article footer {
 }
 
 #pageAction {
-  z-index: 500;
+  z-index: 298;
   width: 200px;
   margin: 0px auto;
 }
