@@ -210,7 +210,7 @@ function loadEditor(type) {
     if(localStorage.getItem('post_setting'))
     {
         console.log(localStorage.getItem('post_setting'))
-        if(localStorage.getItem('post_setting') === 'none') {
+        if(localStorage.getItem('post_setting') != 'none') {
             if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
             {
                 document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
