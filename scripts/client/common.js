@@ -214,6 +214,9 @@ function loadEditor(type) {
                 document.getElementById('postingType').value = localStorage.getItem('post_setting');
                 document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
                 document.getElementById('omgApi').value = localStorage.getItem('omg_api');
+
+                document.getElementById('markdownBtns').classList.add("hide");
+                document.getElementById('postingBtns').classList.add("hide");
             } else if(localStorage.getItem('post_setting') === 'micropub') {
                 document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
                 document.getElementById('postingType').value = 'micropub';

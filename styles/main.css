@@ -1739,8 +1739,8 @@ textarea.form-input,textarea.form-input.input-lg,textarea.form-input.input-sm {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background: #fff;
-  border: .05rem solid #bcc3ce;
+  background: black;
+  border: .05rem solid var(--background-tint-4);
   border-radius: .1rem;
   color: inherit;
   font-size: .8rem;

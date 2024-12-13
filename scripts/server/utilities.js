@@ -339,27 +339,30 @@ export function getEditor(repliers, username) {
             <input type="hidden" name="microPub" id="microPub" />
             <div id="editor-container">
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
+                <input type="text" class="form-input" name="name" id="postName" />
                 <div class="grow-wrap">
                     <textarea rows="15" id="content" id="post" class="form-input grow-me"></textarea>
                 </div>
             </div>
             <div id="editor-footer" class="card-footer mb-2">
-                <button type="button" class="btn btn-link editor-bold"><b class="editor-bold">b</b></button>
-                <button type="button" class="btn btn-link editor-italic"><em class="editor-italic">i</em></button>
-                <button type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
-                <button type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
-                <div class="dropdown">
-                    <a href="javascript:void(0)" class="btn btn-link dropdown-toggle" tabindex="0">
-                        <i class="icon icon-link"></i></i>
-                    </a>
-                    <ul class="menu menu-above">
-                        <li class="menu-item editor-image"><a class="editor-image" href="javascript:void(0)">Markdown image</a></li>
-                        <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
-                        <li class="divider"></li>
-                        <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
-                        <li class="menu-item"><a href="javascript:void(0)">Item 2</a></li>
-                        <li class="menu-item"><a href="javascript:void(0)">Item 3</a></li>
-                    </ul>
+                <div id="markdownBtns" class="btn-group"> 
+                    <button type="button" class="btn btn-link editor-bold"><b class="editor-bold">b</b></button>
+                    <button type="button" class="btn btn-link editor-italic"><em class="editor-italic">i</em></button>
+                    <button type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
+                    <button type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
+                    <div class="dropdown">
+                        <a href="javascript:void(0)" class="btn btn-link dropdown-toggle" tabindex="0">
+                            <i class="icon icon-link"></i></i>
+                        </a>
+                        <ul class="menu menu-above">
+                            <li class="menu-item editor-image"><a class="editor-image" href="javascript:void(0)">Markdown image</a></li>
+                            <li class="menu-item"><a href="javascript:void(0)">Markdown link</a></li>
+                            <li class="divider"></li>
+                            <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
+                            <li class="menu-item"><a href="javascript:void(0)">Item 2</a></li>
+                            <li class="menu-item"><a href="javascript:void(0)">Item 3</a></li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="btn-group float-right">
                     <select class="form-select">
@@ -369,8 +372,8 @@ export function getEditor(repliers, username) {
                     <button id="editor-action" type="button" class="btn btn-primary saveNote">Post</button>
                 </div>
                 <div id="topBarBtns" class="btn-group">
-                    <div id="editor-postingAs" class="dropdown">
-                        <a href="#editor" class="btn btn-link dropdown-toggle" tabindex="0">
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link dropdown-toggle" tabindex="0">
                             <span id="postingName">${username}</span> <i class="icon icon-caret"></i>
                         </a>
                         <!-- menu component -->
@@ -383,6 +386,10 @@ export function getEditor(repliers, username) {
                         </ul>
                     </div>
                     <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button> 
+                    <div id="postingBtns" class="btn-group"> 
+                        <button type="button" class="btn btn-link"><i class="icon icon-bookmark"></i></button>
+                        <button type="button" class="btn btn-link"><i class="icon icon-copy"></i></button>
+                    </div>
                 </div>
                 <br/>
                 <p id="editor-status"></p>
