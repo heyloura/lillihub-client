@@ -739,6 +739,9 @@ document.addEventListener("click", async (item) => {
         let name = item.target.getAttribute('data-name');
         let id = item.target.getAttribute('data-id');
         let avatar = item.target.getAttribute('data-avatar');
+
+        console.log(name, id, avatar);
+
         let chips = document.getElementById('replybox-chips'); 
         chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
         document.getElementById('postId').value = item.target.getAttribute('data-id');
