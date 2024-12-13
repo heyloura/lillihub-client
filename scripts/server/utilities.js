@@ -557,13 +557,13 @@ function getReplyBox(repliers) {
             <input id="replybox-input" data-id="replybox" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
         </div>
         <ul id="replybox-menu" class="menu hide">
-            ${repliers.map(r => {
+            ${!repliers ? '' : repliers.map(r => {
                 //const replier = JSON.parse(r);
                 return `<li class="menu-item" class="hide" data-name="${r.username}" data-avatar="${r.avatar}"></li>`}).join('')}
         </ul>
         </div>
     </div>
-    ${repliers.map(function (ur) {
+    ${!repliers ? '' : repliers.map(function (ur) {
         //const person = JSON.parse(ur);
         return `<input id="replybox-checkbox-${ur.username}" class="hide" type='checkbox' name='replyingTo[]' value='${ur.username}'/>`
     }).join(' ')}
