@@ -198,20 +198,21 @@ function loadEditor(type) {
     var fragment = document.createDocumentFragment();
     fragment.appendChild(document.getElementById('editor-footer'));
     document.getElementById('modalFooter').appendChild(fragment);
-    fragment = document.createDocumentFragment();
-    fragment.appendChild(document.getElementById('topBarBtns'));
-    document.getElementById('modalTitle').appendChild(fragment);
 
     if(type == "reply") {
         document.getElementById('postingName').classList.add('hide');
         document.getElementById('postingBtns').classList.add("hide");
         document.getElementById('postName').classList.add("hide");
         document.getElementById('postStatus').classList.add("hide");
+        document.getElementById('editor-replybox').classList.remove('hide');
+        document.getElementById('topBarBtns').classList.add("hide");
     } else if(type == "note") {
 
     } else {
         // generic post
-
+        fragment = document.createDocumentFragment();
+        fragment.appendChild(document.getElementById('topBarBtns'));
+        document.getElementById('modalTitle').appendChild(fragment);
     }
 
     if(localStorage.getItem('post_setting'))
@@ -739,9 +740,6 @@ document.addEventListener("click", async (item) => {
         let name = item.target.getAttribute('data-name');
         let id = item.target.getAttribute('data-id');
         let avatar = item.target.getAttribute('data-avatar');
-
-        console.log(name, id, avatar);
-
         let chips = document.getElementById('replybox-chips'); 
         chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
         document.getElementById('postId').value = item.target.getAttribute('data-id');
@@ -751,7 +749,9 @@ document.addEventListener("click", async (item) => {
         document.getElementById('replybox-checkbox-' + name).checked = true; 
         document.getElementById('editor-action').classList.add('sendReply');
         document.getElementById('editor-action').innerHTML = 'Send';
-        document.getElementById('modalContent').insertAdjacentHTML('afterbegin',document.getElementById('main-' + id).innerHTML);
+        document.getElementById('modalContent').insertAdjacentHTML('afterbegin',`
+            ${document.getElementById('header-' + id).innerHTML}<br/>
+            ${document.getElementById('main-' + id).innerHTML}`);
     }
     if(item.target.classList.contains('sendReply')){
         let form = document.getElementById('editor'); 
