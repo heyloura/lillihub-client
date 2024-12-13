@@ -340,7 +340,7 @@ export function getEditor(repliers) {
             <div id="editor-container">
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
                 <div class="grow-wrap">
-                    <textarea id="content" id="post" class="form-input grow-me"></textarea>
+                    <textarea rows="15" id="content" id="post" class="form-input grow-me"></textarea>
                 </div>
             </div>
             <div id="editor-footer" class="card-footer mb-2">

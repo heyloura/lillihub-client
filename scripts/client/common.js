@@ -673,7 +673,7 @@ document.addEventListener("click", async (item) => {
         getSelectionAndReplace(document.getElementById('content'),'![alt text](',')');
     }
     if(item.target.classList.contains('actionBtn')) {
-        alert('action btn click:' + window.location.pathname);
+        //alert('action btn click:' + window.location.pathname);
         // here we vary by page...
         if(window.location.pathname.includes('notes')) {
             // the action is to edit a note
@@ -695,9 +695,26 @@ document.addEventListener("click", async (item) => {
     }
     if(item.target.classList.contains('toggleMainReplyBox')) {
         // need to clear values if toggled
-        alert('toggleMainReplyBox btn click');
         document.getElementById('editor-replybox').classList.toggle('hide');
         document.getElementById('editor-replybox').classList.add('mb-2');
+    }
+    if(item.target.classList.contains('addUserToReplyBox')){
+        item.preventDefault();
+        let name = item.target.getAttribute('data-name');
+        let avatar = item.target.getAttribute('data-avatar');
+        let chips = document.getElementById('replybox-chips'); 
+        chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
+        document.getElementById('replybox-input').value = '';
+        document.getElementById('replybox-input').focus();
+        document.getElementById('replybox-menu').classList.add('hide');
+        document.getElementById('replybox-checkbox-' + name).checked = true; 
+    }
+    if(item.target.classList.contains('replierRemoveChip')){
+        let name = item.target.getAttribute('data-name');
+        document.getElementById('chip-' + name).remove(); 
+        document.getElementById('replybox-input').focus();
+        document.getElementById('replybox-menu').classList.add('hide');
+        document.getElementById('replybox-checkbox-' + name).checked = false; 
     }
     if(item.target.classList.contains('closeModal')) {
         document.getElementById('modalTitle').innerHTML = '';
