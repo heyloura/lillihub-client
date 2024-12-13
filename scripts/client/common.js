@@ -771,11 +771,12 @@ document.addEventListener("click", async (item) => {
     }
     if(item.target.classList.contains('sendReply')){
         let id = item.target.getAttribute('data-id');
-        let form = document.getElementById('editor-' + id); 
+        let form = document.getElementById(id + '-editor'); 
         fetch("/timeline/reply", { body: new FormData(form), method: "post" })
             .then(response => response.text())
             .then(data => {
-                closeEditorModal();
+                document.getElementById(id + '-editor').remove();
+                //maybe add a toast message here...
             });
     }
     if(item.target.classList.contains('actionBtn')) {
