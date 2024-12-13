@@ -802,21 +802,44 @@ document.addEventListener("click", async (item) => {
     }
     if(item.target.classList.contains('addUserToReplyBox')){
         item.preventDefault();
+        let id = item.target.getAttribute('data-id');
         let name = item.target.getAttribute('data-name');
         let avatar = item.target.getAttribute('data-avatar');
-        let chips = document.getElementById('replybox-chips'); 
-        chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
-        document.getElementById('replybox-input').value = '';
-        document.getElementById('replybox-input').focus();
-        document.getElementById('replybox-menu').classList.add('hide');
-        document.getElementById('replybox-checkbox-' + name).checked = true; 
+        
+        if(id) {
+            let chips = document.getElementById(id + '-replybox-chips');
+            chips.innerHTML = chips.innerHTML + `<span id="${id}-chip-${name}" class="chip">
+                <img class="avatar avatar-sm" src="${avatar}" />@${name}
+                <a data-id="${id}" data-name="${name}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a>
+            </span>`; 
+            document.getElementById(id + '-replybox-input').value = '';
+            document.getElementById(id + '-replybox-input').focus();
+            document.getElementById(id + '-replybox-menu').classList.add('hide');
+            document.getElementById(id + '-replybox-checkbox-' + name).checked = true; 
+        } else {
+            let chips = document.getElementById('replybox-chips');
+            chips.innerHTML = chips.innerHTML + '<span id="chip-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
+            document.getElementById('replybox-input').value = '';
+            document.getElementById('replybox-input').focus();
+            document.getElementById('replybox-menu').classList.add('hide');
+            document.getElementById('replybox-checkbox-' + name).checked = true; 
+        }
     }
-    if(item.target.classList.contains('replierRemoveChip')){
+    if(item.target.classList.contains('replierRemoveChip')) {
         let name = item.target.getAttribute('data-name');
-        document.getElementById('chip-' + name).remove(); 
-        document.getElementById('replybox-input').focus();
-        document.getElementById('replybox-menu').classList.add('hide');
-        document.getElementById('replybox-checkbox-' + name).checked = false; 
+        let id = item.target.getAttribute('data-id');
+
+        if(id) {
+            document.getElementById(id + '-chip-' + name).remove(); 
+            document.getElementById(id + '-replybox-input').focus();
+            document.getElementById(id + '-replybox-menu').classList.add('hide');
+            document.getElementById(id + '-replybox-checkbox-' + name).checked = false; 
+        } else {
+            document.getElementById('chip-' + name).remove(); 
+            document.getElementById('replybox-input').focus();
+            document.getElementById('replybox-menu').classList.add('hide');
+            document.getElementById('replybox-checkbox-' + name).checked = false; 
+        }
     }
     if(item.target.classList.contains('closeModal')) {
         closeEditorModal();
