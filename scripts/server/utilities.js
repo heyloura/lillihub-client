@@ -203,7 +203,7 @@ export function settingsHTML() {
 
 export function discoverHTML(posts, tagmoji, id) {
     return `
-        <div class="container">
+        <div class="container grid-xl">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     ${posts.items.map(n => postHTML(n)).join('')}
@@ -249,7 +249,7 @@ export function timelineHTML(posts, lastId) {
     </div>
     `;
     return `
-        <div class="container">
+        <div class="container grid-xl">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div class="card bordered">Profile peek here...</div>
@@ -281,7 +281,7 @@ function flattenedNote(note) {
 export function noteHTML(note, notebookId, versions) {
     const n = flattenedNote(note);
     return `
-        <div class="container">
+        <div class="container grid-xl">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     <div class="card bordered pages">
@@ -326,7 +326,7 @@ function getNoteEditor(notebookId, n) {
         <input data-id="${ n ? n.id : 'newNote'}" id="noteContent" class="${n && n.shared ? '' : 'decryptMe'}" type="hidden" value="${n ? n.content_text : ''}" />
         <input id="noteId" type="hidden" value="${n ? n.id : 0}" />
         <form id="edit" class="card">
-            <div id="editor-container" class="card-body">
+            <div id="editor-container grid-xl" class="card-body">
                 <div class="grow-wrap">
                     <textarea id="content" placeholder="Your note is loading...." id="post" class="form-input grow-me" rows="10"></textarea>
                 </div>
@@ -381,7 +381,7 @@ export function getNotebookHTML(notes, notebookId) {
     </div>
     `;
     // return `
-    //     <div class="container">
+    //     <div class="container grid-xl">
     //         <div class="columns">
     //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
     //                 <p id="privateKeyWarning">
@@ -584,7 +584,7 @@ export function getReplyBox(id, repliers, boxOnly = false) {
     if(boxOnly) {
         return `<div id="replybox-${id}" class="form-group">
                     <div class="form-autocomplete">
-                    <div id="replybox-input-container-${id}" class="form-autocomplete-input form-input">
+                    <div id="replybox-input-container grid-xl-${id}" class="form-autocomplete-input form-input">
                         <div id="replybox-chips-${id}">
                         </div>
                         <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
@@ -612,7 +612,7 @@ export function getReplyBox(id, repliers, boxOnly = false) {
             <div id="replybox-${id}" class="form-group">
                 <label class="form-label">Repling to:</label>
                 <div class="form-autocomplete">
-                <div id="replybox-input-container-${id}" class="form-autocomplete-input form-input">
+                <div id="replybox-input-container grid-xl-${id}" class="form-autocomplete-input form-input">
                     <div id="replybox-chips-${id}">
                         <span id="chip-${id}-${author.username}" class="chip"><img class="avatar avatar-sm" src="${author.avatar}" />@${author.username}<a data-name="${author.username}" data-id="${id}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>
                     </div>
