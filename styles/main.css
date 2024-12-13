@@ -5065,7 +5065,7 @@ a.text-error:visited {
 }
 
 .off-canvas .off-canvas-overlay {
-  background: rgba(48,55,66,.1);
+  background: rgba(48,55,66,.75);
   border-color: transparent;
   border-radius: 0;
   bottom: 0;
@@ -6718,6 +6718,8 @@ article footer {
 
 #pageAction {
   z-index: 500;
+  width: 200px;
+  margin: 0px auto;
 }
 
 /* Dracula Theme v1.2.5
