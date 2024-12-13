@@ -5102,6 +5102,10 @@ a.text-error:visited {
   .off-canvas.off-canvas-sidebar-show .off-canvas-overlay {
       display: none!important
   }
+
+  .off-canvas .off-canvas-content {
+    padding: .4rem .4rem .4rem .1rem
+  }
 }
 
 .parallax {
@@ -6580,7 +6584,7 @@ article footer {
   margin-top: -0.5em;
 }
 .page {
-  padding-top: 2em !important;
+  padding-top: 3em !important;
 }
 .ripple {
   background-position: center;
