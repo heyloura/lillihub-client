@@ -649,6 +649,7 @@ document.addEventListener("click", async (item) => {
         getSelectionAndReplace(document.getElementById('content'),'![alt text](',')');
     }
     if(item.target.classList.contains('actionBtn')) {
+        alert('action btn click:' + window.location.pathname);
         // here we vary by page...
         if(window.location.pathname.includes('notes')) {
             // the action is to edit a note
