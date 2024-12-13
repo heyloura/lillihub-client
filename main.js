@@ -570,7 +570,7 @@ Deno.serve(async (req) => {
                 // following
                 fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let following = await fetching.json();
-
+                
                 // tagmoji
                 fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let tagmoji = await fetching.json();
@@ -647,6 +647,7 @@ Deno.serve(async (req) => {
                         `<li class="menu-item"><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join(''))
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
+                    .replaceAll('{{editor}}', utility.getEditor(following))
                 , HTMLHeaders(nonce));
             }
 

@@ -648,6 +648,20 @@ document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('editor-image')) {
         getSelectionAndReplace(document.getElementById('content'),'![alt text](',')');
     }
+    if(item.target.classList.contains('actionBtn')) {
+        // here we vary by page...
+        if(window.location.pathname.includes('notes')) {
+            // the action is to edit a note
+        } else if(window.location.pathname.includes('notebooks')) {
+            // the action is to add a note
+        } else if(window.location.pathname.includes('timeline')) {
+            // the action is to add a post 
+        }  else if(window.location.pathname.includes('discover')) {
+            // the action is to add a post 
+        } else if(window.location.pathname.includes('users')) {
+            // the action is to follow (if not already)?
+        }
+    }
 });
 
 

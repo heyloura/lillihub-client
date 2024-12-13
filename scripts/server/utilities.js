@@ -325,10 +325,17 @@ function getNoteEditor(notebookId, n) {
     return `
         <input data-id="${ n ? n.id : 'newNote'}" id="noteContent" class="${n && n.shared ? '' : 'decryptMe'}" type="hidden" value="${n ? n.content_text : ''}" />
         <input id="noteId" type="hidden" value="${n ? n.id : 0}" />
-        <form id="edit" class="card">
-            <div id="editor-container grid-xl" class="card-body">
+        ${getEditor()}
+    `;
+}
+
+export function getEditor(repliers) {
+    return `
+        <form id="editor" class="card">
+            <div id="editor-container" class="card-body">
+                <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
                 <div class="grow-wrap">
-                    <textarea id="content" placeholder="Your note is loading...." id="post" class="form-input grow-me" rows="10"></textarea>
+                    <textarea id="content" id="post" class="form-input grow-me"></textarea>
                 </div>
             </div>
             <div class="card-footer mb-2">
@@ -357,9 +364,9 @@ function getNoteEditor(notebookId, n) {
                 <p id="editor-status"></p>
                 <p><b>Note:</b> file upload is limited to 3MB.</p>
             </div>
-            <div id="note-toast" class="toast toast-dark hide mt-2">
-                <button data-toast-id="note-toast" class="btn btn-clear float-right dismissToast"></button>
-                <div id="note-toast-message"></div>
+            <div id="editor-toast" class="toast toast-dark hide mt-2">
+                <button data-toast-id="editor-toast" class="btn btn-clear float-right dismiss"></button>
+                <div id="editor-toast-message"></div>
             </div>     
         </form>
     `;
@@ -380,47 +387,6 @@ export function getNotebookHTML(notes, notebookId) {
         ${notes.map(n => notesHTML(n,notebookId)).join('')}
     </div>
     `;
-    // return `
-    //     <div class="container grid-xl">
-    //         <div class="columns">
-    //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-    //                 <p id="privateKeyWarning">
-    //                     Looks like you don't have your secret key set up in Lillihub.
-    //                     Please add it under <a rel="prefetch" swap-target="#main" swap-history="true" href="/settings">settings</a> and then return to this page.
-    //                 </p>
-    //                 <div class="form-group">
-    //                     <label class="form-label">Search your notebook</label>
-    //                     <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
-    //                     <datalist id="tags"></datalist>
-    //                 </div>
-    //                 ${notes.map(n => notesHTML(n,notebookId)).join('')}
-    //             </div>
-    //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-    //                 <div class="btn-group btn-group-block hide-lg">
-    //                     <button class="btn btn-primary">Add new note</button>
-    //                 </div>
-    //                 <details class="accordion">
-    //                     <summary class="accordion-header">
-    //                         <i class="icon icon-arrow-right mr-1"></i>
-    //                         Manage notebook
-    //                     </summary>
-    //                     <div class="accordion-body">
-    //                         <div class="btn-group btn-group-block">
-    //                             <button class="btn btn-link">update name</button>
-    //                         </div>
-    //                         <div class="btn-group btn-group-block">
-    //                             <button class="btn btn-link">export notes</button>
-    //                         </div>
-    //                         <div class="btn-group btn-group-block">
-    //                             <button class="btn btn-link">delete?</button>
-    //                         </div>
-    //                     </div>
-    //                 </details>
-    //             </div>
-    //         </div>
-    //     </div>
-    // `;
-
 }
 
 function notesHTML(note, notebookId) {
@@ -582,60 +548,82 @@ export function postHTML(post, stranger, isConvo, convoId) {
     `;
 }
 
-export function getReplyBox(id, repliers, boxOnly = false) {  
-    if(boxOnly) {
-        return `<div id="replybox-${id}" class="form-group">
-                    <div class="form-autocomplete">
-                    <div id="replybox-input-container grid-xl-${id}" class="form-autocomplete-input form-input">
-                        <div id="replybox-chips-${id}">
-                        </div>
-                        <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
-                    </div>
-                    <ul id="replybox-menu-${id}" class="menu hide">
-                        ${repliers.map(r => {
-                            const replier = JSON.parse(r);
-                            return `<li class="menu-item" class="hide" data-name="${replier.username}" data-avatar="${replier.avatar}"></li>`}).join('')}
-                    </ul>
-                    </div>
-                </div>
-                ${repliers.map(function (ur) {
-                    const person = JSON.parse(ur);
-                    return `<input id="replybox-checkbox-${id}-${person.username}" class="hide" type='checkbox' name='replyingTo[]' value='${person.username}'/>`
-                }).join(' ')}
-                `;
-    }
-    const author = JSON.parse(repliers[0]);
-    return `
-        <form class="form" id='replybox-form-${id}' data-id="${id}">
-            ${repliers.map(function (ur) {
-                const person = JSON.parse(ur);
-                return `<input id="replybox-checkbox-${id}-${person.username}" class="hide" ${person.username.trim() == author.username.trim() ? 'checked="checked"' : ''} type='checkbox' name='replyingTo[]' value='${person.username}'/>`
-            }).join(' ')}
-            <div id="replybox-${id}" class="form-group">
-                <label class="form-label">Repling to:</label>
-                <div class="form-autocomplete">
-                <div id="replybox-input-container grid-xl-${id}" class="form-autocomplete-input form-input">
-                    <div id="replybox-chips-${id}">
-                        <span id="chip-${id}-${author.username}" class="chip"><img class="avatar avatar-sm" src="${author.avatar}" />@${author.username}<a data-name="${author.username}" data-id="${id}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>
-                    </div>
-
-                    <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="" value="">
-                </div>
-                <ul id="replybox-menu-${id}" class="menu hide">
-                    ${repliers.map(r => {
-                        const replier = JSON.parse(r);
-                        return `<li class="menu-item" class="hide" data-name="${replier.username}" data-avatar="${replier.avatar}"></li>`}).join('')}
-                </ul>
-                </div>
+function getReplyBox(repliers) {  
+    return `<div id="replybox" class="form-group">
+        <div class="form-autocomplete">
+        <div id="replybox-input-container grid-xl" class="form-autocomplete-input form-input">
+            <div id="replybox-chips">
             </div>
-            <div class="form-group">
-                <label class="form-label" for="input-example-3">Message</label>
-                <div class="grow-wrap"><textarea id="replybox-textarea-${id}" class="form-input grow-me" name="content" rows="3"></textarea></div>
-                <input type="hidden" class="form-input" name="id" value="${id}" />
-            </div>
-            <div class="form-group">
-                <button data-id="${id}" type="button" class="btn btn-primary replyBtn">Send Reply</button>
-            </div>
-        </form>
+            <input id="replybox-input" data-id="replybox" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
+        </div>
+        <ul id="replybox-menu" class="menu hide">
+            ${repliers.map(r => {
+                //const replier = JSON.parse(r);
+                return `<li class="menu-item" class="hide" data-name="${r.username}" data-avatar="${r.avatar}"></li>`}).join('')}
+        </ul>
+        </div>
+    </div>
+    ${repliers.map(function (ur) {
+        //const person = JSON.parse(ur);
+        return `<input id="replybox-checkbox-${ur.username}" class="hide" type='checkbox' name='replyingTo[]' value='${ur.username}'/>`
+    }).join(' ')}
     `;
 }
+
+// function getReplyBox(id, repliers, boxOnly = false) {  
+//     if(boxOnly) {
+//         return `<div id="replybox-${id}" class="form-group">
+//                     <div class="form-autocomplete">
+//                     <div id="replybox-input-container grid-xl-${id}" class="form-autocomplete-input form-input">
+//                         <div id="replybox-chips-${id}">
+//                         </div>
+//                         <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
+//                     </div>
+//                     <ul id="replybox-menu-${id}" class="menu hide">
+//                         ${repliers.map(r => {
+//                             const replier = JSON.parse(r);
+//                             return `<li class="menu-item" class="hide" data-name="${replier.username}" data-avatar="${replier.avatar}"></li>`}).join('')}
+//                     </ul>
+//                     </div>
+//                 </div>
+//                 ${repliers.map(function (ur) {
+//                     const person = JSON.parse(ur);
+//                     return `<input id="replybox-checkbox-${id}-${person.username}" class="hide" type='checkbox' name='replyingTo[]' value='${person.username}'/>`
+//                 }).join(' ')}
+//                 `;
+//     }
+//     const author = JSON.parse(repliers[0]);
+//     return `
+//         <form class="form" id='replybox-form-${id}' data-id="${id}">
+//             ${repliers.map(function (ur) {
+//                 const person = JSON.parse(ur);
+//                 return `<input id="replybox-checkbox-${id}-${person.username}" class="hide" ${person.username.trim() == author.username.trim() ? 'checked="checked"' : ''} type='checkbox' name='replyingTo[]' value='${person.username}'/>`
+//             }).join(' ')}
+//             <div id="replybox-${id}" class="form-group">
+//                 <label class="form-label">Repling to:</label>
+//                 <div class="form-autocomplete">
+//                 <div id="replybox-input-container grid-xl-${id}" class="form-autocomplete-input form-input">
+//                     <div id="replybox-chips-${id}">
+//                         <span id="chip-${id}-${author.username}" class="chip"><img class="avatar avatar-sm" src="${author.avatar}" />@${author.username}<a data-name="${author.username}" data-id="${id}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>
+//                     </div>
+
+//                     <input id="replybox-input-${id}" data-id="${id}" class="form-input replierInput" type="text" placeholder="" value="">
+//                 </div>
+//                 <ul id="replybox-menu-${id}" class="menu hide">
+//                     ${repliers.map(r => {
+//                         const replier = JSON.parse(r);
+//                         return `<li class="menu-item" class="hide" data-name="${replier.username}" data-avatar="${replier.avatar}"></li>`}).join('')}
+//                 </ul>
+//                 </div>
+//             </div>
+//             <div class="form-group">
+//                 <label class="form-label" for="input-example-3">Message</label>
+//                 <div class="grow-wrap"><textarea id="replybox-textarea-${id}" class="form-input grow-me" name="content" rows="3"></textarea></div>
+//                 <input type="hidden" class="form-input" name="id" value="${id}" />
+//             </div>
+//             <div class="form-group">
+//                 <button data-id="${id}" type="button" class="btn btn-primary replyBtn">Send Reply</button>
+//             </div>
+//         </form>
+//     `;
+// }

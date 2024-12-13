@@ -6637,6 +6637,10 @@ article footer {
   border: 1px solid var(--background-tint-4);
 }
 
+.no-border {
+  border: 0;
+}
+
 .mini_cover {
   float: left;
   padding-right: 1em;
