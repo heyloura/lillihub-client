@@ -343,7 +343,7 @@ export function getEditor(repliers, username) {
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
                 <input type="text" placeholder="title (optional)" class="form-input mb-2" name="name" id="postName" />
                 <div class="grow-wrap">
-                    <textarea rows="10" id="content" id="post" class="form-input grow-me"></textarea>
+                    <textarea name="content" rows="10" id="content" id="post" class="form-input grow-me"></textarea>
                 </div>
             </div>
             <div id="editor-footer" class="card-footer mb-2">
