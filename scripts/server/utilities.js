@@ -552,7 +552,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                 </div>
                  <div class="card-buttons postBtns text-right">
                     <div class="btn-group">
-                        <a data-avatar="${post.avatar}" data-id="${post.id}" data-reply="@${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-reply="@${post.username}" class="replyBtn icon icon-edit"></i></a>
+                        <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="@${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="@${post.username}" class="replyBtn icon icon-edit"></i></a>
                         ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                         <div class="dropdown">
                             <a href="#" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
