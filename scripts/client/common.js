@@ -744,7 +744,7 @@ document.addEventListener("click", async (item) => {
         //loadEditor('reply');
     
         // Set up the reply area
-        document.getElementById('main' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML);
+        document.getElementById('main-' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML);
         document.getElementById('postingName').classList.add('hide');
         document.getElementById('postingBtns').classList.add("hide");
         document.getElementById('postName').classList.add("hide");
