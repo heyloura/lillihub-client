@@ -30,15 +30,6 @@
                 <!-- <span id="titleBar" class="show-sm">{{pageName}}</span> -->
                 <!-- <span id="titleBar">{{pageName}}</span>
                 <button class="btn btn-link btn-action pageAction"><i class="icon icon-caret pageAction"></i></button> -->
-                <div class="dropdown">
-                    <a href="javascript:void(0)" class="btn dropdown-toggle" tabindex="0">
-                        <span id="titleBar">{{pageName}}</span> <i class="icon icon-caret"></i>
-                    </a>
-                    <!-- menu component -->
-                    <ul class="menu" id="pageActions">
-                    
-                    </ul>
-                </div>
             </section>
             <section class="navbar-section">
                 <button class="btn actionBtn"><i class="icon icon-plus actionBtn"></i><span id="actionText">Add</span></button>
@@ -110,8 +101,17 @@
                 </div>
             </div>     
             <a class="off-canvas-overlay" href="#close"></a>
-            <div class="page off-canvas-content">
+            <div class="off-canvas-content">
                 <div id="main" class="pr-0 column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    <div class="dropdown p-centered">
+                        <a href="javascript:void(0)" class="btn dropdown-toggle" tabindex="0">
+                            <span id="titleBar">{{pageName}}</span> <i class="icon icon-caret"></i>
+                        </a>
+                        <!-- menu component -->
+                        <ul class="menu" id="pageActions">
+                        
+                        </ul>
+                    </div>
                     {{pages}}
                 </div>
             </div>
