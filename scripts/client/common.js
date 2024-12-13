@@ -71,7 +71,7 @@ function removeHash() {
     history.pushState("", document.title, window.location.pathname
                                                        + window.location.search);
 }
-function buildCarousel(id, imageArray) 
+function masonryLayout(id, imageArray) 
 {
     let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
     let column1 = '<div class="masonry-column-1">';
@@ -87,7 +87,7 @@ function buildCarousel(id, imageArray)
     }
     return grid + column1 + '</div>' + column2 + '</div>' + '</div>';
 }
-function buildCarousels() {
+function buildMasonry() {
     let galleries = document.querySelectorAll('.gallery');
 
     for(let i = 0; i < galleries.length; i++) {
@@ -100,7 +100,7 @@ function buildCarousels() {
                 imageArray.push(imgs[j].getAttribute('src'));
                 imgs[j].remove();
             }
-            galleries[i].innerHTML = buildCarousel(id, imageArray);
+            galleries[i].innerHTML = masonryLayout(id, imageArray);
             galleries[i].setAttribute('data-loaded', 'true');
         }
     }
@@ -454,7 +454,7 @@ function loadTimeline() {
     document.getElementById("titleBar").innerHTML = "Timeline";
     //document.getElementById("pageName").innerHTML = "Timeline";
     document.querySelector(`#timelineLink`).classList.add("active");
-    buildCarousels();
+    buildMasonry();
     hljs.highlightAll();
 
     const article = document.querySelector('article:first-child');
@@ -499,7 +499,7 @@ Swap.loaders['.post'] = () => {
     document.getElementById("titleBar").innerHTML = "Timeline";
     //document.getElementById("pageName").innerHTML = "Timeline";
     document.querySelector(`#timelineLink`).classList.add("active");
-    buildCarousels();
+    buildMasonry();
     hljs.highlightAll();
 
     return () => {  // unloader function
@@ -513,7 +513,7 @@ Swap.loaders['#discover'] = () => {
     document.getElementById("titleBar").innerHTML = "Discover";
     //document.getElementById("pageName").innerHTML = "Discover";
     document.querySelector(`#discoverLink`).classList.add("active");
-    buildCarousels();
+    buildMasonry();
     hljs.highlightAll();
 
     return () => {  // unloader function
@@ -656,11 +656,21 @@ document.addEventListener("click", async (item) => {
             // the action is to add a note
         } else if(window.location.pathname.includes('timeline')) {
             // the action is to add a post 
+            document.getElementById('modalTitle').innerHTML = 'New post';
+            document.getElementById('modalContent').innerHTML = document.getElementById('editorTemplate').innerHTML;
+            document.getElementById('modal').classList.add("active");
         }  else if(window.location.pathname.includes('discover')) {
             // the action is to add a post 
         } else if(window.location.pathname.includes('users')) {
             // the action is to follow (if not already)?
         }
+    }
+    if(item.target.classList.contains('savePost')) {
+        item.preventDefault();
+        // const form = document.getElementById('mainPost'); 
+        // submitPost(new FormData(form));
+        // document.getElementById('post').value = '';
+        // document.getElementById('replybox-input-main').value = ''; 
     }
 });
 
@@ -681,12 +691,12 @@ function loadPage() {
         document.title = "Lillihub: Discover";
         document.getElementById("titleBar").innerHTML = "Discover";
         document.querySelector(`#discoverLink`).classList.add("active");
-        buildCarousels();
+        buildMasonry();
     } else if(window.location.pathname.includes('users')) {
         document.title = "Lillihub: Timeline";
         document.getElementById("titleBar").innerHTML = "Timeline";
         document.querySelector(`#timelineLink`).classList.add("active");
-        buildCarousels();
+        buildMasonry();
     }
 
     if(localStorage.getItem('discover_setting') === 'custom') {

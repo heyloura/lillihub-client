@@ -332,6 +332,11 @@ function getNoteEditor(notebookId, n) {
 export function getEditor(repliers) {
     return `
         <form id="editor" class="card">
+            <input type="hidden" name="postingType" id="postingType" />
+            <input type="hidden" name="omgApi" id="omgApi" />
+            <input type="hidden" name="omgAddess" id="omgAddess" />
+            <input type="hidden" name="indieToken" id="indieToken" />
+            <input type="hidden" name="microPub" id="microPub" />
             <div id="editor-container" class="card-body">
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
                 <div class="grow-wrap">
@@ -558,13 +563,11 @@ function getReplyBox(repliers) {
         </div>
         <ul id="replybox-menu" class="menu hide">
             ${!repliers ? '' : repliers.map(r => {
-                //const replier = JSON.parse(r);
                 return `<li class="menu-item" class="hide" data-name="${r.username}" data-avatar="${r.avatar}"></li>`}).join('')}
         </ul>
         </div>
     </div>
     ${!repliers ? '' : repliers.map(function (ur) {
-        //const person = JSON.parse(ur);
         return `<input id="replybox-checkbox-${ur.username}" class="hide" type='checkbox' name='replyingTo[]' value='${ur.username}'/>`
     }).join(' ')}
     `;

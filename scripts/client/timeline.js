@@ -166,7 +166,7 @@ function load() {
                 .then(response => response.text())
                 .then(_data => {});
 
-            buildCarousels();
+            buildMasonry();
         });
 }
 
@@ -361,7 +361,7 @@ document.addEventListener("click", (item) => {
             .then(response => response.text())
             .then(data => {
                 document.getElementById('add-' + id).innerHTML = data;
-                buildCarousels();
+                buildMasonry();
                 item.target.style.display = 'none';
                 //loadConversations();
             });
@@ -384,7 +384,7 @@ document.addEventListener("click", (item) => {
             .then(response => response.json())
             .then(data => {
                 document.getElementById('conversation-thread').innerHTML = `<div class="card">${data.conversation}</div>`;
-                buildCarousels();
+                buildMasonry();
             });
         redirectToAnchor('#conversation');
     }
@@ -452,7 +452,7 @@ document.addEventListener("click", (item) => {
                     .then(response => response.text())
                     .then(_data => {});
 
-                buildCarousels();
+                buildMasonry();
             });
     }
     if(item.target.classList.contains('addToReply')) {
