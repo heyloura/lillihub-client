@@ -447,7 +447,7 @@ Swap.loaders['#note'] = () => {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
         document.getElementById('actionIcon').classList.add('icon-plus');
-        document.getElementById('actionIcon').classList.remove('icon-icon-edit');
+        document.getElementById('actionIcon').classList.remove('icon-edit');
     };  
 }
 
@@ -481,7 +481,7 @@ function loadNote() {
 
             //set up pageActions
             document.getElementById('actionIcon').classList.remove('icon-plus');
-            document.getElementById('actionIcon').classList.add('icon-icon-edit');
+            document.getElementById('actionIcon').classList.add('icon-edit');
 
         });
     } else {

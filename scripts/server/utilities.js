@@ -290,7 +290,7 @@ export function noteHTML(note, notebookId, versions) {
                 <div id="preview"></div>
             </div>
         </div>
-        <div id="note-details">
+        <div id="note-details" class="hide">
             <div class="divider" data-content="Note Metadata + Details"></div>
             <div>
                 <table id="metadata-${n.id}" class="table table-striped">

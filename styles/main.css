@@ -6726,10 +6726,6 @@ article footer {
   margin: 0px auto;
 }
 
-.menu-above {
-  top: auto;
-  bottom: 100%;
-}
 
 .navbar {
   background-color: var(--background-tint-1);
