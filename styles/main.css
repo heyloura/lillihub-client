@@ -6720,12 +6720,16 @@ article footer {
   vertical-align: middle;
 }
 
-#pageAction {
+/* #pageAction {
   z-index: 298;
   width: 200px;
   margin: 0px auto;
-}
+} */
 
+#titleBar {
+  text-overflow: ellipsis;
+  width: 175px;
+}
 
 .navbar {
   background-color: var(--background-tint-1);

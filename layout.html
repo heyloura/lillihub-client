@@ -27,9 +27,9 @@
                 <!-- <span id="pageName" class="hide-lg hide">{{pageName}}</span> -->
             </section>
             <section class="navbar-center text-light">
-                <!-- <span id="titleBar" class="show-sm">{{pageName}}</span> -->
-                <!-- <span id="titleBar">{{pageName}}</span>
-                <button class="btn btn-link btn-action pageAction"><i class="icon icon-caret pageAction"></i></button> -->
+                <div id="pageAction">
+                    <span id="titleBar">{{pageName}}</span><button id="pageActionsBtn" class="hide btn btn-link btn-action pageActions"><i class="icon icon-caret pageActions"></i></button>
+                </div>
             </section>
             <section class="navbar-section">
                 <button class="btn btn-action no-border actionBtn"><i id="actionIcon" class="icon icon-plus actionBtn"></i></button>
@@ -103,9 +103,6 @@
             <a class="off-canvas-overlay" href="#close"></a>
             <div class="off-canvas-content">
                 <div id="main" class="pr-0 column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <div id="pageAction">
-                        <span id="titleBar">{{pageName}}</span><button id="pageActionsBtn" class="btn btn-link btn-action pageActions"><i class="icon icon-caret pageActions"></i></button>
-                    </div>
                     {{pages}}
                 </div>
             </div>

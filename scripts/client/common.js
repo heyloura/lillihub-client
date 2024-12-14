@@ -372,6 +372,7 @@ Swap.loaders['#note-list'] = () => {
         if(document.querySelector(`.notebook-${id}`)) {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
+        document.getElementById('pageActionsBtn').classList.add('hide');
     };   
 }
 
@@ -380,7 +381,7 @@ async function loadNotebook() {
     const parts = window.location.pathname.split('/');
     const id = parts[parts.length - 1];
     document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
-    //document.getElementById("pageName").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
+    document.getElementById('pageActionsBtn').classList.remove('hide');
 
     // we have a key, decrypt the notes
     if(localStorage.getItem("mbKey")) {
@@ -448,11 +449,13 @@ Swap.loaders['#note'] = () => {
         }
         document.getElementById('actionIcon').classList.add('icon-plus');
         document.getElementById('actionIcon').classList.remove('icon-edit');
+        document.getElementById('pageActionsBtn').classList.add('hide');
     };  
 }
 
 function loadNote() {
     document.title = "Lillihub: Note";
+    document.getElementById('pageActionsBtn').classList.remove('hide');
     
     const parts = window.location.pathname.split('/');
     const id = parts[2];
@@ -847,6 +850,17 @@ document.addEventListener("click", async (item) => {
             loadEditor();
         }  else if(window.location.pathname.includes('discover')) {
             // the action is to add a post 
+        } else if(window.location.pathname.includes('users')) {
+            // the action is to follow (if not already)?
+        }
+    }
+    if(item.target.classList.contains('pageActionsBtn')) {
+        if(window.location.pathname.includes('notes')) {
+            document.getElementById('modalContent').innerHTML = document.getElementById('note-details').innerHTML
+            document.getElementById('modalTitle').innerHTML = 'Manage Note';
+            document.getElementById('modal').classList.add("active");
+        } else if(window.location.pathname.includes('notebooks')) {
+            // the action is to add a note
         } else if(window.location.pathname.includes('users')) {
             // the action is to follow (if not already)?
         }

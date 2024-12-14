@@ -636,7 +636,7 @@ Deno.serve(async (req) => {
                             <div class="timeline-content">
                             </div>
                         </div>
-                        {post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}
+                        ${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}
                         </div>`;
                 } else if(req.url.includes("timeline")) {
                     id = name;
