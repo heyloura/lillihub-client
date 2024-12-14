@@ -199,14 +199,7 @@ function loadEditor(type) {
     fragment.appendChild(document.getElementById('editor-footer'));
     document.getElementById('modalFooter').appendChild(fragment);
 
-    if(type == "reply") {
-        // document.getElementById('postingName').classList.add('hide');
-        // document.getElementById('postingBtns').classList.add("hide");
-        // document.getElementById('postName').classList.add("hide");
-        // document.getElementById('postStatus').classList.add("hide");
-        // document.getElementById('editor-replybox').classList.remove('hide');
-        // document.getElementById('topBarBtns').classList.add("hide");
-    } else if(type == "note") {
+    if(type == "note") {
 
     } else {
         // generic post
@@ -785,6 +778,15 @@ document.addEventListener("click", async (item) => {
             id = event.target.getAttribute('id') === 'editor-link-markdown-btn' ? null : event.target.getAttribute('id').split('-')[0];
         }
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'[link text](',')');
+    }
+    if(item.target.classList.contains('editor-preview')) {
+        // no parent element to worry about...
+        let id = event.target.getAttribute('id') === 'editor-preview-btn' ? null : event.target.getAttribute('id').split('-')[0];
+
+        // get content, pop up in modal
+        document.getElementById('modalContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').innerHTML);
+        document.getElementById('modalTitle').innerHTML = 'Preview';
+        document.getElementById('modal').classList.add("active");
     }
     if(item.target.classList.contains('replyBtn')){
         let name = item.target.getAttribute('data-name');

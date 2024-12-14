@@ -353,18 +353,15 @@ export function getEditor(repliers, username) {
                     <button id="editor-code-btn" type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
                     <button id="editor-upload-btn" type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
                     <div class="dropdown">
-                        <a href="javascript:void(0)" class="btn btn-link dropdown-toggle" tabindex="0">
+                        <a href="#" class="btn btn-link dropdown-toggle" tabindex="0">
                             <i class="icon icon-link"></i></i>
                         </a>
                         <ul class="menu menu-above">
-                            <li class="menu-item editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="javascript:void(0)">Markdown image</a></li>
-                            <li class="menu-item"><a id="editor-link-markdown-btn" class="editor-link" href="javascript:void(0)">Markdown link</a></li>
-                            <li class="divider"></li>
-                            <li class="menu-item"><a href="javascript:void(0)">Item 1</a></li>
-                            <li class="menu-item"><a href="javascript:void(0)">Item 2</a></li>
-                            <li class="menu-item"><a href="javascript:void(0)">Item 3</a></li>
+                            <li class="menu-item editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="#">Markdown image</a></li>
+                            <li class="menu-item"><a id="editor-link-markdown-btn" class="editor-link" href="#">Markdown link</a></li>
                         </ul>
                     </div>
+                    <button id="editor-preview-btn" type="button" class="btn btn-link editor-preview">preview</button>
                 </div>
                 <div class="btn-group float-right">
                     <select id="postStatus" name="status" class="form-select">
