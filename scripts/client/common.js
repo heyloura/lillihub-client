@@ -783,6 +783,8 @@ document.addEventListener("click", async (item) => {
         // no parent element to worry about...
         let id = event.target.getAttribute('id') === 'editor-preview-btn' ? null : event.target.getAttribute('id').split('-')[0];
 
+        console.log(document.getElementById(id ? id + '-content' : 'content').innerHTML);
+        console.log(converter)
         // get content, pop up in modal
         document.getElementById('modalContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').innerHTML);
         document.getElementById('modalTitle').innerHTML = 'Preview';
