@@ -786,7 +786,7 @@ document.addEventListener("click", async (item) => {
         console.log(document.getElementById(id ? id + '-content' : 'content').innerHTML);
         console.log(converter)
         // get content, pop up in modal
-        document.getElementById('modalContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').innerHTML);
+        document.getElementById('modalContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').value);
         document.getElementById('modalTitle').innerHTML = 'Preview';
         document.getElementById('modal').classList.add("active");
     }
