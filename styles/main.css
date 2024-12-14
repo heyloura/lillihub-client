@@ -6728,7 +6728,9 @@ article footer {
 
 #titleBar {
   text-overflow: ellipsis;
-  width: 175px;
+  max-width: 175px;
+  vertical-align: middle;
+  display: inline-block;
 }
 
 .navbar {

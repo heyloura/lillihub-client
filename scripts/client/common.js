@@ -372,7 +372,6 @@ Swap.loaders['#note-list'] = () => {
         if(document.querySelector(`.notebook-${id}`)) {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
-        document.getElementById('pageActionsBtn').classList.add('hide');
     };   
 }
 
@@ -382,6 +381,8 @@ async function loadNotebook() {
     const id = parts[parts.length - 1];
     document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
     document.getElementById('pageActionsBtn').classList.remove('hide');
+    document.getElementById('actionIcon').classList.add('icon-plus');
+    document.getElementById('actionIcon').classList.remove('icon-edit');
 
     // we have a key, decrypt the notes
     if(localStorage.getItem("mbKey")) {
@@ -454,15 +455,18 @@ Swap.loaders['#note'] = () => {
 }
 
 function loadNote() {
+    // page set up
     document.title = "Lillihub: Note";
     document.getElementById('pageActionsBtn').classList.remove('hide');
-    
+    document.getElementById('actionIcon').classList.remove('icon-plus');
+    document.getElementById('actionIcon').classList.add('icon-edit');
     const parts = window.location.pathname.split('/');
     const id = parts[2];
     if(document.querySelector(`.notebook-${id}`)) {
         document.querySelector(`.notebook-${id}`).classList.add("active");
     }
 
+    // decrypt and show
     if(document.querySelector('.decryptMe')) {
         document.querySelectorAll('.decryptMe').forEach(async (element) => {
             const noteId = element.getAttribute('data-id');
@@ -483,8 +487,7 @@ function loadNote() {
             // document.getElementById('pageActions').appendChild(fragment);
 
             //set up pageActions
-            document.getElementById('actionIcon').classList.remove('icon-plus');
-            document.getElementById('actionIcon').classList.add('icon-edit');
+            
 
         });
     } else {
@@ -499,7 +502,11 @@ function loadNote() {
 function loadTimeline() {
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
+    document.getElementById('pageActionsBtn').classList.add('hide');
     document.querySelector(`#timelineLink`).classList.add("active");
+    document.getElementById('actionIcon').classList.add('icon-plus');
+    document.getElementById('actionIcon').classList.remove('icon-edit');
+
     buildMasonry();
     hljs.highlightAll();
 
@@ -548,10 +555,9 @@ Swap.loaders['#post-list'] = () => {
 }
 
 Swap.loaders['.post'] = () => {
-    document.title = "Lillihub: Timeline";
-    document.getElementById("titleBar").innerHTML = "Timeline";
-    //document.getElementById("pageName").innerHTML = "Timeline";
-    document.querySelector(`#timelineLink`).classList.add("active");
+    // document.title = "Lillihub: Timeline";
+    // document.getElementById("titleBar").innerHTML = "Timeline";
+    // document.querySelector(`#timelineLink`).classList.add("active");
     buildMasonry();
     hljs.highlightAll();
 
@@ -564,8 +570,10 @@ Swap.loaders['#discover'] = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.title = "Lillihub: Discover";
     document.getElementById("titleBar").innerHTML = "Discover";
-    //document.getElementById("pageName").innerHTML = "Discover";
     document.querySelector(`#discoverLink`).classList.add("active");
+    document.getElementById('pageActionsBtn').classList.add('hide');
+    document.getElementById('actionIcon').classList.add('icon-plus');
+    document.getElementById('actionIcon').classList.remove('icon-edit');
     buildMasonry();
     hljs.highlightAll();
 
@@ -854,7 +862,7 @@ document.addEventListener("click", async (item) => {
             // the action is to follow (if not already)?
         }
     }
-    if(item.target.classList.contains('pageActionsBtn')) {
+    if(item.target.classList.contains('pageActions')) {
         if(window.location.pathname.includes('notes')) {
             document.getElementById('modalContent').innerHTML = document.getElementById('note-details').innerHTML
             document.getElementById('modalTitle').innerHTML = 'Manage Note';

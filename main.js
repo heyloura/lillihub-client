@@ -633,10 +633,12 @@ Deno.serve(async (req) => {
                     content = `<div id="post-${id}" class="mt-2 timeline post">
                         <div class="timeline-item">
                             <div class="timeline-left"><a class="timeline-icon icon-lg"><i class="icon icon-message"></i></a></div>
-                            <div class="timeline-content">
+                            <div class="timeline-content pl-2">
+                                Conversation
                             </div>
                         </div>
                         ${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}
+                        <p class="text-center"><button class="btn btn-link">collapse conversation</button></p>
                         </div>`;
                 } else if(req.url.includes("timeline")) {
                     id = name;
