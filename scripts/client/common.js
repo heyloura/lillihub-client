@@ -205,6 +205,9 @@ function loadEditor(type) {
         document.getElementById('modalTitle').innerHTML = 'New Note';
         document.getElementById('postName').classList.add('hide');
         document.getElementById('postStatus').classList.add('hide');
+        document.getElementById('editor-preview-btn').classList.add('hide');
+        document.getElementById('editor-action').classList.add('saveNote');
+        document.getElementById('editor-action').innerHTML = 'Save';
     } else {
         // generic post
         fragment = document.createDocumentFragment();
