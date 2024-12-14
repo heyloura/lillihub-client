@@ -200,7 +200,7 @@ function loadEditor(type) {
     document.getElementById('modalFooter').appendChild(fragment);
 
     if(type == "note") {
-
+        document.getElementById('topBarBtns').classList.add('hide');
     } else {
         // generic post
         fragment = document.createDocumentFragment();
@@ -865,6 +865,7 @@ document.addEventListener("click", async (item) => {
             }
         } else if(window.location.pathname.includes('notebooks')) {
             // the action is to add a note
+            loadEditor('note');
         } else if(window.location.pathname.includes('timeline')) {
             // the action is to add a post 
             loadEditor();
