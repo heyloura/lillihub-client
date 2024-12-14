@@ -201,35 +201,35 @@ function loadEditor(type) {
 
     if(type == "note") {
         document.getElementById('topBarBtns').classList.add('hide');
+        document.getElementById('markdownBtns').classList.remove('hide');
     } else {
         // generic post
         fragment = document.createDocumentFragment();
         fragment.appendChild(document.getElementById('topBarBtns'));
         document.getElementById('modalTitle').appendChild(fragment);
-    }
-
-    if(localStorage.getItem('post_setting'))
-    {
-        if(localStorage.getItem('post_setting') != 'none') {
-            if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
-            {
-                document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
-                document.getElementById('postingType').value = localStorage.getItem('post_setting');
-                document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
-                document.getElementById('omgApi').value = localStorage.getItem('omg_api');
-
-                document.getElementById('markdownBtns').classList.add("hide");
-                document.getElementById('postingBtns').classList.add("hide");
-                document.getElementById('postName').classList.add("hide");
-                document.getElementById('postStatus').classList.add("hide");
-
-            } else if(localStorage.getItem('post_setting') === 'micropub') {
-                document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
-                document.getElementById('postingType').value = 'micropub';
-                document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
-                document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
-            } else {
-                document.getElementById('postingType').value = 'mb';
+        if(localStorage.getItem('post_setting'))
+        {
+            if(localStorage.getItem('post_setting') != 'none') {
+                if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
+                {
+                    document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
+                    document.getElementById('postingType').value = localStorage.getItem('post_setting');
+                    document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
+                    document.getElementById('omgApi').value = localStorage.getItem('omg_api');
+    
+                    document.getElementById('markdownBtns').classList.add("hide");
+                    document.getElementById('postingBtns').classList.add("hide");
+                    document.getElementById('postName').classList.add("hide");
+                    document.getElementById('postStatus').classList.add("hide");
+    
+                } else if(localStorage.getItem('post_setting') === 'micropub') {
+                    document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
+                    document.getElementById('postingType').value = 'micropub';
+                    document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
+                    document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
+                } else {
+                    document.getElementById('postingType').value = 'mb';
+                }
             }
         }
     }
