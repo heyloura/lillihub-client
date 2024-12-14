@@ -202,6 +202,9 @@ function loadEditor(type) {
     if(type == "note") {
         document.getElementById('topBarBtns').classList.add('hide');
         document.getElementById('markdownBtns').classList.remove('hide');
+        document.getElementById('modalTitle').innerHTML = 'New Note';
+        document.getElementById('postName').classList.add('hide');
+        document.getElementById('postStatus').classList.add('hide');
     } else {
         // generic post
         fragment = document.createDocumentFragment();
