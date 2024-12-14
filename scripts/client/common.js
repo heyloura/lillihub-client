@@ -641,9 +641,14 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('editor-upload')) {
-        console.log(event.target.getAttribute('id'));
-
-        let id = event.target.getAttribute('id') === 'editor-upload-btn' ? null : event.target.getAttribute('id').split('-')[0];
+        console.log(event.target);
+        let id = null;
+        if(event.target.getAttribute('id') == null) {
+            console.log(event.target.parentNode);
+            id = event.target.parentNode.getAttribute('id') === 'editor-upload-btn' ? null : event.target.parentNode.getAttribute('id').split('-')[0];
+        } else {
+            id = event.target.getAttribute('id') === 'editor-upload-btn' ? null : event.target.getAttribute('id').split('-')[0];
+        }
         
         console.log(id);
 
