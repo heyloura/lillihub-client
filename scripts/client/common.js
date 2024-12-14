@@ -463,6 +463,13 @@ function loadNote() {
         document.querySelector(`.notebook-${id}`).classList.add("active");
     }
 
+    //set up editor
+    document.getElementById('topBarBtns').classList.add('hide');
+    document.getElementById('postName').classList.add('hide');
+    document.getElementById('postStatus').classList.add('hide');
+    document.getElementById('editor-action').classList.add('saveNote');
+    document.getElementById('editor-action').innerHTML = 'Save';
+    
     // decrypt and show
     if(document.querySelector('.decryptMe')) {
         document.querySelectorAll('.decryptMe').forEach(async (element) => {
