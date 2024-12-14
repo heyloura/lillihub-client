@@ -632,6 +632,14 @@ Deno.serve(async (req) => {
                     const posts = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="user-posts" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>`;
+                } else if(req.url.includes("versions")) {
+                    id = name;
+                    name = "version";
+                    console.log(parts[parts.length - 3])
+                    fetching = await fetch(`https://micro.blog/notes/${parts[parts.length - 3]}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const versions = await fetching.json();
+                    // put JSON check here or something.....
+                    content = `<div id="version" class="mt-2">${JSON.stringify(versions, null, 2)}</div>`;
                 } else if(req.url.includes("notes")) {
                     id = name;
                     name = "note";
@@ -641,7 +649,7 @@ Deno.serve(async (req) => {
                     const versions = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="note" class="mt-2">${utility.noteHTML(note,null,versions.items)}</div>`;
-                } else if(req.url.includes("notebooks")) {
+                }  else if(req.url.includes("notebooks")) {
                     id = name;
                     name = "notebook";
                     fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );

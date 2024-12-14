@@ -736,7 +736,7 @@ document.addEventListener("click", async (item) => {
     // save a private note.
     if(item.target.classList.contains('saveNote')) {
         document.getElementById('editor-action').classList.remove('saveNote');
-        document.getElementById('editor-action').classList.add('loading');
+        document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
         const parts = window.location.pathname.split('/');
 
         let note = document.getElementById("content").value;
@@ -769,6 +769,7 @@ document.addEventListener("click", async (item) => {
     // delete a private note.
     if(item.target.classList.contains('deleteNote')) {
         if(confirm('Are you sure you want to delete this note? This cannot be undone.')) {
+            document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
             const parts = window.location.pathname.split('/');
 
             let id = item.target.getAttribute('data-id');
