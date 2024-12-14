@@ -528,11 +528,9 @@ Deno.serve(async (req) => {
                 const form = new URLSearchParams();
                 form.append("id", id);
                                
-                const posting = await fetch(`https://micro.blog/notes/`, {
+                const posting = await fetch(`https://micro.blog/notes/${id}`, {
                     method: "DELETE",
-                    body: form.toString(),
                     headers: {
-                        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
                         "Authorization": "Bearer " + mbToken
                     }
                 });
