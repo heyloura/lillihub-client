@@ -736,6 +736,9 @@ document.addEventListener("click", async (item) => {
     // save a private note.
     if(item.target.classList.contains('saveNote')) {
         const parts = window.location.pathname.split('/');
+
+        console.log(parts);
+        
         let note = document.getElementById("content").value;
         let id = document.getElementById('noteId') ? document.getElementById('noteId').value : null;
         let notebookId = 0;
