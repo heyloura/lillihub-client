@@ -484,7 +484,7 @@ function loadNote() {
             const html = converter.makeHtml(markdown);
             const metadata = converter.getMetadata();
             const metaDef = objectToTableRows(metadata);
-            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,50) + '...';
+            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 20 ? metadata.title.substring(0,20) + '...' : metadata.title : strip(html).substring(0,50) + '...';
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
             document.getElementById('preview').innerHTML = html;
@@ -812,7 +812,7 @@ document.addEventListener("click", async (item) => {
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'[link text](',')');
     }
     if(item.target.classList.contains('editor-preview')) {
-        // no parent element to worry about...
+        // no parent element to worry about
         let id = event.target.getAttribute('id') === 'editor-preview-btn' ? null : event.target.getAttribute('id').split('-')[0];
 
         document.getElementById('modalContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').value);
