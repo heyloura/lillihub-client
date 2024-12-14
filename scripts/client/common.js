@@ -854,7 +854,15 @@ document.addEventListener("click", async (item) => {
         //alert('action btn click:' + window.location.pathname);
         // here we vary by page...
         if(window.location.pathname.includes('notes')) {
-            window.location.hash = "edit";
+            if(window.location.hash == "edit") {
+                document.getElementById('actionIcon').classList.remove('icon-icon-back');
+                document.getElementById('actionIcon').classList.add('icon-edit');
+                window.location.hash = "note";
+            } else {
+                document.getElementById('actionIcon').classList.remove('icon-edit');
+                document.getElementById('actionIcon').classList.add('icon-icon-back');
+                window.location.hash = "edit";
+            }
         } else if(window.location.pathname.includes('notebooks')) {
             // the action is to add a note
         } else if(window.location.pathname.includes('timeline')) {
