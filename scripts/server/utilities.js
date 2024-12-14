@@ -342,7 +342,7 @@ export function getEditor(repliers, username) {
                     <button id="editor-code-btn" type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
                     <button id="editor-upload-btn" type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
                     <div class="dropdown">
-                        <button class="btn btn-link dropdown-toggle" tabindex="0">
+                        <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
                             <i class="icon icon-link"></i></i>
                         </button>
                         <ul class="menu menu-above">
@@ -361,7 +361,7 @@ export function getEditor(repliers, username) {
                 </div>
                 <div id="topBarBtns" class="btn-group">
                     <div class="dropdown">
-                        <button class="btn btn-link dropdown-toggle" tabindex="0">
+                        <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
                             <span id="postingName">${username}</span> <i class="icon icon-caret"></i>
                         </button>
                         <!-- menu component -->
@@ -541,7 +541,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
                         ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                         <div class="dropdown">
-                            <button class="btn btn-link btn-action dropdown-toggle" tabindex="0">
+                            <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
                                 <i class="icon icon-more-vert"></i>
                             </button>
                             <ul class="menu">
