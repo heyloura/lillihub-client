@@ -523,6 +523,7 @@ Deno.serve(async (req) => {
             if(NOTEBOOKS_DELETE_ROUTE.exec(req.url) && user) {
                 const value = await req.formData();
                 const id = value.get('id');
+                console.log(id);
         
                 const form = new URLSearchParams();
                 form.append("id", id);

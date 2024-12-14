@@ -772,6 +772,7 @@ document.addEventListener("click", async (item) => {
             const parts = window.location.pathname.split('/');
 
             let id = item.target.getAttribute('data-id');
+            console.log(id);
             let notebookId = parts[2];
             
             const form = new URLSearchParams();
