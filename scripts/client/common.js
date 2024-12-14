@@ -855,12 +855,12 @@ document.addEventListener("click", async (item) => {
         // here we vary by page...
         if(window.location.pathname.includes('notes')) {
             if(window.location.hash == "edit") {
-                document.getElementById('actionIcon').classList.remove('icon-icon-back');
+                document.getElementById('actionIcon').classList.remove('icon-back');
                 document.getElementById('actionIcon').classList.add('icon-edit');
                 window.location.hash = "note";
             } else {
                 document.getElementById('actionIcon').classList.remove('icon-edit');
-                document.getElementById('actionIcon').classList.add('icon-icon-back');
+                document.getElementById('actionIcon').classList.add('icon-back');
                 window.location.hash = "edit";
             }
         } else if(window.location.pathname.includes('notebooks')) {

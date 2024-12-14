@@ -342,9 +342,9 @@ export function getEditor(repliers, username) {
                     <button id="editor-code-btn" type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
                     <button id="editor-upload-btn" type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
                     <div class="dropdown">
-                        <a href="#" class="btn btn-link dropdown-toggle" tabindex="0">
+                        <button class="btn btn-link dropdown-toggle" tabindex="0">
                             <i class="icon icon-link"></i></i>
-                        </a>
+                        </button>
                         <ul class="menu menu-above">
                             <li class="menu-item editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="#">Markdown image</a></li>
                             <li class="menu-item"><a id="editor-link-markdown-btn" class="editor-link" href="#">Markdown link</a></li>
@@ -361,9 +361,9 @@ export function getEditor(repliers, username) {
                 </div>
                 <div id="topBarBtns" class="btn-group">
                     <div class="dropdown">
-                        <a href="#" class="btn btn-link dropdown-toggle" tabindex="0">
+                        <button class="btn btn-link dropdown-toggle" tabindex="0">
                             <span id="postingName">${username}</span> <i class="icon icon-caret"></i>
-                        </a>
+                        </button>
                         <!-- menu component -->
                         <ul class="menu">
                             <li class="menu-item">
@@ -541,9 +541,9 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
                         ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                         <div class="dropdown">
-                            <a href="#" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
+                            <button class="btn btn-link btn-action dropdown-toggle" tabindex="0">
                                 <i class="icon icon-more-vert"></i>
-                            </a>
+                            </button>
                             <ul class="menu">
                                 <li class="menu-item">View</li>
                                 <li class="menu-item">Bookmark</li>
