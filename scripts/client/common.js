@@ -642,6 +642,9 @@ document.addEventListener("input", (event) => {
 document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('editor-upload')) {
         let id = event.target.getAttribute('id') === 'editor-upload-btn' ? null : event.target.getAttribute('id').split('-')[0];
+        
+        console.log(id);
+
         var el = window._protected_reference = document.createElement("INPUT");
         el.type = "file";
         document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `<span class="loading"></span>`;
@@ -753,7 +756,7 @@ document.addEventListener("click", async (item) => {
     }
     if(item.target.classList.contains('editor-link')) {
         let id = event.target.getAttribute('id') === 'editor-link-markdown-btn' ? null : event.target.getAttribute('id').split('-')[0];
-        getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'![alt text](',')');
+        getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'[hmmmm](',')');
     }
     if(item.target.classList.contains('replyBtn')){
         let name = item.target.getAttribute('data-name');
