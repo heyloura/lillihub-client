@@ -745,7 +745,7 @@ document.addEventListener("click", async (item) => {
         const form = new URLSearchParams();
         form.append("text", eNote);
         form.append("notebook_id", notebookId);
-        if(id != 0) {
+        if(id != null) {
             form.append("id", id);
         }    
 
