@@ -448,9 +448,6 @@ Swap.loaders['#note'] = () => {
         if(document.querySelector(`.notebook-${id}`)) {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
-        document.getElementById('actionIcon').classList.add('icon-plus');
-        document.getElementById('actionIcon').classList.remove('icon-edit');
-        document.getElementById('pageActionsBtn').classList.add('hide');
     };  
 }
 
@@ -474,7 +471,7 @@ function loadNote() {
             const html = converter.makeHtml(markdown);
             const metadata = converter.getMetadata();
             const metaDef = objectToTableRows(metadata);
-            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,50) + '...';
+            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,50) + '...';
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
             document.getElementById('preview').innerHTML = html;
@@ -850,7 +847,7 @@ document.addEventListener("click", async (item) => {
         //alert('action btn click:' + window.location.pathname);
         // here we vary by page...
         if(window.location.pathname.includes('notes')) {
-            // the action is to edit a note
+            window.location.hash = "edit";
         } else if(window.location.pathname.includes('notebooks')) {
             // the action is to add a note
         } else if(window.location.pathname.includes('timeline')) {

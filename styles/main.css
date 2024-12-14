@@ -6727,8 +6727,6 @@ article footer {
 } */
 
 #titleBar {
-  text-overflow: ellipsis;
-  max-width: 175px;
   vertical-align: middle;
   display: inline-block;
 }
