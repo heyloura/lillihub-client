@@ -641,6 +641,8 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('editor-upload')) {
+        console.log(event.target.getAttribute('id'));
+
         let id = event.target.getAttribute('id') === 'editor-upload-btn' ? null : event.target.getAttribute('id').split('-')[0];
         
         console.log(id);

@@ -577,8 +577,6 @@ Deno.serve(async (req) => {
                 // following
                 fetching = await fetch(`https://micro.blog/users/following/${mbUser.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let following = await fetching.json();
-
-                console.log(following);
                 
                 // tagmoji
                 fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -610,15 +608,6 @@ Deno.serve(async (req) => {
                     const posts = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="user-posts" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>`;
-                } else if(req.url.includes("notes") && req.url.includes("new")) {
-                    id = name;
-                    name = "note";
-                    //fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    // const note = await fetching.json();
-                    // fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    // const versions = await fetching.json();
-                    // // put JSON check here or something.....
-                    //content = `<div id="note" class="mt-2">${utility.noteHTML(note,null,versions.items)}</div>`;
                 } else if(req.url.includes("notes")) {
                     id = name;
                     name = "note";
@@ -641,7 +630,14 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const post = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="post-${id}" class="mt-2 timeline post"><div class=""><p><em>Conversation</em></p></div>${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}</div>`;
+                    content = `<div id="post-${id}" class="mt-2 timeline post">
+                        <div class="timeline-item">
+                            <div class="timeline-left"><a class="timeline-icon icon-lg"><i class="icon icon-message"></i></a></div>
+                            <div class="timeline-content">
+                            </div>
+                        </div>
+                        {post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}
+                        </div>`;
                 } else if(req.url.includes("timeline")) {
                     id = name;
                     name = "timeline";
