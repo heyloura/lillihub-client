@@ -735,14 +735,17 @@ document.addEventListener("click", async (item) => {
 
     // save a private note.
     if(item.target.classList.contains('saveNote')) {
-        console.log('saveNote');
         const parts = window.location.pathname.split('/');
         let note = document.getElementById("content").value;
-
-        console.log(note);
-
-        let id = document.getElementById('noteId').value;
-        let notebookId = parts[2];
+        let id = document.getElementById('noteId') ? document.getElementById('noteId').value : null;
+        let notebookId = 0;
+        
+        if(id) {
+            notebookId = parts[2];
+        } else {
+            notebookId = parts[1];
+        }
+        
         const eNote = await encryptWithKey(note, imported_key);
         const form = new URLSearchParams();
         form.append("text", eNote);
@@ -759,8 +762,12 @@ document.addEventListener("click", async (item) => {
                 "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
             }
         });
-        //should exit edit mode....
-        //window.location.href = '/notebooks/${notebook}';
+
+        if(id) {
+            window.location.href = `/notebooks/${notebookId}/notes/${id}`;
+        } else {
+            window.location.href = `/notebooks/${notebookId}`;
+        }
     }
 
     // toggle a note
