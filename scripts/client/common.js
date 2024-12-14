@@ -446,13 +446,14 @@ Swap.loaders['#note'] = () => {
         if(document.querySelector(`.notebook-${id}`)) {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
+        document.getElementById('actionIcon').classList.add('icon-plus');
+        document.getElementById('actionIcon').classList.remove('icon-icon-edit');
     };  
 }
 
 function loadNote() {
     document.title = "Lillihub: Note";
-    document.getElementById("titleBar").innerHTML = "Note";
-    //document.getElementById("pageName").innerHTML = "Note";
+    
     const parts = window.location.pathname.split('/');
     const id = parts[2];
     if(document.querySelector(`.notebook-${id}`)) {
@@ -466,12 +467,21 @@ function loadNote() {
             const html = converter.makeHtml(markdown);
             const metadata = converter.getMetadata();
             const metaDef = objectToTableRows(metadata);
+            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,50) + '...';
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
             document.getElementById('preview').innerHTML = html;
             growTextArea(document.getElementById('content'));
             document.getElementById('content').dispatchEvent(new Event("input"))
             hljs.highlightAll();
+
+            // var fragment = document.createDocumentFragment();
+            // fragment.appendChild(document.getElementById('note-details'));
+            // document.getElementById('pageActions').appendChild(fragment);
+
+            //set up pageActions
+            document.getElementById('actionIcon').classList.remove('icon-plus');
+            document.getElementById('actionIcon').classList.add('icon-icon-edit');
 
         });
     } else {
@@ -486,7 +496,6 @@ function loadNote() {
 function loadTimeline() {
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
-    //document.getElementById("pageName").innerHTML = "Timeline";
     document.querySelector(`#timelineLink`).classList.add("active");
     buildMasonry();
     hljs.highlightAll();
@@ -783,9 +792,6 @@ document.addEventListener("click", async (item) => {
         // no parent element to worry about...
         let id = event.target.getAttribute('id') === 'editor-preview-btn' ? null : event.target.getAttribute('id').split('-')[0];
 
-        console.log(document.getElementById(id ? id + '-content' : 'content').innerHTML);
-        console.log(converter)
-        // get content, pop up in modal
         document.getElementById('modalContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').value);
         document.getElementById('modalTitle').innerHTML = 'Preview';
         document.getElementById('modal').classList.add("active");

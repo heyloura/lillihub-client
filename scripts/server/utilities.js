@@ -282,42 +282,31 @@ function flattenedNote(note) {
 export function noteHTML(note, notebookId, versions) {
     const n = flattenedNote(note);
     return `
-        <div class="container grid-xl">
-            <div class="columns">
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    <div class="card bordered pages">
-                        <div id="edit">
-                            ${getNoteEditor(notebookId,n)}
-                        </div>
-                        <div class="card-body">
-                            <div id="preview"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <div>
-                        <div class="btn-group btn-group-block">
-                            <a class="btn btn-link" href="#edit">edit note</a>
-                        </div>
-                        <div class="divider" data-content="Note Metadata + Details"></div>
-                        <div>
-                            <table id="metadata-${n.id}" class="table table-striped">
-                                <tr><td>id</td><td>${n.id}</td></tr>
-                                <tr><td>published</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
-                                <tr><td>modified</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
-                                <tr><td>encrypted</td><td>${n.encrypted}</td></tr>
-                                ${n.shared ? `<tr><td>shared</td><td><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></td></tr>` : ''}
-                            </table>
-                        </div>
-                        <div class="divider" data-content="Versions"></div>
-                        ${versions.map(v => `<tr>
-                            <td>${(new Date(v.date_published).toLocaleString('en-US', { timeZoneName: 'short' })).replace(' UTC','')}</td>
-                            <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a></td>
-                        </tr>`).join('')}
-                        <div class="divider" data-content="Related Bookmarks"></div>
-                    </div>
-                </div>
+        <div class="card bordered pages">
+            <div id="edit">
+                ${getNoteEditor(notebookId,n)}
             </div>
+            <div class="card-body">
+                <div id="preview"></div>
+            </div>
+        </div>
+        <div id="note-details">
+            <div class="divider" data-content="Note Metadata + Details"></div>
+            <div>
+                <table id="metadata-${n.id}" class="table table-striped">
+                    <tr><td>id</td><td>${n.id}</td></tr>
+                    <tr><td>published</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
+                    <tr><td>modified</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
+                    <tr><td>encrypted</td><td>${n.encrypted}</td></tr>
+                    ${n.shared ? `<tr><td>shared</td><td><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></td></tr>` : ''}
+                </table>
+            </div>
+            <div class="divider" data-content="Versions"></div>
+            ${versions.map(v => `<tr>
+                <td>${(new Date(v.date_published).toLocaleString('en-US', { timeZoneName: 'short' })).replace(' UTC','')}</td>
+                <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a></td>
+            </tr>`).join('')}
+            <div class="divider" data-content="Related Bookmarks"></div>
         </div>
     `;
 }
