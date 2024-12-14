@@ -484,7 +484,7 @@ function loadNote() {
             const html = converter.makeHtml(markdown);
             const metadata = converter.getMetadata();
             const metaDef = objectToTableRows(metadata);
-            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 20 ? metadata.title.substring(0,20) + '...' : metadata.title : strip(html).substring(0,50) + '...';
+            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
             document.getElementById('preview').innerHTML = html;
