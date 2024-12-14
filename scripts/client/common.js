@@ -735,6 +735,8 @@ document.addEventListener("click", async (item) => {
 
     // save a private note.
     if(item.target.classList.contains('saveNote')) {
+        document.getElementById('editor-action').classList.remove('saveNote');
+        document.getElementById('editor-action').classList.add('loading');
         const parts = window.location.pathname.split('/');
 
         let note = document.getElementById("content").value;
@@ -749,7 +751,6 @@ document.addEventListener("click", async (item) => {
             form.append("id", id);
         }    
 
-        console.log(form.toString());
         const posting = await fetch('/notebooks/note/update', {
             method: "POST",
             body: form.toString(),
@@ -761,6 +762,29 @@ document.addEventListener("click", async (item) => {
         if(id) {
             window.location.href = `/notebooks/${notebookId}/notes/${id}`;
         } else {
+            window.location.href = `/notebooks/${notebookId}`;
+        }
+    }
+
+    // delete a private note.
+    if(item.target.classList.contains('deleteNote')) {
+        if(confirm('Are you sure you want to delete this note? This cannot be undone.')) {
+            const parts = window.location.pathname.split('/');
+
+            let id = item.target.getAttribute('data-id');
+            let notebookId = parts[2];
+            
+            const form = new URLSearchParams();
+            form.append("id", id);    
+    
+            const posting = await fetch('/notebooks/note/delete', {
+                method: "POST",
+                body: form.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                }
+            });
+    
             window.location.href = `/notebooks/${notebookId}`;
         }
     }

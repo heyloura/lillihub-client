@@ -339,13 +339,9 @@ Deno.serve(async (req) => {
             if(new URLPattern({ pathname: "/timeline/reply" }).exec(req.url)) {
                 const value = await req.formData();
 
-                console.log(value);
-
                 const id = value.get('id');
                 const replyingTo = value.getAll('replyingTo[]');
                 let content = value.get('content');
-
-                console.log(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`);
         
                 if(content != null && content != undefined && content != '' && content != 'null' && content != 'undefined') {
                     const replies = replyingTo.map(function (reply, i) { return '@' + reply }).join(' ');
@@ -486,7 +482,6 @@ Deno.serve(async (req) => {
             //----------
             const NOTEBOOKS_UPDATE_ROUTE = new URLPattern({ pathname: "/notebooks/note/update" });
             if(NOTEBOOKS_UPDATE_ROUTE.exec(req.url) && user) {
-                console.log('saving note')
                 const value = await req.formData();
                 const text = value.get('text');
                 const notebook_id = value.get('notebook_id');
@@ -499,8 +494,6 @@ Deno.serve(async (req) => {
                 if(id) {
                     form.append("id", id);
                 }
-
-                console.log(form.toString())
                                
                 const posting = await fetch('https://micro.blog/notes', {
                     method: "POST",
@@ -516,6 +509,38 @@ Deno.serve(async (req) => {
                 }
         
                 return new Response('note updated', {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });
+            }
+
+            //--------------
+            // Delete a Note
+            //--------------
+            const NOTEBOOKS_DELETE_ROUTE = new URLPattern({ pathname: "/notebooks/note/delete" });
+            if(NOTEBOOKS_DELETE_ROUTE.exec(req.url) && user) {
+                const value = await req.formData();
+                const id = value.get('id');
+        
+                const form = new URLSearchParams();
+                form.append("id", id);
+                               
+                const posting = await fetch(`https://micro.blog/notes/`, {
+                    method: "DELETE",
+                    body: form.toString(),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                        "Authorization": "Bearer " + mbToken
+                    }
+                });
+
+                if (!posting.ok) {
+                    console.log(`${user.username} tried to delete a note and ${await posting.text()}`);
+                }
+        
+                return new Response('note deleted', {
                     status: 200,
                     headers: {
                         "content-type": "text/html",

@@ -307,6 +307,15 @@ export function noteHTML(note, notebookId, versions) {
                 <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a></td>
             </tr>`).join('')}
             <div class="divider" data-content="Related Bookmarks"></div>
+            <details class="accordion" open>
+                <summary class="accordion-header">
+                    <i class="icon icon-arrow-right mr-1"></i>
+                    Advanced
+                </summary>
+                <div class="accordion-body">
+                    <button data-id="${n.id}" class="btn btn-danger deleteNote" type="button">Delete Note</button>
+                </div>
+            </details>
         </div>
     `;
 }
