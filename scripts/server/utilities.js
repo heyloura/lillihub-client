@@ -218,10 +218,16 @@ export function discoverHTML(posts, tagmoji, id) {
                         </div>
                     </div>
                     <div class="show-lg">
-                        <details><summary>Tagmoji</summary>
-                            ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                                `<span class="chip ${item.name}Link"><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
-                            ).join('')}
+                        <details class="accordion">
+                            <summary class="accordion-header">
+                                <i class="icon icon-arrow-right mr-1"></i>
+                                Tagmoji
+                            </summary>
+                            <div class="accordion-body">
+                                ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                                    `<span class="chip ${item.name}Link"><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                                ).join('')}                            
+                            </div>
                         </details>
                     </div>
                     <div class="hide-lg">
@@ -245,23 +251,24 @@ export function discoverHTML(posts, tagmoji, id) {
 export function timelineHTML(posts, lastId) {
     return `
     <div>
+        <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/">Back to the beginning</a></p>
         ${posts}
         <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
     </div>
     `;
-    return `
-        <div class="container grid-xl">
-            <div class="columns">
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <div class="card bordered">Profile peek here...</div>
-                </div>
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    ${posts}
-                    <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
-                </div>
-            </div>
-        </div>
-    `;
+    // return `
+    //     <div class="container grid-xl">
+    //         <div class="columns">
+    //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+    //                 <div class="card bordered">Profile peek here...</div>
+    //             </div>
+    //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+    //                 ${posts}
+    //                 <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
+    //             </div>
+    //         </div>
+    //     </div>
+    // `;
 }
 
 function flattenedNote(note) {
@@ -301,11 +308,13 @@ export function noteHTML(note, notebookId, versions) {
                     ${n.shared ? `<tr><td>shared</td><td><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></td></tr>` : ''}
                 </table>
             </div>
-            <div class="divider" data-content="Versions"></div>
-            ${versions.map(v => `<tr>
+            <div class="divider mt-2 pt-2" data-content="Versions"></div>
+            <table class="table table-striped">
+            ${versions.reverse().map(v, i => `<tr>
                 <td>${(new Date(v.date_published).toLocaleString('en-US', { timeZoneName: 'short' })).replace(' UTC','')}</td>
-                <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a></td>
+                <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a>${i == 0 ? ' (current)' : ''}</td>
             </tr>`).join('')}
+            </table>
             <div class="divider" data-content="Related Bookmarks"></div>
             <details class="accordion">
                 <summary class="accordion-header">

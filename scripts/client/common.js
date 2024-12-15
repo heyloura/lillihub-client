@@ -510,6 +510,7 @@ function loadNote() {
 }
 
 Swap.loaders['#version'] = () => {
+    console.alert('version!')
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const parts = window.location.pathname.split('/');
     const id = parts[2];

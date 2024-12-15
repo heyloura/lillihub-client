@@ -8,10 +8,44 @@ import * as utility from "./scripts/server/utilities.js";
 *      const key = await crypto.subtle.generateKey({ name: "AES-CBC", length: 128 },true,["encrypt", "decrypt"]);
 *      const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 ******************************************************************************************************************/
-const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
-const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
-const deployURL = 'https://sad-bee-43--version3.deno.dev/';
+// const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
+// const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
+// const deployURL = 'https://sad-bee-43--version3.deno.dev/';
 const _development = true;
+
+const _appSecret = JSON.parse('{"kty":"oct","k":"c2V4g-FQSxzpeCE8E0JcMg","alg":"A128CBC","key_ops":["encrypt","decrypt"],"ext":true}');
+const deployURL = 'http://localhost:8000/';
+const _mbLiliihubToken = 'BF4E914933A50A2A286B';
+const noMore = ["Theindex", "vladcampos@mastodon.social"];
+
+// Deno.cron("Follow more people", { minute: { every: 1 } }, async () => {
+//     let lillihubFollows = await mb.getMicroBlogFollowing(_mbLiliihubToken, 'lillihub');
+//     console.log(`**********************`);
+//     console.log(`lillhub is following ${lillihubFollows.length}`);
+//     lillihubFollows = lillihubFollows.filter(u => !u.is_you)
+//     console.log(`users with no one to follow.:${noMore.length}`);
+//     if(lillihubFollows.length > 0) {
+//         lillihubFollows.filter(lf => !noMore.includes(lf.username)).slice(0,45).forEach(function (u, i) {
+//             setTimeout(async function() {
+//                 let neighbors = await mb.getMicroBlogFollowing(_mbLiliihubToken, u.username, false);
+//                 neighbors = neighbors.filter(n => !n.username.includes('@') && !n.username.includes('.'));
+//                 console.log(`${i}: ${u.username} (${neighbors.length})`);
+
+//                 for(let i = 0; i < neighbors.length; i++) {
+//                     const followMe = neighbors[i].username;        
+//                     const posting = await fetch(`https://micro.blog/users/follow?username=${followMe}`, { method: "POST", headers: { "Authorization": "Bearer " + _mbLiliihubToken } });
+//                     if (!posting.ok) {
+//                         const error = await posting.text();
+//                     }
+//                 }
+
+//                 noMore.push(u.username)
+//             }, i * 1 * 1000); // every two seconds....
+//         });
+//     }
+// });
+
+
 
 Deno.serve(async (req) => { 
     if(_development) {
@@ -635,12 +669,22 @@ Deno.serve(async (req) => {
                 } else if(req.url.includes("versions")) {
                     id = name;
                     name = "version";
-                    console.log(parts[parts.length - 3])
                     fetching = await fetch(`https://micro.blog/notes/${parts[parts.length - 3]}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const versions = await fetching.json();
                     const version = versions.items.filter(v => v.id == id)[0];
                     // put JSON check here or something.....
-                    content = `<div id="version" class="mt-2">${utility.noteHTML(version,parts[parts.length - 5],versions.items)}</div>`;
+                    content = `<p class="text-center">Version ${version.id}</p>
+                        <div id="version" class="mt-2">${utility.noteHTML(version,parts[parts.length - 5],versions.items)}</div>
+                        <details class="accordion">
+                            <summary class="accordion-header">
+                                <i class="icon icon-arrow-right mr-1"></i>
+                                Advanced
+                            </summary>
+                            <div class="accordion-body">
+                                <p class="text-center"><button class="overrideNote btn btn-error btn-sm" data-id="${parts[parts.length - 3]}" data-content="${version.content_text}">Revert to this version</button></p>                          
+                            </div>
+                        </details>
+                    `;
                 } else if(req.url.includes("notes")) {
                     id = name;
                     name = "note";
