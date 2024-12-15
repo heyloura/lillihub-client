@@ -310,7 +310,7 @@ export function noteHTML(note, notebookId, versions) {
             </div>
             <div class="divider mt-2 pt-2" data-content="Versions"></div>
             <table class="table table-striped">
-            ${versions.reverse().map(v, i => `<tr>
+            ${versions.reverse().map((v, i) => `<tr>
                 <td>${(new Date(v.date_published).toLocaleString('en-US', { timeZoneName: 'short' })).replace(' UTC','')}</td>
                 <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a>${i == 0 ? ' (current)' : ''}</td>
             </tr>`).join('')}
