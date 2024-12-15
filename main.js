@@ -16,35 +16,6 @@ const _development = true;
 const _appSecret = JSON.parse('{"kty":"oct","k":"c2V4g-FQSxzpeCE8E0JcMg","alg":"A128CBC","key_ops":["encrypt","decrypt"],"ext":true}');
 const deployURL = 'http://localhost:8000/';
 const _mbLiliihubToken = 'BF4E914933A50A2A286B';
-const noMore = ["Theindex", "vladcampos@mastodon.social"];
-
-// Deno.cron("Follow more people", { minute: { every: 1 } }, async () => {
-//     let lillihubFollows = await mb.getMicroBlogFollowing(_mbLiliihubToken, 'lillihub');
-//     console.log(`**********************`);
-//     console.log(`lillhub is following ${lillihubFollows.length}`);
-//     lillihubFollows = lillihubFollows.filter(u => !u.is_you)
-//     console.log(`users with no one to follow.:${noMore.length}`);
-//     if(lillihubFollows.length > 0) {
-//         lillihubFollows.filter(lf => !noMore.includes(lf.username)).slice(0,45).forEach(function (u, i) {
-//             setTimeout(async function() {
-//                 let neighbors = await mb.getMicroBlogFollowing(_mbLiliihubToken, u.username, false);
-//                 neighbors = neighbors.filter(n => !n.username.includes('@') && !n.username.includes('.'));
-//                 console.log(`${i}: ${u.username} (${neighbors.length})`);
-
-//                 for(let i = 0; i < neighbors.length; i++) {
-//                     const followMe = neighbors[i].username;        
-//                     const posting = await fetch(`https://micro.blog/users/follow?username=${followMe}`, { method: "POST", headers: { "Authorization": "Bearer " + _mbLiliihubToken } });
-//                     if (!posting.ok) {
-//                         const error = await posting.text();
-//                     }
-//                 }
-
-//                 noMore.push(u.username)
-//             }, i * 1 * 1000); // every two seconds....
-//         });
-//     }
-// });
-
 
 
 Deno.serve(async (req) => { 
@@ -722,7 +693,9 @@ Deno.serve(async (req) => {
                     name = "timeline";
                     fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
-                    content = `<div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
+                    content = `
+                        ${id ? '<p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/">Back to the beginning</a></p>' : ''}
+                        <div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
                 }
                 
                 return new Response(layout.replaceAll('{{nonce}}', nonce)

@@ -251,7 +251,6 @@ export function discoverHTML(posts, tagmoji, id) {
 export function timelineHTML(posts, lastId) {
     return `
     <div>
-        <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/">Back to the beginning</a></p>
         ${posts}
         <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
     </div>

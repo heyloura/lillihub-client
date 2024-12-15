@@ -367,6 +367,53 @@ const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importK
     ['encrypt', 'decrypt']
 ) : '';
 
+// Load the version
+Swap.loaders['#version'] = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const parts = window.location.pathname.split('/');
+    const id = parts[2];
+    loadVersion();
+
+    return () => {  // unloader function
+        if(document.querySelector(`.notebook-${id}`)) {
+            document.querySelector(`.notebook-${id}`).classList.remove("active");
+        }
+    };  
+}
+
+function loadVersion() {
+    // page set up
+    document.title = "Lillihub: Note Vesion";
+    document.getElementById('pageActionsBtn').classList.add('hide');
+    document.getElementById('actionIcon').classList.remove('icon-plus');
+    document.getElementById('actionIcon').classList.remove('icon-edit');
+    document.getElementById('actionIcon').classList.add('icon-back');
+    const parts = window.location.pathname.split('/');
+    const id = parts[2];
+    
+    if(document.querySelector(`.notebook-${id}`)) {
+        document.querySelector(`.notebook-${id}`).classList.add("active");
+    }
+    
+    // decrypt and show
+    if(document.querySelector('.decryptMe')) {
+        document.querySelectorAll('.decryptMe').forEach(async (element) => {
+            const noteId = element.getAttribute('data-id');
+            const markdown = await decryptWithKey(element.value, imported_key);
+            const html = converter.makeHtml(markdown);
+            const metadata = converter.getMetadata();
+            const metaDef = objectToTableRows(metadata);
+            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
+            document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
+            document.getElementById('preview').innerHTML = html;
+            hljs.highlightAll();
+        });
+    } else {
+        document.getElementById('preview').innerHTML = html;
+        hljs.highlightAll();
+    }
+}
+
 // Loaded the note list
 Swap.loaders['#note-list'] = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -445,6 +492,7 @@ async function loadNotebook() {
 
 // Loaded the note
 Swap.loaders['#note'] = () => {
+    console.alert('version!')
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const parts = window.location.pathname.split('/');
     const id = parts[2];
@@ -505,53 +553,6 @@ function loadNote() {
         document.getElementById('preview').innerHTML = html;
         document.getElementById('content').dispatchEvent(new Event("input"))
         growTextArea(document.getElementById('content'));
-        hljs.highlightAll();
-    }
-}
-
-Swap.loaders['#version'] = () => {
-    console.alert('version!')
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    const parts = window.location.pathname.split('/');
-    const id = parts[2];
-    loadVersion();
-
-    return () => {  // unloader function
-        if(document.querySelector(`.notebook-${id}`)) {
-            document.querySelector(`.notebook-${id}`).classList.remove("active");
-        }
-    };  
-}
-
-function loadVersion() {
-    // page set up
-    document.title = "Lillihub: Note Vesion";
-    document.getElementById('pageActionsBtn').classList.add('hide');
-    document.getElementById('actionIcon').classList.remove('icon-plus');
-    document.getElementById('actionIcon').classList.remove('icon-edit');
-    document.getElementById('actionIcon').classList.add('icon-back');
-    const parts = window.location.pathname.split('/');
-    const id = parts[2];
-    
-    if(document.querySelector(`.notebook-${id}`)) {
-        document.querySelector(`.notebook-${id}`).classList.add("active");
-    }
-    
-    // decrypt and show
-    if(document.querySelector('.decryptMe')) {
-        document.querySelectorAll('.decryptMe').forEach(async (element) => {
-            const noteId = element.getAttribute('data-id');
-            const markdown = await decryptWithKey(element.value, imported_key);
-            const html = converter.makeHtml(markdown);
-            const metadata = converter.getMetadata();
-            const metaDef = objectToTableRows(metadata);
-            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
-            document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
-            document.getElementById('preview').innerHTML = html;
-            hljs.highlightAll();
-        });
-    } else {
-        document.getElementById('preview').innerHTML = html;
         hljs.highlightAll();
     }
 }
@@ -718,7 +719,7 @@ document.addEventListener("click", async (item) => {
             id = event.target.getAttribute('id') === 'editor-upload-btn' ? null : event.target.getAttribute('id').split('-')[0];
         }
         
-        var el = window._protected_reference = document.createElement("INPUT");
+        const el = window._protected_reference = document.createElement("INPUT");
         el.type = "file";
         document.getElementById(id ? id + '-editor-status' : 'editor-status').innerHTML = `<span class="loading"></span>`;
 
@@ -838,6 +839,33 @@ document.addEventListener("click", async (item) => {
         }
     }
 
+    // revert to prior version
+    if(item.target.classList.contains('overrideNote')) {
+        if(confirm('Are you sure you want to revert to this version? This cannot be undone.')) {
+            document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
+            const parts = window.location.pathname.split('/');
+
+            let id = item.target.getAttribute('data-id');
+            let content = item.target.getAttribute('data-content');
+            let notebookId = parts[2];
+            
+            const form = new URLSearchParams();
+            form.append("text", content);
+            form.append("notebook_id", notebookId);
+            form.append("id", id);   
+    
+            const posting = await fetch('/notebooks/note/update', {
+                method: "POST",
+                body: form.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                }
+            });
+    
+            window.location.href = `/notebooks/${notebookId}/notes/${id}`;
+        }
+    }
+
     // toggle a note
     if(item.target.classList.contains('editor-bold')) {
         let id = null;
@@ -922,19 +950,22 @@ document.addEventListener("click", async (item) => {
         document.getElementById(id + '-editor-action').innerHTML = 'Send';
     }
     if(item.target.classList.contains('sendReply')){
+        document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
         let id = item.target.getAttribute('data-id');
         let form = document.getElementById(id + '-editor'); 
         fetch("/timeline/reply", { body: new FormData(form), method: "post" })
             .then(response => response.text())
             .then(data => {
                 document.getElementById(id + '-editor').remove();
-                //maybe add a toast message here...
+                document.getElementById('loader').remove();
             });
     }
     if(item.target.classList.contains('actionBtn')) {
         //alert('action btn click:' + window.location.pathname);
         // here we vary by page...
-        if(window.location.pathname.includes('notes')) {
+        if(window.location.pathname.includes('versions')) {
+            history.back();
+        } else if(window.location.pathname.includes('notes')) {
             if(window.location.hash == "edit") {
                 document.getElementById('actionIcon').classList.remove('icon-back');
                 document.getElementById('actionIcon').classList.add('icon-edit');
@@ -962,7 +993,9 @@ document.addEventListener("click", async (item) => {
             document.getElementById('modalTitle').innerHTML = 'Manage Note';
             document.getElementById('modal').classList.add("active");
         } else if(window.location.pathname.includes('notebooks')) {
-            // the action is to add a note
+            //document.getElementById('modalContent').innerHTML = document.getElementById('note-details').innerHTML
+            document.getElementById('modalTitle').innerHTML = 'Manage Notebook';
+            document.getElementById('modal').classList.add("active");
         } else if(window.location.pathname.includes('users')) {
             // the action is to follow (if not already)?
         }
@@ -1034,7 +1067,7 @@ function loadPage() {
     gestures('main');
     if(window.location.pathname.includes('versions')) { 
         loadVersion();
-    } if(window.location.pathname.includes('notes')) {
+    } else if(window.location.pathname.includes('notes')) {
         loadNote();
     } else if(window.location.pathname.includes('notebooks')) {
         loadNotebook();
