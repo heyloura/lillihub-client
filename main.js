@@ -638,9 +638,9 @@ Deno.serve(async (req) => {
                     console.log(parts[parts.length - 3])
                     fetching = await fetch(`https://micro.blog/notes/${parts[parts.length - 3]}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const versions = await fetching.json();
-                    const version = versions.items.filter(v => v.id == id);
+                    const version = versions.items.filter(v => v.id == id)[0];
                     // put JSON check here or something.....
-                    content = `<div id="version" class="mt-2">${JSON.stringify(version, null, 2)}</div>`;
+                    content = `<div id="version" class="mt-2">${utility.noteHTML(version,parts[parts.length - 5],versions.items)}</div>`;
                 } else if(req.url.includes("notes")) {
                     id = name;
                     name = "note";

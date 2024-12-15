@@ -509,6 +509,52 @@ function loadNote() {
     }
 }
 
+Swap.loaders['#version'] = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const parts = window.location.pathname.split('/');
+    const id = parts[2];
+    loadVersion();
+
+    return () => {  // unloader function
+        if(document.querySelector(`.notebook-${id}`)) {
+            document.querySelector(`.notebook-${id}`).classList.remove("active");
+        }
+    };  
+}
+
+function loadVersion() {
+    // page set up
+    document.title = "Lillihub: Note Vesion";
+    document.getElementById('pageActionsBtn').classList.add('hide');
+    document.getElementById('actionIcon').classList.remove('icon-plus');
+    document.getElementById('actionIcon').classList.remove('icon-edit');
+    document.getElementById('actionIcon').classList.add('icon-back');
+    const parts = window.location.pathname.split('/');
+    const id = parts[2];
+    
+    if(document.querySelector(`.notebook-${id}`)) {
+        document.querySelector(`.notebook-${id}`).classList.add("active");
+    }
+    
+    // decrypt and show
+    if(document.querySelector('.decryptMe')) {
+        document.querySelectorAll('.decryptMe').forEach(async (element) => {
+            const noteId = element.getAttribute('data-id');
+            const markdown = await decryptWithKey(element.value, imported_key);
+            const html = converter.makeHtml(markdown);
+            const metadata = converter.getMetadata();
+            const metaDef = objectToTableRows(metadata);
+            document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
+            document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
+            document.getElementById('preview').innerHTML = html;
+            hljs.highlightAll();
+        });
+    } else {
+        document.getElementById('preview').innerHTML = html;
+        hljs.highlightAll();
+    }
+}
+
 function loadTimeline() {
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
@@ -985,7 +1031,9 @@ document.addEventListener("click", async (item) => {
 //--------------------------------------------
 function loadPage() {
     gestures('main');
-    if(window.location.pathname.includes('notes')) {
+    if(window.location.pathname.includes('versions')) { 
+        loadVersion();
+    } if(window.location.pathname.includes('notes')) {
         loadNote();
     } else if(window.location.pathname.includes('notebooks')) {
         loadNotebook();
