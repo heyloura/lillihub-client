@@ -40,7 +40,7 @@
                 <div class="sidebar">
                     <div class="pt-0">
                         <ul class="menu mb-2">
-                            <li class="divider text-green" data-content="Micro.blog Feed"></li>
+                            <li class="divider text-blue" data-content="Micro.blog Social"></li>
                             <li class="menu-item">
                                 <a rel="prefetch" swap-target="#main" swap-history="true" id="timelineLink" href="/timeline">Timeline</a>
                             </li>
@@ -55,7 +55,22 @@
                             </li>
                         </ul>
                         <ul class="menu mb-2">
-                            <li class="divider" data-content="Micro.blog Bookmarks"></li>
+                            <li class="divider text-purple" data-content="Blog Management"></li>
+                            <li class="menu-item">
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="timelineLink" href="/timeline">Timeline</a>
+                            </li>
+                            <li class="menu-item">
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="discoverLink" href="/discover">Discover</a>
+                            </li>
+                            <li class="menu-item">
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="mentions" href="/mentions">Mentions</a>
+                            </li>
+                            <li class="menu-item">
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="following" href="/following">Following</a>
+                            </li>
+                        </ul>
+                        <ul class="menu mb-2">
+                            <li class="divider text-red" data-content="Bookmarks"></li>
                             <li class="menu-item">
                                 <a href="/bookmarks" class="{{bookmarksClass}}">Bookmarks</a>
                             </li>
@@ -75,17 +90,17 @@
                             </li>-->
                         </ul> 
                         <ul class="menu mb-2">
-                            <li class="divider" data-content="Micro.blog Bookshelves"></li>
+                            <li class="divider text-orange" data-content="Bookshelves"></li>
                             <li class="menu-item">
                                 <a href="/bookshelves">Bookshelves</a>
                             </li>
                         </ul> 
                         <ul class="menu mb-2">
-                            <li class="divider" data-content="Micro.blog Notes"></li>
+                            <li class="divider text-yellow" data-content="Private Notes"></li>
                             {{notebooks}}
                         </ul> 
                         <ul class="menu mt-2 mb-2">
-                            <li class="divider" data-content="Lillihub"></li>
+                            <li class="divider text-green" data-content="Lillihub"></li>
                             <li class="menu-item"><a href="/settings">Settings</a></li>
                             <li class="menu-item"><a href="https://docs.lillihub.com">Documentation</a></li>
                             <li class="menu-item"><a href="/logout">Logout</a></li>

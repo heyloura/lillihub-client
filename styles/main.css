@@ -4054,17 +4054,13 @@ a.text-error:visited {
 }
 
 .divider-vert[data-content]::after,.divider[data-content]::after {
-  background: var(--background-tint-1);
+  /* background: var(--background-tint-1); */
   /* color: var(--background-tint-2); */
   content: attr(data-content);
   display: inline-block;
   font-size: .7rem;
   padding: 0 .4rem;
   transform: translateY(-.65rem);
-}
-
-.divider-vert[data-content].text-green::after,.divider[data-content].text-green::after {
-  color: var(--green);
 }
 
 .divider {
@@ -6713,8 +6709,42 @@ article footer {
   --purplered: #BA4477;
 }
 
+.text-red {
+  color: var(--red);
+}
+.text-orange {
+  color: var(--orange);
+}
+.text-yellow {
+  color: var(--yellow);
+}
 .text-green {
   color: var(--green);
+}
+.text-blue {
+  color: var(--blue);
+}
+.text-purple {
+  color: var(--purple);
+}
+
+.divider-vert[data-content].text-red::after,.divider[data-content].text-red::after {
+  color: var(--red);
+}
+.divider-vert[data-content].text-orange::after,.divider[data-content].text-orange::after {
+  color: var(--orange);
+}
+.divider-vert[data-content].text-yellow::after,.divider[data-content].text-yellow::after {
+  color: var(--yellow);
+}
+.divider-vert[data-content].text-green::after,.divider[data-content].text-green::after {
+  color: var(--green);
+}
+.divider-vert[data-content].text-blue::after,.divider[data-content].text-blue::after {
+  color: var(--blue);
+}
+.divider-vert[data-content].text-purple::after,.divider[data-content].text-purple::after {
+  color: var(--purple);
 }
 
 .postBtns {
