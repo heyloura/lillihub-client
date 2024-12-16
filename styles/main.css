@@ -20,10 +20,10 @@
 :root {
   color-scheme: dark; /* both supported */
   --background: #e0e0c5;
-  --background-tint-1: #121212;
-  --background-tint-2: #575757;
+  --background-tint-1: #282c3c;
+  --background-tint-2: #212432;
   --background-tint-3: #3f3f3f;
-  --background-tint-4: #282828;
+  --background-tint-4: #1a1c28;
   --background-shade-1: #C9C9B1;
   --background-shade-2: #B3B39D;
   --background-shade-3: #9C9C89;
@@ -1367,11 +1367,11 @@ dl dd {
 }
 
 .table tbody tr.active,.table.table-striped tbody tr.active {
-  background: var(--background-tint-3);
+  background: var(--background-tint-2);
 }
 
 .table.table-hover tbody tr:hover {
-  background: var(--background-tint-3);
+  background: var(--background-tint-2);
 }
 
 .table.table-scroll {
@@ -1382,7 +1382,7 @@ dl dd {
 }
 
 .table td,.table th {
-  border-bottom: .05rem solid var(--background-tint-3);;
+  border-bottom: .05rem solid var(--background-tint-2);;
   padding: .6rem .4rem
 }
 
@@ -3235,7 +3235,7 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .menu .menu-item>a.active,.menu .menu-item>a:active {
-  background: var(--background-tint-3);
+  background: var(--background-tint-2);
   color: var(--primary);
 }
 
