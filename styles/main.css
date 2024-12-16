@@ -1382,7 +1382,7 @@ dl dd {
 }
 
 .table td,.table th {
-  border-bottom: .05rem solid var(--background-tint-2);;
+  border-bottom: .05rem solid var(--background-tint-2);
   padding: .6rem .4rem
 }
 
@@ -2769,7 +2769,8 @@ video.video-responsive::before {
   -ms-flex-pack: justify;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  justify-content: space-between
+  justify-content: space-between;
+  border-bottom: .05rem solid var(--background-tint-2);
 }
 
 .navbar .navbar-section {
