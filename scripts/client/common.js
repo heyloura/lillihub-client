@@ -548,6 +548,7 @@ function loadNote() {
             let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
             document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
             document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
+            document.getElementById(`pageAction`).insertAdjacentHTML('afterbegin', `<a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${id}" class="btn btn-link btn-action"><i class="icon icon-back"></i></a>`);
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
             document.getElementById('preview').innerHTML = html;
