@@ -419,7 +419,7 @@ export function getNotebookHTML(notes, notebookId) {
             <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
             <datalist id="tags"></datalist>
         </div>
-        ${notes.map(n => notesHTML(n,notebookId)).join('')}
+        ${notes.map((n,i) => `index: ${i} <br/>${notesHTML(n,notebookId)}`).join('')}
     </div>
     `;
 }
