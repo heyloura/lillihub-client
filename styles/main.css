@@ -3196,7 +3196,7 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .menu {
-  background: var(--background-tint-1);
+  /* background: var(--background-tint-1); */
   /* border: 1px solid var(--background-tint-4);
   border-radius: .1rem;
   box-shadow: 0 .05rem .2rem rgba(48,55,66,.3); */
@@ -6749,6 +6749,10 @@ article footer {
   margin-top: -2em;
   display: inline-block;
   background-color: var(--background-tint-1);
+}
+
+#sidebar-id {
+  background-color: var(--background-tint-2);
 }
 
 /* Dracula Theme v1.2.5
