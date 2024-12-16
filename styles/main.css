@@ -3231,12 +3231,12 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .menu .menu-item>a:focus,.menu .menu-item>a:hover {
-  background: var(--background-tint-2);
+  background: var(--background-tint-4);
   color: var(--primary);
 }
 
 .menu .menu-item>a.active,.menu .menu-item>a:active {
-  background: var(--background-tint-2);
+  background: var(--background-tint-4);
   color: var(--primary);
 }
 
