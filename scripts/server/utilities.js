@@ -574,7 +574,6 @@ export function postHTML(post, stranger, isConvo, convoId) {
             </main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
             <div class="card-footer">
-                <div class="divider"></div>
                 <div class="card-subtitle postFooter">
                     <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
                         ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
