@@ -4063,6 +4063,10 @@ a.text-error:visited {
   transform: translateY(-.65rem);
 }
 
+.divider-vert[data-content].text-green::after,.divider[data-content].text-green::after {
+  color: var(--green);
+}
+
 .divider {
   border-top: .05rem solid var(--background-tint-4);
   height: .05rem;
