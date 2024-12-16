@@ -689,7 +689,7 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
                     content = `
-                        ${id ? '<p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/">Back to the beginning</a></p>' : ''}
+                        ${id != "timeline" ? '<p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/">Back to the beginning</a></p>' : ''}
                         <div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
                 }
                 
