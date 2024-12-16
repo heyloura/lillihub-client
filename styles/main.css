@@ -6695,7 +6695,7 @@ article footer {
 }
 
 :root {
-  --red: #de324c;
+  /* --red: #de324c;
   --redorange: #E95E56;
   --orange: #f4895f;
   --orangeyellow: #F6B567;
@@ -6706,8 +6706,22 @@ article footer {
   --blue: #369acc;
   --bluepurple: #6678B7;
   --purple: #9656a2;
-  --purplered: #BA4477;
+  --purplered: #BA4477; */
+  --red: #e78284;
+  --redorange: #EB917D;
+  --orange: #ef9f76;
+  --orangeyellow: #EAB483;
+  --yellow: #e5c890;
+  --yellowgreen: #C6CD8D;
+  --green: #a6d189;
+  --greenblue: #99BEBC;
+  --blue: #8caaee;
+  --bluepurple: #A3B3F0;
+  --purple: #babbf1;
+  --purplered: #D19FBB;
 }
+
+
 
 .text-red {
   color: var(--red);
