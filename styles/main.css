@@ -20,10 +20,10 @@
 :root {
   color-scheme: dark; /* both supported */
   --background: #e0e0c5;
-  --background-tint-1: #282c3c;
-  --background-tint-2: #212432;
+  --background-tint-1: #212432;
+  --background-tint-2: #1a1c28;
   --background-tint-3: #3f3f3f;
-  --background-tint-4: #1a1c28;
+  --background-tint-4: #13151e;
   --background-shade-1: #C9C9B1;
   --background-shade-2: #B3B39D;
   --background-shade-3: #9C9C89;
@@ -6639,7 +6639,7 @@ article footer {
 }
 
 .bordered {
-  border: 1px solid var(--background-tint-4);
+  border-bottom: 1px solid var(--background-tint-4);
 }
 
 .no-border {
@@ -6725,6 +6725,11 @@ article footer {
   vertical-align: middle;
 }
 
+@media (max-width: 840px) {
+  #pageAction { 
+    padding-left: 110px;
+  }
+}
 /* #pageAction {
   z-index: 298;
   width: 200px;

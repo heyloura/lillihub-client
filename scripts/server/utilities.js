@@ -550,13 +550,6 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         ${getAvatar(post, isConvo ? 'avatar-sm' : 'avatar-sm')}
                         <div class="card-title h5 d-inline">${post.name.split(':')[0]}</div>           
                     </div>
-                    <div class="card-subtitle d-block pl-1">
-                            <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
-                                ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
-                                @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
-                            </a> · 
-                        <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
-                    </div>
                 </div>
                  <div class="card-buttons postBtns text-right">
                     <div class="btn-group">
@@ -576,8 +569,19 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     </div>
                 </div>
             </header>
-            <main id="main-${post.id}" data-id="${post.id}">${post.content}</main>
+            <main id="main-${post.id}" data-id="${post.id}">
+                ${post.content}
+            </main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
+            <div class="card-footer">
+                <div class="card-subtitle">
+                    <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
+                        ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
+                        @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
+                    </a> · 
+                    <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
+                </div>
+            </div>
         </article>
         ${isConvo ? `</div>` : '' }
     `;
