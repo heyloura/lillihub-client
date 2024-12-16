@@ -3231,7 +3231,7 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .menu .menu-item>a:focus,.menu .menu-item>a:hover {
-  background: var(--background-tint-4);
+  background: var(--background-tint-2);
   color: var(--primary);
 }
 
