@@ -539,7 +539,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
     post.content.replaceAll('</script', `</div`);
     
     return ` 
-        ${isConvo ? `<div class="timeline-item bordered">
+        ${isConvo ? `<div class="timeline-item">
                         <div class="timeline-left ${convoId && convoId === post.id ? 'highlight' : ''}">
                             <span class="timeline-icon"></span>
                         </div>` : ''}
@@ -574,23 +574,13 @@ export function postHTML(post, stranger, isConvo, convoId) {
             </main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
             <div class="card-footer">
-                <div class="card-subtitle">
-
+                <div class="divider"></div>
+                <div class="card-subtitle postFooter">
+                    <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
+                        ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
+                        @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
+                    </a> · 
                 </div>
-                <details class="accordion">
-                    <summary class="accordion-header pl-0">
-                        <i class="icon icon-arrow-right mr-1"></i>
-                        <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
-                            ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
-                            @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
-                        </a> · 
-                        <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a> ·
-                        6 <i class="icon icon-message"></i>
-                    </summary>
-                    <div class="accordion-body">
-                        <!-- Accordions content -->
-                    </div>
-                </details>
             </div>
         </article>
         ${isConvo ? `</div>` : '' }

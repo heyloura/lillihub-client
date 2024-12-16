@@ -6639,7 +6639,7 @@ article footer {
 }
 
 .bordered {
-  border-bottom: 1px solid var(--background-tint-4);
+  border: 1px solid var(--background-tint-4);
 }
 
 .no-border {
@@ -6742,6 +6742,12 @@ article footer {
 }
 
 .navbar {
+  background-color: var(--background-tint-1);
+}
+
+.postFooter{
+  margin-top: -2em;
+  display: inline-block;
   background-color: var(--background-tint-1);
 }
 
