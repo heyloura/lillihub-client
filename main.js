@@ -8,15 +8,10 @@ import * as utility from "./scripts/server/utilities.js";
 *      const key = await crypto.subtle.generateKey({ name: "AES-CBC", length: 128 },true,["encrypt", "decrypt"]);
 *      const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 ******************************************************************************************************************/
-// const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
-// const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
-// const deployURL = 'https://sad-bee-43--version3.deno.dev/';
+const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
+const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
+const deployURL = 'https://sad-bee-43--version3.deno.dev/';
 const _development = true;
-
-const _appSecret = JSON.parse('{"kty":"oct","k":"c2V4g-FQSxzpeCE8E0JcMg","alg":"A128CBC","key_ops":["encrypt","decrypt"],"ext":true}');
-const deployURL = 'http://localhost:8000/';
-const _mbLiliihubToken = 'BF4E914933A50A2A286B';
-
 
 Deno.serve(async (req) => { 
     if(_development) {

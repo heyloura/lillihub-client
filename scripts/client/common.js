@@ -406,6 +406,14 @@ function loadVersion() {
             document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('preview').innerHTML = html;
+            if(metadata && metadata.background) {
+                document.querySelector(`.card-body`).style.background = metadata.background;
+            }
+            if(metadata && metadata.color) {
+                document.querySelector(`.card-body`).style.setProperty('color', metadata.color, 'important');;
+            }
+            let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
+            document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
             hljs.highlightAll();
         });
     } else {
@@ -433,7 +441,7 @@ async function loadNotebook() {
     const parts = window.location.pathname.split('/');
     const id = parts[parts.length - 1];
     document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
-    document.getElementById('pageActionsBtn').classList.remove('hide');
+    //document.getElementById('pageActionsBtn').classList.remove('hide');
     document.getElementById('actionIcon').classList.add('icon-plus');
     document.getElementById('actionIcon').classList.remove('icon-edit');
 
@@ -451,7 +459,7 @@ async function loadNotebook() {
                 document.querySelector(`article[data-id="${noteId}"]`).style.background = metadata.background;
             }
             if(metadata && metadata.color) {
-                document.querySelector(`article[data-id="${noteId}"]`).style.color = metadata.color;
+                document.querySelector(`article[data-id="${noteId}"] a`).style.setProperty('color', metadata.color, 'important');
             }
             document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,50) + '...'; 
             let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
@@ -492,7 +500,6 @@ async function loadNotebook() {
 
 // Loaded the note
 Swap.loaders['#note'] = () => {
-    console.alert('version!')
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const parts = window.location.pathname.split('/');
     const id = parts[2];
@@ -532,6 +539,14 @@ function loadNote() {
             const html = converter.makeHtml(markdown);
             const metadata = converter.getMetadata();
             const metaDef = objectToTableRows(metadata);
+            if(metadata && metadata.background) {
+                document.querySelector(`.card-body`).style.background = metadata.background;
+            }
+            if(metadata && metadata.color) {
+                document.querySelector(`.card-body`).style.setProperty('color', metadata.color, 'important');
+            }
+            let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
+            document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
             document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
@@ -539,17 +554,10 @@ function loadNote() {
             growTextArea(document.getElementById('content'));
             document.getElementById('content').dispatchEvent(new Event("input"))
             hljs.highlightAll();
-
-            // var fragment = document.createDocumentFragment();
-            // fragment.appendChild(document.getElementById('note-details'));
-            // document.getElementById('pageActions').appendChild(fragment);
-
-            //set up pageActions
-            
-
         });
     } else {
         document.getElementById('content').innerHTML = document.getElementById("noteContent").value;
+        const html = converter.makeHtml(document.getElementById("noteContent").value);
         document.getElementById('preview').innerHTML = html;
         document.getElementById('content').dispatchEvent(new Event("input"))
         growTextArea(document.getElementById('content'));
@@ -961,7 +969,7 @@ document.addEventListener("click", async (item) => {
             });
     }
     if(item.target.classList.contains('actionBtn')) {
-        //alert('action btn click:' + window.location.pathname);
+        alert('action btn click:' + window.location.pathname);
         // here we vary by page...
         if(window.location.pathname.includes('versions')) {
             history.back();

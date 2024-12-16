@@ -287,7 +287,9 @@ function flattenedNote(note) {
 
 export function noteHTML(note, notebookId, versions) {
     const n = flattenedNote(note);
-    return `
+    return `                
+        ${n.shared ? `<p class="text-center"><mark>This note is shared.</mark><br/><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></p>` : ''}
+        <p class="text-center" id="tags-${n.id}"></p>
         <div class="card bordered pages">
             <div id="edit">
                 ${getNoteEditor(notebookId,n)}
@@ -297,6 +299,7 @@ export function noteHTML(note, notebookId, versions) {
             </div>
         </div>
         <div id="note-details" class="hide">
+            <p class="text-center"></p>
             <div class="divider" data-content="Note Metadata + Details"></div>
             <div>
                 <table id="metadata-${n.id}" class="table table-striped">
@@ -304,8 +307,9 @@ export function noteHTML(note, notebookId, versions) {
                     <tr><td>published</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
                     <tr><td>modified</td><td>${(new Date(n.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</td></tr>
                     <tr><td>encrypted</td><td>${n.encrypted}</td></tr>
-                    ${n.shared ? `<tr><td>shared</td><td><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></td></tr>` : ''}
-                </table>
+                    <!--<tr><td>shared</td><td>${n.shared ? `<button data-id="${n.id}" class="btn btn-error unShareNote" type="button">Unshare note</button>` : `<button data-id="${n.id}" class="btn shareNote" type="button">Share note</button>`}</td></tr>-->
+                    <tr><td>shared</td><td>${n.shared ? `Yes` : `No`}</td></tr>
+                </table><br/>
             </div>
             <div class="divider mt-2 pt-2" data-content="Versions"></div>
             <table class="table table-striped">
@@ -313,15 +317,14 @@ export function noteHTML(note, notebookId, versions) {
                 <td>${(new Date(v.date_published).toLocaleString('en-US', { timeZoneName: 'short' })).replace(' UTC','')}</td>
                 <td><a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${notebookId}/notes/${n.id}/versions/${v.id}">${v.id}</a>${i == 0 ? ' (current)' : ''}</td>
             </tr>`).join('')}
-            </table>
-            <div class="divider" data-content="Related Bookmarks"></div>
+            </table><br/>
             <details class="accordion">
                 <summary class="accordion-header">
                     <i class="icon icon-arrow-right mr-1"></i>
                     Advanced
                 </summary>
                 <div class="accordion-body">
-                    <button data-id="${n.id}" class="btn btn-error btn-sm deleteNote" type="button">Delete Note</button>
+                    <p class="text-center"><button data-id="${n.id}" class="btn btn-error btn-sm deleteNote" type="button">Delete Note</button></p>
                 </div>
             </details>
         </div>
@@ -430,7 +433,9 @@ function notesHTML(note, notebookId) {
                 data-published="${n.published}" 
                 data-modified="${n.modified}"
                 data-shared="${n.shared}" >               
-                <a id="title-${n.id}" class="fakeAnchor" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true"></a> 
+                <a id="title-${n.id}" class="fakeAnchor d-block" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">
+                    ${n.shared ? n.content_text.substring(0,50) : ''}
+                </a> 
                 <div class="card-subtitle">
                     ${n.shared ? `<a target="_blank" class="text-gray" href="${n.shared_url}">${n.shared_url}</a>` : ''}
                     <div class="d-inline" id="tags-${n.id}"></div>
