@@ -557,7 +557,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
             </main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
             <div class="card-footer">
-            <div class="card-buttons postBtns text-right">
+                <div class="card-buttons postBtns d-inline">
                     <div class="btn-group">
                         <div class="dropdown">
                             <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
