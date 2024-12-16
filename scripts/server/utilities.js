@@ -551,10 +551,14 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         <div class="card-title h5 d-inline">${post.name.split(':')[0]}</div>           
                     </div>
                 </div>
-                 <div class="card-buttons postBtns text-right">
+            </header>
+            <main id="main-${post.id}" data-id="${post.id}">
+                ${post.content}
+            </main>
+            ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
+            <div class="card-footer">
+            <div class="card-buttons postBtns text-right">
                     <div class="btn-group">
-                        <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
-                        ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                         <div class="dropdown">
                             <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
                                 <i class="icon icon-more-vert"></i>
@@ -566,14 +570,10 @@ export function postHTML(post, stranger, isConvo, convoId) {
                                 <li class="menu-item">Open in micro.blog</li>
                             </ul>
                         </div>
+                        <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
+                        ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                     </div>
                 </div>
-            </header>
-            <main id="main-${post.id}" data-id="${post.id}">
-                ${post.content}
-            </main>
-            ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
-            <div class="card-footer">
                 <div class="card-subtitle postFooter">
                     <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
                         ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
