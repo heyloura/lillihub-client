@@ -262,38 +262,38 @@ Deno.serve(async (req) => {
                 return new Response(`<textarea rows="20">${JSON.stringify(allHighlights)}</textarea>`,HTMLHeaders(nonce));
             }
 
-            if(new URLPattern({ pathname: "/bookmarks/bookmarks" }).exec(req.url)) {
-                const searchParams = new URLSearchParams(req.url.split('?')[1]);
-                const tag = searchParams.get('tag');
-                const items = await mb.getAllFromMicroBlog(mbToken, `https://micro.blog/posts/bookmarks${tag ? `?tag=${tag}` : ''}`);
-                const allHighlights = await mb.getAllFromMicroBlog(mbToken, 'https://micro.blog/posts/bookmarks/highlights');
+            // if(new URLPattern({ pathname: "/bookmarks/bookmarks" }).exec(req.url)) {
+            //     const searchParams = new URLSearchParams(req.url.split('?')[1]);
+            //     const tag = searchParams.get('tag');
+            //     const items = await mb.getAllFromMicroBlog(mbToken, `https://micro.blog/posts/bookmarks${tag ? `?tag=${tag}` : ''}`);
+            //     const allHighlights = await mb.getAllFromMicroBlog(mbToken, 'https://micro.blog/posts/bookmarks/highlights');
 
-                for(let i=0; i< items.length; i++) {
-                    const item = items[i];
-                    const highlights = allHighlights.filter(h => h.url === item.url);
+            //     for(let i=0; i< items.length; i++) {
+            //         const item = items[i];
+            //         const highlights = allHighlights.filter(h => h.url === item.url);
                     
-                    item.title = item.content_html.split('</p>')[0].replace('<p>','');
-                    item.reader = item._microblog.links && item._microblog.links.length > 0 ? item._microblog.links[0].id : null;
-                    item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
-                }
-                return new Response(items.map(b => utility.bookmarkHTML(b)).join(''),HTMLHeaders(nonce));
-            }
+            //         item.title = item.content_html.split('</p>')[0].replace('<p>','');
+            //         item.reader = item._microblog.links && item._microblog.links.length > 0 ? item._microblog.links[0].id : null;
+            //         item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
+            //     }
+            //     return new Response(items.map(b => utility.bookmarkHTML(b)).join(''),HTMLHeaders(nonce));
+            // }
         
-            if(new URLPattern({ pathname: "/bookmarks" }).exec(req.url)) {        
-                // let bookmarks = [];
-                // const fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                // const tags = await fetching.json();
-                // let tagDatalist = `<datalist id="bookmarkTags">${user && user.is_premium && tags && tags.length > 0 ? `
-                //     ${tags.sort().map(t => `<option value="${t}"></option>`).join('')}`  : ''}</datalist>
-                // ${user && user.is_premium && tags && tags.length > 0 ? `
-                //     ${tags.sort().map(t => `<span class="chip ${tag == t ? 'bg-primary' : ''}"><a ${tag == t ? 'class="text-light"' : ''} href="/bookmarks?tag=${t}">${t}</a></span>`).join('')}`  : ''}`;
+            // if(new URLPattern({ pathname: "/bookmarks" }).exec(req.url)) {        
+            //     // let bookmarks = [];
+            //     // const fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            //     // const tags = await fetching.json();
+            //     // let tagDatalist = `<datalist id="bookmarkTags">${user && user.is_premium && tags && tags.length > 0 ? `
+            //     //     ${tags.sort().map(t => `<option value="${t}"></option>`).join('')}`  : ''}</datalist>
+            //     // ${user && user.is_premium && tags && tags.length > 0 ? `
+            //     //     ${tags.sort().map(t => `<span class="chip ${tag == t ? 'bg-primary' : ''}"><a ${tag == t ? 'class="text-light"' : ''} href="/bookmarks?tag=${t}">${t}</a></span>`).join('')}`  : ''}`;
         
-                // return new Response(await HTML(`              
-                // 
+            //     // return new Response(await HTML(`              
+            //     // 
 
-                const layout = new TextDecoder().decode(await Deno.readFile("bookmarks.html"));
-                return new Response(layout.replaceAll('{{nonce}}', nonce),HTMLHeaders(nonce));
-            }
+            //     const layout = new TextDecoder().decode(await Deno.readFile("bookmarks.html"));
+            //     return new Response(layout.replaceAll('{{nonce}}', nonce),HTMLHeaders(nonce));
+            // }
         
             if(new URLPattern({ pathname: "/bookmarks/new" }).exec(req.url)) {
                 const value = await req.formData();
@@ -609,7 +609,28 @@ Deno.serve(async (req) => {
                 // get editor
 
                 // check for notebooks route
-                if(req.url.includes("custom")) {
+                if(req.url.includes("bookmarks")) {
+                    id = name;
+                    name = "bookmarks";
+
+                    const searchParams = new URLSearchParams(req.url.split('?')[1]);
+                    const tag = searchParams.get('tag');
+                    fetching = await fetch(`https://micro.blog/posts/bookmarks${tag ? `?tag=${tag}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const items = (await fetching.json()).items;
+                    fetching = await fetch(`https://micro.blog/posts/bookmarks/highlights`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const allHighlights = (await fetching.json()).items
+    
+                    for(let i=0; i< items.length; i++) {
+                        const item = items[i];
+                        const highlights = allHighlights.filter(h => h.url === item.url);
+                        
+                        item.title = item.content_html.split('</p>')[0].replace('<p>','');
+                        item.reader = item._microblog.links && item._microblog.links.length > 0 ? item._microblog.links[0].id : null;
+                        item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
+                    }
+                    content = `<div id="bookmarks" class="mt-2">${items.map(b => utility.bookmarkHTML(b)).join('')}</div>`;
+                }
+                else if(req.url.includes("custom")) {
                     name = "discover";
                     fetching = await fetch(`https://micro.blog/posts/timeline?count=40`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
                     const posts = await fetching.json();
