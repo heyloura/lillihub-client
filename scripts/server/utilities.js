@@ -547,7 +547,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
             <header id="header-${post.id}" class="card-header pt-1 mt-0 pb-1 mb-0 pl-1 pr-0">
                 <div>   
                     <div class="card-top pl-1">
-                        ${getAvatar(post, isConvo ? 'avatar-sm' : 'avatar-sm')}
+                        ${getAvatar(post, isConvo ? 'avatar' : 'avatar')}
                         <div class="card-title h5 d-inline">${post.name.split(':')[0]}</div>           
                     </div>
                 </div>
@@ -581,6 +581,15 @@ export function postHTML(post, stranger, isConvo, convoId) {
                     </a> · 
                     <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
                 </div>
+                <details class="accordion">
+                    <summary class="accordion-header">
+                        <i class="icon icon-arrow-right mr-1"></i>
+                        Reply
+                    </summary>
+                    <div class="accordion-body">
+                        <!-- Accordions content -->
+                    </div>
+                </details>
             </div>
         </article>
         ${isConvo ? `</div>` : '' }

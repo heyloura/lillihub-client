@@ -6257,7 +6257,7 @@ a,pre,code {
 }
 
 .card-header {
-  border-bottom: .05rem solid var(--background-tint-4);
+  /* border-bottom: .05rem solid var(--background-tint-4); */
   display: flex;
   align-items: center;
 }
