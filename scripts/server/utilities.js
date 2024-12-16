@@ -557,11 +557,18 @@ export function postHTML(post, stranger, isConvo, convoId) {
             </main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
             <div class="card-footer">
+                <div class="card-subtitle postFooter">
+                    <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
+                        ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
+                        @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
+                    </a> · 
+                    <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
+                </div>
                 <div class="card-buttons postBtns d-inline">
                     <div class="btn-group">
                         <div class="dropdown">
                             <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
-                                <i class="icon icon-more-vert"></i>
+                                <i class="icon icon-caret"></i>
                             </button>
                             <ul class="menu">
                                 <li class="menu-item">View</li>
@@ -573,13 +580,6 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
                         ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
                     </div>
-                </div>
-                <div class="card-subtitle postFooter">
-                    <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
-                        ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
-                        @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
-                    </a> · 
-                    <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
                 </div>
             </div>
         </article>
