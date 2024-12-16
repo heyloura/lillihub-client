@@ -6725,7 +6725,7 @@ article footer {
   vertical-align: middle;
 }
 
-@media (max-width: 840px) {
+@media (min-width: 840px) {
   #pageAction { 
     padding-left: 110px;
   }
