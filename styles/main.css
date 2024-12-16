@@ -4055,7 +4055,7 @@ a.text-error:visited {
 
 .divider-vert[data-content]::after,.divider[data-content]::after {
   background: var(--background-tint-1);
-  color: var(--background-tint-2);
+  /* color: var(--background-tint-2); */
   content: attr(data-content);
   display: inline-block;
   font-size: .7rem;
@@ -6709,7 +6709,7 @@ article footer {
   --purplered: #BA4477;
 }
 
-.btn-green {
+.text-green {
   color: var(--green);
 }
 
