@@ -621,8 +621,6 @@ Deno.serve(async (req) => {
                     const allHighlights = (await fetching.json()).items
                     fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const tags = (await fetching.json())
-
-                    console.log(tags)
     
                     for(let i=0; i< items.length; i++) {
                         const item = items[i];

@@ -492,7 +492,7 @@ export function bookmarksHTML(bookmarks, tags, is_premium) {
                                     Bookmark Tags
                                 </summary>
                                 <div class="accordion-body">
-                                    ${tags.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                                    ${tags.sort().map((item) =>
                                         `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks/${item}">${item}</a></span>`
                                     ).join('')}                            
                                 </div>
@@ -506,7 +506,7 @@ export function bookmarksHTML(bookmarks, tags, is_premium) {
                     <div class="hide-lg">
                         <ul class="menu p-0">
                             <li class="divider" data-content="Bookmark Tags"></li>
-                            ${tags.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                            ${tags.sort().map((item) =>
                                 `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks/${item}">${item}</a></span>`
                             ).join('')} 
                         </ul>
