@@ -473,6 +473,50 @@ function flattenedBookmark(post) {
     };
 }
 
+export function bookmarksHTML(bookmarks, tags, is_premium) {
+    return `<div class="container grid-xl">
+            <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 ${is_premium ? 'col-xl-9 col-9' : 'col-xl-12 col-12'}">
+                    <div class="form-group">
+                        <label class="form-label">Search your bookmarks.</label>
+                        <div class="input-group">
+                            <input id="searchBookmark" type="text" class="form-input">
+                            <button class="btn btn-primary input-group-btn searchBookmark"><i class="icon icon-search searchBookmark"></i></button>
+                        </div>
+                    </div>
+                    ${is_premium ? `
+                        <div class="show-lg">
+                            <details class="accordion">
+                                <summary class="accordion-header">
+                                    <i class="icon icon-arrow-right mr-1"></i>
+                                    Bookmark Tags
+                                </summary>
+                                <div class="accordion-body">
+                                    ${tags.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                                        `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks/${item}">${item}</a></span>`
+                                    ).join('')}                            
+                                </div>
+                            </details>
+                        </div>
+                    ` : ''}
+                    ${bookmarks.map(n => bookmarkHTML(n, is_premium)).join('')}
+                </div>
+                ${is_premium ? `
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                    <div class="hide-lg">
+                        <ul class="menu p-0">
+                            <li class="divider" data-content="Bookmark Tags"></li>
+                            ${tags.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                                `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks/${item}">${item}</a></span>`
+                            ).join('')} 
+                        </ul>
+                    </div>
+                </div>
+                    ` : ''}
+            </div>
+        </div>`
+}
+
 export function bookmarkHTML(bookmark, is_premium) {
     const b = flattenedBookmark(bookmark);
     return `
@@ -491,7 +535,7 @@ export function bookmarkHTML(bookmark, is_premium) {
                     <figure class="avatar avatar" data-initial="${b.username.substring(0,1)}">
                         <img src="${b.avatar}" loading="lazy">
                     </figure>
-                    ${b.name}: ${b.title}
+                    ${b.name}: ${b.title.split('<a')[0]}
                 </a> ` : `
                 <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
                     <img src="${b.avatar}" loading="lazy">
