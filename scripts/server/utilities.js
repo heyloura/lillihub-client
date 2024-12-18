@@ -473,30 +473,63 @@ function flattenedBookmark(post) {
     };
 }
 
-export function bookmarkHTML(bookmark) {
+export function bookmarkHTML(bookmark, is_premium) {
     const b = flattenedBookmark(bookmark);
     return `
-        <article id="${b.id}" class="card parent ripple toggleBookmark" data-id="${b.id}" data-highlights="${b.highlights.join(',')}" data-title="${b.name}" data-reader="${b.reader}" data-url="${b.url}" data-timestamp="${b.timestamp}" data-published="${b.published}" data-deletable="${b.deletable}">
-            <header class="card-header">
-                <figure class="avatar avatar-lg" data-initial="${b.username.substring(0,1)}">
+        <article class="bookmark bordered p-2" 
+            id="${b.id}"
+            data-id="${b.id}" 
+            data-highlights="${b.highlights.join(',')}" 
+            data-title="${b.name}" 
+            data-reader="${b.reader}" 
+            data-url="${b.url}" 
+            data-timestamp="${b.timestamp}" 
+            data-published="${b.published}" 
+            data-deletable="${b.deletable}" >    
+            ${is_premium ? `
+                <a id="title-${b.id}" class="fakeAnchor d-block" rel="prefetch" href="/bookmarks/${b.id}" swap-target="#main" swap-history="true">
+                    <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
+                        <img src="${b.avatar}" loading="lazy">
+                    </figure>
+                    ${b.name}
+                </a> ` : `
+                <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
                     <img src="${b.avatar}" loading="lazy">
                 </figure>
-                <div class="card-top">
-                    <div class="card-title h5">${b.name}</div>
-                    <div class="card-subtitle">
-                        <a target="_blank" class="text-gray" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</a>
-                        ${b.tags ? `${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
-                        ${b.highlights && b.highlights.length > 0 ? `<mark>${b.highlights.length} highlight(s) <i class="icon icon-edit"></i></mark>` : ''}
-                        ${b.reader ? `<span class="chip">reader <i class="icon icon-check ml-2"></i></span>` : ''}
-                    </div>  
-                </div>
-            </header>
-            <main>
-                <p>${b.title}</p>            
-                ${b.summary ? `<div class="bordered p-2 bg-dark">🤖 ${b.summary}</div>` : '' }
-            </main>
+                ${b.name}
+            `}           
+            
+            <div class="card-subtitle">
+                <a target="_blank" class="text-gray" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</a>
+                ${b.tags ? `${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
+                ${b.highlights && b.highlights.length > 0 ? `<mark>${b.highlights.length} highlight(s) <i class="icon icon-edit"></i></mark>` : ''}
+                ${b.reader ? `<span class="chip">reader <i class="icon icon-check ml-2"></i></span>` : ''}
+            </div>
         </article>
     `;
+
+    // return `
+    //     <article id="${b.id}" class="card parent ripple toggleBookmark" data-id="${b.id}" data-highlights="${b.highlights.join(',')}" data-title="${b.name}" data-reader="${b.reader}" data-url="${b.url}" data-timestamp="${b.timestamp}" data-published="${b.published}" data-deletable="${b.deletable}">
+    //         <header class="card-header">
+    //             <figure class="avatar avatar-lg" data-initial="${b.username.substring(0,1)}">
+    //                 <img src="${b.avatar}" loading="lazy">
+    //             </figure>
+    //             <div class="card-top">
+    //                 <div class="card-title h5">${b.name}</div>
+    //                 <div class="card-subtitle">
+    //                     <a target="_blank" class="text-gray" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</a>
+    //                     ${b.tags ? `${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
+    //                     ${b.highlights && b.highlights.length > 0 ? `<mark>${b.highlights.length} highlight(s) <i class="icon icon-edit"></i></mark>` : ''}
+    //                     ${b.reader ? `<span class="chip">reader <i class="icon icon-check ml-2"></i></span>` : ''}
+    //                 </div>  
+    //             </div>
+    //         </header>
+    //         <main>
+    //             <p>${b.title}</p>            
+    //             ${b.summary ? `<div class="bordered p-2 bg-dark">🤖 ${b.summary}</div>` : '' }
+    //         </main>
+    //     </article>
+    // `;
 }
 
 function getAvatar(p, size) {
