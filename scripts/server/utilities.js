@@ -503,8 +503,8 @@ export function bookmarkHTML(bookmark, is_premium) {
                 ${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]} ·
                 <a target="_blank" class="text-gray" href="${b.url}">${b.url}</a>
                 ${b.tags ? `· ${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
-                ${b.highlights && b.highlights.length > 0 ? `· <mark>${b.highlights.length} highlight(s) <i class="icon icon-edit"></i></mark>` : ''}
-                ${b.reader ? `· <span class="chip">reader <i class="icon icon-check ml-2"></i></span>` : ''}
+                ${b.highlights && b.highlights.length > 0 ? `· <span class="chip text-yellow">${b.highlights.length} highlight(s)</span>` : ''}
+                ${b.reader ? `· <span class="chip">reader</span>` : ''}
             </div>      
             ${b.summary ? `<main><div class="bordered p-2 bg-dark">🤖 ${b.summary}</div></main>` : '' }
         </article>

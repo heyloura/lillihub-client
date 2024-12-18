@@ -628,7 +628,7 @@ Deno.serve(async (req) => {
                         item.reader = item._microblog.links && item._microblog.links.length > 0 ? item._microblog.links[0].id : null;
                         item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
                     }
-                    content = `<div id="bookmarks" class="mt-2">${items.map(b => utility.bookmarkHTML(b)).join('')}</div>`;
+                    content = `<div id="bookmarks" class="mt-2">${items.map(b => utility.bookmarkHTML(b, mbUser.is_premium)).join('')}</div>`;
                 }
                 else if(req.url.includes("custom")) {
                     name = "discover";
