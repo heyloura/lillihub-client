@@ -535,7 +535,7 @@ export function bookmarkHTML(bookmark, is_premium) {
                     <figure class="avatar avatar" data-initial="${b.username.substring(0,1)}">
                         <img src="${b.avatar}" loading="lazy">
                     </figure>
-                    ${b.name}: ${b.title.split('<a')[0]}
+                    ${b.title.split('<a')[0]}
                 </a> ` : `
                 <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
                     <img src="${b.avatar}" loading="lazy">
@@ -544,7 +544,7 @@ export function bookmarkHTML(bookmark, is_premium) {
             
             <main class="card-subtitle">
                 ${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]} ·
-                <a target="_blank" class="text-gray" href="${b.url}">${b.url}</a>
+                <a target="_blank" class="text-gray" href="${b.url}">${b.name}</a>
                 ${b.tags ? `· ${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
                 ${b.highlights && b.highlights.length > 0 ? `· <span class="chip text-yellow">${b.highlights.length} highlight(s)</span>` : ''}
                 ${b.reader ? `· <span class="chip">reader</span>` : ''}
