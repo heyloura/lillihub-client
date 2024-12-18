@@ -542,7 +542,7 @@ export function bookmarkHTML(bookmark, is_premium) {
                 </figure>
             `}           
             
-            <main class="card-subtitle pt-2">
+            <main class="card-subtitle">
                 ${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]} ·
                 <a target="_blank" class="text-gray" href="${b.url}">${b.url}</a>
                 ${b.tags ? `· ${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
