@@ -630,7 +630,7 @@ Deno.serve(async (req) => {
                         item.reader = item._microblog.links && item._microblog.links.length > 0 ? item._microblog.links[0].id : null;
                         item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
                     }
-                    content = `<div id="bookmarks" class="mt-2">${utility.bookmarksHTML(items, mbUser.is_premium, tags)}</div>`;
+                    content = `<div id="bookmarks" class="mt-2">${utility.bookmarksHTML(items, tags, mbUser.is_premium)}</div>`;
                 }
                 else if(req.url.includes("custom")) {
                     name = "discover";

@@ -6646,6 +6646,7 @@ article footer {
 .mini_cover {
   float: left;
   padding-right: 1em;
+  max-width: 33%;
 }
 
 .fakeAnchor, .fakeAnchor:hover, .fakeAnchor:visited {
