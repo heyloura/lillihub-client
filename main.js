@@ -619,6 +619,8 @@ Deno.serve(async (req) => {
                     const items = (await fetching.json()).items;
                     fetching = await fetch(`https://micro.blog/posts/bookmarks/highlights`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const allHighlights = (await fetching.json()).items
+                    fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const tags = (await fetching.json())
     
                     for(let i=0; i< items.length; i++) {
                         const item = items[i];
@@ -628,7 +630,7 @@ Deno.serve(async (req) => {
                         item.reader = item._microblog.links && item._microblog.links.length > 0 ? item._microblog.links[0].id : null;
                         item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
                     }
-                    content = `<div id="bookmarks" class="mt-2">${utility.bookmarksHTML(items, mbUser.is_premium)}</div>`;
+                    content = `<div id="bookmarks" class="mt-2">${utility.bookmarksHTML(items, mbUser.is_premium, tags)}</div>`;
                 }
                 else if(req.url.includes("custom")) {
                     name = "discover";
