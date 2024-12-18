@@ -598,10 +598,10 @@ Deno.serve(async (req) => {
                     if(rid) {
                         let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const results = await fetching.text(); 
+
+                        console.log(results);
                 
-                        const page = results;
-                        // let highlightCount = 0;
-                            
+                        const page = results;                            
                         const baseURL = page.split('<base href="')[1].split('"')[0];
                         const root = baseURL.split('/');
                         root.pop();
