@@ -531,7 +531,7 @@ export function bookmarkHTML(bookmark, is_premium) {
             data-published="${b.published}" 
             data-deletable="${b.deletable}" >    
             ${is_premium ? `
-                <a id="title-${b.id}" class="fakeAnchor h5 d-block" rel="prefetch" href="/bookmarks/reader/${b.id}?hids=${b.highlights.join(',')}" swap-target="#main" swap-history="true">
+                <a id="title-${b.id}" class="fakeAnchor h5 d-block" rel="prefetch" href="/bookmarks/reader/${b.reader}?hids=${b.highlights.join(',')}" swap-target="#main" swap-history="true">
                     <figure class="avatar avatar" data-initial="${b.username.substring(0,1)}">
                         <img src="${b.avatar}" loading="lazy">
                     </figure>
