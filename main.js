@@ -596,7 +596,7 @@ Deno.serve(async (req) => {
 
                     let reader = '';
                     if(rid) {
-                        let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${rid}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const results = await fetching.text(); 
 
                         console.log(results);
