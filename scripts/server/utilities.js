@@ -542,14 +542,15 @@ export function bookmarkHTML(bookmark, is_premium) {
                 </figure>
             `}           
             
-            <div class="card-subtitle pt-2">
+            <main class="card-subtitle pt-2">
                 ${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]} ·
                 <a target="_blank" class="text-gray" href="${b.url}">${b.url}</a>
                 ${b.tags ? `· ${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
                 ${b.highlights && b.highlights.length > 0 ? `· <span class="chip text-yellow">${b.highlights.length} highlight(s)</span>` : ''}
                 ${b.reader ? `· <span class="chip">reader</span>` : ''}
-            </div>      
-            ${b.summary ? `<main><div class="bordered p-2 bg-dark">🤖 ${b.summary}</div></main>` : '' }
+                
+                ${b.summary ? `<div class="bordered p-2 bg-dark d-block">🤖 ${b.summary}</div>` : '' }
+            </main>      
         </article>
     `;
 
