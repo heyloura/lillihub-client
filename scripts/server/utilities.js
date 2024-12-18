@@ -473,6 +473,38 @@ function flattenedBookmark(post) {
     };
 }
 
+export function bookmarkReaderHTML(reader, bookmark, tags) {
+    return `<div class="container grid-xl">
+            <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    ${bookmarkHTML(bookmark, false)}
+                    ${reader}
+                </div>
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                    <div class="">
+                        <ul class="menu p-0">
+                            <li class="divider text-red" data-content="Bookmark Tags"></li>
+                            ${tags.sort().map((item) =>
+                                `<span class="chip">${item}<button class="btn btn-clear removeTag" aria-label="Close"></button></span>`
+                            ).join('')} 
+                        </ul>
+                        <div class="form-group">
+                        <label class="form-label">Add tags.</label>
+                        <div class="input-group">
+                            <input list="tags"  id="addTag" type="text" class="form-input">
+                            <button class="btn btn-primary input-group-btn addTag"><i class="icon icon-plus addTag"></i></button>
+                            <datalist id="tags">
+                            ${tags.sort().map((item) =>
+                                `<option>${item}</option>`
+                            ).join('')}</datalist>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>`
+}
+
 export function bookmarksHTML(bookmarks, tags, is_premium) {
     return `<div class="container grid-xl">
             <div class="columns">
@@ -531,7 +563,7 @@ export function bookmarkHTML(bookmark, is_premium) {
             data-published="${b.published}" 
             data-deletable="${b.deletable}" >    
             ${is_premium ? `
-                <a id="title-${b.id}" class="fakeAnchor h5 d-block" rel="prefetch" href="/bookmarks/reader/${b.reader}?hids=${b.highlights.join(',')}" swap-target="#main" swap-history="true">
+                <a id="title-${b.id}" class="fakeAnchor h5 d-block" rel="prefetch" href="/bookmarks/reader/${b.reader}?bid=${b.id}&hids=${b.highlights.join(',')}" swap-target="#main" swap-history="true">
                     <figure class="avatar avatar" data-initial="${b.username.substring(0,1)}">
                         <img src="${b.avatar}" loading="lazy">
                     </figure>
@@ -545,37 +577,14 @@ export function bookmarkHTML(bookmark, is_premium) {
             <main class="card-subtitle">
                 ${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]} ·
                 <a target="_blank" class="text-gray" href="${b.url}">${b.name}</a>
-                ${b.tags ? `· ${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
-                ${b.highlights && b.highlights.length > 0 ? `· <span class="chip text-yellow">${b.highlights.length} highlight(s)</span>` : ''}
-                ${b.reader ? `· <span class="chip">reader</span>` : ''}
+                ${is_premium && b.tags ? `· ${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
+                ${is_premium && b.highlights && b.highlights.length > 0 ? `· <span class="chip text-yellow">${b.highlights.length} highlight(s)</span>` : ''}
+                ${is_premium && b.reader ? `· <span class="chip">reader</span>` : ''}
                 
-                ${b.summary ? `<div class="bordered p-2 bg-dark d-block">🤖 ${b.summary}</div>` : '' }
+                ${b.summary ? `<div class="bordered pt-2 mt-2 bg-dark d-block">🤖 ${b.summary}</div>` : '' }
             </main>      
         </article>
     `;
-
-    // return `
-    //     <article id="${b.id}" class="card parent ripple toggleBookmark" data-id="${b.id}" data-highlights="${b.highlights.join(',')}" data-title="${b.name}" data-reader="${b.reader}" data-url="${b.url}" data-timestamp="${b.timestamp}" data-published="${b.published}" data-deletable="${b.deletable}">
-    //         <header class="card-header">
-    //             <figure class="avatar avatar-lg" data-initial="${b.username.substring(0,1)}">
-    //                 <img src="${b.avatar}" loading="lazy">
-    //             </figure>
-    //             <div class="card-top">
-    //                 <div class="card-title h5">${b.name}</div>
-    //                 <div class="card-subtitle">
-    //                     <a target="_blank" class="text-gray" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</a>
-    //                     ${b.tags ? `${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
-    //                     ${b.highlights && b.highlights.length > 0 ? `<mark>${b.highlights.length} highlight(s) <i class="icon icon-edit"></i></mark>` : ''}
-    //                     ${b.reader ? `<span class="chip">reader <i class="icon icon-check ml-2"></i></span>` : ''}
-    //                 </div>  
-    //             </div>
-    //         </header>
-    //         <main>
-    //             <p>${b.title}</p>            
-    //             ${b.summary ? `<div class="bordered p-2 bg-dark">🤖 ${b.summary}</div>` : '' }
-    //         </main>
-    //     </article>
-    // `;
 }
 
 function getAvatar(p, size) {
