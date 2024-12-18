@@ -493,7 +493,7 @@ export function bookmarksHTML(bookmarks, tags, is_premium) {
                                 </summary>
                                 <div class="accordion-body">
                                     ${tags.sort().map((item) =>
-                                        `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks/${item}">${item}</a></span>`
+                                        `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks?tag=${item}">${item}</a></span>`
                                     ).join('')}                            
                                 </div>
                             </details>
@@ -505,9 +505,9 @@ export function bookmarksHTML(bookmarks, tags, is_premium) {
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div class="hide-lg">
                         <ul class="menu p-0">
-                            <li class="divider" data-content="Bookmark Tags"></li>
+                            <li class="divider text-red" data-content="Bookmark Tags"></li>
                             ${tags.sort().map((item) =>
-                                `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks/${item}">${item}</a></span>`
+                                `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks?tag=${item}">${item}</a></span>`
                             ).join('')} 
                         </ul>
                     </div>
@@ -535,7 +535,7 @@ export function bookmarkHTML(bookmark, is_premium) {
                     <figure class="avatar avatar" data-initial="${b.username.substring(0,1)}">
                         <img src="${b.avatar}" loading="lazy">
                     </figure>
-                    ${b.name}: ${b.title.split('<a')[1]}
+                    ${b.name}: ${b.title.split('<a')[0]}
                 </a> ` : `
                 <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
                     <img src="${b.avatar}" loading="lazy">
