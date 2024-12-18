@@ -375,6 +375,7 @@ Swap.loaders['#version'] = () => {
     loadVersion();
 
     return () => {  // unloader function
+        alert('version unload');
         if(document.querySelector(`.notebook-${id}`)) {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
@@ -430,6 +431,7 @@ Swap.loaders['#note-list'] = () => {
     loadNotebook();
 
     return () => {  // unloader function
+        alert('note-list unload');
         if(document.querySelector(`.notebook-${id}`)) {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
@@ -506,6 +508,7 @@ Swap.loaders['#note'] = () => {
     loadNote();
 
     return () => {  // unloader function
+        alert('note unload');
         if(document.querySelector(`.notebook-${id}`)) {
             document.querySelector(`.notebook-${id}`).classList.remove("active");
         }
@@ -614,6 +617,7 @@ Swap.loaders['#post-list'] = () => {
     loadTimeline(); 
 
     return () => {  // unloader function
+        alert('post list unload');
         document.querySelector(`#timelineLink`).classList.remove("active");
         if(localStorage.getItem('post_setting') === 'none') {
             document.getElementById('actionBtn').classList.remove('hide');
@@ -629,6 +633,7 @@ Swap.loaders['.post'] = () => {
     hljs.highlightAll();
 
     return () => {  // unloader function
+        alert('post unload');
         document.querySelector(`#timelineLink`).classList.remove("active");
     };  
 }
@@ -645,6 +650,7 @@ Swap.loaders['#discover'] = () => {
     hljs.highlightAll();
 
     return () => {  // unloader function
+        alert('discover unload');
         document.querySelector(`#discoverLink`).classList.remove("active");
     };  
 }
@@ -970,7 +976,6 @@ document.addEventListener("click", async (item) => {
             });
     }
     if(item.target.classList.contains('actionBtn')) {
-        alert('action btn click:' + window.location.pathname);
         // here we vary by page...
         if(window.location.pathname.includes('versions')) {
             history.back();
