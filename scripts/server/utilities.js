@@ -476,7 +476,7 @@ function flattenedBookmark(post) {
 export function bookmarkHTML(bookmark, is_premium) {
     const b = flattenedBookmark(bookmark);
     return `
-        <article class="bookmark bordered p-2" 
+        <article class="bookmark bordered p-2 mb-2" 
             id="${b.id}"
             data-id="${b.id}" 
             data-highlights="${b.highlights.join(',')}" 
@@ -487,11 +487,11 @@ export function bookmarkHTML(bookmark, is_premium) {
             data-published="${b.published}" 
             data-deletable="${b.deletable}" >    
             ${is_premium ? `
-                <a id="title-${b.id}" class="fakeAnchor d-block" rel="prefetch" href="/bookmarks/${b.id}" swap-target="#main" swap-history="true">
+                <a id="title-${b.id}" class="fakeAnchor d-block" rel="prefetch" href="/bookmarks/reader/${b.id}?hids=${b.highlights.join(',')}" swap-target="#main" swap-history="true">
                     <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
                         <img src="${b.avatar}" loading="lazy">
                     </figure>
-                    ${b.name}
+                    ${b.name}: ${b.title}
                 </a> ` : `
                 <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
                     <img src="${b.avatar}" loading="lazy">
@@ -500,11 +500,13 @@ export function bookmarkHTML(bookmark, is_premium) {
             `}           
             
             <div class="card-subtitle">
-                <a target="_blank" class="text-gray" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</a>
-                ${b.tags ? `${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
-                ${b.highlights && b.highlights.length > 0 ? `<mark>${b.highlights.length} highlight(s) <i class="icon icon-edit"></i></mark>` : ''}
-                ${b.reader ? `<span class="chip">reader <i class="icon icon-check ml-2"></i></span>` : ''}
-            </div>
+                ${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]} ·
+                <a target="_blank" class="text-gray" href="${b.url}">${b.url}</a>
+                ${b.tags ? `· ${b.tags.split(',').map(t => `<span class="chip">${t}</span>`).join(' ')}` : ''}
+                ${b.highlights && b.highlights.length > 0 ? `· <mark>${b.highlights.length} highlight(s) <i class="icon icon-edit"></i></mark>` : ''}
+                ${b.reader ? `· <span class="chip">reader <i class="icon icon-check ml-2"></i></span>` : ''}
+            </div>      
+            ${b.summary ? `<main><div class="bordered p-2 bg-dark">🤖 ${b.summary}</div></main>` : '' }
         </article>
     `;
 
