@@ -574,35 +574,43 @@ Deno.serve(async (req) => {
                 let tagmoji = await fetching.json();
 
                 // check for notebooks route
-                if(req.url.includes("reader")) {
+                if(req.url.includes("details")) {
                     //------------------
                     //  Bookmarks Reader
                     //------------------
                     id = name;
-                    name = "reader";
+                    name = "details";
 
                     const searchParams = new URLSearchParams(req.url.split('?')[1]);
                     const hids = searchParams.get('hids');
                     const bid = searchParams.get('bid');
+                    const rid = searchParams.get('rid');
+
+                    console.log(rid, bid, hids)
 
 
                     // const id = READER_ROUTE.exec(req.url).pathname.groups.id;
                     // const searchParams = new URLSearchParams(req.url.split('?')[1]);
                     // const idsParam = searchParams.get('ids');
                     // const title = searchParams.get('title');
+
+                    let reader = '';
+                    if(rid) {
+                        let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        const results = await fetching.text(); 
                 
-                    let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    const results = await fetching.text(); 
-            
-                    const page = results;
-                    // let highlightCount = 0;
-                        
-                    const baseURL = page.split('<base href="')[1].split('"')[0];
-                    const root = baseURL.split('/');
-                    root.pop();
-                    const htmlBody = page.split('<body>')[1].split('</body>')[0];
-                    let reader = htmlBody.split('<div id="content">')[1].split('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>')[0];
-                    reader = reader.replaceAll('src="',`src="${root.join('/')}/`);
+                        const page = results;
+                        // let highlightCount = 0;
+                            
+                        const baseURL = page.split('<base href="')[1].split('"')[0];
+                        const root = baseURL.split('/');
+                        root.pop();
+                        const htmlBody = page.split('<body>')[1].split('</body>')[0];
+                        reader = htmlBody.split('<div id="content">')[1].split('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>')[0];
+                        reader = reader.replaceAll('src="',`src="${root.join('/')}/`);
+                    }
+                
+
             
                     // if(idsParam) {
                     //     let ids = [...new Set(idsParam.split(','))];
@@ -644,7 +652,7 @@ Deno.serve(async (req) => {
                     //     item.reader = item._microblog.links && item._microblog.links.length > 0 ? item._microblog.links[0].id : null;
                     //     item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
                     // }
-                    content = `<div id="reader" class="mt-2">${utility.bookmarkReaderHTML(reader, bookmark, tags)}</div>`;
+                    content = `<div id="reader" class="mt-2">${utility.bookmarkReaderHTML(reader, bookmark[0], tags)}</div>`;
                 } else if(req.url.includes("bookmarks")) {
                     //-----------
                     //  Bookmarks
