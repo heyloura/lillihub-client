@@ -660,31 +660,13 @@ Swap.loaders['#discover'] = () => {
 *************************************************************/
 
 document.addEventListener('keydown', (event) => {
-    // Check if Ctrl+B was pressed
-    console.log(event.srcElement.getAttribute('id'));
-    if (event.srcElement.getAttribute('id') == 'content' && event.ctrlKey && event.key.toLowerCase() === 'b') {
-        event.preventDefault(); // Prevent the default Ctrl+B behavior
-  
-    //   // Get the selected text
-    //   const selectedText = textarea.value.substring(
-    //     textarea.selectionStart,
-    //     textarea.selectionEnd
-    //   );
-  
-    //   // Surround the selected text with asterisks
-    //   const modifiedText = `*${selectedText}*`;
-  
-    //   // Replace the selected text with the modified text
-    //   const start = textarea.selectionStart;
-    //   const end = textarea.selectionEnd;
-    //   textarea.value =
-    //     textarea.value.substring(0, start) +
-    //     modifiedText +
-    //     textarea.value.substring(end);
-  
-    //   // Set the cursor position after the modified text
-    //   textarea.selectionStart = start + modifiedText.length;
-    //   textarea.selectionEnd = start + modifiedText.length;
+    if (event.srcElement.getAttribute('id').includes('content') && event.ctrlKey && event.key.toLowerCase() === 'b') {
+        event.preventDefault();
+        getSelectionAndReplace(event.srcElement,'**','**');
+    }
+    if (event.srcElement.getAttribute('id').includes('content') && event.ctrlKey && event.key.toLowerCase() === 'i') {
+        event.preventDefault();
+        getSelectionAndReplace(event.srcElement,'**','**');
     }
 });
 
