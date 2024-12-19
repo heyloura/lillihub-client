@@ -353,8 +353,10 @@ Deno.serve(async (req) => {
                 const indieToken = value.get('indieToken');
                 const microPub = value.get('microPub');
 
-                const replies = replyingTo.map(function (reply) { return '@' + reply }).join(', ');
-                content = replies + ' ' + content;
+                if(replyingTo) {
+                    const replies = replyingTo.map(function (reply) { return '@' + reply }).join(', ');
+                    content = replies + ' ' + content;
+                }
 
                 if(!postingType || postingType === 'mb') {
                     const formBody = new URLSearchParams();
@@ -376,6 +378,8 @@ Deno.serve(async (req) => {
                     } else {
                         formBody.append("mp-syndicate-to[]", "");
                     }
+
+                    console.log(formBody);
                     
                     //const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
                     //if (!posting.ok) {

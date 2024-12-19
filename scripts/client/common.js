@@ -911,52 +911,52 @@ document.addEventListener("click", async (item) => {
     // toggle a note
     if(item.target.classList.contains('editor-bold')) {
         let id = null;
-        if(event.target.getAttribute('id') == null) {
-            id = event.target.parentNode.getAttribute('id') === 'editor-bold-btn' ? null : event.target.parentNode.getAttribute('id').split('-')[0];
+        if(item.target.getAttribute('id') == null) {
+            id = item.target.parentNode.getAttribute('id') === 'editor-bold-btn' ? null : item.target.parentNode.getAttribute('id').split('-')[0];
         } else {
-            id = event.target.getAttribute('id') === 'editor-bold-btn' ? null : event.target.getAttribute('id').split('-')[0];
+            id = item.target.getAttribute('id') === 'editor-bold-btn' ? null : item.target.getAttribute('id').split('-')[0];
         }
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'**','**');
     }
     if(item.target.classList.contains('editor-italic')) {
         let id = null;
-        if(event.target.getAttribute('id') == null) {
-            id = event.target.parentNode.getAttribute('id') === 'editor-italic-btn' ? null : event.target.parentNode.getAttribute('id').split('-')[0];
+        if(item.target.getAttribute('id') == null) {
+            id = item.target.parentNode.getAttribute('id') === 'editor-italic-btn' ? null : item.target.parentNode.getAttribute('id').split('-')[0];
         } else {
-            id = event.target.getAttribute('id') === 'editor-italic-btn' ? null : event.target.getAttribute('id').split('-')[0];
+            id = item.target.getAttribute('id') === 'editor-italic-btn' ? null : item.target.getAttribute('id').split('-')[0];
         }
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'*','*');
     }
     if(item.target.classList.contains('editor-code')) {
         let id = null;
-        if(event.target.getAttribute('id') == null) {
-            id = event.target.parentNode.getAttribute('id') === 'editor-code-btn' ? null : event.target.parentNode.getAttribute('id').split('-')[0];
+        if(item.target.getAttribute('id') == null) {
+            id = item.target.parentNode.getAttribute('id') === 'editor-code-btn' ? null : item.target.parentNode.getAttribute('id').split('-')[0];
         } else {
-            id = event.target.getAttribute('id') === 'editor-code-btn' ? null : event.target.getAttribute('id').split('-')[0];
+            id = item.target.getAttribute('id') === 'editor-code-btn' ? null : item.target.getAttribute('id').split('-')[0];
         }
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'`','`');
     }
     if(item.target.classList.contains('editor-image')) {
         let id = null;
-        if(event.target.getAttribute('id') == null) {
-            id = event.target.parentNode.getAttribute('id') === 'editor-image-markdown-btn' ? null : event.target.parentNode.getAttribute('id').split('-')[0];
+        if(item.target.getAttribute('id') == null) {
+            id = item.target.parentNode.getAttribute('id') === 'editor-image-markdown-btn' ? null : item.target.parentNode.getAttribute('id').split('-')[0];
         } else {
-            id = event.target.getAttribute('id') === 'editor-image-markdown-btn' ? null : event.target.getAttribute('id').split('-')[0];
+            id = item.target.getAttribute('id') === 'editor-image-markdown-btn' ? null : item.target.getAttribute('id').split('-')[0];
         }
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'![alt text](',')');
     }
     if(item.target.classList.contains('editor-link')) {
         let id = null;
-        if(event.target.getAttribute('id') == null) {
-            id = event.target.parentNode.getAttribute('id') === 'editor-link-markdown-btn' ? null : event.target.parentNode.getAttribute('id').split('-')[0];
+        if(item.target.getAttribute('id') == null) {
+            id = item.target.parentNode.getAttribute('id') === 'editor-link-markdown-btn' ? null : item.target.parentNode.getAttribute('id').split('-')[0];
         } else {
-            id = event.target.getAttribute('id') === 'editor-link-markdown-btn' ? null : event.target.getAttribute('id').split('-')[0];
+            id = item.target.getAttribute('id') === 'editor-link-markdown-btn' ? null : item.target.getAttribute('id').split('-')[0];
         }
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'[link text](',')');
     }
     if(item.target.classList.contains('editor-preview')) {
         // no parent element to worry about
-        let id = event.target.getAttribute('id') === 'editor-preview-btn' ? null : event.target.getAttribute('id').split('-')[0];
+        let id = item.target.getAttribute('id') === 'editor-preview-btn' ? null : item.target.getAttribute('id').split('-')[0];
 
         document.getElementById('modalContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').value);
         document.getElementById('modalTitle').innerHTML = 'Preview';
@@ -1024,8 +1024,10 @@ document.addEventListener("click", async (item) => {
             loadEditor();
         }  else if(window.location.pathname.includes('discover')) {
             // the action is to add a post 
+            loadEditor();
         } else if(window.location.pathname.includes('users')) {
             // the action is to follow (if not already)?
+            loadEditor();
         }
     }
     if(item.target.classList.contains('pageActions')) {
@@ -1093,8 +1095,15 @@ document.addEventListener("click", async (item) => {
     }
     if(item.target.classList.contains('savePost')) {
         item.preventDefault();
-        // const form = document.getElementById('mainPost'); 
-        // submitPost(new FormData(form));
+        document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`);
+        const form = document.getElementById('editor'); 
+        fetch("/post/add", { body: new FormData(form), method: "post" })
+            .then(response => response.json())
+            .then(data => {
+                closeEditorModal();
+            }).finally(() => {
+                document.getElementById('loader').remove();
+            });
         // document.getElementById('post').value = '';
         // document.getElementById('replybox-input-main').value = ''; 
     }
