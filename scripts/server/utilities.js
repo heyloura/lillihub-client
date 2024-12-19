@@ -546,7 +546,7 @@ export function bookmarkReaderHTML(reader, bookmark, tags) {
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     ${bookmarkHTML(bookmark, false)}
                     ${reader}
-                </div>
+                <!--</div>-->
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <ul class="menu p-0">
                         <li class="divider text-red" data-content="Bookmark Tags"></li>
@@ -633,9 +633,10 @@ export function bookmarkHTML(bookmark, is_premium) {
                     </figure>-->
                     ${b.title.split('<a')[0]}
                 </a> ` : `
-                <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
+                <!--<figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
                     <img src="${b.avatar}" loading="lazy">
-                </figure>
+                </figure>-->
+                ${b.title.split('<a')[0]}
             `}           
             
             <main class="card-subtitle">
