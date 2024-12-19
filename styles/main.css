@@ -5062,7 +5062,7 @@ a.text-error:visited {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
   height: 100%;
-  padding: .4rem .4rem .4rem .1rem
+  /* padding: .4rem .4rem .4rem .1rem */
 }
 
 .off-canvas .off-canvas-overlay {

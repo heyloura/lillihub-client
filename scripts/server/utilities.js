@@ -565,7 +565,6 @@ export function bookmarkReaderHTML(reader, bookmark, tags) {
                             ).join('')}</datalist>
                         </div>
                     </div>
-                    </div>
                 </div>
             </div>
         </div>`
