@@ -379,13 +379,13 @@ Deno.serve(async (req) => {
                         formBody.append("mp-syndicate-to[]", "");
                     }
 
-                    console.log(formBody);
+                    console.log(formBody.toString());
                     
-                    //const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
-                    //if (!posting.ok) {
-                    //    console.log(`${user.username} tried to add a post and ${await posting.text()}`);
-                    //}
-                    //return new Response(JSON.stringify({"response":{"message":"Post was sent."}}), JSONHeaders());
+                    const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
+                    if (!posting.ok) {
+                       console.log(`${user.username} tried to add a post and ${await posting.text()}`);
+                    }
+                    return new Response(JSON.stringify({"response":{"message":"Post was sent."}}), JSONHeaders());
 
                 } else if(postingType === 'statuslog') {
                     const posting = await fetch(`https://api.omg.lol/address/${omgAddess}/statuses/`, { method: "POST", body: JSON.stringify({"status": content}), headers: { "Authorization": "Bearer " + omgApi } });

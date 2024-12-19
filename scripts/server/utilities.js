@@ -353,7 +353,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
         const mpDestination = destination ? destination : defaultDestination;
         destinations = config.destination ? config.destination.map(item => {
             if(item.uid != mpDestination) {
-                return `<li class="menu-item"><a class="changeDestination" href="/post?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
+                return `<li class="menu-item"><a class="changeDestination" href="?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
             }
         }).join('') : '';
 

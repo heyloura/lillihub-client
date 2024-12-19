@@ -212,6 +212,7 @@ function loadEditor(type) {
         fragment.appendChild(document.getElementById('topBarBtns'));
         document.getElementById('modalTitle').appendChild(fragment);
         document.getElementById('editor-action').classList.add('savePost');
+        document.getElementById('editor-preview-btn').classList.add('hide');
         if(localStorage.getItem('post_setting'))
         {
             if(localStorage.getItem('post_setting') != 'none') {
