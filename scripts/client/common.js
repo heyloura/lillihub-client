@@ -662,7 +662,7 @@ Swap.loaders['#discover'] = () => {
 document.addEventListener('keydown', (event) => {
     // Check if Ctrl+B was pressed
     console.log(event);
-    if (event.ctrlKey && event.key.toLowerCase() === 'b') {
+    if (event.srcElement.getAttribute('id') == 'content' && event.ctrlKey && event.key.toLowerCase() === 'b') {
     //   event.preventDefault(); // Prevent the default Ctrl+B behavior
   
     //   // Get the selected text

@@ -397,7 +397,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
 
         categoriesList = `<div class="dropdown">
                 <button type="button" class="btn btn-link dropdown-toggle">
-                    <span id="categoriesDropdown" class="badge"><i class="icon icon-bookmark"></i></span>
+                    <span id="categoriesDropdown"><i class="icon icon-bookmark"></i></span>
                 </button>
                 <ul id="categoriesSelectMenu" class="menu bg-dark">
                     ${categoriesList}
