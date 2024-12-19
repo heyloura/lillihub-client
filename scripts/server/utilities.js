@@ -359,7 +359,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
 
         destinations = `<div id="destinationDropdown" class="dropdown">
                         <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
-                            <span id="postingName">${config.destination.filter(d => d.uid == mpDestination)[0].name)}</span> <i class="icon icon-caret"></i>
+                            <span id="postingName">${config.destination.filter(d => d.uid == mpDestination)[0].name}</span> <i class="icon icon-caret"></i>
                         </button>
                         <ul id="destinationSelectMenu" class="menu">
                             ${destinations}
