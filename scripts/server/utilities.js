@@ -285,14 +285,14 @@ function flattenedNote(note) {
     }
 }
 
-export function noteHTML(note, notebookId, versions) {
+export async function noteHTML(note, notebookId, versions) {
     const n = flattenedNote(note);
     return `                
         ${n.shared ? `<p class="text-center"><mark>This note is shared.</mark><br/><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></p>` : ''}
         <p class="text-center" id="tags-${n.id}"></p>
         <div class="card bordered pages">
             <div id="edit">
-                ${getNoteEditor(notebookId,n)}
+                ${await getNoteEditor(notebookId,n)}
             </div>
             <div class="card-body">
                 <div id="preview"></div>
@@ -331,15 +331,80 @@ export function noteHTML(note, notebookId, versions) {
     `;
 }
 
-function getNoteEditor(notebookId, n) {
+async function getNoteEditor(notebookId, n) {
     return `
         <input data-id="${ n ? n.id : 'newNote'}" id="noteContent" class="${n && n.shared ? '' : 'decryptMe'}" type="hidden" value="${n ? n.content_text : ''}" />
         <input id="noteId" type="hidden" value="${n ? n.id : 0}" />
-        ${getEditor()}
+        ${await getEditor()}
     `;
 }
 
-export function getEditor(repliers, username) {
+export async function getEditor(repliers, username, mbToken, destination) {
+    let destinations = '';
+    let syndicates = '';
+    let categoriesList = '';
+    
+
+    if(mbToken) {
+        let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+        const config = await fetching.json();
+    
+        const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
+        const mpDestination = destination ? destination : defaultDestination;
+        destinations = config.destination ? config.destination.map(item => {
+            if(item.uid != mpDestination) {
+                return `<li class="menu-item"><a class="changeDestination" href="/post?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
+            }
+        }).join('') : '';
+
+        destinations = `<div id="destinationDropdown" class="dropdown">
+                        <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
+                            <span id="postingName">${config.destination.filter(d => d.uid == mpDestination)[0].name)}</span> <i class="icon icon-caret"></i>
+                        </button>
+                        <ul id="destinationSelectMenu" class="menu">
+                            ${destinations}
+                        </ul>
+                    </div>`;
+    
+        fetching = await fetch(`https://micro.blog/micropub?q=syndicate-to&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+        const syndicate = await fetching.json();
+    
+        syndicates = syndicate["syndicate-to"] ? syndicate["syndicate-to"].map(item => {
+            return `<li class="menu-item"><label>
+                    <input class="syndicateChange" type="checkbox" name="syndicate[]" value="${item.uid}" checked="checked"> ${item.name}
+                    </label></li>`;
+        }).join('') : '';
+
+        
+        syndicates = `<div class="dropdown">
+                        <button type="button" class="btn btn-link dropdown-toggle">
+                            <span id="syndicatesDropdown" class="badge" data-badge="${syndicate["syndicate-to"].length}"><i class="icon icon-copy"></i></span>
+                        </button>
+                        <ul id="syndicatesSelectMenu" class="menu">
+                            ${syndicates}
+                        </ul>
+                    </div>`;
+
+        fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+        const categories = await fetching.json();
+    
+        categoriesList = categories.categories ? categories.categories.map(item => {
+            return `<li class="menu-item"><label>
+                    <input class="categoriesChange" ${post && post.properties.category.includes(item) ? 'checked="checked"' : '' } type="checkbox" name="category[]" value="${item}"> ${item}
+                    </label></li>`;
+        }).join('') : '';
+
+        categoriesList = `<div class="dropdown">
+                <button type="button" class="btn btn-link dropdown-toggle">
+                    <span id="categoriesDropdown" class="badge"><i class="bi bi-tags"></i></span>
+                </button>
+                <ul id="categoriesSelectMenu" class="menu">
+                    ${categoriesList}
+                </ul>
+            </div>`;
+    }
+
+
     return `
         <form id="editor" class="card">
             <input type="hidden" name="postingType" id="postingType" />
@@ -395,8 +460,9 @@ export function getEditor(repliers, username) {
                     </div>
                     <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button> 
                     <div id="postingBtns" class="btn-group"> 
-                        <button id="editor-categories-btn" type="button" class="btn btn-link"><i class="icon icon-bookmark"></i></button>
-                        <button id="editor-crosspost-btn" type="button" class="btn btn-link"><i class="icon icon-copy"></i></button>
+                        ${destinations}
+                        ${categoriesList}
+                        ${syndicates}
                     </div>
                 </div>
                 <br/>

@@ -736,7 +736,7 @@ Deno.serve(async (req) => {
                     const version = versions.items.filter(v => v.id == id)[0];
                     // put JSON check here or something.....
                     content = `<p class="text-center">Version ${version.id}</p>
-                        <div id="version" class="mt-2">${utility.noteHTML(version,parts[parts.length - 5],versions.items)}</div>
+                        <div id="version" class="mt-2">${await utility.noteHTML(version,parts[parts.length - 5],versions.items)}</div>
                         <details class="accordion">
                             <summary class="accordion-header">
                                 <i class="icon icon-arrow-right mr-1"></i>
@@ -758,7 +758,7 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const versions = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="note" class="mt-2">${utility.noteHTML(note,parts[parts.length - 3],versions.items)}</div>`;
+                    content = `<div id="note" class="mt-2">${await utility.noteHTML(note,parts[parts.length - 3],versions.items)}</div>`;
                 }  else if(req.url.includes("notebooks")) {
                     //-----------
                     //  Notebooks
@@ -801,13 +801,15 @@ Deno.serve(async (req) => {
                         <div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
                 }
                 
+                const searchParams = new URLSearchParams(req.url.split('?')[1]);
+                const destination = searchParams.get('destination');
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
                     .replaceAll('{{pages}}', content)
                     .replaceAll('{{notebooks}}', notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element =>
                         `<li class="menu-item"><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join(''))
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
-                    .replaceAll('{{editor}}', utility.getEditor(following, mbUser.username))
+                    .replaceAll('{{editor}}', await utility.getEditor(following, mbUser.username, mbToken, destination))
                 , HTMLHeaders(nonce));
             }
 

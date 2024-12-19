@@ -658,6 +658,33 @@ Swap.loaders['#discover'] = () => {
 /************************************************************
 ** Events
 *************************************************************/
+document.addEventListener("change", (event) => {  
+    if(event.target.classList.contains('syndicateChange')) {
+        var checkedBoxes = document.querySelectorAll(`input[name="syndicate[]"]:checked`).length;
+        var element = document.getElementById('syndicatesDropdown');
+
+        if(checkedBoxes == 0) {
+            element.removeAttribute('data-badge');
+            element.classList.remove('badge');
+        } else {
+            element.setAttribute('data-badge', checkedBoxes);
+            element.classList.add('badge');
+        }
+    }
+    if(event.target.classList.contains('categoriesChange')) {
+        var checkedBoxes = document.querySelectorAll(`input[name="category[]"]:checked`).length;
+        var element = document.getElementById('categoriesDropdown');
+
+        if(checkedBoxes == 0) {
+            element.removeAttribute('data-badge');
+            element.classList.remove('badge');
+        } else {
+            element.setAttribute('data-badge', checkedBoxes);
+            element.classList.add('badge');
+        }
+    }
+});
+
 document.addEventListener("input", (event) => {  
     if(event.target.classList.contains('grow-me')) {
         growTextArea(event.target);
@@ -1070,6 +1097,15 @@ document.addEventListener("click", async (item) => {
         // submitPost(new FormData(form));
         // document.getElementById('post').value = '';
         // document.getElementById('replybox-input-main').value = ''; 
+    }
+    if(item.target.classList.contains('changeDestination')) {
+        document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`);
+        if(confirm('You are navigating away from the page and will lose any changes. Continue?'))
+        {
+            return true;
+        }
+        document.getElementById('loader').remove();
+        return false;
     }
 });
 

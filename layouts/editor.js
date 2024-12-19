@@ -67,7 +67,7 @@ export async function EditorTemplate(user, token, req) {
 
     const categoriesCheckboxList = categories.categories ? categories.categories.map(item => {
         return `<li class="menu-item"><label>
-                <input ${post && post.properties.category.includes(item) ? 'checked="checked"' : '' } type="checkbox" name="category[]" onchange="countChecked('category[]', 'categoriesDropdown')" value="${item}"> ${item}
+                <input class="categoriesChanged" ${post && post.properties.category.includes(item) ? 'checked="checked"' : '' } type="checkbox" name="category[]" value="${item}"> ${item}
                 </label></li>`;
     }).join('') : '';
 
