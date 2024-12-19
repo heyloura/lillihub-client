@@ -626,7 +626,6 @@ Deno.serve(async (req) => {
                         let ids = [...new Set(hids.split(','))];
                         let allHighlights = await mb.getAllFromMicroBlog(mbToken,'https://micro.blog/posts/bookmarks/highlights');
                         let matchingHighlights = allHighlights.filter((h) => {return ids.includes(h.id.toString());});
-                        highlightCount = matchingHighlights.length;
                         for(var i = 0; i < matchingHighlights.length; i++) {
                             var highlight = matchingHighlights[i];
                             content = content.replaceAll(highlight.content_text,`<mark>${highlight.content_text}</mark>`);
