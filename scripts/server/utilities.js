@@ -552,7 +552,7 @@ export function bookmarksHTML(bookmarks, tags, is_premium) {
 export function bookmarkHTML(bookmark, is_premium) {
     const b = flattenedBookmark(bookmark);
     return `
-        <article class="bookmark bordered p-2 mb-2" 
+        <article class="bookmark card p-2 mb-2" 
             id="${b.id}"
             data-id="${b.id}" 
             data-title="${b.name}" 
@@ -580,7 +580,7 @@ export function bookmarkHTML(bookmark, is_premium) {
                 ${is_premium && b.highlights && b.highlights.length > 0 ? `· <span class="chip text-yellow">${b.highlights.length} highlight(s)</span>` : ''}
                 ${is_premium && b.reader ? `· <span class="chip">reader</span>` : ''}
                 
-                ${b.summary ? `<div class="bordered pt-2 mt-2 bg-dark d-block">🤖 ${b.summary}</div>` : '' }
+                ${b.summary ? `<div class="p-2 mt-2 d-block">🤖 ${b.summary}</div>` : '' }
             </main>      
         </article>
     `;

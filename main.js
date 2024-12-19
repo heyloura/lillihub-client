@@ -621,19 +621,17 @@ Deno.serve(async (req) => {
                         reader = htmlBody.split('<div id="content">')[1].split('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>')[0];
                         reader = reader.replaceAll('src="',`src="${root.join('/')}/`);
                     }
-                
-
             
-                    // if(idsParam) {
-                    //     let ids = [...new Set(idsParam.split(','))];
-                    //     let allHighlights = await getAllFromMicroBlog('https://micro.blog/posts/bookmarks/highlights', mbToken);
-                    //     let matchingHighlights = allHighlights.filter((h) => {return ids.includes(h.id.toString());});
-                    //     highlightCount = matchingHighlights.length;
-                    //     for(var i = 0; i < matchingHighlights.length; i++) {
-                    //     var highlight = matchingHighlights[i];
-                    //     content = content.replaceAll(highlight.content_text,`<mark>${highlight.content_text}</mark>`);
-                    //     }
-                    // }
+                    if(hids) {
+                        let ids = [...new Set(hids.split(','))];
+                        let allHighlights = await mb.getAllFromMicroBlog(mbToken,'https://micro.blog/posts/bookmarks/highlights');
+                        let matchingHighlights = allHighlights.filter((h) => {return ids.includes(h.id.toString());});
+                        highlightCount = matchingHighlights.length;
+                        for(var i = 0; i < matchingHighlights.length; i++) {
+                            var highlight = matchingHighlights[i];
+                            content = content.replaceAll(highlight.content_text,`<mark>${highlight.content_text}</mark>`);
+                        }
+                    }
                     
                     // let script = `
     
@@ -666,7 +664,7 @@ Deno.serve(async (req) => {
                     //     item.reader = item._microblog.links && item._microblog.links.length > 0 ? item._microblog.links[0].id : null;
                     //     item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
                     // }
-                    content = `<div id="reader" class="mt-2">${utility.bookmarkReaderHTML(reader, bookmark[0], tags)}</div>`;
+                    content = `<div id="reader" class="mt-2">${utility.bookmarkReaderHTML(reader, bookmark, tags)}</div>`;
                 } else if(req.url.includes("bookmarks")) {
                     //-----------
                     //  Bookmarks
