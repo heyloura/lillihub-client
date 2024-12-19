@@ -364,6 +364,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
                         <ul id="destinationSelectMenu" class="menu bg-dark">
                             ${destinations}
                         </ul>
+                        <input name="destination" type="hidden" value="${mpDestination}"> 
                     </div>`;
     
         fetching = await fetch(`https://micro.blog/micropub?q=syndicate-to&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
