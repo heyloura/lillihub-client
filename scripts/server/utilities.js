@@ -390,7 +390,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
     
         categoriesList = categories.categories ? categories.categories.map(item => {
             return `<li class="menu-item"><label>
-                    <input class="categoriesChange" ${post && post.properties.category.includes(item) ? 'checked="checked"' : '' } type="checkbox" name="category[]" value="${item}"> ${item}
+                    <input class="categoriesChange" type="checkbox" name="category[]" value="${item}"> ${item}
                     </label></li>`;
         }).join('') : '';
 
