@@ -231,7 +231,7 @@ export function discoverHTML(posts, tagmoji, id) {
                         </details>
                     </div>
                     <div class="hide-lg">
-                        <ul class="menu p-0">
+                        <ul class="menu bg-dark p-0">
                             <li class="divider" data-content="Discover Tagmoji"></li>
                             ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
                                     `<li class="menu-item">
@@ -361,7 +361,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
                         <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
                             <span id="postingName">${config.destination.filter(d => d.uid == mpDestination)[0].name}</span> <i class="icon icon-caret"></i>
                         </button>
-                        <ul id="destinationSelectMenu" class="menu">
+                        <ul id="destinationSelectMenu" class="menu bg-dark">
                             ${destinations}
                         </ul>
                     </div>`;
@@ -380,7 +380,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
                         <button type="button" class="btn btn-link dropdown-toggle">
                             <span id="syndicatesDropdown" class="badge" data-badge="${syndicate["syndicate-to"].length}"><i class="icon icon-copy"></i></span>
                         </button>
-                        <ul id="syndicatesSelectMenu" class="menu">
+                        <ul id="syndicatesSelectMenu" class="menu bg-dark">
                             ${syndicates}
                         </ul>
                     </div>`;
@@ -398,7 +398,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
                 <button type="button" class="btn btn-link dropdown-toggle">
                     <span id="categoriesDropdown" class="badge"><i class="bi bi-tags"></i></span>
                 </button>
-                <ul id="categoriesSelectMenu" class="menu">
+                <ul id="categoriesSelectMenu" class="menu bg-dark">
                     ${categoriesList}
                 </ul>
             </div>`;
@@ -430,7 +430,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
                         <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
                             <i class="icon icon-link"></i></i>
                         </button>
-                        <ul class="menu menu-above">
+                        <ul class="menu bg-dark">
                             <li class="menu-item editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="#">Markdown image</a></li>
                             <li class="menu-item"><a id="editor-link-markdown-btn" class="editor-link" href="#">Markdown link</a></li>
                         </ul>
@@ -445,22 +445,9 @@ export async function getEditor(repliers, username, mbToken, destination) {
                     <button id="editor-action" type="button" class="btn btn-primary">Post</button>
                 </div>
                 <div id="topBarBtns" class="btn-group">
-                    <div class="dropdown">
-                        <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
-                            <span id="postingName">${username}</span> <i class="icon icon-caret"></i>
-                        </button>
-                        <!-- menu component -->
-                        <ul class="menu">
-                            <li class="menu-item">
-                                <a class="checkForChanges" href="/settings#posting">
-                                    Settings
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    ${destinations}
                     <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button> 
                     <div id="postingBtns" class="btn-group"> 
-                        ${destinations}
                         ${categoriesList}
                         ${syndicates}
                     </div>
@@ -548,7 +535,7 @@ export function bookmarkReaderHTML(reader, bookmark, tags) {
                     ${reader}
                 <!--</div>-->
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <ul class="menu p-0">
+                    <ul class="menu bg-dark p-0">
                         <li class="divider text-red" data-content="Bookmark Tags"></li>
                         ${bookmark.tags ? bookmark.tags.sort().map((item) =>
                             `<span class="chip">${item}<button class="btn btn-clear removeTag" aria-label="Close"></button></span>`
@@ -601,7 +588,7 @@ export function bookmarksHTML(bookmarks, tags, is_premium) {
                 ${is_premium ? `
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div class="hide-lg">
-                        <ul class="menu p-0">
+                        <ul class="menu bg-dark p-0">
                             <li class="divider text-red" data-content="Bookmark Tags"></li>
                             ${tags.sort().map((item) =>
                                 `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks?tag=${item}">${item}</a></span>`
@@ -723,7 +710,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
                                 <i class="icon icon-caret"></i>
                             </button>
-                            <ul class="menu">
+                            <ul class="menu bg-dark">
                                 <li class="menu-item">View</li>
                                 <li class="menu-item">Bookmark</li>
                                 <li class="menu-item">Quote</li>
@@ -748,7 +735,7 @@ function getReplyBox(repliers) {
             </div>
             <input id="replybox-input" class="form-input replierInput" type="text" placeholder="Begin typing to find users" value="">
         </div>
-        <ul id="replybox-menu" class="menu hide">
+        <ul id="replybox-menu" class="menu hide bg-dark">
             ${!repliers ? '' : repliers.map(r => {
                 return `<li class="menu-item" class="hide" data-name="${r.username}" data-avatar="${r.avatar}"></li>`}).join('')}
         </ul>
