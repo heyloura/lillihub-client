@@ -610,8 +610,6 @@ Deno.serve(async (req) => {
                     if(rid) {
                         let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${rid}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const results = await fetching.text(); 
-
-                        console.log(results);
                 
                         const page = results;                            
                         const baseURL = page.split('<base href="')[1].split('"')[0];
@@ -620,6 +618,8 @@ Deno.serve(async (req) => {
                         const htmlBody = page.split('<body>')[1].split('</body>')[0];
                         reader = htmlBody.split('<div id="content">')[1].split('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>')[0];
                         reader = reader.replaceAll('src="',`src="${root.join('/')}/`);
+
+                        console.log(reader);
                     }
             
                     if(hids) {
