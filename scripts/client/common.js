@@ -181,7 +181,6 @@ function strip(html){
 }
 function getSelectionAndReplace(el,startTag,endTag) // javascript
 {
-    console.log("test");
     var start = el.selectionStart; //index of the first selected character
     var finish = el.selectionEnd; //index of the last selected character
     var allText = el.value;
@@ -189,7 +188,6 @@ function getSelectionAndReplace(el,startTag,endTag) // javascript
     var sel = allText.substring(start, finish);
     var newText = allText.substring(0, start)+startTag+sel+endTag+allText.substring(finish, allText.length);
 
-    console.log(newText);
     el.value=newText;
 }
 
@@ -213,6 +211,7 @@ function loadEditor(type) {
         fragment = document.createDocumentFragment();
         fragment.appendChild(document.getElementById('topBarBtns'));
         document.getElementById('modalTitle').appendChild(fragment);
+        document.getElementById('editor-action').classList.add('savePost');
         if(localStorage.getItem('post_setting'))
         {
             if(localStorage.getItem('post_setting') != 'none') {
