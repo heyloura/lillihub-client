@@ -636,7 +636,7 @@ export function bookmarkHTML(bookmark, is_premium) {
                 <!--<figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
                     <img src="${b.avatar}" loading="lazy">
                 </figure>-->
-                ${b.title.split('<a')[0]}
+                ${b.name}
             `}           
             
             <main class="card-subtitle">
