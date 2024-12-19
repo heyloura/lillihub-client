@@ -550,9 +550,9 @@ export function bookmarkReaderHTML(reader, bookmark, tags) {
                     <div class="">
                         <ul class="menu p-0">
                             <li class="divider text-red" data-content="Bookmark Tags"></li>
-                            ${bookmark.tags.sort().map((item) =>
+                            ${bookmark.tags ? bookmark.tags.sort().map((item) =>
                                 `<span class="chip">${item}<button class="btn btn-clear removeTag" aria-label="Close"></button></span>`
-                            ).join('')} 
+                            ).join('') : ''} 
                         </ul>
                         <div class="form-group">
                         <label class="form-label">Add tags.</label>
@@ -629,9 +629,9 @@ export function bookmarkHTML(bookmark, is_premium) {
             data-deletable="${b.deletable}" >    
             ${is_premium ? `
                 <a id="title-${b.id}" class="fakeAnchor h5 d-block" rel="prefetch" href="/bookmarks/details?rid=${b.reader}&bid=${b.id}&hids=${b.highlights.join(',')}" swap-target="#main" swap-history="true">
-                    <figure class="avatar avatar" data-initial="${b.username.substring(0,1)}">
+                    <!--<figure class="avatar avatar" data-initial="${b.username.substring(0,1)}">
                         <img src="${b.avatar}" loading="lazy">
-                    </figure>
+                    </figure>-->
                     ${b.title.split('<a')[0]}
                 </a> ` : `
                 <figure class="avatar avatar-sm" data-initial="${b.username.substring(0,1)}">
