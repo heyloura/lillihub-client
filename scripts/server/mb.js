@@ -9,27 +9,27 @@
 
 // Takes a post object returned from M.B. and then
 // flattens it like a pancake.
-export function flattenedMicroBlogPost(post) {
-    return {
-        id: post && post.id ? post.id : 0,
-        content: post &&  post.content_html ? post.content_html : '',
-        url: post &&  post.url ? post.url : '',
-        published: post &&  post.date_published ? post.date_published : '',
-        name: post &&  post.author && post.author.name ? post.author.name : '',
-        authorUrl: post &&  post.author && post.author.url ? post.author.url : '',
-        avatar: post &&  post.author && post.author.avatar ? post.author.avatar : '',
-        username: post &&  post.author && post.author._microblog && post.author._microblog.username ? post.author._microblog.username : '',
-        relative: post &&  post._microblog && post._microblog.date_relative ? post._microblog.date_relative : '',
-        timestamp: post &&  post._microblog && post._microblog.date_timestamp ? post._microblog.date_timestamp : '',
-        favorite: post &&  post._microblog && post._microblog.is_favorite ? post._microblog.is_favorite : false,
-        bookmark: post &&  post._microblog && post._microblog.is_bookmark ? post._microblog.is_bookmark : false,
-        deletable: post &&  post._microblog && post._microblog.is_deletable ? post._microblog.is_deletable : false,
-        conversation: post &&  post._microblog && post._microblog.is_conversation ? post._microblog.is_conversation : false,
-        linkpost: post && post._microblog && post._microblog.is_linkpost ? post._microblog.is_linkpost : false,
-        mention: post && post._microblog && post._microblog.is_mention ? post._microblog.is_mention : false,
-        bio: post && post._microblog && post._microblog.bio ? post._microblog.bio : ''
-    };
-}
+// export function flattenedMicroBlogPost(post) {
+//     return {
+//         id: post && post.id ? post.id : 0,
+//         content: post &&  post.content_html ? post.content_html : '',
+//         url: post &&  post.url ? post.url : '',
+//         published: post &&  post.date_published ? post.date_published : '',
+//         name: post &&  post.author && post.author.name ? post.author.name : '',
+//         authorUrl: post &&  post.author && post.author.url ? post.author.url : '',
+//         avatar: post &&  post.author && post.author.avatar ? post.author.avatar : '',
+//         username: post &&  post.author && post.author._microblog && post.author._microblog.username ? post.author._microblog.username : '',
+//         relative: post &&  post._microblog && post._microblog.date_relative ? post._microblog.date_relative : '',
+//         timestamp: post &&  post._microblog && post._microblog.date_timestamp ? post._microblog.date_timestamp : '',
+//         favorite: post &&  post._microblog && post._microblog.is_favorite ? post._microblog.is_favorite : false,
+//         bookmark: post &&  post._microblog && post._microblog.is_bookmark ? post._microblog.is_bookmark : false,
+//         deletable: post &&  post._microblog && post._microblog.is_deletable ? post._microblog.is_deletable : false,
+//         conversation: post &&  post._microblog && post._microblog.is_conversation ? post._microblog.is_conversation : false,
+//         linkpost: post && post._microblog && post._microblog.is_linkpost ? post._microblog.is_linkpost : false,
+//         mention: post && post._microblog && post._microblog.is_mention ? post._microblog.is_mention : false,
+//         bio: post && post._microblog && post._microblog.bio ? post._microblog.bio : ''
+//     };
+// }
 
 // Gets information about the M.B. user
 export async function getMicroBlogUser(accessToken) {
@@ -52,28 +52,28 @@ export async function getMicroBlogUser(accessToken) {
 }
 
 // Gets the Micro.Blog discover posts
-export async function getMicroBlogDiscoverPosts(accessToken) {
-    // the discover endpoint does not support paging.
-    const items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/discover');
+// export async function getMicroBlogDiscoverPosts(accessToken) {
+//     // the discover endpoint does not support paging.
+//     const items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/discover');
 
-    items.map(post => {
-        if(post.content.split('<img').length > 1) {
-            const startTag = post.content.split('<img')[1];
-            const startSrc = startTag.split('src="')[1];
-            const endSrc = startSrc.split('"')[0];
-            post.image = endSrc;
-        }
+//     items.map(post => {
+//         if(post.content.split('<img').length > 1) {
+//             const startTag = post.content.split('<img')[1];
+//             const startSrc = startTag.split('src="')[1];
+//             const endSrc = startSrc.split('"')[0];
+//             post.image = endSrc;
+//         }
 
-        return post;
-    });
-    return items;
-}
+//         return post;
+//     });
+//     return items;
+// }
 
-export async function getMicroBlogUserOrTagmojiPosts(accessToken, id) {
-    // does not support paging.
-    const items = await __getMicroBlogPosts(accessToken, `https://micro.blog/posts/${id}`);
-    return items;
-}
+// export async function getMicroBlogUserOrTagmojiPosts(accessToken, id) {
+//     // does not support paging.
+//     const items = await __getMicroBlogPosts(accessToken, `https://micro.blog/posts/${id}`);
+//     return items;
+// }
 
 export async function getMicroBlogTimelinePosts(accessToken,lastId) {
     const fetching = await fetch(`https://micro.blog/posts/check`, { method: "GET", headers: { "Authorization": "Bearer " + accessToken } } );
@@ -106,31 +106,31 @@ export async function getMicroBlogTimelinePosts(accessToken,lastId) {
     return posts;
 }
 
-export async function getMicroBlogDiscoverPhotoPosts(accessToken) {
-    // the discover endpoint does not support paging.
-    return (await getMicroBlogDiscoverPosts(accessToken)).filter(post => post.image);
-}
+// export async function getMicroBlogDiscoverPhotoPosts(accessToken) {
+//     // the discover endpoint does not support paging.
+//     return (await getMicroBlogDiscoverPosts(accessToken)).filter(post => post.image);
+// }
 
-export async function getMicroBlogConversation(accessToken, id) {
-    const items = await __getMicroBlogPosts(accessToken, `https://micro.blog/posts/conversation?id=${id}`);
-    return items.slice(0).reverse();
-}
+// export async function getMicroBlogConversation(accessToken, id) {
+//     const items = await __getMicroBlogPosts(accessToken, `https://micro.blog/posts/conversation?id=${id}`);
+//     return items.slice(0).reverse();
+// }
 
-export async function getMicroBlogUserProfile(accessToken, username) {
-    const fetching = await fetch(`https://micro.blog/posts/${username}?count=1`, { 
-        method: "GET", 
-        headers: { "Authorization": "Bearer " + accessToken } 
-    });
-    return await fetching.json();   
-}
+// export async function getMicroBlogUserProfile(accessToken, username) {
+//     const fetching = await fetch(`https://micro.blog/posts/${username}?count=1`, { 
+//         method: "GET", 
+//         headers: { "Authorization": "Bearer " + accessToken } 
+//     });
+//     return await fetching.json();   
+// }
 
-export async function getMicroBlogFollowing(accessToken, username, isMe = true) {
-    const fetching = await fetch(isMe ? `https://micro.blog/users/following/${username}` : `https://micro.blog/users/discover/${username}`, { 
-        method: "GET", 
-        headers: { "Authorization": "Bearer " + accessToken } 
-    });
-    return await fetching.json();   
-}
+// export async function getMicroBlogFollowing(accessToken, username, isMe = true) {
+//     const fetching = await fetch(isMe ? `https://micro.blog/users/following/${username}` : `https://micro.blog/users/discover/${username}`, { 
+//         method: "GET", 
+//         headers: { "Authorization": "Bearer " + accessToken } 
+//     });
+//     return await fetching.json();   
+// }
 
 // for places that paging is not supported by micro.blog
 export async function getAllFromMicroBlog(access_token, url) {
@@ -172,7 +172,6 @@ export async function getAllFromMicroBlog(access_token, url) {
 }
 
 async function __getMicroBlogPosts(accessToken, url, lastId, count) {
-    //console.log('__getMicroBlogPosts', url, lastId, count)
     try {
         const guard = count ? Math.ceil(count / 40) : 1; // prevent infinite loops
         let loop = 0;

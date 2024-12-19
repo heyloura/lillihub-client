@@ -549,6 +549,18 @@ Deno.serve(async (req) => {
                 });
             }
 
+            const GET_BOOKMARK_ROUTE = new URLPattern({ pathname: "/api/timeline/mark/:id" });
+            if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
+                const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
+                const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+                return new Response('Timeline marked', {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });
+            }
+
 
             // -----------------------------------------------------
             // All other pages
@@ -633,8 +645,10 @@ Deno.serve(async (req) => {
                     // const tags = await fetching.json();
 
 
-                    fetching = await fetch(`https://micro.blog/posts/bookmarks/${bid}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    const bookmark = (await fetching.json()).items;
+                    // fetching = await fetch(`https://micro.blog/posts/bookmarks/${bid}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    // const bookmark = (await fetching.json()).items;
+
+                    const bookmark = (await mb.getAllFromMicroBlog(mbToken, `https://micro.blog/posts/bookmarks`)).filter(b => b.id == bid)[0];
 
 
                     console.log(bookmark)

@@ -484,7 +484,7 @@ export function bookmarkReaderHTML(reader, bookmark, tags) {
                     <div class="">
                         <ul class="menu p-0">
                             <li class="divider text-red" data-content="Bookmark Tags"></li>
-                            ${tags.sort().map((item) =>
+                            ${bookmark.tags.sort().map((item) =>
                                 `<span class="chip">${item}<button class="btn btn-clear removeTag" aria-label="Close"></button></span>`
                             ).join('')} 
                         </ul>
