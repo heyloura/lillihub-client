@@ -540,21 +540,21 @@ function flattenedBookmark(post) {
 }
 
 export function bookmarkReaderHTML(reader, bookmark, tags) {
-    return `<div class="container grid-xl">
+    return `
+        <div class="container grid-xl">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     ${bookmarkHTML(bookmark, false)}
                     ${reader}
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <div class="">
-                        <ul class="menu p-0">
-                            <li class="divider text-red" data-content="Bookmark Tags"></li>
-                            ${bookmark.tags ? bookmark.tags.sort().map((item) =>
-                                `<span class="chip">${item}<button class="btn btn-clear removeTag" aria-label="Close"></button></span>`
-                            ).join('') : ''} 
-                        </ul>
-                        <div class="form-group">
+                    <ul class="menu p-0">
+                        <li class="divider text-red" data-content="Bookmark Tags"></li>
+                        ${bookmark.tags ? bookmark.tags.sort().map((item) =>
+                            `<span class="chip">${item}<button class="btn btn-clear removeTag" aria-label="Close"></button></span>`
+                        ).join('') : ''} 
+                    </ul>
+                    <div class="form-group">
                         <label class="form-label">Add tags.</label>
                         <div class="input-group">
                             <input list="tags"  id="addTag" type="text" class="form-input">
