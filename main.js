@@ -402,10 +402,7 @@ Deno.serve(async (req) => {
                     }
                     const data = await posting.json(); 
                     return new Response(JSON.stringify(data), JSONHeaders());
-                }
-                
-        
-                //return Response.redirect(req.url.replaceAll('/post/add', status == 'draft' ? `/blog?status=draft&destination=${destination}` : `/blog?status=published&destination=${destination}`));
+                }        
             }
 
             //-------------

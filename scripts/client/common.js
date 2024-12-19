@@ -658,6 +658,36 @@ Swap.loaders['#discover'] = () => {
 /************************************************************
 ** Events
 *************************************************************/
+
+document.addEventListener('keydown', (event) => {
+    // Check if Ctrl+B was pressed
+    console.log(event);
+    if (event.ctrlKey && event.key.toLowerCase() === 'b') {
+    //   event.preventDefault(); // Prevent the default Ctrl+B behavior
+  
+    //   // Get the selected text
+    //   const selectedText = textarea.value.substring(
+    //     textarea.selectionStart,
+    //     textarea.selectionEnd
+    //   );
+  
+    //   // Surround the selected text with asterisks
+    //   const modifiedText = `*${selectedText}*`;
+  
+    //   // Replace the selected text with the modified text
+    //   const start = textarea.selectionStart;
+    //   const end = textarea.selectionEnd;
+    //   textarea.value =
+    //     textarea.value.substring(0, start) +
+    //     modifiedText +
+    //     textarea.value.substring(end);
+  
+    //   // Set the cursor position after the modified text
+    //   textarea.selectionStart = start + modifiedText.length;
+    //   textarea.selectionEnd = start + modifiedText.length;
+    }
+});
+
 document.addEventListener("change", (event) => {  
     if(event.target.classList.contains('syndicateChange')) {
         var checkedBoxes = document.querySelectorAll(`input[name="syndicate[]"]:checked`).length;
@@ -917,6 +947,7 @@ document.addEventListener("click", async (item) => {
             id = item.target.getAttribute('id') === 'editor-bold-btn' ? null : item.target.getAttribute('id').split('-')[0];
         }
         getSelectionAndReplace(document.getElementById(id ? id + '-content' : 'content'),'**','**');
+        document.getElementById(id ? id + '-content' : 'content').focus();
     }
     if(item.target.classList.contains('editor-italic')) {
         let id = null;
