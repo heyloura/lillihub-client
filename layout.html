@@ -48,13 +48,13 @@
                                 <a rel="prefetch" swap-target="#main" swap-history="true" id="discoverLink" href="/discover">Discover</a>
                             </li>
                             <li class="menu-item">
-                                <a rel="prefetch" swap-target="#main" swap-history="true" id="mentions" href="/mentions">Mentions</a>
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="mentionsLink" href="/mentions">Mentions</a>
                             </li>
                             <li class="menu-item">
-                                <a rel="prefetch" swap-target="#main" swap-history="true" id="replies" href="/replies">Replies</a>
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="repliesLink" href="/replies">Replies</a>
                             </li>
                             <li class="menu-item">
-                                <a rel="prefetch" swap-target="#main" swap-history="true" id="following" href="/following">Following</a>
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="followingLink" href="/following">Following</a>
                             </li>
                         </ul>
                         <ul class="menu mb-2">
@@ -69,28 +69,20 @@
                                 <a rel="prefetch" swap-target="#main" swap-history="true" id="blogMediaLink" href="/media">Media</a>
                             </li>
                             <li class="menu-item">
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="blogPhotoCollectionsLink" href="/photo-collections">Photo Collections</a>
+                            </li>
+                            <li class="menu-item">
                                 <a rel="prefetch" swap-target="#main" swap-history="true" id="blogWebMentionsLink" href="/webmentions">Webmentions</a>
                             </li>
                         </ul>
                         <ul class="menu mb-2">
                             <li class="divider text-red" data-content="Bookmarks"></li>
                             <li class="menu-item">
-                                <a href="/bookmarks" class="{{bookmarksClass}}">Bookmarks</a>
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="bookmarksLink" href="/bookmarks">Bookmarks</a>
                             </li>
-                            <!--<div class="accordion" class="{{tagsClass}}">
-                                <input {{tagPage}} type="checkbox" id="accordion-tags" name="accordion-checkbox" hidden>
-                                <label class="accordion-header" for="accordion-tags">
-                                  Tags
-                                </label>
-                                <div class="accordion-body">
-                                    <li class="menu-item" >
-                                        Sample Tag :)
-                                    </li>
-                                </div>
-                            </div>
-                            <li class="menu-item">
-                                <a href="/highlights" class="{{highlightsClass}}">Highlights</a>
-                            </li>-->
+                            <li class="menu-item {{premium}}">
+                                <a rel="prefetch" swap-target="#main" swap-history="true" id="highlightsLink" href="/highlights">Highlights</a>
+                            </li>
                         </ul> 
                         <ul class="menu mb-2">
                             <li class="divider text-orange" data-content="Bookshelves"></li>
@@ -134,7 +126,7 @@
             <div class="modal-container">
               <div class="modal-header">
                 <button class="btn btn-clear float-right closeModal text-primary" aria-label="Close"></button>
-                <div id="modalTitle" class="modal-title"></div>
+                <div id="modalTitle" class="modal-title text-primary"></div>
               </div>
               <div class="modal-body">
                 <div id="modalContent" class="content">

@@ -1,3 +1,4 @@
+let convoSource = 'timeline';
 function growTextArea(el) {
     el.parentNode.dataset.replicatedValue = el.value;
 }
@@ -30,46 +31,6 @@ function gestures(elId) {
     touchendX = e.changedTouches[0].screenX
         checkDirection()
     })
-}
-// const findParentHasClassReturnId = (el, className) => {
-//     if(!el || !el.parentNode || !el.parentNode.classList) 
-//     {
-//         return 0;
-//     }
-//     if(el.parentNode.classList.contains(className)) 
-//     {
-//         return el.parentNode.getAttribute('id');
-//     }
-//     return findParentHasClassReturnId(el.parentNode, className);
-// }
-// function redirectToAnchor(anchor, scrollToTop = true) {
-//     var delayInMilliseconds = 400;
-//     setTimeout(function() {
-//         document.location.hash = anchor;
-//         if(scrollToTop) {
-//             window.scrollTo({ top: 0, behavior: 'smooth' });
-//         }
-//     }, delayInMilliseconds);
-// }
-// function removeHash() { 
-//     var scrollV, scrollH, loc = window.location;
-//     if ("pushState" in history)
-//         history.pushState("", document.title, loc.pathname + loc.search);
-//     else {
-//         // Prevent scrolling by storing the page's current scroll offset
-//         scrollV = document.body.scrollTop;
-//         scrollH = document.body.scrollLeft;
-
-//         loc.hash = "";
-
-//         // Restore the scroll offset, should be flicker free
-//         document.body.scrollTop = scrollV;
-//         document.body.scrollLeft = scrollH;
-//     }
-// }
-function removeHash() { 
-    history.pushState("", document.title, window.location.pathname
-                                                       + window.location.search);
 }
 function masonryLayout(id, imageArray) 
 {
@@ -242,6 +203,77 @@ function loadEditor(type) {
 
     document.getElementById('modal').classList.add("active");
 }
+
+function replyModal(name, id, avatar) { 
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(document.getElementById(`post-${id}`));
+    document.getElementById('modalContent').appendChild(fragment);
+    document.getElementById('modalContent').insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML);
+    document.querySelector('#modalContent .postBtns').remove();
+    let chips = document.getElementById('replybox-chips'); 
+
+    document.getElementById('postingName').classList.add('hide');
+    document.getElementById('postingBtns').classList.add("hide");
+    document.getElementById('postName').classList.add("hide");
+    document.getElementById('postStatus').classList.add("hide");
+    document.getElementById('editor-replybox').classList.remove('hide');
+    document.getElementById('topBarBtns').classList.add("hide");
+
+    chips.innerHTML = chips.innerHTML + `<span id="${id}-chip-${name}" class="chip">
+            <img class="avatar avatar-sm" src="${avatar}" />@${name}
+            <a data-id="${id}" data-name="${name}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a>
+        </span>`;                    
+    document.getElementById('postId').value = id;
+    document.getElementById('replybox-input').value = '';
+    document.getElementById('replybox-input').focus();
+    document.getElementById('replybox-menu').classList.add('hide');
+    if(document.getElementById('replybox-checkbox-' + name)) {
+        document.getElementById('replybox-checkbox-' + name).checked = true; 
+    } else {
+        document.getElementById('editor-replybox').insertAdjacentHTML('beforeend', `
+            <input id="replybox-checkbox-${name}" class="hide" type="checkbox" name="replyingTo[]" value="${name}" checked="checked">
+        `);
+    }
+    
+    document.getElementById('editor-action').classList.add('sendReply');
+    document.getElementById('editor-action').setAttribute('data-id', id);
+    document.getElementById('editor-action').innerHTML = 'Send';
+
+    document.getElementById('modalTitle').innerHTML = 'Conversation';
+    document.getElementById('modal').classList.add("active");
+    document.getElementById('editor-preview-btn').classList.add('hide');
+}
+
+function resetUI() {
+    document.querySelectorAll(`.sidebar .menu-item a`).forEach(el => el.classList.remove("active"));
+    document.title = "Lillihub";
+    document.getElementById('pageActionsBtn').classList.add('hide');
+    //document.getElementById('actionIcon').classList.add('hide');
+    document.getElementById("titleBar").innerHTML = "Lillihub";
+    document.querySelectorAll(`.extraAction`).forEach(el => el.remove());
+
+    document.getElementById('actionIcon').classList.add('icon-plus');
+    document.getElementById('actionIcon').classList.remove('icon-edit');
+    document.getElementById('actionIcon').classList.remove('hide');
+
+    document.getElementById('pageActionsBtn').classList.add('hide');
+}
+
+function loadAddBookmarkModal() {
+    document.getElementById('modalTitle').innerHTML = 'Add Bookmark';
+    document.getElementById('modalContent').innerHTML = `
+        <form>
+            <input type="url" name="url" class="form-control" />
+            ${[...document.getElementById('tags').options].map(o => `<div class="form-group d-inline">
+                    <label class="form-checkbox">
+                        <input type="checkbox" name="tags[]" value="${o.text}" />
+                        <i class="form-icon"></i> ${o.text}
+                    </label>
+                </div>`).join('')}
+        </form>
+    `;
+    document.getElementById('modal').classList.add("active");
+}
 /************************************************************
 ** Swap
 ** Facilitates AJAX-style navigation in web pages 
@@ -267,7 +299,6 @@ var Swap = (() => {
                     history.pushState({}, "", href);
                 register_links();  
                 document.getElementById('loader').remove();
-                //document.querySelector('.off-canvas-overlay').dispatchEvent(new Event("click"));
             });
         }
     }
@@ -375,20 +406,19 @@ Swap.loaders['#version'] = () => {
     loadVersion();
 
     return () => {  // unloader function
-        alert('version unload');
-        if(document.querySelector(`.notebook-${id}`)) {
-            document.querySelector(`.notebook-${id}`).classList.remove("active");
-        }
+        resetUI();
     };  
 }
 
 function loadVersion() {
     // page set up
     document.title = "Lillihub: Note Vesion";
-    document.getElementById('pageActionsBtn').classList.add('hide');
+
+    // change the action btn
     document.getElementById('actionIcon').classList.remove('icon-plus');
-    document.getElementById('actionIcon').classList.remove('icon-edit');
     document.getElementById('actionIcon').classList.add('icon-back');
+
+    // get the notebook id
     const parts = window.location.pathname.split('/');
     const id = parts[2];
     
@@ -431,10 +461,7 @@ Swap.loaders['#note-list'] = () => {
     loadNotebook();
 
     return () => {  // unloader function
-        alert('note-list unload');
-        if(document.querySelector(`.notebook-${id}`)) {
-            document.querySelector(`.notebook-${id}`).classList.remove("active");
-        }
+        resetUI();
     };   
 }
 
@@ -443,9 +470,6 @@ async function loadNotebook() {
     const parts = window.location.pathname.split('/');
     const id = parts[parts.length - 1];
     document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
-    //document.getElementById('pageActionsBtn').classList.remove('hide');
-    document.getElementById('actionIcon').classList.add('icon-plus');
-    document.getElementById('actionIcon').classList.remove('icon-edit');
 
     // we have a key, decrypt the notes
     if(localStorage.getItem("mbKey")) {
@@ -508,16 +532,15 @@ Swap.loaders['#note'] = () => {
     loadNote();
 
     return () => {  // unloader function
-        alert('note unload');
-        if(document.querySelector(`.notebook-${id}`)) {
-            document.querySelector(`.notebook-${id}`).classList.remove("active");
-        }
+        resetUI()
     };  
 }
 
 function loadNote() {
     // page set up
     document.title = "Lillihub: Note";
+
+    // page actons and edit action
     document.getElementById('pageActionsBtn').classList.remove('hide');
     document.getElementById('actionIcon').classList.remove('icon-plus');
     document.getElementById('actionIcon').classList.add('icon-edit');
@@ -551,7 +574,6 @@ function loadNote() {
             let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
             document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
             document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
-            document.getElementById(`pageAction`).insertAdjacentHTML('afterbegin', `<a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${id}" class="btn btn-link btn-action"><i class="icon icon-back"></i></a>`);
             document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
             document.getElementById('content').innerHTML = markdown;
             document.getElementById('preview').innerHTML = html;
@@ -567,15 +589,21 @@ function loadNote() {
         growTextArea(document.getElementById('content'));
         hljs.highlightAll();
     }
+
+    document.getElementById(`pageAction`).insertAdjacentHTML('afterbegin', `<a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks/${id}" class="btn btn-link btn-action extraAction"><i class="icon icon-back"></i></a>`);
+    for (const elt of document.querySelectorAll('*[swap-target]')) {
+        elt.onclick = e => {
+            update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
+            e.preventDefault();
+        }
+    };
 }
 
 function loadTimeline() {
+    convoSource = 'timeline';
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
-    document.getElementById('pageActionsBtn').classList.add('hide');
     document.querySelector(`#timelineLink`).classList.add("active");
-    document.getElementById('actionIcon').classList.add('icon-plus');
-    document.getElementById('actionIcon').classList.remove('icon-edit');
 
     buildMasonry();
     hljs.highlightAll();
@@ -617,41 +645,89 @@ Swap.loaders['#post-list'] = () => {
     loadTimeline(); 
 
     return () => {  // unloader function
-        alert('post list unload');
-        document.querySelector(`#timelineLink`).classList.remove("active");
-        if(localStorage.getItem('post_setting') === 'none') {
-            document.getElementById('actionBtn').classList.remove('hide');
-        }
+        resetUI();
     };  
 }
 
-Swap.loaders['.post'] = () => {
-    // document.title = "Lillihub: Timeline";
-    // document.getElementById("titleBar").innerHTML = "Timeline";
-    // document.querySelector(`#timelineLink`).classList.add("active");
+function loadConversation() {
     buildMasonry();
     hljs.highlightAll();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById("titleBar").innerHTML = 'Conversation';
+    document.querySelector(`#timelineLink`).classList.add("active");
+    const id = document.getElementById('conversation').getAttribute('data-id');
+    document.getElementById(`pageAction`).insertAdjacentHTML('afterbegin', `<a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline${id ? `/${id}` : ''}" class="btn btn-link btn-action extraAction"><i class="icon icon-back"></i></a>`);
+    document.title = "Lillihub: Conversation";
 
-    return () => {  // unloader function
-        alert('post unload');
-        document.querySelector(`#timelineLink`).classList.remove("active");
+    for (const elt of document.querySelectorAll('*[swap-target]')) {
+        elt.onclick = e => {
+            update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
+            e.preventDefault();
+        }
+    }
+
+    if(convoSource == 'discover') {
+        if(localStorage.getItem('discover_setting') === 'custom') {
+            document.querySelector('.extraAction').setAttribute('href', '/discover/custom')
+        } else {
+            document.querySelector('.extraAction').setAttribute('href', '/discover')
+        }   
+    }
+}
+
+Swap.loaders['#conversation'] = () => {
+    loadConversation();
+    
+    return () => {  // unloader function      
+        resetUI();
     };  
+}
+
+function loadDiscover() {
+    document.title = "Lillihub: Discover";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById("titleBar").innerHTML = "Discover";
+    document.querySelector(`#discoverLink`).classList.add("active");
+    buildMasonry();
+    hljs.highlightAll();
+    convoSource = 'discover';
 }
 
 Swap.loaders['#discover'] = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.title = "Lillihub: Discover";
-    document.getElementById("titleBar").innerHTML = "Discover";
-    document.querySelector(`#discoverLink`).classList.add("active");
-    document.getElementById('pageActionsBtn').classList.add('hide');
-    document.getElementById('actionIcon').classList.add('icon-plus');
-    document.getElementById('actionIcon').classList.remove('icon-edit');
-    buildMasonry();
-    hljs.highlightAll();
+    loadDiscover()
 
     return () => {  // unloader function
-        alert('discover unload');
-        document.querySelector(`#discoverLink`).classList.remove("active");
+        resetUI();      
+    };  
+}
+
+function loadBookmarks() {
+    document.title = "Lillihub: Bookmarks";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById("titleBar").innerHTML = "Bookmarks";
+    document.querySelector(`#bookmarksLink`).classList.add("active");
+}
+
+Swap.loaders['#bookmarks'] = () => {
+    loadBookmarks()
+
+    return () => {  // unloader function
+        resetUI();      
+    };  
+}
+
+function loadMentions() {
+    document.title = "Lillihub: Mentions";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById("titleBar").innerHTML = "Mentions";
+    document.querySelector(`#mentionsLink`).classList.add("active");
+}
+
+Swap.loaders['#mentions'] = () => {
+    loadBookmarks()
+
+    return () => {  // unloader function
+        resetUI();      
     };  
 }
 
@@ -672,8 +748,8 @@ document.addEventListener('keydown', (event) => {
 
 document.addEventListener("change", (event) => {  
     if(event.target.classList.contains('syndicateChange')) {
-        var checkedBoxes = document.querySelectorAll(`input[name="syndicate[]"]:checked`).length;
-        var element = document.getElementById('syndicatesDropdown');
+        const checkedBoxes = document.querySelectorAll(`input[name="syndicate[]"]:checked`).length;
+        const element = document.getElementById('syndicatesDropdown');
 
         if(checkedBoxes == 0) {
             element.removeAttribute('data-badge');
@@ -684,8 +760,8 @@ document.addEventListener("change", (event) => {
         }
     }
     if(event.target.classList.contains('categoriesChange')) {
-        var checkedBoxes = document.querySelectorAll(`input[name="category[]"]:checked`).length;
-        var element = document.getElementById('categoriesDropdown');
+        const checkedBoxes = document.querySelectorAll(`input[name="category[]"]:checked`).length;
+        const element = document.getElementById('categoriesDropdown');
 
         if(checkedBoxes == 0) {
             element.removeAttribute('data-badge');
@@ -976,57 +1052,38 @@ document.addEventListener("click", async (item) => {
         document.getElementById('modal').classList.add("active");
     }
     if(item.target.classList.contains('replyBtn')){
-        let name = item.target.getAttribute('data-name');
-        let id = item.target.getAttribute('data-id');
-        let avatar = item.target.getAttribute('data-avatar');
+        const name = item.target.getAttribute('data-name');
+        const id = item.target.getAttribute('data-id');
+        const avatar = item.target.getAttribute('data-avatar');
     
-        // Set up the reply area
-        document.getElementById('main-' + id).insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML.replaceAll('id="',`id="${id}-`));
-        let chips = document.getElementById(id + '-replybox-chips'); 
-
-        document.getElementById(id + '-postingName').classList.add('hide');
-        document.getElementById(id + '-postingBtns').classList.add("hide");
-        document.getElementById(id + '-postName').classList.add("hide");
-        document.getElementById(id + '-postStatus').classList.add("hide");
-        document.getElementById(id + '-editor-replybox').classList.remove('hide');
-        document.getElementById(id + '-topBarBtns').classList.add("hide");
-
-        chips.innerHTML = chips.innerHTML + `<span id="${id}-chip-${name}" class="chip">
-                <img class="avatar avatar-sm" src="${avatar}" />@${name}
-                <a data-id="${id}" data-name="${name}" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a>
-            </span>`;                    
-        document.getElementById(id + '-postId').value = item.target.getAttribute('data-id');
-        document.getElementById(id + '-replybox-input').value = '';
-        document.getElementById(id + '-replybox-input').focus();
-        document.getElementById(id + '-replybox-menu').classList.add('hide');
-        document.getElementById(id + '-replybox-checkbox-' + name).checked = true; 
-        document.getElementById(id + '-editor-action').classList.add('sendReply');
-        document.getElementById(id + '-editor-action').setAttribute('data-id', id);
-        document.getElementById(id + '-editor-action').innerHTML = 'Send';
+        replyModal(name, id, avatar);
     }
     if(item.target.classList.contains('sendReply')){
         document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
-        let id = item.target.getAttribute('data-id');
-        let form = document.getElementById(id + '-editor'); 
+        let form = document.getElementById('editor'); 
         fetch("/timeline/reply", { body: new FormData(form), method: "post" })
             .then(response => response.text())
             .then(data => {
-                document.getElementById(id + '-editor').remove();
+                //document.getElementById(id + '-editor').remove();           
+            })
+            .finally(() => {
+                closeEditorModal();
                 document.getElementById('loader').remove();
             });
     }
     if(item.target.classList.contains('actionBtn')) {
+        item.preventDefault();
         // here we vary by page...
         if(window.location.pathname.includes('versions')) {
             history.back();
         } else if(window.location.pathname.includes('notes')) {
-            if(window.location.hash == "edit") {
-                document.getElementById('actionIcon').classList.remove('icon-back');
+            if(window.location.hash == "#edit") {
+                document.getElementById('actionIcon').classList.remove('icon-cross');
                 document.getElementById('actionIcon').classList.add('icon-edit');
-                window.location.hash = "note";
+                window.location.hash = "";
             } else {
                 document.getElementById('actionIcon').classList.remove('icon-edit');
-                document.getElementById('actionIcon').classList.add('icon-back');
+                document.getElementById('actionIcon').classList.add('icon-cross');
                 window.location.hash = "edit";
             }
         } else if(window.location.pathname.includes('notebooks')) {
@@ -1041,6 +1098,8 @@ document.addEventListener("click", async (item) => {
         } else if(window.location.pathname.includes('users')) {
             // the action is to follow (if not already)?
             loadEditor();
+        } else if(window.location.pathname.includes('bookmarks')) {
+            loadAddBookmarkModal();
         }
     }
     if(item.target.classList.contains('pageActions')) {
@@ -1145,12 +1204,12 @@ function loadPage() {
         loadNotebook();
     } else if(window.location.pathname.includes('timeline')) {
         loadTimeline(); 
-    }  
-    else if(window.location.pathname.includes('discover')) {
-        document.title = "Lillihub: Discover";
-        document.getElementById("titleBar").innerHTML = "Discover";
-        document.querySelector(`#discoverLink`).classList.add("active");
-        buildMasonry();
+    } else if(window.location.pathname.includes('posts')) {
+        loadConversation(); 
+    }  else if(window.location.pathname.includes('discover')) {
+        loadDiscover()
+    } else if(window.location.pathname.includes('mentions')) {
+        loadMentions()
     } else if(window.location.pathname.includes('users')) {
         document.title = "Lillihub: Timeline";
         document.getElementById("titleBar").innerHTML = "Timeline";
@@ -1167,8 +1226,7 @@ if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", async (event) => {
         loadPage();
     });
-}
-else
+} else
 {
     loadPage();
 }

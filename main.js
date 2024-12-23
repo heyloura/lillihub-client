@@ -10,7 +10,6 @@ import * as utility from "./scripts/server/utilities.js";
 ******************************************************************************************************************/
 const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
 const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
-const deployURL = 'https://sad-bee-43--version3.deno.dev/';
 const _development = true;
 
 Deno.serve(async (req) => { 
@@ -169,11 +168,11 @@ Deno.serve(async (req) => {
             /********************************
                 TIMELINE BASED ROUTES
             *********************************/
-            if((new URLPattern({ pathname: "/timeline/mentions" })).exec(req.url) && user) {
-                const layout = new TextDecoder().decode(await Deno.readFile("mentions.html"));
-                return new Response(layout.replaceAll('{{nonce}}', nonce),
-                  HTMLHeaders(nonce));
-            }
+            // if((new URLPattern({ pathname: "/timeline/mentions" })).exec(req.url) && user) {
+            //     const layout = new TextDecoder().decode(await Deno.readFile("mentions.html"));
+            //     return new Response(layout.replaceAll('{{nonce}}', nonce),
+            //       HTMLHeaders(nonce));
+            // }
 
 
             if(new URLPattern({ pathname: "/timeline/following" }).exec(req.url) && user) {
@@ -739,17 +738,13 @@ Deno.serve(async (req) => {
                     name = "timeline";
                     fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const post = await fetching.json();
+                    const original = post.items.filter(i => i.id == id)[0];
                     // put JSON check here or something.....
-                    content = `<div id="post-${id}" class="mt-2 timeline post">
-                        <div class="timeline-item">
-                            <div class="timeline-left"><a class="timeline-icon icon-lg"><i class="icon icon-message"></i></a></div>
-                            <div class="timeline-content pl-2">
-                                Conversation
-                            </div>
-                        </div>
-                        ${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}
-                        <p class="text-center"><button class="btn btn-link">collapse conversation</button></p>
-                        </div>`;
+                    content = `<div id="conversation"
+                        data-name="${original &&  original.author && original.author._microblog && original.author._microblog.username ? original.author._microblog.username : ''}"
+                        data-id="${id}"
+                        data-avatar="${original &&  original.author && original.author.avatar ? original.author.avatar : ''}"
+                        >${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}</div>`;
                 } else if(req.url.includes("timeline")) {
                     //----------
                     //  Timeline
@@ -761,7 +756,25 @@ Deno.serve(async (req) => {
                     content = `
                         ${id != "timeline" ? '<p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/">Back to the beginning</a></p>' : ''}
                         <div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
+                } else if(req.url.includes("mentions")) {
+                    //----------
+                    //  Mentions
+                    //----------
+                    id = name;
+                    name = "mentions";
+                    fetching = await fetch(`https://micro.blog/posts/mentions${id != "mentions" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    //fetching = await fetch(`https://micro.blog/posts/mentions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+
+                    const posts = await fetching.json();
+                    content = `
+                        <div id="mentions" class="mt-2">
+                            <div>
+                                ${posts.items.map(n => utility.postHTML(n)).join('')}
+                                <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/mentions/${posts.items[posts.items.length -1].id}">Load More</a></p>
+                            </div>
+                        </div>`;
                 }
+
                 
                 const searchParams = new URLSearchParams(req.url.split('?')[1]);
                 const destination = searchParams.get('destination');
@@ -772,6 +785,7 @@ Deno.serve(async (req) => {
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
                     .replaceAll('{{editor}}', await utility.getEditor(following, mbUser.username, mbToken, destination))
+                    .replaceAll('{{premium}}', mbUser.is_premium ? '' : 'hide')
                 , HTMLHeaders(nonce));
             }
 

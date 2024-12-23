@@ -231,16 +231,9 @@ export function discoverHTML(posts, tagmoji, id) {
                         </details>
                     </div>
                     <div class="hide-lg">
-                        <ul class="menu bg-dark p-0">
-                            <li class="divider" data-content="Discover Tagmoji"></li>
-                            ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                                    `<li class="menu-item">
-                                        <a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}" >
-                                            ${item.emoji} ${item.title}
-                                        </a>
-                                    </li>`
-                                ).join('')}
-                        </ul>
+                        ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
+                            `<span class="chip ${item.name}Link"><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
+                        ).join('')}  
                     </div>
                 </div>
             </div>
@@ -255,19 +248,6 @@ export function timelineHTML(posts, lastId) {
         <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
     </div>
     `;
-    // return `
-    //     <div class="container grid-xl">
-    //         <div class="columns">
-    //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-    //                 <div class="card bordered">Profile peek here...</div>
-    //             </div>
-    //             <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-    //                 ${posts}
-    //                 <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
-    //             </div>
-    //         </div>
-    //     </div>
-    // `;
 }
 
 function flattenedNote(note) {
@@ -288,9 +268,9 @@ function flattenedNote(note) {
 export async function noteHTML(note, notebookId, versions) {
     const n = flattenedNote(note);
     return `                
-        ${n.shared ? `<p class="text-center"><mark>This note is shared.</mark><br/><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></p>` : ''}
-        <p class="text-center" id="tags-${n.id}"></p>
-        <div class="card bordered pages">
+        ${n.shared ? `<p><mark>This note is shared.</mark><br/><a target="_blank" href="${n.shared_url}">${n.shared_url}</a></p>` : ''}
+        <p id="tags-${n.id}"></p>
+        <div class="card no-border pages">
             <div id="edit">
                 ${await getNoteEditor(notebookId,n)}
             </div>
@@ -299,7 +279,6 @@ export async function noteHTML(note, notebookId, versions) {
             </div>
         </div>
         <div id="note-details" class="hide">
-            <p class="text-center"></p>
             <div class="divider" data-content="Note Metadata + Details"></div>
             <div>
                 <table id="metadata-${n.id}" class="table table-striped">
@@ -407,7 +386,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
 
 
     return `
-        <form id="editor" class="card">
+        <form id="editor" class="card no-border">
             <input type="hidden" name="postingType" id="postingType" />
             <input type="hidden" name="omgApi" id="omgApi" />
             <input type="hidden" name="omgAddess" id="omgAddess" />
@@ -534,9 +513,8 @@ export function bookmarkReaderHTML(reader, bookmark, tags) {
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     ${bookmarkHTML(bookmark, false)}
                     ${reader}
-                <!--</div>-->
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <ul class="menu bg-dark p-0">
+                    <ul class="menu p-0">
                         <li class="divider text-red" data-content="Bookmark Tags"></li>
                         ${bookmark.tags ? bookmark.tags.sort().map((item) =>
                             `<span class="chip">${item}<button class="btn btn-clear removeTag" aria-label="Close"></button></span>`
@@ -589,14 +567,17 @@ export function bookmarksHTML(bookmarks, tags, is_premium) {
                 ${is_premium ? `
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
                     <div class="hide-lg">
-                        <ul class="menu bg-dark p-0">
+                        <ul class="menu p-0">
                             <li class="divider text-red" data-content="Bookmark Tags"></li>
                             ${tags.sort().map((item) =>
                                 `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks?tag=${item}">${item}</a></span>`
                             ).join('')} 
                         </ul>
                     </div>
-                </div>
+                </div><datalist id="tags">
+                            ${tags.sort().map((item) =>
+                                `<option>${item}</option>`
+                            ).join('')}</datalist>
                     ` : ''}
             </div>
         </div>`
@@ -712,14 +693,14 @@ export function postHTML(post, stranger, isConvo, convoId) {
                                 <i class="icon icon-caret"></i>
                             </button>
                             <ul class="menu bg-dark">
-                                <li class="menu-item">View</li>
+                                <li class="menu-item"><a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" class="btn btn-link btn-action">View Post</a></li>
                                 <li class="menu-item">Bookmark</li>
                                 <li class="menu-item">Quote</li>
                                 <li class="menu-item">Open in micro.blog</li>
                             </ul>
                         </div>
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
-                        ${!isConvo && (post.conversation || post.mention) ? `<a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#post${isConvo ? '-convo' : ''}-${post.id}" class="btn btn-link btn-action"><i class="icon icon-message"></i></a>` : ''}
+                        ${!isConvo && (post.conversation || post.mention) ? `<a class="btn btn-link btn-action"  swap-history="true"  rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main"><i class="icon icon-message"></i></a>` : ''}
                     </div>
                 </div>
             </div>
