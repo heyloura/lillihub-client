@@ -205,12 +205,17 @@ function loadEditor(type) {
 }
 
 function replyModal(name, id, avatar) { 
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(document.getElementById(`post-${id}`));
+    const fragment = document.createDocumentFragment();
+    if(document.getElementById(`post-${id}`)) {
+        fragment.appendChild(document.getElementById(`post-${id}`));
+    } else {
+        fragment.appendChild(document.getElementById(`post-convo-${id}`).cloneNode(true));
+    }   
+    console.log(fragment)
     document.getElementById('modalContent').appendChild(fragment);
     document.getElementById('modalContent').insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML);
     document.querySelector('#modalContent .postBtns').remove();
-    let chips = document.getElementById('replybox-chips'); 
+    const chips = document.getElementById('replybox-chips'); 
 
     document.getElementById('postingName').classList.add('hide');
     document.getElementById('postingBtns').classList.add("hide");
@@ -239,7 +244,8 @@ function replyModal(name, id, avatar) {
     document.getElementById('editor-action').setAttribute('data-id', id);
     document.getElementById('editor-action').innerHTML = 'Send';
 
-    document.getElementById('modalTitle').innerHTML = 'Conversation';
+    document.getElementById('modalTitle').innerHTML = 'Reply';
+    document.getElementById('modal').style.zIndex = "401";
     document.getElementById('modal').classList.add("active");
     document.getElementById('editor-preview-btn').classList.add('hide');
 }
@@ -298,6 +304,7 @@ var Swap = (() => {
                 if (pushstate)
                     history.pushState({}, "", href);
                 register_links();  
+            }).finally(() => {
                 document.getElementById('loader').remove();
             });
         }
@@ -422,9 +429,9 @@ function loadVersion() {
     const parts = window.location.pathname.split('/');
     const id = parts[2];
     
-    if(document.querySelector(`.notebook-${id}`)) {
-        document.querySelector(`.notebook-${id}`).classList.add("active");
-    }
+    // if(document.querySelector(`.notebook-${id}`)) {
+    //     document.querySelector(`.notebook-${id}`).classList.add("active");
+    // }
     
     // decrypt and show
     if(document.querySelector('.decryptMe')) {
@@ -469,7 +476,7 @@ async function loadNotebook() {
     document.title = "Lillihub: Notes";
     const parts = window.location.pathname.split('/');
     const id = parts[parts.length - 1];
-    document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
+    //document.getElementById("titleBar").innerHTML = document.querySelector(`.notebook-${id}`).innerHTML;
 
     // we have a key, decrypt the notes
     if(localStorage.getItem("mbKey")) {
@@ -519,9 +526,9 @@ async function loadNotebook() {
         });
     }
 
-    if(document.querySelector(`.notebook-${id}`)) {
-        document.querySelector(`.notebook-${id}`).classList.add("active");
-    }
+    // if(document.querySelector(`.notebook-${id}`)) {
+    //     document.querySelector(`.notebook-${id}`).classList.add("active");
+    // }
 }
 
 // Loaded the note
@@ -546,9 +553,9 @@ function loadNote() {
     document.getElementById('actionIcon').classList.add('icon-edit');
     const parts = window.location.pathname.split('/');
     const id = parts[2];
-    if(document.querySelector(`.notebook-${id}`)) {
-        document.querySelector(`.notebook-${id}`).classList.add("active");
-    }
+    // if(document.querySelector(`.notebook-${id}`)) {
+    //     document.querySelector(`.notebook-${id}`).classList.add("active");
+    // }
 
     //set up editor
     document.getElementById('topBarBtns').classList.add('hide');
@@ -603,7 +610,7 @@ function loadTimeline() {
     convoSource = 'timeline';
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
-    document.querySelector(`#timelineLink`).classList.add("active");
+    //document.querySelector(`#timelineLink`).classList.add("active");
 
     buildMasonry();
     hljs.highlightAll();
@@ -652,30 +659,33 @@ Swap.loaders['#post-list'] = () => {
 function loadConversation() {
     buildMasonry();
     hljs.highlightAll();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.getElementById("titleBar").innerHTML = 'Conversation';
-    document.querySelector(`#timelineLink`).classList.add("active");
-    const id = document.getElementById('conversation').getAttribute('data-id');
-    document.getElementById(`pageAction`).insertAdjacentHTML('afterbegin', `<a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline${id ? `/${id}` : ''}" class="btn btn-link btn-action extraAction"><i class="icon icon-back"></i></a>`);
-    document.title = "Lillihub: Conversation";
+    //window.scrollTo({ top: 0, behavior: 'smooth' });
+    //document.getElementById("titleBar").innerHTML = 'Conversation';
+    //document.querySelector(`#timelineLink`).classList.add("active");
+    //const id = document.getElementById('conversation').getAttribute('data-id');
+    //document.getElementById(`pageAction`).insertAdjacentHTML('afterbegin', `<a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline${id ? `/${id}` : ''}" class="btn btn-link btn-action extraAction"><i class="icon icon-back"></i></a>`);
+    //document.title = "Lillihub: Conversation";
 
-    for (const elt of document.querySelectorAll('*[swap-target]')) {
-        elt.onclick = e => {
-            update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
-            e.preventDefault();
-        }
-    }
+    // for (const elt of document.querySelectorAll('*[swap-target]')) {
+    //     elt.onclick = e => {
+    //         update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
+    //         e.preventDefault();
+    //     }
+    // }
 
-    if(convoSource == 'discover') {
-        if(localStorage.getItem('discover_setting') === 'custom') {
-            document.querySelector('.extraAction').setAttribute('href', '/discover/custom')
-        } else {
-            document.querySelector('.extraAction').setAttribute('href', '/discover')
-        }   
-    }
+    // if(convoSource == 'discover') {
+    //     if(localStorage.getItem('discover_setting') === 'custom') {
+    //         document.querySelector('.extraAction').setAttribute('href', '/discover/custom')
+    //     } else {
+    //         document.querySelector('.extraAction').setAttribute('href', '/discover')
+    //     }   
+    // }
+
+    document.getElementById('conversationModal').classList.add("active");
+
 }
 
-Swap.loaders['#conversation'] = () => {
+Swap.loaders['#conversationContent'] = () => {
     loadConversation();
     
     return () => {  // unloader function      
@@ -687,7 +697,7 @@ function loadDiscover() {
     document.title = "Lillihub: Discover";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Discover";
-    document.querySelector(`#discoverLink`).classList.add("active");
+    //document.querySelector(`#discoverLink`).classList.add("active");
     buildMasonry();
     hljs.highlightAll();
     convoSource = 'discover';
@@ -705,7 +715,7 @@ function loadBookmarks() {
     document.title = "Lillihub: Bookmarks";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Bookmarks";
-    document.querySelector(`#bookmarksLink`).classList.add("active");
+    //document.querySelector(`#bookmarksLink`).classList.add("active");
 }
 
 Swap.loaders['#bookmarks'] = () => {
@@ -720,7 +730,7 @@ function loadMentions() {
     document.title = "Lillihub: Mentions";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Mentions";
-    document.querySelector(`#mentionsLink`).classList.add("active");
+    //document.querySelector(`#mentionsLink`).classList.add("active");
 }
 
 Swap.loaders['#mentions'] = () => {
@@ -736,11 +746,11 @@ Swap.loaders['#mentions'] = () => {
 *************************************************************/
 
 document.addEventListener('keydown', (event) => {
-    if (event.srcElement.getAttribute('id').includes('content') && event.ctrlKey && event.key.toLowerCase() === 'b') {
+    if (event.srcElement && event.srcElement.getAttribute('id') && event.srcElement.getAttribute('id').includes('content') && event.ctrlKey && event.key.toLowerCase() === 'b') {
         event.preventDefault();
         getSelectionAndReplace(event.srcElement,'**','**');
     }
-    if (event.srcElement.getAttribute('id').includes('content') && event.ctrlKey && event.key.toLowerCase() === 'i') {
+    if (event.srcElement && event.srcElement.getAttribute('id') && event.srcElement.getAttribute('id').includes('content') && event.ctrlKey && event.key.toLowerCase() === 'i') {
         event.preventDefault();
         getSelectionAndReplace(event.srcElement,'**','**');
     }
@@ -1165,6 +1175,9 @@ document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('closeModal')) {
         closeEditorModal();
     }
+    if(item.target.classList.contains('closeConversationModal')) {
+        document.getElementById('conversationModal').classList.remove("active");
+    }
     if(item.target.classList.contains('savePost')) {
         item.preventDefault();
         document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`);
@@ -1213,7 +1226,7 @@ function loadPage() {
     } else if(window.location.pathname.includes('users')) {
         document.title = "Lillihub: Timeline";
         document.getElementById("titleBar").innerHTML = "Timeline";
-        document.querySelector(`#timelineLink`).classList.add("active");
+        //document.querySelector(`#timelineLink`).classList.add("active");
         buildMasonry();
     }
 

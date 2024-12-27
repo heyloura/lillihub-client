@@ -241,6 +241,28 @@ export function discoverHTML(posts, tagmoji, id) {
     `;
 }
 
+export function timelineHeader(active) {
+    return `
+        <ul class="tab tab-block footerBar">
+            <li class="tab-item ${active == 'timeline' ? 'active' : ''}">
+                <a rel="prefetch" swap-target="#main" swap-history="true" id="timelineLink" href="/timeline"><i class="icon icon-time"></i> Timeline</a>
+            </li>
+            <li class="tab-item">
+                <a rel="prefetch" swap-target="#main" swap-history="true" id="discoverLink" href="/discover"><i class="icon icon-search"></i> Discover</a>
+            </li>
+            <li class="tab-item">
+                <a rel="prefetch" swap-target="#main" swap-history="true" id="mentionsLink" href="/mentions"><i class="icon icon-mail"></i> Mentions</a>
+            </li>
+            <li class="tab-item">
+                <a rel="prefetch" swap-target="#main" swap-history="true" id="repliesLink" href="/replies"><i class="icon icon-message"></i> Replies</a>
+            </li>
+            <li class="tab-item">
+                <a rel="prefetch" swap-target="#main" swap-history="true" id="followingLink" href="/following"><i class="icon icon-people"></i> Following</a>
+            </li>
+        </ul>
+    `;
+}
+
 export function timelineHTML(posts, lastId) {
     return `
     <div>
@@ -700,7 +722,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             </ul>
                         </div>
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
-                        ${!isConvo && (post.conversation || post.mention) ? `<a class="btn btn-link btn-action"  swap-history="true"  rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main"><i class="icon icon-message"></i></a>` : ''}
+                        ${!isConvo && (post.conversation || post.mention) ? `<a class="btn btn-link btn-action"  rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#conversationContent"><i class="icon icon-message"></i></a>` : ''}
                     </div>
                 </div>
             </div>

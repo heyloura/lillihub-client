@@ -20,22 +20,49 @@
     <body>
         <header id="header" class="navbar">
             <section class="navbar-section pt-1">
-                <a class="show-lg off-canvas-toggle btn no-border btn-action" href="#sidebar-id">
+                <div class="dropdown">
+                    <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
+                        <i class="icon icon-apps"></i> Lillihub
+                    </button>
+                    <!-- menu component -->
+                    <ul class="menu bg-dark">
+                        <li class="menu-item text-blue">
+                            <a rel="prefetch" swap-target="#main" swap-history="true" href="/blog">Blog Management</a>
+                        </li>
+                        <li class="menu-item text-purple">
+                            <a rel="prefetch" swap-target="#main" swap-history="true" href="/bookmarks">Bookmarks</a>
+                        </li>
+                        <li class="menu-item text-red">
+                            <a rel="prefetch" swap-target="#main" swap-history="true" href="/bookshelves">Bookshelves</a>
+                        </li>
+                        <li class="menu-item text-orange">
+                            <a rel="prefetch" swap-target="#main" swap-history="true" href="/notebooks">Notes</a>
+                        </li>
+                        <li class="menu-item text-yellow">
+                            <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline">Timeline</a>
+                        </li>
+                        <li class="divider text-green" data-content="Lillihub"></li>
+                        <li class="menu-item"><a href="/settings">Settings</a></li>
+                        <li class="menu-item"><a href="https://docs.lillihub.com">Documentation</a></li>
+                        <li class="menu-item"><a href="/logout">Logout</a></li>
+                    </ul>
+                  </div>
+                <!--<a class="show-lg off-canvas-toggle btn no-border btn-action" href="#sidebar-id">
                     <i class="icon icon-menu"></i>
-                </a>
+                </a>-->
                 <!-- <a href="/"><img src="/logo.png" height="34px" class="hide-lg mr-2"></a> -->
                 <!-- <span id="pageName" class="hide-lg hide">{{pageName}}</span> -->
             </section>
             <section class="navbar-center text-light pt-1">
                 <div id="pageAction">
-                    <span id="titleBar">{{pageName}}</span><button id="pageActionsBtn" class="hide btn btn-link btn-action pageActions"><i class="icon icon-caret pageActions"></i></button>
+                    <span id="titleBar" class="hide">{{pageName}}</span><button id="pageActionsBtn" class="hide btn btn-link btn-action pageActions"><i class="icon icon-caret pageActions"></i></button>
                 </div>
             </section>
             <section class="navbar-section pt-1">
                 <button class="btn btn-action no-border actionBtn"><i id="actionIcon" class="icon icon-plus actionBtn"></i></button>
             </section>
         </header>
-        <div class="off-canvas off-canvas-sidebar-show">                
+        <!--<div class="off-canvas off-canvas-sidebar-show">                
             <div id="sidebar-id" class="off-canvas-sidebar">
                 <div class="sidebar">
                     <div class="pt-0">
@@ -112,15 +139,12 @@
             </div>     
             <a class="off-canvas-overlay" href="#close"></a>
             <div class="off-canvas-content">
-                <div id="main" class="page container grid-lg">
-                    {{pages}}
-                </div>
+
             </div>
-        </div>
-        <!-- <div id="editor-toast" class="toast toast-dark hide mt-2">
-            <button data-toast-id="editor-toast" class="btn btn-clear float-right dismiss"></button>
-            <div id="editor-toast-message"></div>
-        </div>   -->
+        </div>-->
+        <main id="main" class="page container grid-md">
+            {{pages}}
+        </main>
         <div class="modal" id="modal">
             <div class="modal-overlay closeModal" aria-label="Close"></div>
             <div class="modal-container">
@@ -133,6 +157,19 @@
                 </div>
               </div>
               <div id="modalFooter" class="modal-footer">
+              </div>
+            </div>
+        </div>
+        <div class="modal" id="conversationModal">
+            <div class="modal-overlay closeConversationModal" aria-label="Close"></div>
+            <div class="modal-container">
+              <div class="modal-header">
+                <button class="btn btn-clear float-right closeConversationModal text-primary" aria-label="Close"></button>
+                <div id="conversationTitle" class="modal-title text-primary">Conversation</div>
+              </div>
+              <div class="modal-body">
+                <div id="conversationContent" class="content">
+                </div>
               </div>
             </div>
         </div>

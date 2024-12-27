@@ -573,17 +573,11 @@ Deno.serve(async (req) => {
                 let id = null;
                 let content = '';
 
-                // get notebooks for sidebar
-                let fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                const notebooks = await fetching.json();
+                console.log(req.headers.get("swap-target"));
 
                 // following
-                fetching = await fetch(`https://micro.blog/users/following/${mbUser.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                let fetching = await fetch(`https://micro.blog/users/following/${mbUser.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 let following = await fetching.json();
-                
-                // tagmoji
-                fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                let tagmoji = await fetching.json();
 
                 // check for notebooks route
                 if(req.url.includes("details")) {
@@ -658,6 +652,8 @@ Deno.serve(async (req) => {
                     name = "discover";
                     fetching = await fetch(`https://micro.blog/posts/timeline?count=40`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
                     const posts = await fetching.json();
+                    fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    let tagmoji = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
                 } else if(req.url.includes("settings")) {
@@ -674,6 +670,8 @@ Deno.serve(async (req) => {
                     name = "discover";
                     fetching = await fetch(`https://micro.blog/posts/discover${id != "discover" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
                     const posts = await fetching.json();
+                    fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    let tagmoji = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
                 } else if(req.url.includes("users")) {
@@ -724,12 +722,21 @@ Deno.serve(async (req) => {
                     //-----------
                     //  Notebooks
                     //-----------
-                    id = name;
+                    id = name;  
+                    if(id != 'notebooks') {
+                        fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        const notes = await fetching.json();
+                        // put JSON check here or something.....
+                        content = `<div id="note-list" class="mt-2">${utility.getNotebookHTML(notes.items,id)}</div>`;
+                    } else {
+                        fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        const notebooks = await fetching.json();
+                        content = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element =>
+                            `<li class="menu-item"><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join('');
+                        content = `<div id="notebook-list" class="menu">${content}</div>`;
+                    }
                     name = "notebook";
-                    fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    const notes = await fetching.json();
-                    // put JSON check here or something.....
-                    content = `<div id="note-list" class="mt-2">${utility.getNotebookHTML(notes.items,id)}</div>`;
+
                 } else if(req.url.includes("posts")) {
                     //-------
                     //  Posts
@@ -740,7 +747,7 @@ Deno.serve(async (req) => {
                     const post = await fetching.json();
                     const original = post.items.filter(i => i.id == id)[0];
                     // put JSON check here or something.....
-                    content = `<div id="conversation"
+                    content = `<div id="conversationContent"
                         data-name="${original &&  original.author && original.author._microblog && original.author._microblog.username ? original.author._microblog.username : ''}"
                         data-id="${id}"
                         data-avatar="${original &&  original.author && original.author.avatar ? original.author.avatar : ''}"
@@ -753,7 +760,7 @@ Deno.serve(async (req) => {
                     name = "timeline";
                     fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
-                    content = `
+                    content = `${utility.timelineHeader('timeline')}
                         ${id != "timeline" ? '<p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/">Back to the beginning</a></p>' : ''}
                         <div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
                 } else if(req.url.includes("mentions")) {
@@ -780,11 +787,9 @@ Deno.serve(async (req) => {
                 const destination = searchParams.get('destination');
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
                     .replaceAll('{{pages}}', content)
-                    .replaceAll('{{notebooks}}', notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element =>
-                        `<li class="menu-item"><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join(''))
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
-                    .replaceAll('{{editor}}', await utility.getEditor(following, mbUser.username, mbToken, destination))
+                    .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
                     .replaceAll('{{premium}}', mbUser.is_premium ? '' : 'hide')
                 , HTMLHeaders(nonce));
             }

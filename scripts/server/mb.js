@@ -124,13 +124,13 @@ export async function getMicroBlogTimelinePosts(accessToken,lastId) {
 //     return await fetching.json();   
 // }
 
-// export async function getMicroBlogFollowing(accessToken, username, isMe = true) {
-//     const fetching = await fetch(isMe ? `https://micro.blog/users/following/${username}` : `https://micro.blog/users/discover/${username}`, { 
-//         method: "GET", 
-//         headers: { "Authorization": "Bearer " + accessToken } 
-//     });
-//     return await fetching.json();   
-// }
+export async function getMicroBlogFollowing(accessToken, username, isMe = true) {
+    const fetching = await fetch(isMe ? `https://micro.blog/users/following/${username}` : `https://micro.blog/users/discover/${username}`, { 
+        method: "GET", 
+        headers: { "Authorization": "Bearer " + accessToken } 
+    });
+    return await fetching.json();   
+}
 
 // for places that paging is not supported by micro.blog
 export async function getAllFromMicroBlog(access_token, url) {

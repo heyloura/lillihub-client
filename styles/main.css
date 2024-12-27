@@ -3637,7 +3637,9 @@ summary.accordion-header::-webkit-details-marker {
 .tab.tab-block .tab-item {
   -ms-flex: 1 0 0;
   flex: 1 0 0;
-  text-align: center
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--greenblue);
 }
 
 .tab.tab-block .tab-item a {
@@ -4123,7 +4125,7 @@ a.text-error:visited {
   position: absolute;
   top: 50%;
   width: .8rem;
-  z-index: 1
+  z-index: 3
 }
 
 .loading.loading-lg {
@@ -6334,9 +6336,9 @@ main p:last-child {
   border-bottom: 0;
 }
 
-.tab-item {
+/* .tab-item {
   margin-top: 3em !important;
-}
+} */
 
 .mt-0 {
   margin-top: 0 !important;
@@ -6496,6 +6498,7 @@ textarea {
 
 .navbar {
   padding: 0.25em;
+  padding-bottom: 0em;
   /* background-color: var(--background-tint-1); */
 }
 
@@ -6583,7 +6586,6 @@ article footer {
   position: fixed;
   width: 100%;
   z-index: 201;
-  margin-top: -0.5em;
 }
 .page {
   padding-top: 3em !important;
@@ -6771,11 +6773,16 @@ article footer {
   vertical-align: middle;
 }
 
-@media (min-width: 840px) {
+/* #post-list {
+  max-width: 70ch;
+  margin: 0px auto;
+} */
+
+/* @media (min-width: 840px) {
   #pageAction { 
     padding-left: 110px;
   }
-}
+} */
 /* #pageAction {
   z-index: 298;
   width: 200px;
@@ -6788,7 +6795,7 @@ article footer {
 }
 
 .navbar {
-  background-color: var(--background-tint-1);
+  background-color: var(--background-tint-2);
 }
 
 .postFooter{
@@ -6799,6 +6806,32 @@ article footer {
 
 #sidebar-id {
   background-color: var(--background-tint-2);
+}
+
+.footerBar {
+  position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    margin: 0;
+    z-index: 2;
+    border-top: 1px solid var(--background-tint-4);
+    margin-bottom: 10px;
+}
+
+.footerBar .tab-item {
+    background-color: var(--background-tint-2);
+}
+
+@media (min-width: 840px) {
+  .footerBar { 
+    position: fixed;
+    top: 0;
+    z-index: 202;
+    left: 12.5%;
+    width: 75%;
+  }
 }
 
 /* Dracula Theme v1.2.5
