@@ -1528,7 +1528,7 @@ dl dd {
 }
 
 .btn.btn-link.active,.btn.btn-link:active,.btn.btn-link:focus,.btn.btn-link:hover {
-  color: #302ecd
+  color: var(--primary-shade);
 }
 
 .btn.btn-sm {
@@ -3950,8 +3950,8 @@ a.text-error:visited {
 }
 
 .bg-dark {
-  background: #303742!important;
-  color: #fff
+  background: var(--background-tint-2) !important;
+  color: var(--text-color);
 }
 
 .bg-gray {
@@ -6817,11 +6817,16 @@ article footer {
     margin: 0;
     z-index: 2;
     border-top: 1px solid var(--background-tint-4);
-    margin-bottom: 10px;
+    margin-bottom: 3px;
 }
 
 .footerBar .tab-item {
     background-color: var(--background-tint-2);
+}
+
+.footerBar .tab-item i {
+  display: block;
+  margin: 0 auto;
 }
 
 @media (min-width: 840px) {
@@ -6831,6 +6836,9 @@ article footer {
     z-index: 202;
     left: 12.5%;
     width: 75%;
+  }
+  .footerBar .tab-item i {
+    display: inline-block;
   }
 }
 
