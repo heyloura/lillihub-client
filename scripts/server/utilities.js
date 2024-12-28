@@ -206,17 +206,14 @@ export function discoverHTML(posts, tagmoji, id) {
     return `
         <div class="container grid-xl">
             <div class="columns">
-                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    ${posts.items.map(n => postHTML(n)).join('')}
-                </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                    <div class="form-group">
+                    <!--<div class="form-group">
                         <label class="form-label">Search for featured posts.</label>
                         <div class="input-group">
                             <input id="searchPost" type="text" class="form-input" placeholder="...">
                             <button class="btn btn-primary input-group-btn searchPost"><i class="icon icon-search searchPost"></i></button>
                         </div>
-                    </div>
+                    </div>-->
                     <div class="show-lg">
                         <details class="accordion">
                             <summary class="accordion-header">
@@ -236,6 +233,9 @@ export function discoverHTML(posts, tagmoji, id) {
                         ).join('')}  
                     </div>
                 </div>
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    ${posts.items.map(n => postHTML(n)).join('')}
+                </div>
             </div>
         </div>
     `;
@@ -244,19 +244,19 @@ export function discoverHTML(posts, tagmoji, id) {
 export function timelineHeader(active) {
     return `
         <ul class="tab tab-block footerBar">
-            <li class="tab-item ${active == 'timeline' ? 'active' : ''}">
+            <li class="tab-item ${active == 'timeline' ? 'active' : ''} text-yellow">
                 <a rel="prefetch" swap-target="#main" swap-history="true" id="timelineLink" href="/timeline"><i class="icon icon-time"></i> Timeline</a>
             </li>
-            <li class="tab-item">
+            <li class="tab-item ${active == 'discover' ? 'active' : ''} text-yellow">
                 <a rel="prefetch" swap-target="#main" swap-history="true" id="discoverLink" href="/discover"><i class="icon icon-search"></i> Discover</a>
             </li>
-            <li class="tab-item">
+            <li class="tab-item ${active == 'mentions' ? 'active' : ''} text-yellow">
                 <a rel="prefetch" swap-target="#main" swap-history="true" id="mentionsLink" href="/mentions"><i class="icon icon-mail"></i> Mentions</a>
             </li>
-            <li class="tab-item">
+            <li class="tab-item ${active == 'replies' ? 'active' : ''} text-yellow">
                 <a rel="prefetch" swap-target="#main" swap-history="true" id="repliesLink" href="/replies"><i class="icon icon-message"></i> Replies</a>
             </li>
-            <li class="tab-item">
+            <li class="tab-item ${active == 'following' ? 'active' : ''} text-yellow">
                 <a rel="prefetch" swap-target="#main" swap-history="true" id="followingLink" href="/following"><i class="icon icon-people"></i> Following</a>
             </li>
         </ul>
@@ -267,7 +267,7 @@ export function timelineHTML(posts, lastId) {
     return `
     <div>
         ${posts}
-        <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>
+        ${lastId ? `<p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/${lastId}">Load More</a></p>` : ''}
     </div>
     `;
 }
@@ -344,14 +344,14 @@ export async function getEditor(repliers, username, mbToken, destination) {
     let destinations = '';
     let syndicates = '';
     let categoriesList = '';
-    
+    let mpDestination = '';
 
     if(mbToken) {
         let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
         const config = await fetching.json();
     
         const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
-        const mpDestination = destination ? destination : defaultDestination;
+        mpDestination = destination ? destination : defaultDestination;
         destinations = config.destination ? config.destination.map(item => {
             if(item.uid != mpDestination) {
                 return `<li class="menu-item"><a class="changeDestination" href="?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
@@ -415,6 +415,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
             <input type="hidden" name="indieToken" id="indieToken" />
             <input type="hidden" name="microPub" id="microPub" />
             <input type="hidden" name="id" id="postId" />
+            <input type="hidden" name="destination" value="${mpDestination}" />
             <div id="editor-container">
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
                 <input type="text" placeholder="title (optional)" class="form-input mb-2" name="name" id="postName" />
@@ -471,7 +472,7 @@ export function getNotebookHTML(notes, notebookId) {
         </p>
         <div class="form-group">
             <label class="form-label">Search your notebook</label>
-            <input list="tags" id="search" type="text" class="form-input search" placeholder="...">
+            <input data-element="article" list="tags" id="search" type="text" class="form-input search" placeholder="...">
             <datalist id="tags"></datalist>
         </div>
         ${notes.map((n,i) => `${notesHTML(n,notebookId)}`).join('')}
@@ -715,10 +716,9 @@ export function postHTML(post, stranger, isConvo, convoId) {
                                 <i class="icon icon-caret"></i>
                             </button>
                             <ul class="menu bg-dark">
-                                <li class="menu-item"><a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" class="btn btn-link btn-action">View Post</a></li>
-                                <li class="menu-item">Bookmark</li>
-                                <li class="menu-item">Quote</li>
-                                <li class="menu-item">Open in micro.blog</li>
+                                <li class="menu-item"><a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" class="btn btn-link">View Post</a></li>
+                                <li class="menu-item"><button data-id="${post.id}" type="button" class="btn btn-link bookmarkPost">Bookmark Post</button></li>
+                                <li class="menu-item"><button data-url="${post.url}" type="button" class="btn btn-link quotePost">Quote Post</button></li>
                             </ul>
                         </div>
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>

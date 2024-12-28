@@ -168,38 +168,32 @@ Deno.serve(async (req) => {
             /********************************
                 TIMELINE BASED ROUTES
             *********************************/
-            // if((new URLPattern({ pathname: "/timeline/mentions" })).exec(req.url) && user) {
-            //     const layout = new TextDecoder().decode(await Deno.readFile("mentions.html"));
-            //     return new Response(layout.replaceAll('{{nonce}}', nonce),
-            //       HTMLHeaders(nonce));
-            // }
 
-
-            if(new URLPattern({ pathname: "/timeline/following" }).exec(req.url) && user) {
-                let fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                let results = await fetching.json();
+            // if(new URLPattern({ pathname: "/timeline/following" }).exec(req.url) && user) {
+            //     let fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            //     let results = await fetching.json();
         
-                const users = results.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0)).map((item) =>
-                    `<tr>
-                        <td><figure class="avatar avatar-lg" data-initial="${item.username.substring(0,1)}">
-                                <img src="${item.avatar}" loading="lazy">
-                            </figure>
-                        </td>
-                        <td>
-                            <div class="card-title">${item.name}</div>
-                            <div class="card-subtitle"><a href="/user/${item.username}" class="text-gray">@${item.username}</a></div>  
-                        </td>
-                        <td>${item.username.split('@').length == 1 ? '<span class="chip">Micro.blog</span>' : '<span class="chip">Other</span>'}</td>
-                    </tr>
-                    `
-                ).join('');
+            //     const users = results.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0)).map((item) =>
+            //         `<tr>
+            //             <td><figure class="avatar avatar-lg" data-initial="${item.username.substring(0,1)}">
+            //                     <img src="${item.avatar}" loading="lazy">
+            //                 </figure>
+            //             </td>
+            //             <td>
+            //                 <div class="card-title">${item.name}</div>
+            //                 <div class="card-subtitle"><a href="/user/${item.username}" class="text-gray">@${item.username}</a></div>  
+            //             </td>
+            //             <td>${item.username.split('@').length == 1 ? '<span class="chip">Micro.blog</span>' : '<span class="chip">Other</span>'}</td>
+            //         </tr>
+            //         `
+            //     ).join('');
         
-                const layout = new TextDecoder().decode(await Deno.readFile("following.html"));
+            //     const layout = new TextDecoder().decode(await Deno.readFile("following.html"));
 
-                return new Response(layout.replaceAll('{{nonce}}', nonce)
-                    .replaceAll('{{users}}', users)
-                    ,HTMLHeaders(nonce));
-            } 
+            //     return new Response(layout.replaceAll('{{nonce}}', nonce)
+            //         .replaceAll('{{users}}', users)
+            //         ,HTMLHeaders(nonce));
+            // } 
 
 
 
@@ -255,37 +249,37 @@ Deno.serve(async (req) => {
             //     return new Response(JSON.stringify(data), JSONHeaders());
             // }
         
-            if(new URLPattern({ pathname: "/bookmarks/highlights" }).exec(req.url)) {
-                const nonce = crypto.randomUUID();
-                const allHighlights = await mb.getAllFromMicroBlog(mbToken, 'https://micro.blog/posts/bookmarks/highlights');
-                return new Response(`<textarea rows="20">${JSON.stringify(allHighlights)}</textarea>`,HTMLHeaders(nonce));
-            }
+            // if(new URLPattern({ pathname: "/bookmarks/highlights" }).exec(req.url)) {
+            //     const nonce = crypto.randomUUID();
+            //     const allHighlights = await mb.getAllFromMicroBlog(mbToken, 'https://micro.blog/posts/bookmarks/highlights');
+            //     return new Response(`<textarea rows="20">${JSON.stringify(allHighlights)}</textarea>`,HTMLHeaders(nonce));
+            // }
 
-            if(new URLPattern({ pathname: "/bookmarks/new" }).exec(req.url)) {
-                const value = await req.formData();
-                const url = value.get('url');
+            // if(new URLPattern({ pathname: "/bookmarks/new" }).exec(req.url)) {
+            //     const value = await req.formData();
+            //     const url = value.get('url');
         
-                const formBody = new URLSearchParams();
-                formBody.append("h", "entry");
-                formBody.append("bookmark-of", url);
+            //     const formBody = new URLSearchParams();
+            //     formBody.append("h", "entry");
+            //     formBody.append("bookmark-of", url);
         
-                const posting = await fetch(`https://micro.blog/micropub`, {
-                    method: "POST",
-                    body: formBody.toString(),
-                    headers: {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8","Authorization": "Bearer " + mbToken}
-                });
-                let message = 'bookmark added';
-                if (!posting.ok) {
-                    message = await posting.text();
-                    console.log(`${user.username} tried to add a bookmark ${url} and ${message}`);
-                }
-                return new Response(message, {
-                    status: 200,
-                    headers: {
-                        "content-type": "text/html",
-                    },
-                });
-            }
+            //     const posting = await fetch(`https://micro.blog/micropub`, {
+            //         method: "POST",
+            //         body: formBody.toString(),
+            //         headers: {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8","Authorization": "Bearer " + mbToken}
+            //     });
+            //     let message = 'bookmark added';
+            //     if (!posting.ok) {
+            //         message = await posting.text();
+            //         console.log(`${user.username} tried to add a bookmark ${url} and ${message}`);
+            //     }
+            //     return new Response(message, {
+            //         status: 200,
+            //         headers: {
+            //             "content-type": "text/html",
+            //         },
+            //     });
+            // }
 
 
 
@@ -377,8 +371,6 @@ Deno.serve(async (req) => {
                     } else {
                         formBody.append("mp-syndicate-to[]", "");
                     }
-
-                    console.log(formBody.toString());
                     
                     const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
                     if (!posting.ok) {
@@ -394,13 +386,6 @@ Deno.serve(async (req) => {
                     const data = await posting.json(); 
                     return new Response(JSON.stringify(data), JSONHeaders());
 
-                } else if(postingType === 'weblog') {
-                    const posting = await fetch(`https://api.omg.lol/address/${omgAddess}/weblog/entry/abc123`, { method: "POST", body: content, headers: { "Authorization": "Bearer " + omgApi } });
-                    if (!posting.ok) {
-                        console.log(`${user.username} tried to add a post and ${await posting.text()}`);
-                    }
-                    const data = await posting.json(); 
-                    return new Response(JSON.stringify(data), JSONHeaders());
                 }        
             }
 
@@ -514,6 +499,31 @@ Deno.serve(async (req) => {
                 });
             }
 
+            //--------------------------
+            // Follow or Unfollow a user
+            //--------------------------
+            if((new URLPattern({ pathname: "/users/follow" })).exec(req.url) && user) {
+                const value = await req.formData();
+                const username = value.get('username');
+                let unfollow = value.get('unfollow');
+                unfollow = unfollow == 'true';
+        
+                const posting = await fetch(`https://micro.blog/users/${unfollow ? 'unfollow' : 'follow'}?username=${username}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+                const result = `User was ${unfollow ? 'unfollowed' : 'followed'}.`;
+                if (!posting.ok) {
+                    let error = await posting.text();
+                    console.log(`${user.username} tried to un/follow ${username} and ${error}`);
+                    result = error;
+                }
+        
+                return new Response(result, {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });    
+            }
+
 
             
             // -----------------------------------------------------
@@ -565,7 +575,7 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // All other pages
             // -----------------------------------------------------
-            const pages = ["notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings"]
+            const pages = ["notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies"]
             if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
                 const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
@@ -645,17 +655,6 @@ Deno.serve(async (req) => {
                         item.highlights = highlights && highlights.length > 0 ? highlights.map(h => h.id) : [];
                     }
                     content = `<div id="bookmarks" class="mt-2">${utility.bookmarksHTML(items, tags, mbUser.is_premium)}</div>`;
-                } else if(req.url.includes("custom")) {
-                    //-------------------
-                    //  Discover - Custom
-                    //-------------------
-                    name = "discover";
-                    fetching = await fetch(`https://micro.blog/posts/timeline?count=40`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
-                    const posts = await fetching.json();
-                    fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    let tagmoji = await fetching.json();
-                    // put JSON check here or something.....
-                    content = `<div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
                 } else if(req.url.includes("settings")) {
                     //----------
                     //  Settings
@@ -668,12 +667,20 @@ Deno.serve(async (req) => {
                     //----------
                     id = name;
                     name = "discover";
-                    fetching = await fetch(`https://micro.blog/posts/discover${id != "discover" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
-                    const posts = await fetching.json();
                     fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     let tagmoji = await fetching.json();
                     // put JSON check here or something.....
-                    content = `<div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
+                    if(id != 'discover') {
+                        fetching = await fetch(`https://micro.blog/posts/discover${id != "original" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+                        const posts = await fetching.json();
+                        content = `${utility.timelineHeader('discover')}<div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
+                    } else {
+                        fetching = await fetch(`https://micro.blog/posts/timeline?count=40`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+                        const posts = await fetching.json();
+                        content = `${utility.timelineHeader('discover')}
+                        <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/discover/original">View the original discover feed</a></p>
+                        <div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
+                    }
                 } else if(req.url.includes("users")) {
                     //-------
                     //  Users
@@ -682,8 +689,38 @@ Deno.serve(async (req) => {
                     name = "users";
                     fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
+                    const friend = following.filter(f => f.username == id)[0] ?? null;
+
+                    console.log(id, following.filter(f => f.username == id)[0])
+
                     // put JSON check here or something.....
-                    content = `<div id="user-posts" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>`;
+                    content = `${utility.timelineHeader('timeline')}
+                    
+                    <div class="bg-dark p-2 m-2">
+                        <figure class="avatar avatar-lg p-centered">
+                            <img src="${posts.author.avatar}" loading="lazy">
+                        </figure>
+                        <h3 class="title mt-2 text-center">${posts.author.name}</h3>
+                        <p class="text-center"><a target="_blank" href="${posts.author.url}">${posts.author.url}</a></p>
+                        <p class="text-center">${posts._microblog.bio}</p>
+                        ${!friend ? `<p class="text-center"><button data-username="${posts._microblog.username}" class="btn btn-primary followUser">Follow</button></p>
+                                    <div id="toast-${posts._microblog.username}-follow" class="toast hide">
+                                        <button data-id="${posts._microblog.username}-follow" class="btn btn-clear float-right clearToast"></button>
+                                        <div id="toast-username-${posts._microblog.username}-follow">Waiting for server....</div>
+                                    </div>` : ''}
+                    </div>
+                    <div id="user-posts" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''))}</div>
+                    ${!friend ? '' : `<details class="p-2 m-2">
+                        <summary class="c-hand">Actions</summary>
+                        <div class="mt-2"><p><button data-username="${posts._microblog.username}" class="btn btn-danger unfollow">Unfollow</button></p>
+                        <p>Or <a href="https://micro.blog/${posts._microblog.username}">Mute, block or report user on Micro.blog</a></p>
+                        <div id="toast-${posts._microblog.username}-unfollow" class="toast hide">
+                                    <button data-id="${posts._microblog.username}-unfollow" class="btn btn-clear float-right clearToast"></button>
+                                    <div id="toast-username-${posts._microblog.username}-unfollow">Waiting for server....</div>
+                                </div>
+                        </div>
+                    </details>`}`;
+
                 } else if(req.url.includes("versions")) {
                     //--------------
                     //  Note Version
@@ -718,7 +755,7 @@ Deno.serve(async (req) => {
                     const versions = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="note" class="mt-2">${await utility.noteHTML(note,parts[parts.length - 3],versions.items)}</div>`;
-                }  else if(req.url.includes("notebooks")) {
+                } else if(req.url.includes("notebooks")) {
                     //-----------
                     //  Notebooks
                     //-----------
@@ -747,7 +784,7 @@ Deno.serve(async (req) => {
                     const post = await fetching.json();
                     const original = post.items.filter(i => i.id == id)[0];
                     // put JSON check here or something.....
-                    content = `<div id="conversationContent"
+                    content = `${utility.timelineHeader('timeline')}<div id="conversationContent"
                         data-name="${original &&  original.author && original.author._microblog && original.author._microblog.username ? original.author._microblog.username : ''}"
                         data-id="${id}"
                         data-avatar="${original &&  original.author && original.author.avatar ? original.author.avatar : ''}"
@@ -761,7 +798,6 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
                     content = `${utility.timelineHeader('timeline')}
-                        ${id != "timeline" ? '<p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/">Back to the beginning</a></p>' : ''}
                         <div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
                 } else if(req.url.includes("mentions")) {
                     //----------
@@ -770,16 +806,89 @@ Deno.serve(async (req) => {
                     id = name;
                     name = "mentions";
                     fetching = await fetch(`https://micro.blog/posts/mentions${id != "mentions" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    //fetching = await fetch(`https://micro.blog/posts/mentions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
 
                     const posts = await fetching.json();
-                    content = `
+                    content = `${utility.timelineHeader('mentions')}
                         <div id="mentions" class="mt-2">
                             <div>
                                 ${posts.items.map(n => utility.postHTML(n)).join('')}
                                 <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/mentions/${posts.items[posts.items.length -1].id}">Load More</a></p>
                             </div>
                         </div>`;
+                } else if(req.url.includes("replies")) {
+                    //----------
+                    //  Replies
+                    //----------
+                    // Using ?before_id= does not work on the replies endpoint
+                    id = name;
+                    name = "replies";
+                    fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const posts = await fetching.json();
+                    content = `${utility.timelineHeader('replies')}
+                        <div id="replies" class="mt-2">
+                            <div>
+                                ${posts.items.map(n => utility.postHTML(n)).join('')}
+                                <p class="text-center m-2 p-2 underlined"><a rel="prefetch" target="_blank" href="https://micro.blog/account/replies">View earlier/manage replies on Micro.blog</a></p>
+                            </div>
+                        </div>`;
+                } else if(req.url.includes("following")) {
+                    //----------
+                    //  Following
+                    //----------
+                    id = name;
+                    name = "following";
+                    fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const results = await fetching.json();
+            
+                    const users = results.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0)).map((item) =>
+                        `<tr>
+                            <td><figure class="avatar avatar-lg" data-initial="${item.username.substring(0,1)}">
+                                    <img src="${item.avatar}" loading="lazy">
+                                </figure>
+                            </td>
+                            <td>
+                                <div class="card-title">${item.name}</div>
+                                <div class="card-subtitle"><a href="/user/${item.username}" class="text-gray">@${item.username}</a></div>  
+                            </td>
+                            <td>${item.username.split('@').length == 1 ? '<span class="chip">Micro.blog</span>' : '<span class="chip">Other</span>'}</td>
+                        </tr>
+                        `
+                    ).join('');
+
+                    content = `${utility.timelineHeader('following')}
+                    <div id="following" class="mt-2">
+                        <div class="form-group">
+                            <label class="form-label">Search your followings</label>
+                            <input data-element="tr" id="search" type="text" class="form-input search" placeholder="...">
+                        </div>
+                        <table class="table table-striped">${users}</table>
+                    </div>`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    //fetching = await fetch(`https://micro.blog/posts/replies${id != "replies" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    //const posts = await fetching.json();
+                    // content = `${utility.timelineHeader('replies')}
+                    //     <div id="replies" class="mt-2">
+                    //         <div>
+                    //             ${posts.items.map(n => utility.postHTML(n)).join('')}
+                    //             <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/replies/${posts.items[posts.items.length -1].id}">Load More</a></p>
+                    //         </div>
+                    //     </div>`;
                 }
 
                 

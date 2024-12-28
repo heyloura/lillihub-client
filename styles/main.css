@@ -120,7 +120,7 @@ code.hljs {
 * @link https://github.com/ionaru/easy-markdown-editor
 * @license MIT
 */
-.CodeMirror {
+/* .CodeMirror {
   font-family: monospace;
   height: 300px;
   color: #000;
@@ -985,7 +985,7 @@ span[data-img-src]::after {
 
 .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {
   background: rgba(255,0,0,.15)
-}
+} */
 
 /*! Spectre.css v0.5.9 | MIT License | github.com/picturepan2/spectre */
 html {
@@ -1212,7 +1212,7 @@ a.active,a:active,a:focus,a:hover {
 }
 
 a:visited {
-  color: var(--secondary)
+  color: var(--primary)
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -3221,7 +3221,7 @@ summary.accordion-header::-webkit-details-marker {
   text-decoration: none
 }
 
-.menu .menu-item>a {
+.menu .menu-item>a, .menu .menu-item>button  {
   border-radius: .1rem;
   color: inherit;
   display: block;
@@ -3230,12 +3230,12 @@ summary.accordion-header::-webkit-details-marker {
   text-decoration: none
 }
 
-.menu .menu-item>a:focus,.menu .menu-item>a:hover {
+.menu .menu-item>a:focus,.menu .menu-item>a:hover,.menu .menu-item>button:focus,.menu .menu-item>button:hover {
   background: var(--background-tint-4);
   color: var(--primary);
 }
 
-.menu .menu-item>a.active,.menu .menu-item>a:active {
+.menu .menu-item>a.active,.menu .menu-item>a:active,.menu .menu-item>button.active,.menu .menu-item>button:active {
   background: var(--background-tint-4);
   color: var(--primary);
 }
@@ -3639,7 +3639,7 @@ summary.accordion-header::-webkit-details-marker {
   flex: 1 0 0;
   text-align: center;
   font-size: 0.9em;
-  color: var(--greenblue);
+  /* color: var(--greenblue); */
 }
 
 .tab.tab-block .tab-item a {
@@ -3845,11 +3845,11 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 a.text-primary:focus,a.text-primary:hover {
-  color: #4240d4
+  color: var(--primary)
 }
 
 a.text-primary:visited {
-  color: #6c6ade
+  color: var(--primary)
 }
 
 .text-secondary {
@@ -5662,9 +5662,9 @@ a.text-error:visited {
   font-size: 3.2rem
 }
 
-.accordion .icon,.btn .icon,.menu .icon,.toast .icon {
+/* .accordion .icon,.btn .icon,.menu .icon,.toast .icon {
   vertical-align: -10%
-}
+} */
 
 .btn-lg .icon {
   vertical-align: -15%
@@ -6801,7 +6801,6 @@ article footer {
 .postFooter{
   margin-top: -2em;
   display: inline-block;
-  background-color: var(--background-tint-1);
 }
 
 #sidebar-id {
@@ -6818,6 +6817,7 @@ article footer {
     z-index: 2;
     border-top: 1px solid var(--background-tint-4);
     margin-bottom: 3px;
+    background-color: var(--background-tint-2);
 }
 
 .footerBar .tab-item {
@@ -6829,17 +6829,27 @@ article footer {
   margin: 0 auto;
 }
 
-@media (min-width: 840px) {
+#post-list {
+  margin-bottom: 60px;
+}
+
+@media (min-width: 960px) {
   .footerBar { 
     position: fixed;
     top: 0;
     z-index: 202;
-    left: 12.5%;
-    width: 75%;
+    max-width: 720px;
+    width: 720px;
+    margin-left: -360px;
+    left: 50%;
   }
   .footerBar .tab-item i {
     display: inline-block;
   }
+}
+
+.underlined {
+  text-decoration: underline;
 }
 
 /* Dracula Theme v1.2.5

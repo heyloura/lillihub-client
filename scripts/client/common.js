@@ -131,11 +131,11 @@ function handleConnection(load, offline) {
 window.addEventListener('online', handleConnection(function(){},function(){}));
 window.addEventListener('offline', handleConnection(function(){},function(){}));
 
-function clearActiveMenuStyle() {
-    document.querySelectorAll('.menu-item > a').forEach(element => {
-        element.classList.remove('active');
-    });
-}
+// function clearActiveMenuStyle() {
+//     document.querySelectorAll('.menu-item > a').forEach(element => {
+//         element.classList.remove('active');
+//     });
+// }
 function strip(html){
     let doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || "";
@@ -154,9 +154,9 @@ function getSelectionAndReplace(el,startTag,endTag) // javascript
 
 function loadEditor(type) {
     document.getElementById('modalContent').innerHTML = document.getElementById('editorTemplate').innerHTML;
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(document.getElementById('editor-footer'));
-    document.getElementById('modalFooter').appendChild(fragment);
+    // var fragment = document.createDocumentFragment();
+    // fragment.appendChild(document.getElementById('editor-footer'));
+    // document.getElementById('modalFooter').appendChild(fragment);
 
     if(type == "note") {
         document.getElementById('topBarBtns').classList.add('hide');
@@ -169,7 +169,7 @@ function loadEditor(type) {
         document.getElementById('editor-action').innerHTML = 'Save';
     } else {
         // generic post
-        fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
         fragment.appendChild(document.getElementById('topBarBtns'));
         document.getElementById('modalTitle').appendChild(fragment);
         document.getElementById('editor-action').classList.add('savePost');
@@ -280,6 +280,70 @@ function loadAddBookmarkModal() {
     `;
     document.getElementById('modal').classList.add("active");
 }
+
+function loadParent() {
+    var promises = [];
+    var children = document.querySelectorAll('[data-mention="true"][data-conversation="true"][data-processed="false"]');
+    children = [...children];
+    children.forEach((child) => {
+        let id = child.getAttribute('data-id');
+        child.classList.remove('parent');
+        child.classList.add('child');
+        child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
+        child.setAttribute('data-processed', 'true');
+
+        var promise = fetch("/conversation/" + id, { method: "get" })
+            .then(response => response.json())
+            .then(data => {
+                var doc = new DOMParser().parseFromString(data.conversation, "text/html");
+                var parent = child.parentNode;
+                var parentArticle = doc.querySelector('article');
+                if(parentArticle.children.length == 3) {
+                    //clean up for gallery
+                    var galleryImgs = doc.querySelectorAll('article:first-child img');
+                    galleryImgs.forEach((img) => {
+                        img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
+                    });
+                    parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
+                }
+                if(parent && parentArticle && child) {
+                    parent.insertBefore(parentArticle, child);
+                }
+                document.getElementById('content-' + id).innerHTML = data.conversation.replaceAll('convoBtns', 'convoBtns hide');
+                document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
+
+                let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
+                if(visibleParent) {
+                    visibleParent.remove();
+                }
+
+                document.getElementById('loading-' + id).remove();
+            });
+
+            promises.push(promise);
+    });
+
+    Promise.all(promises).then(results => {
+        var parents = document.querySelectorAll('.parent');
+        parents = [...parents];
+        let singles = new Set();
+        parents.forEach((parent) => {
+            let id = parent.getAttribute('data-id');
+            if(!parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
+                parent.children[0].style.borderBottom = 0;
+                if(parent.children.length > 1 && parent.children[1].nodeName == 'MAIN') {
+                    parent.children[1].remove();
+                }
+                if(parent.children.length > 2 && parent.children[1].nodeName == 'DIV') {
+                    parent.children[2].remove();
+                }                                
+            }
+            singles.add(id);
+        });
+        buildCarousels();
+    });
+}
+
 /************************************************************
 ** Swap
 ** Facilitates AJAX-style navigation in web pages 
@@ -294,12 +358,19 @@ var Swap = (() => {
     window.addEventListener("popstate", () => update(location.href, "[swap-history-restore]", false, "body"));
     window.addEventListener("DOMContentLoaded", dom_load);
     function update(href, target, pushstate, fallback = null) {
+
+        console.log(href, target, pushstate)
+
+
         if(!href.includes('#')) {
-            clearActiveMenuStyle();
             document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
             fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
                 var tmp = document.createElement('html');
                 tmp.innerHTML = html;
+
+
+                console.log(tmp);
+
                 (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
                 if (pushstate)
                     history.pushState({}, "", href);
@@ -340,7 +411,7 @@ var Swap = (() => {
 })();
 
 /************************************************************
-** Notebooks
+** Pages
 *************************************************************/
 function hexStringToArrayBuffer(hexString) {
     const length = hexString.length / 2;
@@ -697,7 +768,6 @@ function loadDiscover() {
     document.title = "Lillihub: Discover";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Discover";
-    //document.querySelector(`#discoverLink`).classList.add("active");
     buildMasonry();
     hljs.highlightAll();
     convoSource = 'discover';
@@ -715,7 +785,6 @@ function loadBookmarks() {
     document.title = "Lillihub: Bookmarks";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Bookmarks";
-    //document.querySelector(`#bookmarksLink`).classList.add("active");
 }
 
 Swap.loaders['#bookmarks'] = () => {
@@ -730,11 +799,44 @@ function loadMentions() {
     document.title = "Lillihub: Mentions";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Mentions";
-    //document.querySelector(`#mentionsLink`).classList.add("active");
+    buildMasonry();
+    hljs.highlightAll();
 }
 
 Swap.loaders['#mentions'] = () => {
-    loadBookmarks()
+    loadMentions()
+
+    return () => {  // unloader function
+        resetUI();      
+    };  
+}
+
+function loadReplies() {
+    document.title = "Lillihub: Replies";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById("titleBar").innerHTML = "Replies";
+    buildMasonry();
+    hljs.highlightAll();
+}
+
+Swap.loaders['#replies'] = () => {
+    loadReplies()
+
+    return () => {  // unloader function
+        resetUI();      
+    };  
+}
+
+function loadFollowing() {
+    document.title = "Lillihub: Following";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById("titleBar").innerHTML = "Following";
+    buildMasonry();
+    hljs.highlightAll();
+}
+
+Swap.loaders['#following'] = () => {
+    loadFollowing();
 
     return () => {  // unloader function
         resetUI();      
@@ -789,14 +891,8 @@ document.addEventListener("input", (event) => {
     }
     if(event.target.classList.contains('search')) {
         if(document.getElementById('search').value != '') {
-            liveSearch('article', 'search');
-            //document.querySelector('main').classList.remove('pages');
-            //document.querySelector('table').classList.add('d-hide');
-        } else {
-            //document.querySelector('main').classList.add('pages');
-            //document.querySelector('table').classList.remove('d-hide');
+            liveSearch(document.getElementById('search').getAttribute('data-element'), 'search');
         }
-
     }
     if(event.target.classList.contains('replierInput')) {
         let id = event.target.getAttribute('id') === 'replybox-input' ? null : event.target.getAttribute('id').split('-')[0];
@@ -1182,6 +1278,7 @@ document.addEventListener("click", async (item) => {
         item.preventDefault();
         document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`);
         const form = document.getElementById('editor'); 
+
         fetch("/post/add", { body: new FormData(form), method: "post" })
             .then(response => response.json())
             .then(data => {
@@ -1189,8 +1286,6 @@ document.addEventListener("click", async (item) => {
             }).finally(() => {
                 document.getElementById('loader').remove();
             });
-        // document.getElementById('post').value = '';
-        // document.getElementById('replybox-input-main').value = ''; 
     }
     if(item.target.classList.contains('changeDestination')) {
         document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`);
@@ -1200,6 +1295,26 @@ document.addEventListener("click", async (item) => {
         }
         document.getElementById('loader').remove();
         return false;
+    }
+    if(item.target.classList.contains('followUser') || item.target.classList.contains('unfollow')){
+        let username = item.target.getAttribute('data-username');
+        let formData = new FormData();
+        let tag = item.target.classList.contains('unfollow') ? '-unfollow' : '-follow';
+        formData.append("username", username);
+        formData.append("unfollow", item.target.classList.contains('unfollow'));
+        fetch("/users/follow", { body: formData, method: "post" })
+            .then(response => response.text())
+            .then(data => {
+                if(username && document.getElementById('toast-' + username + tag)) {
+                    document.getElementById('toast-username-' + username + tag).innerHTML = data;
+                    document.getElementById('toast-' + username + tag).classList.remove('hide');
+                    item.target.classList.add('hide');
+                }
+            });
+    }
+    if(item.target.classList.contains('clearToast')) {
+        let id = item.target.getAttribute('data-id');
+        document.getElementById('toast-' + id).classList.add("hide");
     }
 });
 
@@ -1223,16 +1338,14 @@ function loadPage() {
         loadDiscover()
     } else if(window.location.pathname.includes('mentions')) {
         loadMentions()
+    } else if(window.location.pathname.includes('replies')) {
+        loadReplies()
+    } else if(window.location.pathname.includes('following')) {
+        loadFollowing()
     } else if(window.location.pathname.includes('users')) {
         document.title = "Lillihub: Timeline";
         document.getElementById("titleBar").innerHTML = "Timeline";
-        //document.querySelector(`#timelineLink`).classList.add("active");
         buildMasonry();
-    }
-
-    if(localStorage.getItem('discover_setting') === 'custom') {
-        let href = document.getElementById('discoverLink').getAttribute('href');
-        document.getElementById('discoverLink').setAttribute('href', href += '/custom');
     }
 }
 if (document.readyState === "loading") {
