@@ -548,7 +548,7 @@ Deno.serve(async (req) => {
             }
 
             const MARK_TIMELINE_ROUTE = new URLPattern({ pathname: "/api/timeline/mark/:id" });
-            if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
+            if(MARK_TIMELINE_ROUTE.exec(req.url)) {
                 const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
                 const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
                 return new Response('Timeline marked', {
@@ -559,18 +559,25 @@ Deno.serve(async (req) => {
                 });
             }
 
-            const GET_BOOKMARK_ROUTE = new URLPattern({ pathname: "/api/timeline/mark/:id" });
-            if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
-                const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
-                const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
-                return new Response('Timeline marked', {
-                    status: 200,
-                    headers: {
-                        "content-type": "text/html",
-                    },
-                });
-            }
+            // const GET_BOOKMARK_ROUTE = new URLPattern({ pathname: "/api/timeline/mark/:id" });
+            // if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
+            //     const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
+            //     const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+            //     return new Response('Timeline marked', {
+            //         status: 200,
+            //         headers: {
+            //             "content-type": "text/html",
+            //         },
+            //     });
+            // }
 
+            const GET_PARENT_ROUTE = new URLPattern({ pathname: "/api/timeline/parent/:id" });
+            if(GET_PARENT_ROUTE.exec(req.url)) {
+                const id = GET_PARENT_ROUTE.exec(req.url).pathname.groups.id;
+                const fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const post = await fetching.json();
+                return new Response(post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join(''), HTMLHeaders());
+            }
 
             // -----------------------------------------------------
             // All other pages
@@ -798,7 +805,7 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const posts = await fetching.json();
                     content = `${utility.timelineHeader('timeline')}
-                        <div id="post-list" class="mt-2">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
+                        <div id="post-list" class="">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
                 } else if(req.url.includes("mentions")) {
                     //----------
                     //  Mentions

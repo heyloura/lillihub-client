@@ -6809,7 +6809,7 @@ article footer {
 
 .footerBar {
   position: fixed;
-    bottom: 0;
+    /* bottom: 0; */
     left: 0;
     right: 0;
     height: 50px;
@@ -6830,10 +6830,15 @@ article footer {
 }
 
 #post-list {
+  margin-top: 65px;
   margin-bottom: 60px;
 }
 
 @media (min-width: 960px) {
+  #post-list {
+    margin-top: 35px;
+    margin-bottom: 30px;
+  }
   .footerBar { 
     position: fixed;
     top: 0;

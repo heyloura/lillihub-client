@@ -688,7 +688,22 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         <div class="timeline-left ${convoId && convoId === post.id ? 'highlight' : ''}">
                             <span class="timeline-icon"></span>
                         </div>` : ''}
-        <article id="post${isConvo ? '-convo' : ''}-${post.id}" data-id="${post.id}" class="card parent ${isConvo ? 'timeline-content pt-0 mt-0' : ''} ${convoId && convoId === post.id ? 'highlight' : ''}" data-reply="${post.username}" data-avatar="${post.avatar}" data-id="${post.id}" data-processed="false" data-url="${post.url}" data-mention="${post.mention}" data-conversation="${post.conversation}" data-timestamp="${post.timestamp}" data-published="${post.published}" data-deletable="${post.deletable}" data-linkpost="${post.linkpost}" data-bookmark="${post.bookmark}" data-favorite="${post.favorite}">
+        <article id="post${isConvo ? '-convo' : ''}-${post.id}" 
+            data-id="${post.id}" 
+            class="card parent ${isConvo ? 'timeline-content pt-0 mt-0' : ''} ${convoId && convoId === post.id ? 'highlight' : ''}" 
+            data-reply="${post.username}" 
+            data-avatar="${post.avatar}" 
+            data-id="${post.id}" 
+            data-processed="false" 
+            data-url="${post.url}" 
+            data-mention="${post.mention}" 
+            data-conversation="${post.conversation}" 
+            data-timestamp="${post.timestamp}" 
+            data-published="${post.published}" 
+            data-deletable="${post.deletable}" 
+            data-linkpost="${post.linkpost}" 
+            data-bookmark="${post.bookmark}" 
+            data-favorite="${post.favorite}">
             <header id="header-${post.id}" class="card-header pt-1 mt-0 pb-1 mb-0 pl-1 pr-0">
                 <div>   
                     <div class="card-top pl-1">

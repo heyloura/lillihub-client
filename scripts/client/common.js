@@ -211,7 +211,6 @@ function replyModal(name, id, avatar) {
     } else {
         fragment.appendChild(document.getElementById(`post-convo-${id}`).cloneNode(true));
     }   
-    console.log(fragment)
     document.getElementById('modalContent').appendChild(fragment);
     document.getElementById('modalContent').insertAdjacentHTML('beforeend', document.getElementById('editorTemplate').innerHTML);
     document.querySelector('#modalContent .postBtns').remove();
@@ -292,36 +291,91 @@ function loadParent() {
         child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
         child.setAttribute('data-processed', 'true');
 
-        var promise = fetch("/conversation/" + id, { method: "get" })
-            .then(response => response.json())
-            .then(data => {
-                var doc = new DOMParser().parseFromString(data.conversation, "text/html");
-                var parent = child.parentNode;
-                var parentArticle = doc.querySelector('article');
-                if(parentArticle.children.length == 3) {
-                    //clean up for gallery
-                    var galleryImgs = doc.querySelectorAll('article:first-child img');
-                    galleryImgs.forEach((img) => {
-                        img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
-                    });
-                    parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
-                }
-                if(parent && parentArticle && child) {
-                    parent.insertBefore(parentArticle, child);
-                }
-                document.getElementById('content-' + id).innerHTML = data.conversation.replaceAll('convoBtns', 'convoBtns hide');
-                document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
+        var promise = fetch("/api/timeline/parent/" + id, { method: "get" })
+        .then(response => response.text())
+        .then(data => {
+            var doc = new DOMParser().parseFromString(data, "text/html");
+            var parent = child.parentNode;
+            var parentArticle = doc.querySelector('article');
+            if(parentArticle.children.length == 3) {
+                //clean up for gallery
+                var galleryImgs = doc.querySelectorAll('article:first-child img');
+                galleryImgs.forEach((img) => {
+                    img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
+                    console.log(img);
+                });
+                parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
+            }
 
-                let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
-                if(visibleParent) {
-                    visibleParent.remove();
+            console.log(parent,parentArticle,child)
+
+
+            if(parent && parentArticle && child) {
+                child.insertAdjacentHTML( 'beforebegin', `<div class="timeline">${parentArticle.outerHTML}</div>`);
+                //parent.insertBefore(parentArticle, child);
+            }
+            //document.getElementById('content-' + id).innerHTML = data;
+            //document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
+
+            let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
+            if(visibleParent) {
+
+                console.log(visibleParent);
+
+                visibleParent.remove();
+            }
+
+            document.getElementById('loading-' + id).remove();
+            var conversation = doc.querySelectorAll('article:not(:first-child)');
+            var strangers = doc.querySelectorAll('article:not(:first-child)[data-stranger="true"]');
+            if(conversation.length > 0) {
+                let text = `<div class="card child avatars"><div><a class="btn btn-link btn-action"  rel="prefetch" href="/timeline/posts/${id}" swap-target="#conversationContent">${conversation.length} comments`;
+                if(strangers.length > 0) {
+                    text = text + ' ('+strangers.length+' not following)';
                 }
+                if(child && child.parentNode && text) {
+                    child.insertAdjacentHTML( 'beforebegin', text + '</a></div></div>');
+                }
+            }
+        });
 
-                document.getElementById('loading-' + id).remove();
-            });
-
-            promises.push(promise);
+        promises.push(promise);
     });
+
+
+
+
+
+        // var promise = fetch("/api/timeline/parent/" + id, { method: "get" })
+        //     .then(response => response.text())
+        //     .then(data => {
+        //         var doc = new DOMParser().parseFromString(data, "text/html");
+        //         var parent = child.parentNode;
+        //         var parentArticle = doc.querySelector('article');
+        //         if(parentArticle.children.length == 3) {
+        //             //clean up for gallery
+        //             var galleryImgs = doc.querySelectorAll('article:first-child img');
+        //             galleryImgs.forEach((img) => {
+        //                 img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
+        //             });
+        //             parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
+        //         }
+        //         if(parent && parentArticle && child) {
+        //             parent.insertBefore(parentArticle, child);
+        //         }
+        //         //document.getElementById('content-' + id).innerHTML = data.conversation.replaceAll('convoBtns', 'convoBtns hide');
+        //         //document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
+
+        //         let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
+        //         if(visibleParent) {
+        //             visibleParent.remove();
+        //         }
+
+        //         //document.getElementById('loading-' + id).remove();
+        //     });
+
+        //     promises.push(promise);
+        // });
 
     Promise.all(promises).then(results => {
         var parents = document.querySelectorAll('.parent');
@@ -329,7 +383,7 @@ function loadParent() {
         let singles = new Set();
         parents.forEach((parent) => {
             let id = parent.getAttribute('data-id');
-            if(!parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
+            if(parent.parentNode.getAttribute('id') && !parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
                 parent.children[0].style.borderBottom = 0;
                 if(parent.children.length > 1 && parent.children[1].nodeName == 'MAIN') {
                     parent.children[1].remove();
@@ -340,7 +394,7 @@ function loadParent() {
             }
             singles.add(id);
         });
-        buildCarousels();
+        buildMasonry();
     });
 }
 
@@ -692,6 +746,9 @@ function loadTimeline() {
 
     const article = document.querySelector('article:first-child');
     const id = article.getAttribute('data-id');
+
+
+    loadParent();
     // let checks = 0;
     // let count = 0;
     // const timerID = setInterval(function() {
@@ -730,30 +787,7 @@ Swap.loaders['#post-list'] = () => {
 function loadConversation() {
     buildMasonry();
     hljs.highlightAll();
-    //window.scrollTo({ top: 0, behavior: 'smooth' });
-    //document.getElementById("titleBar").innerHTML = 'Conversation';
-    //document.querySelector(`#timelineLink`).classList.add("active");
-    //const id = document.getElementById('conversation').getAttribute('data-id');
-    //document.getElementById(`pageAction`).insertAdjacentHTML('afterbegin', `<a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline${id ? `/${id}` : ''}" class="btn btn-link btn-action extraAction"><i class="icon icon-back"></i></a>`);
-    //document.title = "Lillihub: Conversation";
-
-    // for (const elt of document.querySelectorAll('*[swap-target]')) {
-    //     elt.onclick = e => {
-    //         update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
-    //         e.preventDefault();
-    //     }
-    // }
-
-    // if(convoSource == 'discover') {
-    //     if(localStorage.getItem('discover_setting') === 'custom') {
-    //         document.querySelector('.extraAction').setAttribute('href', '/discover/custom')
-    //     } else {
-    //         document.querySelector('.extraAction').setAttribute('href', '/discover')
-    //     }   
-    // }
-
     document.getElementById('conversationModal').classList.add("active");
-
 }
 
 Swap.loaders['#conversationContent'] = () => {
