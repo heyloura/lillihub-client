@@ -737,7 +737,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             </ul>
                         </div>
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
-                        ${!isConvo && (post.conversation || post.mention) ? `<a class="btn btn-link btn-action"  rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#conversationContent"><i class="icon icon-message"></i></a>` : ''}
+                        ${!isConvo && (post.conversation || post.mention) ? `<a class="btn btn-link btn-action convoBtn"  rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#conversationContent"><i class="icon icon-message"></i></a>` : ''}
                     </div>
                 </div>
             </div>

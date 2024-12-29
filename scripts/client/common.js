@@ -284,22 +284,46 @@ function loadParent() {
     var promises = [];
     var children = document.querySelectorAll('[data-mention="true"][data-conversation="true"][data-processed="false"]');
     children = [...children];
+    var ids = new Set();
+    var allPosts = document.querySelectorAll('article[data-id]');
+    console.log(allPosts)
+
+    allPosts.forEach(element => {
+        ids.add(element.getAttribute('data-id'));
+    });
+
     children.forEach((child) => {
         let id = child.getAttribute('data-id');
         child.classList.remove('parent');
         child.classList.add('child');
         child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
         child.setAttribute('data-processed', 'true');
+        const btn = child.querySelector('.convoBtn');
+
+        console.log(btn)
 
         var promise = fetch("/api/timeline/parent/" + id, { method: "get" })
         .then(response => response.text())
         .then(data => {
             var doc = new DOMParser().parseFromString(data, "text/html");
             var parent = child.parentNode;
-            var parentArticle = doc.querySelector('article');
+            var articles = doc.querySelectorAll('article');
+            var parentArticle = articles[0];
+            var children = new Set();
+
+            articles.forEach(element => {
+                if(!ids.has(element.getAttribute('data-id'))) {
+                    //element.remove();
+                } else {
+                    element.classList.remove('parent');
+                    //element.classList.add('child');
+                    children.add(element);
+                }
+            });
+            
             if(parentArticle.children.length == 3) {
                 //clean up for gallery
-                var galleryImgs = doc.querySelectorAll('article:first-child img');
+                const galleryImgs = doc.querySelectorAll('article:first-child img');
                 galleryImgs.forEach((img) => {
                     img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
                     console.log(img);
@@ -307,75 +331,59 @@ function loadParent() {
                 parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
             }
 
-            console.log(parent,parentArticle,child)
-
+            //console.log(children);
 
             if(parent && parentArticle && child) {
-                child.insertAdjacentHTML( 'beforebegin', `<div class="timeline">${parentArticle.outerHTML}</div>`);
+                const moveTo = parentArticle.querySelector('.postBtns .btn-group');
+                moveTo.appendChild(btn);
+
+                btn.onclick = e => {
+                    update(btn.getAttribute('href'), btn.getAttribute('swap-target'), btn.getAttribute('swap-history'));
+                    e.preventDefault();
+                }
+
+                const conversation = doc.querySelectorAll('article:not(:first-child)');
+                const strangers = doc.querySelectorAll('article:not(:first-child)[data-stranger="true"]');
+                if(conversation.length > 0) {
+                    let text = `<span> ${conversation.length - 1} comments`;
+                    if(strangers.length > 0) {
+                        text = text + ' ('+strangers.length+' not following)';
+                    }
+                    if(btn && btn.parentNode && text) {
+                        btn.insertAdjacentHTML('beforeend', text + '</span>');
+                    }
+                }
+
+                child.insertAdjacentHTML( 'beforebegin', `<div class="timeline">${parentArticle.outerHTML}${[...children].map(element => {
+                    return `<div class="timeline-item child">
+                                <div class="timeline-left">
+                                    <span class="timeline-icon"></span>
+                                </div>
+                                <div class="timeline-content child">
+                                    ${element.outerHTML}
+                                </div>
+                            </div>`
+                }).join('')}</div>`);
                 //parent.insertBefore(parentArticle, child);
+                child.remove();
             }
-            //document.getElementById('content-' + id).innerHTML = data;
-            //document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
 
-            let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
+            const visibleParent = document.getElementById(`post-${parentArticle.getAttribute('data-id')}`); 
             if(visibleParent) {
-
-                console.log(visibleParent);
-
                 visibleParent.remove();
             }
 
+            children.forEach(id => {
+                if(document.getElementById(`post-${id.getAttribute('data-id')}`)) {
+                    document.getElementById(`post-${id.getAttribute('data-id')}`).remove();
+                }
+            });
+
             document.getElementById('loading-' + id).remove();
-            var conversation = doc.querySelectorAll('article:not(:first-child)');
-            var strangers = doc.querySelectorAll('article:not(:first-child)[data-stranger="true"]');
-            if(conversation.length > 0) {
-                let text = `<div class="card child avatars"><div><a class="btn btn-link btn-action"  rel="prefetch" href="/timeline/posts/${id}" swap-target="#conversationContent">${conversation.length} comments`;
-                if(strangers.length > 0) {
-                    text = text + ' ('+strangers.length+' not following)';
-                }
-                if(child && child.parentNode && text) {
-                    child.insertAdjacentHTML( 'beforebegin', text + '</a></div></div>');
-                }
-            }
         });
 
         promises.push(promise);
     });
-
-
-
-
-
-        // var promise = fetch("/api/timeline/parent/" + id, { method: "get" })
-        //     .then(response => response.text())
-        //     .then(data => {
-        //         var doc = new DOMParser().parseFromString(data, "text/html");
-        //         var parent = child.parentNode;
-        //         var parentArticle = doc.querySelector('article');
-        //         if(parentArticle.children.length == 3) {
-        //             //clean up for gallery
-        //             var galleryImgs = doc.querySelectorAll('article:first-child img');
-        //             galleryImgs.forEach((img) => {
-        //                 img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
-        //             });
-        //             parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
-        //         }
-        //         if(parent && parentArticle && child) {
-        //             parent.insertBefore(parentArticle, child);
-        //         }
-        //         //document.getElementById('content-' + id).innerHTML = data.conversation.replaceAll('convoBtns', 'convoBtns hide');
-        //         //document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
-
-        //         let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
-        //         if(visibleParent) {
-        //             visibleParent.remove();
-        //         }
-
-        //         //document.getElementById('loading-' + id).remove();
-        //     });
-
-        //     promises.push(promise);
-        // });
 
     Promise.all(promises).then(results => {
         var parents = document.querySelectorAll('.parent');
@@ -396,6 +404,8 @@ function loadParent() {
         });
         buildMasonry();
     });
+
+    //convoBtn
 }
 
 /************************************************************
@@ -421,7 +431,6 @@ var Swap = (() => {
             fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
                 var tmp = document.createElement('html');
                 tmp.innerHTML = html;
-
 
                 console.log(tmp);
 
@@ -737,9 +746,6 @@ function loadTimeline() {
     document.getElementById("titleBar").innerHTML = "Timeline";
     //document.querySelector(`#timelineLink`).classList.add("active");
 
-    buildMasonry();
-    hljs.highlightAll();
-
     if(localStorage.getItem('post_setting') === 'none') {
         document.getElementById('actionBtn').classList.add('hide');
     }
@@ -747,8 +753,6 @@ function loadTimeline() {
     const article = document.querySelector('article:first-child');
     const id = article.getAttribute('data-id');
 
-
-    loadParent();
     // let checks = 0;
     // let count = 0;
     // const timerID = setInterval(function() {
@@ -773,6 +777,10 @@ function loadTimeline() {
     fetch("/api/timeline/mark/" + id, { method: "get" })
         .then(response => response.text())
         .then(_data => {});
+
+    loadParent();
+    buildMasonry();
+    hljs.highlightAll();
 }
 
 Swap.loaders['#post-list'] = () => {

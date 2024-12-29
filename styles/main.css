@@ -5398,8 +5398,12 @@ a.text-error:visited {
 .timeline .timeline-item {
   display: -ms-flexbox;
   display: flex;
+  position: relative;
+  background-color: var(--background-tint-4);
+}
+
+.timeline .timeline-item:last-child {
   margin-bottom: 1.2rem;
-  position: relative
 }
 
 .timeline .timeline-item::before {
@@ -5420,6 +5424,7 @@ a.text-error:visited {
 .timeline .timeline-item .timeline-content {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
+  background-color: var(--background-tint-4);
   /* padding: 2px 0 2px .8rem */
 }
 
@@ -6280,7 +6285,7 @@ article main {
 }
 
 .child {
-  margin-left: 2em;
+  margin-left: 0.5em;
   border-top: 0;
 }
 

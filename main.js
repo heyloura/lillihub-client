@@ -12,6 +12,7 @@ const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
 const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
 const _development = true;
 
+
 Deno.serve(async (req) => { 
     if(_development) {
         console.log(req.url);
@@ -802,10 +803,11 @@ Deno.serve(async (req) => {
                     //----------
                     id = name;
                     name = "timeline";
-                    fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    const posts = await fetching.json();
+                    //fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    //const posts = await fetching.json();
+                    const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
                     content = `${utility.timelineHeader('timeline')}
-                        <div id="post-list" class="">${utility.timelineHTML(posts.items.map(n => utility.postHTML(n)).join(''),posts.items[posts.items.length -1].id)}</div>`;
+                        <div id="post-list" class="">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
                 } else if(req.url.includes("mentions")) {
                     //----------
                     //  Mentions

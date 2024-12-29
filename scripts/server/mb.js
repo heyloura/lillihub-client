@@ -81,14 +81,18 @@ export async function getMicroBlogTimelinePosts(accessToken,lastId) {
     const marker = results.markers.timeline;
 
     let items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/timeline', lastId && lastId != 0 ? lastId : null, 40);
+
     let ids = items.map(i => i.id);
     let posts = items;
     
     let i = 0;
     if(marker && !ids.includes(marker.id) && lastId == 0) {
-        while(!ids.includes(results.markers.timeline.id) && i < 10)
+        while(!ids.includes(results.markers.timeline.id) && i < 100)
         {
+            console.log(posts.length, i)
             items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/timeline', ids[ids.length - 1], 40);
+
+            console.log(items.length)
 
             if(!items || items.length == 0) {
                 break;
@@ -177,9 +181,10 @@ async function __getMicroBlogPosts(accessToken, url, lastId, count) {
         let loop = 0;
         let items = [];
         lastId = lastId ?? 0;
+
         while(loop < guard && (!count || items.length < count)) {
             loop++;
-            
+
             let fetchMe = url;
             if(lastId || count) {
                 fetchMe = `${fetchMe}?${lastId ? `before_id=${lastId}${lastId && count ? '&' : ''}${count ? `count=${count}` : ''}` : ''}`;
@@ -190,8 +195,7 @@ async function __getMicroBlogPosts(accessToken, url, lastId, count) {
                     method: "GET", 
                     headers: { "Authorization": "Bearer " + accessToken } 
                 });
-                const results = await fetching.json();   
-            
+                const results = await fetching.json();               
                 items = [...items, ...results.items];
             } else {
                 const fetching = await fetch(fetchMe, { 
@@ -203,8 +207,9 @@ async function __getMicroBlogPosts(accessToken, url, lastId, count) {
 
         }
         
-        return items.map(item => flattenedMicroBlogPost(item)); 
-    } catch {
+        return items; 
+    } catch(error) {
+        console.error(error);
         return undefined; 
     }
 }
