@@ -339,17 +339,17 @@ function loadParent() {
                     e.preventDefault();
                 }
 
-                const conversation = doc.querySelectorAll('article:not(:first-child)');
-                const strangers = doc.querySelectorAll('article:not(:first-child)[data-stranger="true"]');
-                if(conversation.length > 0) {
-                    let text = `<span> ${conversation.length - 1} comments`;
-                    if(strangers.length > 0) {
-                        text = text + ' ('+strangers.length+' not following)';
-                    }
-                    if(btn && btn.parentNode && text) {
-                        btn.insertAdjacentHTML('beforeend', text + '</span>');
-                    }
-                }
+                // const conversation = doc.querySelectorAll('article:not(:first-child)');
+                // const strangers = doc.querySelectorAll('article:not(:first-child)[data-stranger="true"]');
+                // if(conversation.length > 0) {
+                //     let text = `<span> ${conversation.length - 1} comments`;
+                //     if(strangers.length > 0) {
+                //         text = text + ' ('+strangers.length+' not following)';
+                //     }
+                //     if(btn && btn.parentNode && text) {
+                //         btn.insertAdjacentHTML('beforeend', text + '</span>');
+                //     }
+                // }
 
                 child.insertAdjacentHTML( 'beforebegin', `<div class="timeline">${parentArticle.outerHTML}${[...children].map(element => {
                     return `<div class="timeline-item child">
