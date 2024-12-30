@@ -309,7 +309,7 @@ function loadParent() {
             var children = new Set();
 
             articles.forEach(element => {
-                console.log(element);
+                //console.log(element);
                 if(ids.has(element.getAttribute('data-id')) && element.getAttribute('data-id') != parentArticle.getAttribute('data-id')) {
                     element.classList.remove('parent');
                     children.add(element);
