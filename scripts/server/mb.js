@@ -80,12 +80,17 @@ export async function getMicroBlogTimelinePosts(accessToken,lastId) {
     const results = await fetching.json(); 
     const marker = results.markers.timeline;
 
+    if(lastId == 'timeline') {
+        lastId = 0;
+    }
+
     let items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/timeline', lastId && lastId != 0 ? lastId : null, 40);
 
     let ids = items.map(i => i.id);
     let posts = items;
     
     let i = 0;
+    console.log(marker,!ids.includes(marker.id),lastId)
     if(marker && !ids.includes(marker.id) && lastId == 0) {
         while(!ids.includes(results.markers.timeline.id) && i < 100)
         {
