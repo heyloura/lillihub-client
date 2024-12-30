@@ -286,7 +286,6 @@ function loadParent() {
     children = [...children];
     var ids = new Set();
     var allPosts = document.querySelectorAll('article[data-id]');
-    console.log(allPosts)
 
     allPosts.forEach(element => {
         ids.add(element.getAttribute('data-id'));
@@ -300,8 +299,6 @@ function loadParent() {
         child.setAttribute('data-processed', 'true');
         const btn = child.querySelector('.convoBtn');
 
-        console.log(btn)
-
         var promise = fetch("/api/timeline/parent/" + id, { method: "get" })
         .then(response => response.text())
         .then(data => {
@@ -312,12 +309,12 @@ function loadParent() {
             var children = new Set();
 
             articles.forEach(element => {
-                if(!ids.has(element.getAttribute('data-id'))) {
-                    //element.remove();
-                } else {
+                console.log(element);
+                if(ids.has(element.getAttribute('data-id')) && element.getAttribute('data-id') != parentArticle.getAttribute('data-id')) {
                     element.classList.remove('parent');
-                    //element.classList.add('child');
                     children.add(element);
+                } else {
+                    
                 }
             });
             
@@ -896,7 +893,7 @@ document.addEventListener('keydown', (event) => {
     }
     if (event.srcElement && event.srcElement.getAttribute('id') && event.srcElement.getAttribute('id').includes('content') && event.ctrlKey && event.key.toLowerCase() === 'i') {
         event.preventDefault();
-        getSelectionAndReplace(event.srcElement,'**','**');
+        getSelectionAndReplace(event.srcElement,'*','*');
     }
 });
 
