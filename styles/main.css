@@ -6873,9 +6873,10 @@ article footer {
 
 @media (min-width: 960px) {
   #destinationsSwitch {
-    bottom: unset;
-    top: 10px;
-}
+    position: relative;
+    display: block;
+    margin: 0px auto;
+  }
   .bottom-menu {
     bottom: unset !important;
     top: 100% !important;
