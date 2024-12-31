@@ -508,17 +508,29 @@ function blogHTML(post) {
 
 export function getBlogHTML(posts, config, mpDestination, categories) {
     return `
-    <div>
-        ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
-        <div class="form-group">
-            <label class="form-label">Search your blog</label>
-            <input data-element="article" list="categories" type="text" class="form-input">
+    <div class="container grid-xl">
+            <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                    <div class="form-group">
+                        <label class="form-label">Search your blog</label>
+                        <div class="input-group">
+                            <input id="searchBlog" type="text" class="form-input">
+                            <button class="btn btn-primary input-group-btn searchBlog"><i class="icon icon-search searchPost"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        ${categories.categories ? categories.categories.sort().map((item) =>
+                            `<span class="chip ${item}Link"><a class="${item}" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?category=${item}">${item}</a></span>`
+                        ).join('') : ''} 
+                    </div>
+                </div>
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
+                    ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
+                    ${posts.map((p) => `${blogHTML(p)}`).join('')}
+                </div>
+            </div>
         </div>
-        ${categories.categories ? categories.categories.sort().map((item) =>
-            `<span class="chip ${item}Link"><a class="${item}" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?category=${item}">${item}</a></span>`
-        ).join('') : ''} 
-        ${posts.map((p) => `${blogHTML(p)}`).join('')}
-    </div>
+    <div>
     `;
 }
 

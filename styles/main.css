@@ -6873,7 +6873,7 @@ article footer {
 
 @media (min-width: 960px) {
   #destinationsSwitch {
-    position: relative;
+    position: relative !important;
     display: block;
     margin: 0px auto;
   }
