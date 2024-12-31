@@ -733,11 +733,11 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             <ul class="menu bg-dark">
                                 <li class="menu-item"><a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" class="btn btn-link">View Post</a></li>
                                 <li class="menu-item"><button data-url="${post.url}" type="button" class="btn btn-link bookmarkPost">Bookmark Post</button></li>
-                                <li class="menu-item"><button data-id="${post.id}" type="button" class="btn btn-link quotePost">Quote Post</button></li>
+                                <li class="menu-item"><button data-id="${post.id}" data-url="${post.url}" data-name="${post.username}" type="button" class="btn btn-link quotePost">Quote Post</button></li>
                             </ul>
                         </div>
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
-                        ${!isConvo && (post.conversation || post.mention) ? `<button type="button" data-id="${post.id}" class="btn btn-link btn-action convoBtn"><i class="icon icon-message convoBtn"></i></button>` : ''}
+                        ${!isConvo && (post.conversation || post.mention) ? `<button type="button" data-id="${post.id}" class="btn btn-link btn-action convoBtn"><i data-id="${post.id}" class="icon icon-message convoBtn"></i></button>` : ''}
                     </div>
                 </div>
             </div>
