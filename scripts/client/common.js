@@ -881,7 +881,7 @@ function loadBlog() {
                 });
                 images = `<div class="thumbnail_images">${images}<div>`;
             }
-            element.innerHTML = doc.innerHTML + images;
+            element.innerHTML = doc.body.innerHTML + images;
         }
         hljs.highlightAll(); 
     });
