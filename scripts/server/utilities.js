@@ -497,9 +497,7 @@ function blogHTML(post) {
                 <a id="title-${b.uid}" class="fakeAnchor h5 d-block" rel="prefetch" href="/blog/${b.uid}" swap-target="#main" swap-history="true">
                     ${b.name}
                 </a> ` : ``}                      
-            <main class="card-subtitle markdown ${b.name ? "hasTitle" : ""}">
-                ${b.content}
-            </main>      
+            <main class="card-subtitle markdown ${b.name ? "hasTitle" : ""} ${b.content.includes('<img') ? "hasImages" : ""}">${b.content}</main>      
         </article>
     `;
 }
