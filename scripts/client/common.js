@@ -875,10 +875,13 @@ function loadBlog() {
             let images = '';
             if(element.classList.contains('hasImages')) {
                 var doc = new DOMParser().parseFromString(html, "text/html");
-                doc.querySelectorAll('img').forEach(el => images += el.outerHTML);
+                doc.querySelectorAll('img').forEach(el => {
+                    images += el.outerHTML;
+                    el.remove();
+                });
                 images = `<div class="thumbnail_images">${images}<div>`;
             }
-            element.innerHTML = html  + images;
+            element.innerHTML = doc.innerHTML + images;
         }
         hljs.highlightAll(); 
     });
