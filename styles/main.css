@@ -6852,6 +6852,7 @@ article footer {
 #destinationsSwitch {
     position: fixed;
     bottom: 4px;
+    top: unset;
     z-index: 201;
     left: 35px;
     max-width: 250px;
@@ -6871,6 +6872,10 @@ article footer {
 }
 
 @media (min-width: 960px) {
+  #destinationsSwitch {
+    bottom: unset;
+    top: 10px;
+}
   .bottom-menu {
     bottom: unset !important;
     top: 100% !important;
