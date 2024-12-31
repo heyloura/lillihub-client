@@ -884,10 +884,13 @@ Deno.serve(async (req) => {
                     fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=${category ? '5000' : '25'}${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const results = await fetching.json();
 
+                    fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const categories = await fetching.json();
+
                     content = `${utility.blogHeader('blog')}
                         <div id="blog" class="mt-2">
                             <div>
-                                <pre>${JSON.stringify(results.items, null, 2)}</pre>
+                                ${getBlogHTML(results.items, config, mpDestination, categories)}
                             </div>
                         </div>`;
                 }

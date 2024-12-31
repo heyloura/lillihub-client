@@ -474,6 +474,57 @@ export async function getEditor(repliers, username, mbToken, destination) {
     `;
 }
 
+function flattenedBlogPost(post) {
+    return {
+        type: post && post.type ? post.type : '',
+        uid: post && post.properties && post.properties.uid && post.properties.uid[0] ? post.properties.uid[0] : '',
+        name: post && post.properties && post.properties.name && post.properties.name[0] ? post.properties.name[0] : '',
+        content: post && post.properties && post.properties.content && post.properties.content[0] ? post.properties.content[0] : '',
+        published: post && post.properties && post.properties.published && post.properties.published[0] ? post.properties.published[0] : '',
+        status: post && post.properties && post.properties["post-status"] && post.properties["post-status"][0] ? post.properties["post-status"][0] : '',
+        url: post && post.properties && post.properties.url && post.properties.url[0] ? post.properties.url[0] : '',
+        category: post && post.properties && post.properties.category ? post.properties.category : [],
+    };
+}
+
+function blogHTML(post) {
+    const b = flattenedBlogPost(post);
+    return `
+            <article class="blogPost bordered p-2" 
+                data-id="${b.uid}" 
+                data-url="${b.url}" 
+                data-published="${b.published}" >               
+                <a id="blog-${b.uid}" class="fakeAnchor d-block" rel="prefetch" href="/blog/${b.uid}" swap-target="#main" swap-history="true">
+                    ${b.url}
+                </a>
+                <main class="hide">
+                    ${b.content}
+                </main>
+            </article>
+    `;
+}
+
+export function getBlogHTML(posts, config, mpDestination, categories) {
+    return `
+    <div>
+        ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
+        <div class="form-group">
+            <label class="form-label">Search your blog</label>
+            <input data-element="article" list="categories" id="search" type="text" class="form-input search" placeholder="...">
+            <datalist id="categories">
+                ${categories.categories ? categories.categories.map(item => {
+                    return `<option value="${item}">${item}</option>`;
+                }).join('') : '';}
+            </datalist>
+        </div>
+        ${categories.categories ? categories.categories.sort().map((item) =>
+            `<span class="chip ${item}Link"><a class="${item}" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?category=${item}">${item} ${item}</a></span>`
+        ).join('') : ''} 
+        ${posts.map((p) => `${blogHTML(p)}`).join('')}
+    </div>
+    `;
+}
+
 export function getNotebookHTML(notes, notebookId) {
     return `
     <div>
