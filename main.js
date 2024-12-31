@@ -574,7 +574,7 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // All other pages
             // -----------------------------------------------------
-            const pages = ["notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies"]
+            const pages = ["notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies", "blog", "draft", "media", "collections", "webmentions"]
             if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
                 const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
@@ -863,33 +863,21 @@ Deno.serve(async (req) => {
                         </div>
                         <table class="table table-striped">${users}</table>
                     </div>`;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    //fetching = await fetch(`https://micro.blog/posts/replies${id != "replies" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    //const posts = await fetching.json();
-                    // content = `${utility.timelineHeader('replies')}
-                    //     <div id="replies" class="mt-2">
-                    //         <div>
-                    //             ${posts.items.map(n => utility.postHTML(n)).join('')}
-                    //             <p class="text-center m-2 p-2"><a rel="prefetch" swap-target="#main" swap-history="true" href="/replies/${posts.items[posts.items.length -1].id}">Load More</a></p>
-                    //         </div>
-                    //     </div>`;
+                } else if(req.url.includes("blog")) {
+                    //----------
+                    //  Following
+                    //----------
+                    id = name;
+                    name = "blog";
+                    content = `${utility.blogHeader('blog')}
+                        <div id="blog" class="mt-2">
+                            <div>
+                                Hello World
+                            </div>
+                        </div>`;
                 }
+
+                //blog
 
                 
                 const searchParams = new URLSearchParams(req.url.split('?')[1]);

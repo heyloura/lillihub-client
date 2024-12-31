@@ -228,23 +228,45 @@ export function discoverHTML(posts, tagmoji, id) {
     `;
 }
 
+export function blogHeader(active) {
+    return `
+        <ul class="tab tab-block footerBar">
+            <li class="tab-item ${active == 'blog' ? 'active' : ''} text-blue">
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/blog"><i class="icon icon-share"></i> Blog</a>
+            </li>
+            <li class="tab-item ${active == 'draft' ? 'active' : ''} text-blue">
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/drafts"><i class="icon icon-edit"></i> Drafts</a>
+            </li>
+            <li class="tab-item ${active == 'media' ? 'active' : ''} text-blue">
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/media"><i class="icon icon-photo"></i> Media</a>
+            </li>
+            <li class="tab-item ${active == 'collections' ? 'active' : ''} text-blue">
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/collections"><i class="icon icon-link"></i> Collections</a>
+            </li>
+            <li class="tab-item ${active == 'webmentions' ? 'active' : ''} text-blue">
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/webmentions"><i class="icon icon-message"></i> Webmentions</a>
+            </li>
+        </ul>
+    `;
+}
+
 export function timelineHeader(active) {
     return `
         <ul class="tab tab-block footerBar">
             <li class="tab-item ${active == 'timeline' ? 'active' : ''} text-yellow">
-                <a rel="prefetch" swap-target="#main" swap-history="true" id="timelineLink" href="/timeline"><i class="icon icon-time"></i> Timeline</a>
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline"><i class="icon icon-time"></i> Timeline</a>
             </li>
             <li class="tab-item ${active == 'discover' ? 'active' : ''} text-yellow">
-                <a rel="prefetch" swap-target="#main" swap-history="true" id="discoverLink" href="/discover"><i class="icon icon-search"></i> Discover</a>
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/discover"><i class="icon icon-search"></i> Discover</a>
             </li>
             <li class="tab-item ${active == 'mentions' ? 'active' : ''} text-yellow">
-                <a rel="prefetch" swap-target="#main" swap-history="true" id="mentionsLink" href="/mentions"><i class="icon icon-mail"></i> Mentions</a>
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/mentions"><i class="icon icon-mail"></i> Mentions</a>
             </li>
             <li class="tab-item ${active == 'replies' ? 'active' : ''} text-yellow">
-                <a rel="prefetch" swap-target="#main" swap-history="true" id="repliesLink" href="/replies"><i class="icon icon-message"></i> Replies</a>
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/replies"><i class="icon icon-message"></i> Replies</a>
             </li>
             <li class="tab-item ${active == 'following' ? 'active' : ''} text-yellow">
-                <a rel="prefetch" swap-target="#main" swap-history="true" id="followingLink" href="/following"><i class="icon icon-people"></i> Following</a>
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/following"><i class="icon icon-people"></i> Following</a>
             </li>
         </ul>
     `;
