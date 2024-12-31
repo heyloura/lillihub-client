@@ -6843,7 +6843,14 @@ article footer {
   bottom: 0;
 }
 
+.bottom-menu {
+  bottom: 100% !important;
+}
+
 @media (min-width: 960px) {
+  .bottom-menu {
+    top: 100% !important;
+  }
   #post-list {
     margin-top: 35px;
     margin-bottom: 30px;
