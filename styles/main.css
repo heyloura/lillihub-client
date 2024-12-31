@@ -6814,7 +6814,7 @@ article footer {
 
 .footerBar {
   position: fixed;
-  top: 48px;
+  top: 0;
   left: 0;
   right: 0;
   height: 50px;
@@ -6839,6 +6839,10 @@ article footer {
   margin-bottom: 60px;
 }
 
+#header {
+  bottom: 0;
+}
+
 @media (min-width: 960px) {
   #post-list {
     margin-top: 35px;
@@ -6855,6 +6859,9 @@ article footer {
   }
   .footerBar .tab-item i {
     display: inline-block;
+  }
+  #header {
+    top: 0;
   }
 }
 
