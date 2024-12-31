@@ -6845,7 +6845,7 @@ article footer {
 }
 
 .bottom-menu {
-  top: unset !important;
+  /* top: unset !important; */
   bottom: 100% !important;
 }
 
