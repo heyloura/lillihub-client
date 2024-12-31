@@ -871,8 +871,8 @@ function loadBlog() {
             }
             element.innerHTML = strip(html).substring(0,600) + '...' + images;
         } else {
-            var doc = new DOMParser().parseFromString(html, "text/html");
             const html = converter.makeHtml(element.innerHTML);
+            var doc = new DOMParser().parseFromString(html, "text/html");
             let images = '';
             if(element.classList.contains('hasImages')) {
                 
