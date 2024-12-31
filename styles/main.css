@@ -5399,7 +5399,7 @@ a.text-error:visited {
   display: -ms-flexbox;
   display: flex;
   position: relative;
-  background-color: var(--background-tint-4);
+  background-color: var(--background-tint-2);
 }
 
 .timeline .timeline-item:last-child {
@@ -5424,8 +5424,7 @@ a.text-error:visited {
 .timeline .timeline-item .timeline-content {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
-  background-color: var(--background-tint-4);
-  /* padding: 2px 0 2px .8rem */
+  background-color: var(--background-tint-2);
 }
 
 .timeline .timeline-item .timeline-icon {
@@ -6814,15 +6813,15 @@ article footer {
 
 .footerBar {
   position: fixed;
-    /* bottom: 0; */
-    left: 0;
-    right: 0;
-    height: 50px;
-    margin: 0;
-    z-index: 2;
-    border-top: 1px solid var(--background-tint-4);
-    margin-bottom: 3px;
-    background-color: var(--background-tint-2);
+  top: 48px;
+  left: 0;
+  right: 0;
+  height: 50px;
+  margin: 0;
+  z-index: 2;
+  border-top: 1px solid var(--background-tint-4);
+  margin-bottom: 3px;
+  background-color: var(--background-tint-2);
 }
 
 .footerBar .tab-item {
@@ -6846,7 +6845,7 @@ article footer {
   }
   .footerBar { 
     position: fixed;
-    top: 0;
+    top: -1px;
     z-index: 202;
     max-width: 720px;
     width: 720px;

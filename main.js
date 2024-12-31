@@ -12,8 +12,6 @@ const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
 const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
 const _development = true;
 
-
-
 Deno.serve(async (req) => { 
     if(_development) {
         console.log(req.url);

@@ -313,8 +313,6 @@ function loadParent() {
                 if(ids.has(element.getAttribute('data-id')) && element.getAttribute('data-id') != parentArticle.getAttribute('data-id')) {
                     element.classList.remove('parent');
                     children.add(element);
-                } else {
-                    
                 }
             });
             
@@ -327,8 +325,6 @@ function loadParent() {
                 });
                 parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
             }
-
-            //console.log(children);
 
             if(parent && parentArticle && child) {
                 const moveTo = parentArticle.querySelector('.postBtns .btn-group');
@@ -401,8 +397,6 @@ function loadParent() {
         });
         buildMasonry();
     });
-
-    //convoBtn
 }
 
 /************************************************************
@@ -1312,6 +1306,19 @@ document.addEventListener("click", async (item) => {
     }
     if(item.target.classList.contains('closeConversationModal')) {
         document.getElementById('conversationModal').classList.remove("active");
+    }
+    if(item.target.classList.contains('convoBtn')) {
+        const id = item.target.getAttribute('data-id');
+        document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`);
+        fetch("/api/timeline/parent/" + id, { method: "get" })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('conversationContent').innerHTML = data;           
+            })
+            .finally(() => {
+                loadConversation();
+                document.getElementById('loader').remove();
+            });   
     }
     if(item.target.classList.contains('savePost')) {
         item.preventDefault();
