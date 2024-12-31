@@ -6846,7 +6846,7 @@ article footer {
 
 .bottom-menu {
   /* top: unset !important; */
-  bottom: 100% !important;
+  bottom: 100%;
 }
 
 #destinationsSwitch {
@@ -6878,7 +6878,7 @@ article footer {
 }
   .bottom-menu {
     /* bottom: unset !important; */
-    top: 100% !important;
+    top: 100%;
   }
   #post-list {
     margin-top: 35px;
