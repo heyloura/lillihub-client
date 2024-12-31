@@ -871,10 +871,11 @@ function loadBlog() {
             }
             element.innerHTML = strip(html).substring(0,600) + '...' + images;
         } else {
+            var doc = new DOMParser().parseFromString(html, "text/html");
             const html = converter.makeHtml(element.innerHTML);
             let images = '';
             if(element.classList.contains('hasImages')) {
-                var doc = new DOMParser().parseFromString(html, "text/html");
+                
                 doc.querySelectorAll('img').forEach(el => {
                     images += el.outerHTML;
                     el.remove();
