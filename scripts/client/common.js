@@ -864,7 +864,7 @@ function loadBlog() {
         if(element.classList.contains('hasTitle')) {
             const html = converter.makeHtml(element.innerHTML);
             const images = '';
-            if(element.classList.contains('hasImage')) {
+            if(element.classList.contains('hasImages')) {
                 var doc = new DOMParser().parseFromString(html, "text/html");
                 doc.querySelectorAll('img').forEach(el => console.log(el));
                 console.log()
