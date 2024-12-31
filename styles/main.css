@@ -6849,6 +6849,14 @@ article footer {
   bottom: 100% !important;
 }
 
+#destinationsSwitch {
+    position: fixed;
+    bottom: 4px;
+    z-index: 201;
+    left: 35px;
+    max-width: 250px;
+}
+
 @media (min-width: 960px) {
   .bottom-menu {
     bottom: unset !important;
@@ -6874,6 +6882,13 @@ article footer {
     top: 0;
     bottom: unset;
   }
+  #destinationsSwitch {
+    position: fixed;
+    bottom: 4px;
+    z-index: 201;
+    left: 35px;
+    max-width: 250px;
+}
 }
 
 .underlined {
