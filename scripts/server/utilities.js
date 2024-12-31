@@ -346,6 +346,24 @@ async function getNoteEditor(notebookId, n) {
     `;
 }
 
+export function getBogSelect(config, mpDestination, id) {
+    const destinations = config.destination ? config.destination.map(item => {
+        if(item.uid != mpDestination) {
+            return `<li class="menu-item"><a class="changeDestination" href="?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
+        }
+    }).join('') : '';
+
+    return `<div id="${id}" class="dropdown">
+                    <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
+                        <span id="postingName">${config.destination.filter(d => d.uid == mpDestination)[0].name}</span> <i class="icon icon-caret"></i>
+                    </button>
+                    <ul id="destinationSelectMenu" class="menu bg-dark">
+                        ${destinations}
+                    </ul>
+                    <input name="destination" type="hidden" value="${mpDestination}"> 
+                </div>`;
+}
+
 export async function getEditor(repliers, username, mbToken, destination) {
     let destinations = '';
     let syndicates = '';
@@ -358,21 +376,8 @@ export async function getEditor(repliers, username, mbToken, destination) {
     
         const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
         mpDestination = destination ? destination : defaultDestination;
-        destinations = config.destination ? config.destination.map(item => {
-            if(item.uid != mpDestination) {
-                return `<li class="menu-item"><a class="changeDestination" href="?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
-            }
-        }).join('') : '';
 
-        destinations = `<div id="destinationDropdown" class="dropdown">
-                        <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
-                            <span id="postingName">${config.destination.filter(d => d.uid == mpDestination)[0].name}</span> <i class="icon icon-caret"></i>
-                        </button>
-                        <ul id="destinationSelectMenu" class="menu bg-dark">
-                            ${destinations}
-                        </ul>
-                        <input name="destination" type="hidden" value="${mpDestination}"> 
-                    </div>`;
+        destinations = getBogSelect(config, mpDestination, 'destinationDropdown');
     
         fetching = await fetch(`https://micro.blog/micropub?q=syndicate-to&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
         const syndicate = await fetching.json();

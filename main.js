@@ -581,8 +581,8 @@ Deno.serve(async (req) => {
                 let name = parts[parts.length - 1].split('?')[0];
                 let id = null;
                 let content = '';
-
-                console.log(req.headers.get("swap-target"));
+                const searchParams = new URLSearchParams(req.url.split('?')[1]);
+                const destination = searchParams.get('destination');
 
                 // following
                 let fetching = await fetch(`https://micro.blog/users/following/${mbUser.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -869,6 +869,13 @@ Deno.serve(async (req) => {
                     //----------
                     id = name;
                     name = "blog";
+
+                    let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const config = await fetching.json();
+                
+                    const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
+                    mpDestination = destination ? destination : defaultDestination;
+
                     content = `${utility.blogHeader('blog')}
                         <div id="blog" class="mt-2">
                             <div>
@@ -880,8 +887,7 @@ Deno.serve(async (req) => {
                 //blog
 
                 
-                const searchParams = new URLSearchParams(req.url.split('?')[1]);
-                const destination = searchParams.get('destination');
+                
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
                     .replaceAll('{{pages}}', content)
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')

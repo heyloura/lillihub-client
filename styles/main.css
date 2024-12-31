@@ -6840,6 +6840,7 @@ article footer {
 }
 
 #header {
+  top: unset;
   bottom: 0;
 }
 
@@ -6869,6 +6870,7 @@ article footer {
   }
   #header {
     top: 0;
+    bottom: unset;
   }
 }
 
