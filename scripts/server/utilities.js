@@ -498,7 +498,7 @@ function blogHTML(post) {
                     ${b.name}
                 </a> ` : ``}                      
             <main class="card-subtitle p-0 pt-2 pb-2 markdown ${b.name ? "hasTitle" : ""} ${b.content.includes('<img') ? "hasImages" : ""}">${b.content}</main>
-            <div class="card-footer pl-0"><a target="_blank" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' })).split(',')[0]}</a>
+            <div class="card-footer pl-0"><a target="_blank" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' }))}</a>
             ${b.category ? b.category.sort().map((item) =>
                 `#${item} `
             ).join('') : ''}</div>      
