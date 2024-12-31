@@ -131,11 +131,6 @@ function handleConnection(load, offline) {
 window.addEventListener('online', handleConnection(function(){},function(){}));
 window.addEventListener('offline', handleConnection(function(){},function(){}));
 
-// function clearActiveMenuStyle() {
-//     document.querySelectorAll('.menu-item > a').forEach(element => {
-//         element.classList.remove('active');
-//     });
-// }
 function strip(html){
     let doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || "";
@@ -867,7 +862,14 @@ function loadBlog() {
     document.getElementById('destinationsSwitchMenu').classList.add('bottom-menu');
     document.querySelectorAll('.markdown').forEach(async (element) => {
         if(element.classList.contains('hasTitle')) {
-            element.innerHTML = strip(converter.makeHtml(element.innerHTML)).substring(0,600) + '...';
+            const html = converter.makeHtml(element.innerHTML);
+            const images = '';
+            if(element.classList.contains('hasImage')) {
+                var doc = new DOMParser().parseFromString(html, "text/html");
+                doc.querySelectorAll('img').forEach(el => console.log(el));
+                console.log()
+            }
+            element.innerHTML = strip(html).substring(0,600) + '...' + images;
         } else {
             element.innerHTML = converter.makeHtml(element.innerHTML);
         }
