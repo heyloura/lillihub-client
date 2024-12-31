@@ -6860,12 +6860,13 @@ article footer {
 .thumbnail_images {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: left;
 }
 
 .thumbnail_images img {
   flex-shrink: 0;
-  margin: 10px;
+  margin: 0.5em;
+  max-height: 80px;
   height: 80px;
 }
 
