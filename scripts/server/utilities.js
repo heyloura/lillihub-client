@@ -497,9 +497,7 @@ function blogHTML(post) {
                 <a id="blog-${b.uid}" class="fakeAnchor d-block" rel="prefetch" href="/blog/${b.uid}" swap-target="#main" swap-history="true">
                     ${b.url}
                 </a>
-                <main class="markdown">
-                    ${b.content}
-                </main>
+                <main class="markdown">${b.content}</main>
             </article>
     `;
 }
