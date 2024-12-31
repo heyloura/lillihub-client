@@ -865,7 +865,11 @@ Swap.loaders['#following'] = () => {
 function loadBlog() {
     document.title = "Lillihub: Blog";
     document.querySelectorAll('.markdown').forEach(async (element) => {
-        element.innerHTML = converter.makeHtml(element.innerHTML);
+        if(element.classList.contains('hasTitle')) {
+            element.innerHTML = strip(converter.makeHtml(element.innerHTML)).substring(0,600) + '...';
+        } else {
+            element.innerHTML = converter.makeHtml(element.innerHTML);
+        }
         hljs.highlightAll(); 
     });
 }

@@ -489,16 +489,18 @@ function flattenedBlogPost(post) {
 
 function blogHTML(post) {
     const b = flattenedBlogPost(post);
-    return `<details class="accordion" ${!b.name ? "open" : ""}>
-                <summary class="accordion-header"
-                    data-id="${b.uid}" 
-                    data-url="${b.url}" 
-                    data-published="${b.published}" >       
-                    <i class="icon icon-arrow-right mr-1"></i>        
-                    ${!b.name ? b.url : b.name}
-                </summary>
-                <main class="markdown">${b.content}</main>
-            </details>
+    return `<article class="bookmark card p-2 mb-2" 
+            data-uid="${b.uid}"  
+            data-url="${b.url}"
+            data-published="${b.published}">    
+            ${b.name ? `
+                <a id="title-${b.uid}" class="fakeAnchor h5 d-block" rel="prefetch" href="/blog/${b.uid}" swap-target="#main" swap-history="true">
+                    ${b.name}
+                </a> ` : ``}                      
+            <main class="card-subtitle markdown ${b.name ? "hasTitle" : ""}">
+                ${b.content}
+            </main>      
+        </article>
     `;
 }
 
@@ -508,12 +510,7 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
         ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
         <div class="form-group">
             <label class="form-label">Search your blog</label>
-            <input data-element="article" list="categories" id="search" type="text" class="form-input search" placeholder="...">
-            <datalist id="categories">
-                ${categories.categories ? categories.categories.map(item => {
-                    return `<option value="${item}">${item}</option>`;
-                }).join('') : ''}
-            </datalist>
+            <input data-element="article" list="categories" type="text" class="form-input">
         </div>
         ${categories.categories ? categories.categories.sort().map((item) =>
             `<span class="chip ${item}Link"><a class="${item}" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?category=${item}">${item}</a></span>`
