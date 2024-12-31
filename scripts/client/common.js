@@ -1369,10 +1369,9 @@ document.addEventListener("click", async (item) => {
         let author = item.target.getAttribute('data-name');
         item.preventDefault();
         loadEditor();
-        document.getElementById('content').innerHTML = `
-            <blockquote cite="${url}"><div>${document.getElementById(`main-${id}`).innerHTML}</div>
-            <footer>- ${author}, <cite><a href="${url}" class="u-in-reply-to">${url}</a></cite></footer></blockquote>
-        `;        
+        document.getElementById('content').innerHTML = 
+`<blockquote cite="${url}"><div>${document.getElementById(`main-${id}`).innerHTML}</div>
+<footer>- ${author}, <cite><a href="${url}" class="u-in-reply-to">${url}</a></cite></footer></blockquote>`;        
         document.getElementById('content').dispatchEvent(new Event("input"))
         growTextArea(document.getElementById('content'));
     }
