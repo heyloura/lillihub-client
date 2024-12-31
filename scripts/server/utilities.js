@@ -514,7 +514,7 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
             <datalist id="categories">
                 ${categories.categories ? categories.categories.map(item => {
                     return `<option value="${item}">${item}</option>`;
-                }).join('') : '';}
+                }).join('') : ''}
             </datalist>
         </div>
         ${categories.categories ? categories.categories.sort().map((item) =>
