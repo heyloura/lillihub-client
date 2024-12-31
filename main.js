@@ -878,7 +878,7 @@ Deno.serve(async (req) => {
                     const config = await fetching.json();
                 
                     const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
-                    mpDestination = destination ? destination : defaultDestination;
+                    const mpDestination = destination ? destination : defaultDestination;
 
                     //https://micro.blog/micropub?q=source&filter=daughter&limit=3&offset=2
                     fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=${category ? '5000' : '25'}${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
