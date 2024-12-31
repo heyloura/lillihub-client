@@ -6845,11 +6845,13 @@ article footer {
 }
 
 .bottom-menu {
+  top: unset !important;
   bottom: 100% !important;
 }
 
 @media (min-width: 960px) {
   .bottom-menu {
+    bottom: unset !important;
     top: 100% !important;
   }
   #post-list {
