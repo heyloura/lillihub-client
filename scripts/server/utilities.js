@@ -494,14 +494,25 @@ function blogHTML(post) {
             data-url="${b.url}"
             data-published="${b.published}">    
             ${b.name ? `
-                <a id="title-${b.uid}" class="fakeAnchor h5 d-block" rel="prefetch" href="/blog/${b.uid}" swap-target="#main" swap-history="true">
+                <span id="title-${b.uid}" class="fakeAnchor h5 d-block">
                     ${b.name}
-                </a> ` : ``}                      
+                </span> ` : ``}                      
             <main class="card-subtitle p-0 pt-2 pb-2 markdown ${b.name ? "hasTitle" : ""} ${b.content.includes('<img') || b.content.includes('![') ? "hasImages" : ""}">${b.content}</main>
-            <div class="card-footer pl-0"><a target="_blank" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' }))}</a>
-            ${b.category ? b.category.sort().map((item) =>
-                `#${item} `
-            ).join('') : ''}</div>      
+            <div class="card-footer pl-0">
+                <a target="_blank" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' }))}</a>
+                ${b.category ? b.category.sort().map((item) =>
+                    `#${item} `
+                ).join('') : ''}
+                <div class="dropdown">
+                    <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
+                        <i class="icon icon-caret"></i>
+                    </button>
+                    <ul class="menu bg-dark">
+                        <li class="menu-item"><a rel="prefetch" href="/blog/${b.uid}" swap-target="#main" class="btn btn-link">Edit Post</a></li>
+                        <li class="menu-item"><button data-id="53854842" type="button" class="btn btn-link previewBlogPost">Preview Post</button></li>
+                    </ul>
+                </div>
+            </div>      
         </article>
     `;
 }
