@@ -31,7 +31,7 @@ export function settingsHTML() {
 
             </div>
         </div>
-        <div class="card mb-2">
+        <!--<div class="card mb-2">
             <div class="card-body">
                 <div id="posting">
                     <h2>Discovery Options</h2>
@@ -58,7 +58,7 @@ export function settingsHTML() {
                 </div>
 
             </div>
-        </div>
+        </div>-->
         <div class="card mb-2">
             <div class="card-body">
                 <div id="private-notes">
@@ -214,20 +214,7 @@ export function discoverHTML(posts, tagmoji, id) {
                             <button class="btn btn-primary input-group-btn searchPost"><i class="icon icon-search searchPost"></i></button>
                         </div>
                     </div>-->
-                    <div class="show-lg">
-                        <details class="accordion">
-                            <summary class="accordion-header">
-                                <i class="icon icon-arrow-right mr-1"></i>
-                                Tagmoji
-                            </summary>
-                            <div class="accordion-body">
-                                ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
-                                    `<span class="chip ${item.name}Link"><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
-                                ).join('')}                            
-                            </div>
-                        </details>
-                    </div>
-                    <div class="hide-lg">
+                    <div>
                         ${tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>
                             `<span class="chip ${item.name}Link"><a class="${item.name}LinkAnchor" rel="prefetch" swap-target="#main" swap-history="true" href="/discover/${item.name}">${item.emoji} ${item.title}</a></span>`
                         ).join('')}  
