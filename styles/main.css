@@ -6877,7 +6877,7 @@ article footer {
     top: 10px;
 }
   .bottom-menu {
-    bottom: unset !important;
+    /* bottom: unset !important; */
     top: 100% !important;
   }
   #post-list {
