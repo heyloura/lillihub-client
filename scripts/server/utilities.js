@@ -497,7 +497,7 @@ function blogHTML(post) {
                 <a id="blog-${b.uid}" class="fakeAnchor d-block" rel="prefetch" href="/blog/${b.uid}" swap-target="#main" swap-history="true">
                     ${b.url}
                 </a>
-                <main class="hide">
+                <main class="markdown">
                     ${b.content}
                 </main>
             </article>
@@ -518,7 +518,7 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
             </datalist>
         </div>
         ${categories.categories ? categories.categories.sort().map((item) =>
-            `<span class="chip ${item}Link"><a class="${item}" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?category=${item}">${item} ${item}</a></span>`
+            `<span class="chip ${item}Link"><a class="${item}" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?category=${item}">${item}</a></span>`
         ).join('') : ''} 
         ${posts.map((p) => `${blogHTML(p)}`).join('')}
     </div>
