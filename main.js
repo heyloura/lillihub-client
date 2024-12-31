@@ -890,7 +890,7 @@ Deno.serve(async (req) => {
                     content = `${utility.blogHeader('blog')}
                         <div id="blog" class="mt-2">
                             <div>
-                                ${utility.getBlogHTML(results.items, config, mpDestination, categories)}
+                                ${utility.getBlogHTML(results.items.filter(p => p.properties["post-status"][0] == 'published'), config, mpDestination, categories)}
                             </div>
                         </div>`;
                 }
