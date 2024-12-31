@@ -232,7 +232,7 @@ export function blogHeader(active) {
     return `
         <ul class="tab tab-block footerBar">
             <li class="tab-item ${active == 'blog' ? 'active' : ''} text-blue">
-                <a rel="prefetch" swap-target="#main" swap-history="true" href="/blog"><i class="icon icon-share"></i> Blog</a>
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/blog"><i class="icon icon-emoji"></i> Blog</a>
             </li>
             <li class="tab-item ${active == 'draft' ? 'active' : ''} text-blue">
                 <a rel="prefetch" swap-target="#main" swap-history="true" href="/drafts"><i class="icon icon-edit"></i> Drafts</a>
@@ -240,11 +240,8 @@ export function blogHeader(active) {
             <li class="tab-item ${active == 'media' ? 'active' : ''} text-blue">
                 <a rel="prefetch" swap-target="#main" swap-history="true" href="/media"><i class="icon icon-photo"></i> Media</a>
             </li>
-            <li class="tab-item ${active == 'collections' ? 'active' : ''} text-blue">
-                <a rel="prefetch" swap-target="#main" swap-history="true" href="/collections"><i class="icon icon-link"></i> Collections</a>
-            </li>
             <li class="tab-item ${active == 'webmentions' ? 'active' : ''} text-blue">
-                <a rel="prefetch" swap-target="#main" swap-history="true" href="/webmentions"><i class="icon icon-message"></i> Webmentions</a>
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/webmentions"><i class="icon icon-share"></i> Mentions</a>
             </li>
         </ul>
     `;
