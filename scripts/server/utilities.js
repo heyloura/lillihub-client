@@ -489,16 +489,16 @@ function flattenedBlogPost(post) {
 
 function blogHTML(post) {
     const b = flattenedBlogPost(post);
-    return `
-            <article class="blogPost bordered p-2" 
-                data-id="${b.uid}" 
-                data-url="${b.url}" 
-                data-published="${b.published}" >               
-                <a id="blog-${b.uid}" class="fakeAnchor d-block" rel="prefetch" href="/blog/${b.uid}" swap-target="#main" swap-history="true">
+    return `<details class="accordion" ${b.name ? "open" : ""}>
+                <summary class="accordion-header"> 
+                    data-id="${b.uid}" 
+                    data-url="${b.url}" 
+                    data-published="${b.published}" >       
+                    <i class="icon icon-arrow-right mr-1"></i>        
                     ${b.url}
-                </a>
+                </summary>
                 <main class="markdown">${b.content}</main>
-            </article>
+            </details>
     `;
 }
 
