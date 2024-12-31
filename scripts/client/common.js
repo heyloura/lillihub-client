@@ -863,46 +863,10 @@ Swap.loaders['#following'] = () => {
 }
 
 function loadBlog() {
-    // page set up
     document.title = "Lillihub: Blog";
-
-    // // page actons and edit action
-    // document.getElementById('pageActionsBtn').classList.remove('hide');
-    // document.getElementById('actionIcon').classList.remove('icon-plus');
-    // document.getElementById('actionIcon').classList.add('icon-edit');
-    // const parts = window.location.pathname.split('/');
-    // const id = parts[2];
-    // // if(document.querySelector(`.notebook-${id}`)) {
-    // //     document.querySelector(`.notebook-${id}`).classList.add("active");
-    // // }
-
-    // //set up editor
-    // document.getElementById('topBarBtns').classList.add('hide');
-    // document.getElementById('postName').classList.add('hide');
-    // document.getElementById('postStatus').classList.add('hide');
-    // document.getElementById('editor-action').classList.add('saveNote');
-    // document.getElementById('editor-action').innerHTML = 'Save';
-    
-    // decrypt and show
     document.querySelectorAll('.markdown').forEach(async (element) => {
         element.innerHTML = converter.makeHtml(element.innerHTML);
-        // const metadata = converter.getMetadata();
-        // const metaDef = objectToTableRows(metadata);
-        // if(metadata && metadata.background) {
-        //     document.querySelector(`.card-body`).style.background = metadata.background;
-        // }
-        // if(metadata && metadata.color) {
-        //     document.querySelector(`.card-body`).style.setProperty('color', metadata.color, 'important');
-        // }
-        // let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
-        // document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
-        // document.getElementById("titleBar").innerHTML = metadata && metadata.title ? metadata.title.length > 25 ? metadata.title.substring(0,25) + '...' : metadata.title : strip(html).substring(0,25) + '...';
-        // document.getElementById(`metadata-${noteId}`).insertAdjacentHTML('afterbegin', metaDef);
-        // document.getElementById('content').innerHTML = markdown;
-        // document.getElementById('preview').innerHTML = html;
-        // growTextArea(document.getElementById('content'));
-        // document.getElementById('content').dispatchEvent(new Event("input"))
-        // hljs.highlightAll();
+        hljs.highlightAll(); 
     });
 }
 
