@@ -1173,6 +1173,7 @@ document.addEventListener("click", async (item) => {
         let id = item.target.getAttribute('id') === 'editor-preview-btn' ? null : item.target.getAttribute('id').split('-')[0];
 
         document.getElementById('previewContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').value);
+        document.getElementById('previewModal').style.zIndex = "401";
         document.getElementById('previewModal').classList.add("active");
     }
     if(item.target.classList.contains('replyBtn')){
