@@ -6861,6 +6861,10 @@ article footer {
   text-decoration: underline;
 }
 
+.mini_thumbnail {
+  display: inline-block;
+}
+
 /* Dracula Theme v1.2.5
  *
  * https://github.com/dracula/highlightjs
