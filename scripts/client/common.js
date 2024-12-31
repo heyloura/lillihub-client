@@ -164,7 +164,7 @@ function loadEditor(type) {
         document.getElementById('modalTitle').innerHTML = 'New Note';
         document.getElementById('postName').classList.add('hide');
         document.getElementById('postStatus').classList.add('hide');
-        document.getElementById('editor-preview-btn').classList.add('hide');
+        //document.getElementById('editor-preview-btn').classList.add('hide');
         document.getElementById('editor-action').classList.add('saveNote');
         document.getElementById('editor-action').innerHTML = 'Save';
     } else {
@@ -173,7 +173,7 @@ function loadEditor(type) {
         fragment.appendChild(document.getElementById('topBarBtns'));
         document.getElementById('modalTitle').appendChild(fragment);
         document.getElementById('editor-action').classList.add('savePost');
-        document.getElementById('editor-preview-btn').classList.add('hide');
+        //document.getElementById('editor-preview-btn').classList.add('hide');
         if(localStorage.getItem('post_setting'))
         {
             if(localStorage.getItem('post_setting') != 'none') {
@@ -246,7 +246,7 @@ function replyModal(name, id, avatar) {
     document.getElementById('modalTitle').innerHTML = 'Reply';
     document.getElementById('modal').style.zIndex = "401";
     document.getElementById('modal').classList.add("active");
-    document.getElementById('editor-preview-btn').classList.add('hide');
+    //document.getElementById('editor-preview-btn').classList.add('hide');
 }
 
 function resetUI() {
@@ -1172,9 +1172,8 @@ document.addEventListener("click", async (item) => {
         // no parent element to worry about
         let id = item.target.getAttribute('id') === 'editor-preview-btn' ? null : item.target.getAttribute('id').split('-')[0];
 
-        document.getElementById('modalContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').value);
-        document.getElementById('modalTitle').innerHTML = 'Preview';
-        document.getElementById('modal').classList.add("active");
+        document.getElementById('previewContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').value);
+        document.getElementById('previewModal').classList.add("active");
     }
     if(item.target.classList.contains('replyBtn')){
         const name = item.target.getAttribute('data-name');
@@ -1292,6 +1291,9 @@ document.addEventListener("click", async (item) => {
     }
     if(item.target.classList.contains('closeConversationModal')) {
         document.getElementById('conversationModal').classList.remove("active");
+    }
+    if(item.target.classList.contains('closePreviewModal')) {
+        document.getElementById('previewModal').classList.remove("active");
     }
     if(item.target.classList.contains('convoBtn')) {
         const id = item.target.getAttribute('data-id');
