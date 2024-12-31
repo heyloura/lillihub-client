@@ -489,13 +489,13 @@ function flattenedBlogPost(post) {
 
 function blogHTML(post) {
     const b = flattenedBlogPost(post);
-    return `<details class="accordion" ${b.name ? "open" : ""}>
-                <summary class="accordion-header"> 
+    return `<details class="accordion" ${!b.name ? "open" : ""}>
+                <summary class="accordion-header"
                     data-id="${b.uid}" 
                     data-url="${b.url}" 
                     data-published="${b.published}" >       
                     <i class="icon icon-arrow-right mr-1"></i>        
-                    ${b.url}
+                    ${!b.name ? b.url : b.name}
                 </summary>
                 <main class="markdown">${b.content}</main>
             </details>
