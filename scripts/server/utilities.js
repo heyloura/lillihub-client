@@ -732,8 +732,8 @@ export function postHTML(post, stranger, isConvo, convoId) {
                             </button>
                             <ul class="menu bg-dark">
                                 <li class="menu-item"><a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" class="btn btn-link">View Post</a></li>
-                                <li class="menu-item"><button data-id="${post.id}" type="button" class="btn btn-link bookmarkPost">Bookmark Post</button></li>
-                                <li class="menu-item"><button data-url="${post.url}" type="button" class="btn btn-link quotePost">Quote Post</button></li>
+                                <li class="menu-item"><button data-url="${post.url}" type="button" class="btn btn-link bookmarkPost">Bookmark Post</button></li>
+                                <li class="menu-item"><button data-id="${post.id}" type="button" class="btn btn-link quotePost">Quote Post</button></li>
                             </ul>
                         </div>
                         <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>

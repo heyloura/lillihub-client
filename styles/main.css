@@ -3227,7 +3227,8 @@ summary.accordion-header::-webkit-details-marker {
   display: block;
   margin: 0 -.4rem;
   padding: .2rem .4rem;
-  text-decoration: none
+  text-decoration: none;
+  width: 100%;
 }
 
 .menu .menu-item>a:focus,.menu .menu-item>a:hover,.menu .menu-item>button:focus,.menu .menu-item>button:hover {

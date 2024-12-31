@@ -309,7 +309,6 @@ function loadParent() {
             var children = new Set();
 
             articles.forEach(element => {
-                //console.log(element);
                 if(ids.has(element.getAttribute('data-id')) && element.getAttribute('data-id') != parentArticle.getAttribute('data-id')) {
                     element.classList.remove('parent');
                     children.add(element);
@@ -335,18 +334,6 @@ function loadParent() {
                     e.preventDefault();
                 }
 
-                // const conversation = doc.querySelectorAll('article:not(:first-child)');
-                // const strangers = doc.querySelectorAll('article:not(:first-child)[data-stranger="true"]');
-                // if(conversation.length > 0) {
-                //     let text = `<span> ${conversation.length - 1} comments`;
-                //     if(strangers.length > 0) {
-                //         text = text + ' ('+strangers.length+' not following)';
-                //     }
-                //     if(btn && btn.parentNode && text) {
-                //         btn.insertAdjacentHTML('beforeend', text + '</span>');
-                //     }
-                // }
-
                 child.insertAdjacentHTML( 'beforebegin', `<div class="timeline">${parentArticle.outerHTML}${[...children].map(element => {
                     return `<div class="timeline-item child">
                                 <div class="timeline-left">
@@ -357,7 +344,6 @@ function loadParent() {
                                 </div>
                             </div>`
                 }).join('')}</div>`);
-                //parent.insertBefore(parentArticle, child);
                 child.remove();
             }
 
@@ -1361,6 +1347,21 @@ document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('clearToast')) {
         let id = item.target.getAttribute('data-id');
         document.getElementById('toast-' + id).classList.add("hide");
+    }
+    if(item.target.classList.contains('bookmarkPost')) {
+        let url = item.target.getAttribute('data-url');
+        item.preventDefault();
+        document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`);
+        let formData = new FormData();
+        formData.append("url", url);
+
+        fetch("/bookmark/new", { body: formData, method: "post" })
+            .then(response => response.json())
+            .then(data => {
+                alert(data);
+            }).finally(() => {
+                document.getElementById('loader').remove();
+            });
     }
 });
 

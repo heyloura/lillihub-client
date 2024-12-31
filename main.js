@@ -255,31 +255,7 @@ Deno.serve(async (req) => {
             //     return new Response(`<textarea rows="20">${JSON.stringify(allHighlights)}</textarea>`,HTMLHeaders(nonce));
             // }
 
-            // if(new URLPattern({ pathname: "/bookmarks/new" }).exec(req.url)) {
-            //     const value = await req.formData();
-            //     const url = value.get('url');
-        
-            //     const formBody = new URLSearchParams();
-            //     formBody.append("h", "entry");
-            //     formBody.append("bookmark-of", url);
-        
-            //     const posting = await fetch(`https://micro.blog/micropub`, {
-            //         method: "POST",
-            //         body: formBody.toString(),
-            //         headers: {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8","Authorization": "Bearer " + mbToken}
-            //     });
-            //     let message = 'bookmark added';
-            //     if (!posting.ok) {
-            //         message = await posting.text();
-            //         console.log(`${user.username} tried to add a bookmark ${url} and ${message}`);
-            //     }
-            //     return new Response(message, {
-            //         status: 200,
-            //         headers: {
-            //             "content-type": "text/html",
-            //         },
-            //     });
-            // }
+
 
 
 
@@ -475,7 +451,6 @@ Deno.serve(async (req) => {
             if(NOTEBOOKS_DELETE_ROUTE.exec(req.url) && user) {
                 const value = await req.formData();
                 const id = value.get('id');
-                console.log(id);
         
                 const form = new URLSearchParams();
                 form.append("id", id);
@@ -524,6 +499,35 @@ Deno.serve(async (req) => {
                 });    
             }
 
+            //--------------------------
+            // Bookmark something
+            //--------------------------
+            if(new URLPattern({ pathname: "/bookmarks/new" }).exec(req.url)) {
+                const value = await req.formData();
+                const url = value.get('url');
+        
+                const formBody = new URLSearchParams();
+                formBody.append("h", "entry");
+                formBody.append("bookmark-of", url);
+        
+                const posting = await fetch(`https://micro.blog/micropub`, {
+                    method: "POST",
+                    body: formBody.toString(),
+                    headers: {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8","Authorization": "Bearer " + mbToken}
+                });
+                let message = 'bookmark added';
+                if (!posting.ok) {
+                    message = await posting.text();
+                    console.log(`${user.username} tried to add a bookmark ${url} and ${message}`);
+                }
+                return new Response(message, {
+                    status: 200,
+                    headers: {
+                        "content-type": "text/html",
+                    },
+                });
+            }
+
 
             
             // -----------------------------------------------------
@@ -558,18 +562,6 @@ Deno.serve(async (req) => {
                     },
                 });
             }
-
-            // const GET_BOOKMARK_ROUTE = new URLPattern({ pathname: "/api/timeline/mark/:id" });
-            // if(MARK_TIMELINE_ROUTE.exec(req.url) && user) {
-            //     const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
-            //     const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
-            //     return new Response('Timeline marked', {
-            //         status: 200,
-            //         headers: {
-            //             "content-type": "text/html",
-            //         },
-            //     });
-            // }
 
             const GET_PARENT_ROUTE = new URLPattern({ pathname: "/api/timeline/parent/:id" });
             if(GET_PARENT_ROUTE.exec(req.url)) {
