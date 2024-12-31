@@ -866,12 +866,18 @@ function loadBlog() {
             const images = '';
             if(element.classList.contains('hasImages')) {
                 var doc = new DOMParser().parseFromString(html, "text/html");
-                doc.querySelectorAll('img').forEach(el => console.log(el));
-                console.log()
+                doc.querySelectorAll('img').forEach(el => images += el.outerHTML);
+                images = `<div class="thumbnail_images">${images}<div>`;
             }
             element.innerHTML = strip(html).substring(0,600) + '...' + images;
         } else {
-            element.innerHTML = converter.makeHtml(element.innerHTML);
+            const images = '';
+            if(element.classList.contains('hasImages')) {
+                var doc = new DOMParser().parseFromString(html, "text/html");
+                doc.querySelectorAll('img').forEach(el => images += el.outerHTML);
+                images = `<div class="thumbnail_images">${images}<div>`;
+            }
+            element.innerHTML = converter.makeHtml(element.innerHTML)  + images;
         }
         hljs.highlightAll(); 
     });
