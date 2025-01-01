@@ -882,7 +882,7 @@ Deno.serve(async (req) => {
 
                     if(id != 'blog') {
                         fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${encodeURIComponent(id)}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                        post = await fetching.json();
+                        const post = await fetching.json();
 
                         content = `${utility.blogHeader('blog')}
                             <div id="blog" class="mt-2">

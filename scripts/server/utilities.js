@@ -522,6 +522,7 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
     <div class="container grid-xl">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
                     <div class="form-group">
                         <label class="form-label">Search your blog</label>
                         <div class="input-group">
@@ -536,7 +537,7 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
                     </div>
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
+                    
                     ${posts.map((p) => `${blogHTML(p, mpDestination)}`).join('')}
                 </div>
             </div>
