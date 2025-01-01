@@ -880,19 +880,32 @@ Deno.serve(async (req) => {
                     const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
                     const mpDestination = destination ? destination : defaultDestination;
 
-                    //https://micro.blog/micropub?q=source&filter=daughter&limit=3&offset=2
-                    fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=${category ? '5000' : '25'}${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    const results = await fetching.json();
+                    if(id != 'blog') {
+                        fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${encodeURIComponent(id)}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        post = await fetching.json();
 
-                    fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    const categories = await fetching.json();
+                        content = `${utility.blogHeader('blog')}
+                            <div id="blog" class="mt-2">
+                                <div>
+                                    <textarea rows="20">${JSON.stringify(post, null, 2)}</textarea>
+                                </div>
+                            </div>`;
+                    } else {
 
-                    content = `${utility.blogHeader('blog')}
-                        <div id="blog" class="mt-2">
-                            <div>
-                                ${utility.getBlogHTML(results.items.filter(p => p.properties["post-status"][0] == 'published'), config, mpDestination, categories)}
-                            </div>
-                        </div>`;
+                        //https://micro.blog/micropub?q=source&filter=daughter&limit=3&offset=2
+                        fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=${category ? '5000' : '25'}${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        const results = await fetching.json();
+
+                        fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        const categories = await fetching.json();
+
+                        content = `${utility.blogHeader('blog')}
+                            <div id="blog" class="mt-2">
+                                <div>
+                                    ${utility.getBlogHTML(results.items.filter(p => p.properties["post-status"][0] == 'published'), config, mpDestination, categories)}
+                                </div>
+                            </div>`;
+                    }
                 }
 
                 //blog

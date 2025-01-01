@@ -487,7 +487,7 @@ function flattenedBlogPost(post) {
     };
 }
 
-function blogHTML(post) {
+function blogHTML(post, destination) {
     const b = flattenedBlogPost(post);
     return `<article class="bookmark card p-2 mb-2" 
             data-uid="${b.uid}"  
@@ -508,7 +508,7 @@ function blogHTML(post) {
                         <i class="icon icon-caret"></i>
                     </button>
                     <ul class="menu bg-dark">
-                        <li class="menu-item"><a rel="prefetch" href="/blog/${b.uid}" swap-target="#main" class="btn btn-link">Edit Post</a></li>
+                        <li class="menu-item"><a rel="prefetch" href="/blog/${encodeURIComponent(b.url)}?destination=${encodeURIComponent(destination)}" swap-target="#main" class="btn btn-link">Edit Post</a></li>
                         <li class="menu-item"><button data-id="53854842" type="button" class="btn btn-link previewBlogPost">Preview Post</button></li>
                     </ul>
                 </div>
@@ -537,7 +537,7 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
-                    ${posts.map((p) => `${blogHTML(p)}`).join('')}
+                    ${posts.map((p) => `${blogHTML(p, mpDestination)}`).join('')}
                 </div>
             </div>
         </div>
