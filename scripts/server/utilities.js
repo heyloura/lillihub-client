@@ -508,7 +508,7 @@ function blogHTML(post, destination) {
                         <i class="icon icon-caret"></i>
                     </button>
                     <ul class="menu bg-dark">
-                        <li class="menu-item"><a rel="prefetch" href="/blog/${encodeURIComponent(b.url)}?destination=${encodeURIComponent(destination)}" swap-target="#main" class="btn btn-link">Edit Post</a></li>
+                        <li class="menu-item"><a rel="prefetch" href="/blog/${encodeURIComponent(b.url)}?destination=${encodeURIComponent(destination)}" swap-history="true" swap-target="#main" class="btn btn-link">Edit Post</a></li>
                         <li class="menu-item"><button data-id="53854842" type="button" class="btn btn-link previewBlogPost">Preview Post</button></li>
                     </ul>
                 </div>
