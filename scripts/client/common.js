@@ -863,7 +863,7 @@ function loadBlog() {
     document.querySelectorAll('.markdown').forEach(async (element) => {
         if(element.classList.contains('hasTitle')) {
             const html = converter.makeHtml(element.innerHTML);
-            document.getElementById(`${emenet.getAttribute('data-id')}-markdown`).value = html;
+            document.getElementById(`${element.getAttribute('data-id')}-markdown`).value = html;
             let images = '';
             if(element.classList.contains('hasImages')) {
                 var doc = new DOMParser().parseFromString(html, "text/html");
@@ -873,7 +873,7 @@ function loadBlog() {
             element.innerHTML = strip(html).substring(0,600) + '...' + images;
         } else {
             const html = converter.makeHtml(element.innerHTML);
-            document.getElementById(`${emenet.getAttribute('data-id')}-markdown`).value = html;
+            document.getElementById(`${element.getAttribute('data-id')}-markdown`).value = html;
             var doc = new DOMParser().parseFromString(html, "text/html");
             let images = '';
             if(element.classList.contains('hasImages')) {
