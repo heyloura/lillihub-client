@@ -6873,6 +6873,7 @@ article footer {
 
 .card-footer .card-subtitle {
   vertical-align: sub;
+  display: inline;
  }
 
 @media (min-width: 960px) {
