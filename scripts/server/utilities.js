@@ -554,8 +554,7 @@ export async function editHTML(post, repliers, username, mbToken, destination) {
     return `                
         <p id="category-${b.uid}"></p>
         <div class="card no-border pages">
-            <input data-id="${b.uid}" id="markdown" type="hidden" value="${b.content}" />
-            <input id="noteId" type="hidden" value="${n ? n.id : 0}" />
+            <input data-id="${b.uid}" data-url="${encodeURIComponent(b.url)}" id="markdown" type="hidden" value="${b.content}" />
             ${await getEditor(repliers, username, mbToken, destination)}
         </div>
     `;
