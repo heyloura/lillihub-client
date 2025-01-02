@@ -690,8 +690,6 @@ Deno.serve(async (req) => {
                     const posts = await fetching.json();
                     const friend = following.filter(f => f.username == id)[0] ?? null;
 
-                    console.log(id, following.filter(f => f.username == id)[0])
-
                     // put JSON check here or something.....
                     content = `${utility.timelineHeader('timeline')}
                     
@@ -863,7 +861,7 @@ Deno.serve(async (req) => {
                         </div>
                         <table class="table table-striped">${users}</table>
                     </div>`;
-                } else if(req.url.includes("blog")) {
+                } else if(req.url.includes("edit")) {
                     //----------
                     //  Following
                     //----------
@@ -880,17 +878,29 @@ Deno.serve(async (req) => {
                     const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
                     const mpDestination = destination ? destination : defaultDestination;
 
-                    if(id != 'blog') {
-                        fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${id}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                        const post = await fetching.json();
+                    fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${id}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const post = await fetching.json();
 
-                        content = `${utility.blogHeader('blog')}
-                            <div id="blog" class="mt-2">
-                                <div>
-                                    <textarea rows="20">${JSON.stringify(post, null, 2)}</textarea>
-                                </div>
-                            </div>`;
-                    } else {
+                    content = `${utility.blogHeader('blog')}
+                        <div id="editPost" class="mt-2">
+                            ${editHTML(post, following, mbUser.username, mbToken, mpDestination)}
+                        </div>`;
+                } else if(req.url.includes("blog")) {
+                    //-------
+                    //  Blog
+                    //-------
+                    id = name;
+                    name = "blog";
+
+                    let offset = '';
+                    let category = '';
+                    let q = '';
+
+                    fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const config = await fetching.json();
+                
+                    const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
+                    const mpDestination = destination ? destination : defaultDestination;
 
                         //https://micro.blog/micropub?q=source&filter=daughter&limit=3&offset=2
                         fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=${category ? '5000' : '25'}${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -905,12 +915,9 @@ Deno.serve(async (req) => {
                                     ${utility.getBlogHTML(results.items.filter(p => p.properties["post-status"][0] == 'published'), config, mpDestination, categories)}
                                 </div>
                             </div>`;
-                    }
                 }
 
-                //blog
 
-                
                 
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
                     .replaceAll('{{pages}}', content)

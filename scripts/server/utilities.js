@@ -511,7 +511,7 @@ function blogHTML(post, destination) {
                         <i class="icon icon-caret"></i>
                     </button>
                     <ul class="menu bg-dark">
-                        <li class="menu-item"><a rel="prefetch" href="/blog/${encodeURIComponent(b.url)}?destination=${encodeURIComponent(destination)}" swap-history="true" swap-target="#main" class="btn btn-link">Edit Post</a></li>
+                        <li class="menu-item"><a rel="prefetch" href="/blog/edit/${encodeURIComponent(b.url)}?destination=${encodeURIComponent(destination)}" swap-history="true" swap-target="#main" class="btn btn-link">Edit Post</a></li>
                         <li class="menu-item"><button data-id="${b.uid}" type="button" class="btn btn-link previewBlogPost">Preview Post</button></li>
                     </ul>
                 </div>
@@ -546,6 +546,18 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
             </div>
         </div>
     <div>
+    `;
+}
+
+export async function editHTML(post, repliers, username, mbToken, destination) {
+    const b = flattenedBlogPost(post);
+    return `                
+        <p id="category-${b.uid}"></p>
+        <div class="card no-border pages">
+            <input data-id="${b.uid}" id="markdown" type="hidden" value="${b.content}" />
+            <input id="noteId" type="hidden" value="${n ? n.id : 0}" />
+            ${await getEditor(repliers, username, mbToken, destination)}
+        </div>
     `;
 }
 
