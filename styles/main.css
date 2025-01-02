@@ -6871,6 +6871,10 @@ article footer {
   height: 80px;
 }
 
+.card-footer .card-subtitle {
+  vertical-align: sub;
+ }
+
 @media (min-width: 960px) {
   #destinationsSwitch {
     position: relative !important;

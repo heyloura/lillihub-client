@@ -497,19 +497,22 @@ function blogHTML(post, destination) {
                 <span id="title-${b.uid}" class="fakeAnchor h5 d-block">
                     ${b.name}
                 </span> ` : ``}                      
-            <main class="card-subtitle p-0 pt-2 pb-2 markdown ${b.name ? "hasTitle" : ""} ${b.content.includes('<img') || b.content.includes('![') ? "hasImages" : ""}">${b.content}</main>
+            <main data-id="${b.uid}" class="card-subtitle p-0 pt-2 pb-2 markdown ${b.name ? "hasTitle" : ""} ${b.content.includes('<img') || b.content.includes('![') ? "hasImages" : ""}">${b.content}</main>
             <div class="card-footer pl-0">
+                <input type="hidden" id="${b.uid}-markdown" />
+                <div class="card-subtitle">
                 <a target="_blank" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' }))}</a>
                 ${b.category ? b.category.sort().map((item) =>
                     `#${item} `
                 ).join('') : ''}
+                </div>
                 <div class="dropdown">
                     <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
                         <i class="icon icon-caret"></i>
                     </button>
                     <ul class="menu bg-dark">
                         <li class="menu-item"><a rel="prefetch" href="/blog/${encodeURIComponent(b.url)}?destination=${encodeURIComponent(destination)}" swap-history="true" swap-target="#main" class="btn btn-link">Edit Post</a></li>
-                        <li class="menu-item"><button data-id="53854842" type="button" class="btn btn-link previewBlogPost">Preview Post</button></li>
+                        <li class="menu-item"><button data-id="${b.uid}" type="button" class="btn btn-link previewBlogPost">Preview Post</button></li>
                     </ul>
                 </div>
             </div>      

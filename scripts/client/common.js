@@ -863,6 +863,7 @@ function loadBlog() {
     document.querySelectorAll('.markdown').forEach(async (element) => {
         if(element.classList.contains('hasTitle')) {
             const html = converter.makeHtml(element.innerHTML);
+            document.getElementById(`${emenet.getAttribute('data-id')}-markdown`).value = html;
             let images = '';
             if(element.classList.contains('hasImages')) {
                 var doc = new DOMParser().parseFromString(html, "text/html");
@@ -872,6 +873,7 @@ function loadBlog() {
             element.innerHTML = strip(html).substring(0,600) + '...' + images;
         } else {
             const html = converter.makeHtml(element.innerHTML);
+            document.getElementById(`${emenet.getAttribute('data-id')}-markdown`).value = html;
             var doc = new DOMParser().parseFromString(html, "text/html");
             let images = '';
             if(element.classList.contains('hasImages')) {
@@ -1207,6 +1209,13 @@ document.addEventListener("click", async (item) => {
         let id = item.target.getAttribute('id') === 'editor-preview-btn' ? null : item.target.getAttribute('id').split('-')[0];
 
         document.getElementById('previewContent').innerHTML = converter.makeHtml(document.getElementById(id ? id + '-content' : 'content').value);
+        document.getElementById('previewModal').style.zIndex = "401";
+        document.getElementById('previewModal').classList.add("active");
+    }
+    if(item.target.classList.contains('previewBlogPost')) {
+        let id = item.target.getAttribute('data-id');
+
+        document.getElementById('previewContent').innerHTML = document.getElementById(id + '-markdown').value);
         document.getElementById('previewModal').style.zIndex = "401";
         document.getElementById('previewModal').classList.add("active");
     }
