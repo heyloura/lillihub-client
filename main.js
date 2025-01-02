@@ -883,7 +883,7 @@ Deno.serve(async (req) => {
 
                     content = `${utility.blogHeader('blog')}
                         <div id="editPost" class="mt-2">
-                            ${editHTML(post, following, mbUser.username, mbToken, mpDestination)}
+                            ${utility.editHTML(post, following, mbUser.username, mbToken, mpDestination)}
                         </div>`;
                 } else if(req.url.includes("blog")) {
                     //-------
