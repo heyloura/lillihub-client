@@ -1215,7 +1215,7 @@ document.addEventListener("click", async (item) => {
     if(item.target.classList.contains('previewBlogPost')) {
         let id = item.target.getAttribute('data-id');
 
-        document.getElementById('previewContent').innerHTML = document.getElementById(id + '-markdown').value);
+        document.getElementById('previewContent').innerHTML = document.getElementById(id + '-markdown').value;
         document.getElementById('previewModal').style.zIndex = "401";
         document.getElementById('previewModal').classList.add("active");
     }
