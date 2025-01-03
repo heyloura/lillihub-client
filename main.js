@@ -8,9 +8,12 @@ import * as utility from "./scripts/server/utilities.js";
 *      const key = await crypto.subtle.generateKey({ name: "AES-CBC", length: 128 },true,["encrypt", "decrypt"]);
 *      const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 ******************************************************************************************************************/
-const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
-const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
+//const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
+//const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
 const _development = true;
+
+const _appSecret = JSON.parse('{"kty":"oct","k":"c2V4g-FQSxzpeCE8E0JcMg","alg":"A128CBC","key_ops":["encrypt","decrypt"],"ext":true}');
+const _lillihubToken = 'BF4E914933A50A2A286B';
 
 Deno.serve(async (req) => { 
     if(_development) {
@@ -321,6 +324,36 @@ Deno.serve(async (req) => {
                 const omgAddess = value.get('omgAddess');
                 const indieToken = value.get('indieToken');
                 const microPub = value.get('microPub');
+                const url = value.get('url');
+
+                if(url) {
+                    // this is editing a blog post on M.b.
+                    const updatePost = {
+                        action: "update",
+                        url: url,
+                        replace: {
+                            content: [content],
+                            name: [name],
+                            category: categories, 
+                            "post-status": status == 'draft' ? ['draft'] : ['published']
+                        }
+                    };
+            
+                    if(destination) {
+                        updatePost["mp-destination"] = destination;
+                    }
+            
+                    if(syndicates) {
+                        updatePost["mp-syndicate-to[]"] = syndicates;
+                    }
+            
+                    const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: JSON.stringify(updatePost), headers: { "Authorization": "Bearer " + accessTokenValue, "Content-Type": "application/json" } });
+                    if (!posting.ok) {
+                        console.log(`${user.username} tried to add a post and ${await posting.text()}`);
+                    }
+
+                    return new Response(JSON.stringify({"response":{"message":"Post was edited."}}), JSONHeaders());
+                }
 
                 if(replyingTo) {
                     const replies = replyingTo.map(function (reply) { return '@' + reply }).join(', ');
@@ -880,10 +913,11 @@ Deno.serve(async (req) => {
 
                     fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${id}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const post = await fetching.json();
+                    const p = utility.flattenedBlogPost(post)
 
                     content = `${utility.blogHeader('blog')}
                         <div id="editPost" class="mt-2">
-                            ${await utility.editHTML(post, following, mbUser.username, mbToken, mpDestination)}
+                            ${await utility.editHTML(post, following, mbUser.username, mbToken, mpDestination, p.name, p.content, p.url, p.category)}
                         </div>`;
                 } else if(req.url.includes("blog")) {
                     //-------

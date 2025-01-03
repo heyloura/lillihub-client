@@ -364,7 +364,7 @@ export function getBogSelect(config, mpDestination, id) {
                 </div>`;
 }
 
-export async function getEditor(repliers, username, mbToken, destination) {
+export async function getEditor(repliers, username, mbToken, destination, name, content, url, cats, status) {
     let destinations = '';
     let syndicates = '';
     let categoriesList = '';
@@ -403,7 +403,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
     
         categoriesList = categories.categories ? categories.categories.map(item => {
             return `<li class="menu-item"><label>
-                    <input class="categoriesChange" type="checkbox" name="category[]" value="${item}"> ${item}
+                    <input class="categoriesChange" type="checkbox" name="category[]" value="${item}" ${cats.includes(item) ? 'checked="checked"' : ''}> ${item}
                     </label></li>`;
         }).join('') : '';
 
@@ -427,11 +427,12 @@ export async function getEditor(repliers, username, mbToken, destination) {
             <input type="hidden" name="microPub" id="microPub" />
             <input type="hidden" name="id" id="postId" />
             <input type="hidden" name="destination" value="${mpDestination}" />
+            <input type="hidden" name="url" value="${url}" />
             <div id="editor-container">
                 <div id="editor-replybox" class="hide">${getReplyBox(repliers)}</div>
-                <input type="text" placeholder="title (optional)" class="form-input mb-2" name="name" id="postName" />
+                <input type="text" placeholder="title (optional)" class="form-input mb-2" name="name" id="postName" value="${name ? name : ''}" />
                 <div class="grow-wrap">
-                    <textarea name="content" rows="10" id="content" id="post" class="form-input grow-me"></textarea>
+                    <textarea name="content" rows="10" id="content" id="post" class="form-input grow-me">${content ? content : ''}</textarea>
                 </div>
             </div>
             <div id="editor-footer" class="card-footer mb-2">
@@ -453,8 +454,8 @@ export async function getEditor(repliers, username, mbToken, destination) {
                 </div>
                 <div class="btn-group float-right">
                     <select id="postStatus" name="status" class="form-select">
-                        <option value="publish">Publish</option>
-                        <option value="draft">Draft</option>
+                        <option value="publish" ${status && status != 'draft' ? 'selected="selected"' : ''}>Publish</option>
+                        <option value="draft" ${status && status == 'draft' ? 'selected="selected"' : ''}>Draft</option>
                     </select>
                     <button id="editor-action" type="button" class="btn btn-primary">Post</button>
                 </div>
@@ -474,7 +475,7 @@ export async function getEditor(repliers, username, mbToken, destination) {
     `;
 }
 
-function flattenedBlogPost(post) {
+export function flattenedBlogPost(post) {
     return {
         type: post && post.type ? post.type : '',
         uid: post && post.properties && post.properties.uid && post.properties.uid[0] ? post.properties.uid[0] : '',
