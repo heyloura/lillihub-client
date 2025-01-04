@@ -946,8 +946,9 @@ Deno.serve(async (req) => {
                                 <div>
                                     ${utility.getBlogHTML(results.items
                                         .filter(p => req.url.includes("blog") ? p.properties["post-status"][0] == 'published' : p.properties["post-status"][0] == 'draft')
-                                        .filter(p => category ? p.properties.category ? p.properties.category.includes(category) : false : true ), config, mpDestination, categories,q || category || offset)
-                                        .slice(0, 25)}
+                                        .filter(p => category ? p.properties.category ? p.properties.category.includes(category) : false : true ).slice(0, 25)
+                                        ,config, mpDestination, categories,q || category || offset)
+                                        }
                                 </div>
                             </div>`;
                 } else if(req.url.includes("pages")) {
@@ -959,16 +960,12 @@ Deno.serve(async (req) => {
 
                     fetching = await fetch(`https://${user.username}.micro.blog/rsd.xml`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const result = await fetching.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(result, "text/xml");
 
-                    console.log(doc);
+                    console.log(result);
 
                     content = `${utility.blogHeader('pages')}
                         <div id="pages" class="mt-2">
-                            <pre>
-                                ${doc.body.innerHTML}
-                            </pre>
+                            <input id="pageXML" type="hidden" value="${result}" />
                         </div>`;
                 }
 

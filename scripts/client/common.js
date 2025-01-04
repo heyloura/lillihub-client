@@ -860,7 +860,7 @@ Swap.loaders['#following'] = () => {
 
 function loadBlog() {
     document.title = "Lillihub: Blog";
-    document.getElementById('destinationsSwitchMenu').classList.add('bottom-menu');
+    document.getElementById('destinationsSwitch').classList.add('bottom-menu');
     document.querySelectorAll('.markdown').forEach(async (element) => {
         if(element.classList.contains('hasTitle')) {
             const html = converter.makeHtml(element.innerHTML);
