@@ -403,7 +403,7 @@ export async function getEditor(repliers, username, mbToken, destination, name, 
     
         categoriesList = categories.categories ? categories.categories.map(item => {
             return `<li class="menu-item"><label>
-                    <input class="categoriesChange" type="checkbox" name="category[]" value="${item}" ${cats.includes(item) ? 'checked="checked"' : ''}> ${item}
+                    <input class="categoriesChange" type="checkbox" name="category[]" value="${item}" ${cats && cats.includes(item) ? 'checked="checked"' : ''}> ${item}
                     </label></li>`;
         }).join('') : '';
 
@@ -521,7 +521,7 @@ function blogHTML(post, destination) {
     `;
 }
 
-export function getBlogHTML(posts, config, mpDestination, categories) {
+export function getBlogHTML(posts, config, mpDestination, categories, clear) {
     return `
     <div class="container grid-xl">
             <div class="columns">
@@ -539,6 +539,7 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
                             `<span class="chip ${item}Link"><a class="${item}" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?category=${item}">${item}</a></span>`
                         ).join('') : ''} 
                     </div>
+                    ${ clear ? `<p class="text-center"><a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?destination=${encodeURIComponent(mpDestination)}" >clear filters</a></p>` : ''}
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
                     
@@ -553,10 +554,8 @@ export function getBlogHTML(posts, config, mpDestination, categories) {
 export async function editHTML(post, repliers, username, mbToken, destination) {
     const b = flattenedBlogPost(post);
     return `                
-        <p id="category-${b.uid}"></p>
         <div class="card no-border pages">
-            <input data-id="${b.uid}" data-url="${encodeURIComponent(b.url)}" id="markdown" type="hidden" value="${b.content}" />
-            ${await getEditor(repliers, username, mbToken, destination)}
+            ${await getEditor(repliers, username, mbToken, destination, b.name, b.content, b.url, b.category, b.status)}
         </div>
     `;
 }

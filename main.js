@@ -8,12 +8,9 @@ import * as utility from "./scripts/server/utilities.js";
 *      const key = await crypto.subtle.generateKey({ name: "AES-CBC", length: 128 },true,["encrypt", "decrypt"]);
 *      const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 ******************************************************************************************************************/
-//const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
-//const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
+const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
+const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
 const _development = true;
-
-const _appSecret = JSON.parse('{"kty":"oct","k":"c2V4g-FQSxzpeCE8E0JcMg","alg":"A128CBC","key_ops":["encrypt","decrypt"],"ext":true}');
-const _lillihubToken = 'BF4E914933A50A2A286B';
 
 Deno.serve(async (req) => { 
     if(_development) {
@@ -607,7 +604,7 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // All other pages
             // -----------------------------------------------------
-            const pages = ["notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies", "blog", "draft", "media", "collections", "webmentions"]
+            const pages = ["pages", "notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies", "blog", "draft", "media", "collections", "webmentions"]
             if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
                 const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
@@ -693,7 +690,7 @@ Deno.serve(async (req) => {
                     //----------
                     name = "settings";
                     content = `<div id="settings" class="mt-2">${utility.settingsHTML()}</div>`;
-                }else if(req.url.includes("discover")) {
+                } else if(req.url.includes("discover")) {
                     //----------
                     //  Discover
                     //----------
@@ -901,10 +898,6 @@ Deno.serve(async (req) => {
                     id = name;
                     name = "blog";
 
-                    let offset = '';
-                    let category = '';
-                    let q = '';
-
                     fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const config = await fetching.json();
                 
@@ -913,22 +906,22 @@ Deno.serve(async (req) => {
 
                     fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${id}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const post = await fetching.json();
-                    const p = utility.flattenedBlogPost(post)
 
                     content = `${utility.blogHeader('blog')}
                         <div id="editPost" class="mt-2">
-                            ${await utility.editHTML(post, following, mbUser.username, mbToken, mpDestination, p.name, p.content, p.url, p.category)}
+                            ${await utility.editHTML(post, following, mbUser.username, mbToken, mpDestination)}
                         </div>`;
-                } else if(req.url.includes("blog")) {
+                } else if(req.url.includes("blog") || req.url.includes("drafts")) {
                     //-------
                     //  Blog
                     //-------
                     id = name;
                     name = "blog";
 
-                    let offset = '';
-                    let category = '';
-                    let q = '';
+                    const searchParams = new URLSearchParams(req.url.split('?')[1]);
+                    const category = searchParams.get('category');
+                    const q = searchParams.get('q');
+                    const offset = searchParams.get('offset');
 
                     fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     const config = await fetching.json();
@@ -937,18 +930,46 @@ Deno.serve(async (req) => {
                     const mpDestination = destination ? destination : defaultDestination;
 
                         //https://micro.blog/micropub?q=source&filter=daughter&limit=3&offset=2
-                        fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=${category ? '5000' : '25'}${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=50000${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+
                         const results = await fetching.json();
 
                         fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const categories = await fetching.json();
 
-                        content = `${utility.blogHeader('blog')}
+                        if(results.items > 25) {
+                            // we need to add the offset link for paging....
+                        }
+
+                        content = `${utility.blogHeader(req.url.includes("blog") ? 'blog' : 'draft')}
                             <div id="blog" class="mt-2">
                                 <div>
-                                    ${utility.getBlogHTML(results.items.filter(p => p.properties["post-status"][0] == 'published'), config, mpDestination, categories)}
+                                    ${utility.getBlogHTML(results.items
+                                        .filter(p => req.url.includes("blog") ? p.properties["post-status"][0] == 'published' : p.properties["post-status"][0] == 'draft')
+                                        .filter(p => category ? p.properties.category ? p.properties.category.includes(category) : false : true ), config, mpDestination, categories,q || category || offset)
+                                        .slice(0, 25)}
                                 </div>
                             </div>`;
+                } else if(req.url.includes("pages")) {
+                    //-------
+                    //  Pages
+                    //-------
+                    id = name;
+                    name = "pages";
+
+                    fetching = await fetch(`https://${user.username}.micro.blog/rsd.xml`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const result = await fetching.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(result, "text/xml");
+
+                    console.log(doc);
+
+                    content = `${utility.blogHeader('pages')}
+                        <div id="pages" class="mt-2">
+                            <pre>
+                                ${doc.body.innerHTML}
+                            </pre>
+                        </div>`;
                 }
 
 

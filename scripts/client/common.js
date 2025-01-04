@@ -202,7 +202,7 @@ function loadEditor(type) {
 function replyModal(name, id, avatar) { 
     const fragment = document.createDocumentFragment();
     if(document.getElementById(`post-${id}`)) {
-        fragment.appendChild(document.getElementById(`post-${id}`));
+        fragment.appendChild(document.getElementById(`post-${id}`).cloneNode(true));
     } else {
         fragment.appendChild(document.getElementById(`post-convo-${id}`).cloneNode(true));
     }   
@@ -248,7 +248,6 @@ function resetUI() {
     document.querySelectorAll(`.sidebar .menu-item a`).forEach(el => el.classList.remove("active"));
     document.title = "Lillihub";
     document.getElementById('pageActionsBtn').classList.add('hide');
-    //document.getElementById('actionIcon').classList.add('hide');
     document.getElementById("titleBar").innerHTML = "Lillihub";
     document.querySelectorAll(`.extraAction`).forEach(el => el.remove());
 
@@ -257,6 +256,8 @@ function resetUI() {
     document.getElementById('actionIcon').classList.remove('hide');
 
     document.getElementById('pageActionsBtn').classList.add('hide');
+
+    document.querySelector('.actionBtn').classList.remove('hide');
 }
 
 function loadAddBookmarkModal() {
@@ -886,8 +887,8 @@ function loadBlog() {
             }
             element.innerHTML = doc.body.innerHTML + images;
         }
-        hljs.highlightAll(); 
     });
+    hljs.highlightAll(); 
 }
 
 Swap.loaders['#blog'] = () => {
@@ -898,8 +899,19 @@ Swap.loaders['#blog'] = () => {
     };  
 }
 
+function loadEditBlog() {
+    document.title = "Lillihub: Edit";
+    document.querySelector('.actionBtn').classList.add('hide');
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(document.getElementById('topBarBtns'));
+    document.getElementById('editor').prepend(fragment);
+    document.getElementById('editor-action').classList.add('savePost');
+    growTextArea(document.getElementById('content'));
+    document.getElementById('content').dispatchEvent(new Event("input"))
+}
+
 Swap.loaders['#editPost'] = () => {
-    loadBlog();
+    loadEditBlog();
 
     return () => {  // unloader function
         resetUI();      
@@ -1010,6 +1022,16 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("click", async (item) => {
+    if(item.target.classList.contains('searchBlog')) {
+        document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
+        let url = window.location.href;    
+        if (url.indexOf('?') > -1){
+            url += '&q=' + document.getElementById('searchBlog').value;
+        } else {
+            url += '?q='+ document.getElementById('searchBlog').value;
+        }
+        window.location.href = url;
+    }
     if(item.target.classList.contains('editor-upload')) {
         let id = null;
         if(event.target.getAttribute('id') == null) {
@@ -1455,7 +1477,9 @@ function loadPage() {
         loadReplies();
     } else if(window.location.pathname.includes('following')) {
         loadFollowing();
-    } else if(window.location.pathname.includes('blog')) { 
+    } else if(window.location.pathname.includes('edit')) { 
+        loadEditBlog(); 
+    } else if(window.location.pathname.includes('blog') || window.location.pathname.includes('draft')) { 
         loadBlog();
     } else if(window.location.pathname.includes('users')) {
         document.title = "Lillihub: Timeline";
