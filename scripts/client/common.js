@@ -13,25 +13,25 @@ function liveSearch(selector, searchboxId) {
         }
     }
 }
-let touchstartX = 0;
-let touchendX = 0;
-function checkDirection() {
-    if (touchendX < touchstartX - 50) {
-        history.back();
-    }
-    if (touchendX > touchstartX) return;
-}
-function gestures(elId) {
-    // set up gesture navigation
-    document.getElementById(elId).addEventListener('touchstart', e => {
-        touchstartX = e.changedTouches[0].screenX
-    })
+// let touchstartX = 0;
+// let touchendX = 0;
+// function checkDirection() {
+//     if (touchendX < touchstartX - 50) {
+//         history.back();
+//     }
+//     if (touchendX > touchstartX) return;
+// }
+// function gestures(elId) {
+//     // set up gesture navigation
+//     document.getElementById(elId).addEventListener('touchstart', e => {
+//         touchstartX = e.changedTouches[0].screenX
+//     })
 
-    document.getElementById(elId).addEventListener('touchend', e => {
-    touchendX = e.changedTouches[0].screenX
-        checkDirection()
-    })
-}
+//     document.getElementById(elId).addEventListener('touchend', e => {
+//     touchendX = e.changedTouches[0].screenX
+//         checkDirection()
+//     })
+// }
 function masonryLayout(id, imageArray) 
 {
     let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
@@ -258,6 +258,8 @@ function resetUI() {
     document.getElementById('pageActionsBtn').classList.add('hide');
 
     document.querySelector('.actionBtn').classList.remove('hide');
+    document.querySelector('.actionBtn').classList.remove('uploadBtn');
+    document.getElementById('actionIcon').classList.remove('uploadBtn');
 }
 
 function loadAddBookmarkModal() {
@@ -860,7 +862,7 @@ Swap.loaders['#following'] = () => {
 
 function loadBlog() {
     document.title = "Lillihub: Blog";
-    document.getElementById('destinationsSwitch').classList.add('bottom-menu');
+    document.getElementById('destinationsSwitchMenu').classList.add('bottom-menu');
     document.querySelectorAll('.markdown').forEach(async (element) => {
         if(element.classList.contains('hasTitle')) {
             const html = converter.makeHtml(element.innerHTML);
@@ -868,7 +870,11 @@ function loadBlog() {
             let images = '';
             if(element.classList.contains('hasImages')) {
                 var doc = new DOMParser().parseFromString(html, "text/html");
-                doc.querySelectorAll('img').forEach(el => images += el.outerHTML);
+                doc.querySelectorAll('img').forEach(el => {
+                    el.classList.add('enlarge');
+                    el.classList.add('c-hand');
+                    images += el.outerHTML;
+                });
                 images = `<div class="thumbnail_images">${images}<div>`;
             }
             element.innerHTML = strip(html).substring(0,600) + '...' + images;
@@ -880,6 +886,8 @@ function loadBlog() {
             if(element.classList.contains('hasImages')) {
                 
                 doc.querySelectorAll('img').forEach(el => {
+                    el.classList.add('enlarge');
+                    el.classList.add('c-hand');
                     images += el.outerHTML;
                     el.remove();
                 });
@@ -917,6 +925,23 @@ Swap.loaders['#editPost'] = () => {
         resetUI();      
     };  
 }
+
+function loadUploads() {
+    document.title = "Lillihub: Upload";
+    document.getElementById('actionIcon').classList.remove('icon-plus');
+    document.getElementById('actionIcon').classList.add('icon-upload');
+    document.getElementById('actionIcon').classList.add('uploadBtn');
+    document.querySelector('.actionBtn').classList.add('uploadBtn');
+}
+
+Swap.loaders['#uploads'] = () => {
+    loadUploads();
+
+    return () => {  // unloader function
+        resetUI();      
+    };  
+}
+
 
 /************************************************************
 ** Events
@@ -1022,6 +1047,70 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("click", async (item) => {
+    if(item.target.classList.contains('deleteUpload')) {
+        if(confirm('Are you sure you want to delete this? This cannot be undone')) {
+            document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
+            const formData = new FormData();
+            formData.append('destination', item.target.getAttribute('data-destination'));
+            formData.append('url', item.target.getAttribute('data-url'))
+
+            fetch('/media/delete', { method: "POST", body: formData })
+                .then(response => console.log(response.status) || response)
+                .then(response => response.json())
+                .then(data => {
+                    window.location.reload();
+                });
+        }
+    }
+    if(item.target.classList.contains('uploadBtn')) {
+        const el = window._protected_reference = document.createElement("INPUT");
+        el.type = "file";
+        el.addEventListener('change', function(ev2) {
+            document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
+            console.log(el.files);
+            console.log('size: ' + el.files[0].size /1024 /1024 + ' MB');
+            if(el.files[0].size /1024 /1024 > 3) {
+                alert('file must be smaller than 3MB');
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < el.files.length; i++) {
+                formData.append('file[]', el.files[i], el.files[i].name);
+                formData.append('destination', document.getElementById('destinationsSwitch').getAttribute('data-destination'));
+            }
+
+            fetch('/media/upload', { method: "POST", body: formData })
+                .then(response => console.log(response.status) || response)
+                .then(response => response.json())
+                .then(data => {
+                    window.location.reload();
+                });
+        });
+      
+        el.click(); // open
+    }
+    if(item.target.classList.contains('enlarge')){
+        const url = item.target.getAttribute('data-url');
+        const alt = item.target.getAttribute('alt');
+        const img = item.target.cloneNode(true);
+        if(url) {
+            img.setAttribute('src', url);
+        }
+        document.getElementById('previewContent').innerHTML =  alt ? `${img.outerHTML}<p>&#x1f916; ${alt}</p>` : img.outerHTML;
+        document.getElementById('previewModal').style.zIndex = "401";
+        document.getElementById('previewModal').classList.add("active");
+    }
+    if(item.target.classList.contains('searchUploads')) {
+        document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
+        let url = window.location.href;    
+        if (url.indexOf('?') > -1){
+            url += '&q=' + document.getElementById('searchUploads').value;
+        } else {
+            url += '?q='+ document.getElementById('searchUploads').value;
+        }
+        window.location.href = url;
+    }
     if(item.target.classList.contains('searchBlog')) {
         document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
         let url = window.location.href;    
@@ -1298,7 +1387,16 @@ document.addEventListener("click", async (item) => {
             loadEditor();
         } else if(window.location.pathname.includes('bookmarks')) {
             loadAddBookmarkModal();
-        }
+        } else if(window.location.pathname.includes('blog')) {
+            // the action is to follow (if not already)?
+            loadEditor();
+        } else if(window.location.pathname.includes('drafts')) {
+            // the action is to follow (if not already)?
+            loadEditor();
+        } else if(window.location.pathname.includes('pages')) {
+            // the action is to follow (if not already)?
+            loadEditor();
+        } 
     }
     if(item.target.classList.contains('pageActions')) {
         if(window.location.pathname.includes('notes')) {
@@ -1458,7 +1556,7 @@ document.addEventListener("click", async (item) => {
 // For when a user does a manual page refresh
 //--------------------------------------------
 function loadPage() {
-    gestures('main');
+    //gestures('main');
     if(window.location.pathname.includes('versions')) { 
         loadVersion();
     } else if(window.location.pathname.includes('notes')) {
@@ -1481,7 +1579,9 @@ function loadPage() {
         loadEditBlog(); 
     } else if(window.location.pathname.includes('blog') || window.location.pathname.includes('draft')) { 
         loadBlog();
-    } else if(window.location.pathname.includes('users')) {
+    } else if(window.location.pathname.includes('uploads')) {
+        loadUploads();   
+    }else if(window.location.pathname.includes('users')) {
         document.title = "Lillihub: Timeline";
         document.getElementById("titleBar").innerHTML = "Timeline";
         buildMasonry();

@@ -237,8 +237,11 @@ export function blogHeader(active) {
             <li class="tab-item ${active == 'draft' ? 'active' : ''} text-blue">
                 <a rel="prefetch" swap-target="#main" swap-history="true" href="/drafts"><i class="icon icon-edit"></i> Drafts</a>
             </li>
-            <li class="tab-item ${active == 'media' ? 'active' : ''} text-blue">
-                <a rel="prefetch" swap-target="#main" swap-history="true" href="/media"><i class="icon icon-photo"></i> Media</a>
+            <li class="tab-item ${active == 'uploads' ? 'active' : ''} text-blue">
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/uploads"><i class="icon icon-photo"></i> Uploads</a>
+            </li>
+            <li class="tab-item ${active == 'pages' ? 'active' : ''} text-blue">
+                <a rel="prefetch" swap-target="#main" swap-history="true" href="/pages"><i class="icon icon-copy"></i> Pages</a>
             </li>
             <li class="tab-item ${active == 'webmentions' ? 'active' : ''} text-blue">
                 <a rel="prefetch" swap-target="#main" swap-history="true" href="/webmentions"><i class="icon icon-share"></i> Mentions</a>
@@ -353,7 +356,7 @@ export function getBogSelect(config, mpDestination, id) {
         }
     }).join('') : '';
 
-    return `<div id="${id}" class="dropdown">
+    return `<div id="${id}" class="dropdown" data-destination="${config.destination.filter(d => d.uid == mpDestination)[0].uid}">
                     <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
                         <span id="postingName">${config.destination.filter(d => d.uid == mpDestination)[0].name}</span> <i class="icon icon-caret"></i>
                     </button>
@@ -531,7 +534,7 @@ export function getBlogHTML(posts, config, mpDestination, categories, clear) {
                         <label class="form-label">Search your blog</label>
                         <div class="input-group">
                             <input id="searchBlog" type="text" class="form-input">
-                            <button class="btn btn-primary input-group-btn searchBlog"><i class="icon icon-search searchPost"></i></button>
+                            <button class="btn btn-primary input-group-btn searchBlog"><i class="icon icon-search searchBlog"></i></button>
                         </div>
                     </div>
                     <div>
@@ -542,8 +545,104 @@ export function getBlogHTML(posts, config, mpDestination, categories, clear) {
                     ${ clear ? `<p class="text-center"><a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?destination=${encodeURIComponent(mpDestination)}" >clear filters</a></p>` : ''}
                 </div>
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">
-                    
                     ${posts.map((p) => `${blogHTML(p, mpDestination)}`).join('')}
+                </div>
+            </div>
+        </div>
+    <div>
+    `;
+}
+
+export function flattenedCollection(post) {
+    return {
+        type: post && post.type ? post.type : '',
+        uid: post && post.properties && post.properties.uid && post.properties.uid[0] ? post.properties.uid[0] : '',
+        name: post && post.properties && post.properties.name && post.properties.name[0] ? post.properties.name[0] : '',
+        url: post && post.properties && post.properties.url && post.properties.url[0] ? post.properties.url[0] : '',
+        count: post && post.properties && post.properties['microblog-uploads-count'] ? post.properties['microblog-uploads-count'] : 0,
+    };
+}
+
+export function flattenedUpload(post) {
+    return {
+        alt: post && post.alt ? post.alt : '',
+        url: post && post && post.url ? post.url : '',
+        published: post && post && post.published ? post.published : '',
+        large: post && post && post.sizes && post.sizes.large ? post.sizes.large  : '',
+        medium: post && post && post.sizes && post.sizes.medium ? post.sizes.medium  : '',
+        small: post && post && post.sizes && post.sizes.small ? post.sizes.small  : '',
+        cdnLarge: post && post && post.cdn && post.cdn.large ? post.cdn.large  : '',
+        cdnMedium: post && post && post.cdn && post.cdn.medium ? post.cdn.medium  : '',
+        cdnSmall: post && post && post.cdn && post.cdn.small ? post.cdn.small  : '',
+    };
+}
+
+function uploadHTML(post, destination) {
+    const b = flattenedUpload(post);
+    return `<article class="upload card p-2 mb-2" 
+            data-published="${b.published}"  
+            data-url="${b.url}">                      
+            <main class="p-0 pt-2 pb-2">
+                ${b.url.includes('.png') || b.url.includes('.jpeg') || b.url.includes('.jpg') || b.url.includes('.gif') || b.url.includes('.webp') ?
+                    `<img alt="${b.alt}" data-url="${b.url}" class="enlarge c-hand" src="${b.cdnSmall ? b.cdnSmall : 
+                        b.small ? b.small : 
+                        b.cdnMedium ? b.cdnMedium : 
+                        b.medium ? b.medium : 
+                        b.cdnLarge ? b.cdnLarge : 
+                        b.large ? b.large : b.url
+                    }" ${b.alt ? b.alt : ''} />` : '' }
+                ${b.url.includes('.pdf') ? `<embed src="${b.url}" />` : ''}
+                ${b.url.includes('.svg') ? `<object data="${b.url}" type="image/svg+xml"></object>` : ''}
+                ${b.url.includes('.mp4') || b.url.includes('.webm') || b.url.includes('.ogg') ? `<video controls>
+                    <source src="${b.url}" type="video/${b.url.split('.')[b.url.split('.').length - 1]}" />
+                    </video>` : ''}
+            </main>
+            <div class="card-footer pl-0">
+                <div class="card-subtitle">
+                    <a target="_blank" href="${b.url}">${(new Date(b.published).toLocaleString('en-US', { timeZoneName: 'short' }))}</a>
+                </div>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
+                        <i class="icon icon-caret"></i>
+                    </button>
+                    <ul class="menu bg-dark">
+                        
+                        <li class="menu-item"><button class="btn btn-link" type="button">Add to collection</button></li>
+                        <li class="divider"></li>
+                        <li class="menu-item"><button data-url="${b.url}" data-destination="${destination}" class="btn btn-link text-danger deleteUpload" type="button">Delete</button></li>
+                    </ul> 
+                </div>
+            </div>      
+        </article>
+    `;
+}
+
+export function getUploadHTML(posts, config, mpDestination, fileExtensions, clear, collectionNames) {
+    return `
+    <div class="container grid-xl">
+            <div class="columns">
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
+                ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
+                    <div class="form-group">
+                        <label class="form-label">Search your uploads</label>
+                        <div class="input-group">
+                            <input id="searchUploads" type="text" class="form-input">
+                            <button class="btn btn-primary input-group-btn searchUploads"><i class="icon icon-search searchUploads"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        ${fileExtensions ? fileExtensions.sort().map((item) =>
+                            `<span class="chip ${item}Link"><a rel="prefetch" swap-target="#main" swap-history="true" href="/uploads?type=${item}">${item}</a></span>`
+                        ).join('') : ''} 
+                    </div>
+                    ${collectionNames ? `<div class="divider"></div>` : ''}
+                    ${collectionNames ? collectionNames.sort((a,b) => (a.properties.name[0] > b.properties.name[0]) ? 1 : ((b.properties.name[0] > a.properties.name[0]) ? -1 : 0)).map((item) =>
+                        `<span class="chip"><a rel="prefetch" swap-target="#main" swap-history="true" href="/uploads?collection=${item.properties.uid[0]}">${item.properties.name[0]}</a></span>`
+                    ).join('') : ''}
+                    ${ clear ? `<p class="text-center"><a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/uploads?destination=${encodeURIComponent(mpDestination)}" >clear filters</a></p>` : ''}
+                </div>
+                <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-9 col-9">                 
+                    ${posts.map((p) => `${uploadHTML(p, mpDestination)}`).join('')}
                 </div>
             </div>
         </div>

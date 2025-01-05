@@ -165,106 +165,6 @@ Deno.serve(async (req) => {
                   HTMLHeaders(nonce));
             }
 
-            /********************************
-                TIMELINE BASED ROUTES
-            *********************************/
-
-            // if(new URLPattern({ pathname: "/timeline/following" }).exec(req.url) && user) {
-            //     let fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-            //     let results = await fetching.json();
-        
-            //     const users = results.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0)).map((item) =>
-            //         `<tr>
-            //             <td><figure class="avatar avatar-lg" data-initial="${item.username.substring(0,1)}">
-            //                     <img src="${item.avatar}" loading="lazy">
-            //                 </figure>
-            //             </td>
-            //             <td>
-            //                 <div class="card-title">${item.name}</div>
-            //                 <div class="card-subtitle"><a href="/user/${item.username}" class="text-gray">@${item.username}</a></div>  
-            //             </td>
-            //             <td>${item.username.split('@').length == 1 ? '<span class="chip">Micro.blog</span>' : '<span class="chip">Other</span>'}</td>
-            //         </tr>
-            //         `
-            //     ).join('');
-        
-            //     const layout = new TextDecoder().decode(await Deno.readFile("following.html"));
-
-            //     return new Response(layout.replaceAll('{{nonce}}', nonce)
-            //         .replaceAll('{{users}}', users)
-            //         ,HTMLHeaders(nonce));
-            // } 
-
-
-
-
-
-
-
-            /********************************
-                BOOKMARKS BASED ROUTES
-            *********************************/
-            // const READER_ROUTE = new URLPattern({ pathname: "/bookmarks/reader/:id" });
-            // if(READER_ROUTE.exec(req.url)) {
-            //     const id = READER_ROUTE.exec(req.url).pathname.groups.id;
-            //     // const searchParams = new URLSearchParams(req.url.split('?')[1]);
-            //     // const idsParam = searchParams.get('ids');
-            //     // const title = searchParams.get('title');
-            
-            //     let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-            //     const results = await fetching.text(); 
-        
-            //     const page = results;
-            //     // let highlightCount = 0;
-                    
-            //     const baseURL = page.split('<base href="')[1].split('"')[0];
-            //     const root = baseURL.split('/');
-            //     root.pop();
-            //     const htmlBody = page.split('<body>')[1].split('</body>')[0];
-            //     let content = htmlBody.split('<div id="content">')[1].split('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>')[0];
-            //     content = content.replaceAll('src="',`src="${root.join('/')}/`);
-        
-            //     // if(idsParam) {
-            //     //     let ids = [...new Set(idsParam.split(','))];
-            //     //     let allHighlights = await getAllFromMicroBlog('https://micro.blog/posts/bookmarks/highlights', mbToken);
-            //     //     let matchingHighlights = allHighlights.filter((h) => {return ids.includes(h.id.toString());});
-            //     //     highlightCount = matchingHighlights.length;
-            //     //     for(var i = 0; i < matchingHighlights.length; i++) {
-            //     //     var highlight = matchingHighlights[i];
-            //     //     content = content.replaceAll(highlight.content_text,`<mark>${highlight.content_text}</mark>`);
-            //     //     }
-            //     // }
-                
-            //     // let script = `
-
-            //     //     <script nonce=${nonce}>
-
-            //     //     </script>`;
-        
-            //     // fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-            //     // const tags = await fetching.json();
-
-            //     const data = {};
-            //     data.content = content;
-            //     return new Response(JSON.stringify(data), JSONHeaders());
-            // }
-        
-            // if(new URLPattern({ pathname: "/bookmarks/highlights" }).exec(req.url)) {
-            //     const nonce = crypto.randomUUID();
-            //     const allHighlights = await mb.getAllFromMicroBlog(mbToken, 'https://micro.blog/posts/bookmarks/highlights');
-            //     return new Response(`<textarea rows="20">${JSON.stringify(allHighlights)}</textarea>`,HTMLHeaders(nonce));
-            // }
-
-
-
-
-
-
-
-
-
-
-
             // -----------------------------------------------------
             // POSTING endpoints
             // -----------------------------------------------------
@@ -412,6 +312,8 @@ Deno.serve(async (req) => {
                       formData.append('file', fileBlob, val.name);
                     } else {
                       if(field == 'destination') {
+                        console.log('destination')
+                        console.log(val)
                         const decoded = decodeURI(val);
                         formData.append("mp-destination", decoded);
                         destination = val;
@@ -433,6 +335,31 @@ Deno.serve(async (req) => {
                 result.ai = user.ai;
 
                 return new Response(JSON.stringify(result), JSONHeaders());
+            }
+
+            //-------------
+            // Delete media
+            //-------------
+            if((new URLPattern({ pathname: "/media/delete" })).exec(req.url)) {
+                const value = await req.formData();
+                const destination = value.get('destination');
+                const url = value.get('url');
+        
+                const formBody = new URLSearchParams();
+                formBody.append("mp-destination", destination);
+                formBody.append('action', 'delete');
+                formBody.append('url', url);
+        
+                const fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const config = await fetching.json();
+                const mediaEndpoint = config["media-endpoint"];
+        
+                const posting = await fetch(mediaEndpoint, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
+                if (!posting.ok) {
+                    console.log(`${user.username} tried to delete a media item and ${await posting.text()}`);
+                }
+        
+                return new Response(JSON.stringify({status: 'upload deleted'}), JSONHeaders());
             }
 
             //----------
@@ -557,9 +484,7 @@ Deno.serve(async (req) => {
                     },
                 });
             }
-
-
-            
+   
             // -----------------------------------------------------
             // API endpoints
             // -----------------------------------------------------
@@ -604,8 +529,9 @@ Deno.serve(async (req) => {
             // -----------------------------------------------------
             // All other pages
             // -----------------------------------------------------
-            const pages = ["pages", "notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies", "blog", "draft", "media", "collections", "webmentions"]
+            const pages = ["pages", "notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies", "blog", "draft", "uploads", "collections", "webmentions"]
             if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
+                let disableCSP = false;
                 const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
                 let name = parts[parts.length - 1].split('?')[0];
@@ -911,6 +837,94 @@ Deno.serve(async (req) => {
                         <div id="editPost" class="mt-2">
                             ${await utility.editHTML(post, following, mbUser.username, mbToken, mpDestination)}
                         </div>`;
+                } else if(req.url.includes("uploads")) {
+                    //-------
+                    //  Blog
+                    //-------
+                    id = name;
+                    name = "uploads";
+                    disableCSP = true;
+
+                    const searchParams = new URLSearchParams(req.url.split('?')[1]);
+                    const type = searchParams.get('type');
+                    const collection = searchParams.get('collection');
+                    const q = searchParams.get('q');
+                    const offset = searchParams.get('offset');
+
+                    fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const config = await fetching.json();
+                
+                    const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
+                    const mpDestination = destination ? destination : defaultDestination;
+
+                    fetching = await fetch(`${config["media-endpoint"]}?q=source${offset ? `&offset=${offset}` : ''}&limit=50000&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const results = await fetching.json();
+
+                    let nextPage = false;
+                    let items = results.items
+                        .filter(p => type ? p.url.includes('.' + type) : true)
+                        .filter(p => q ? p.alt ? p.alt.includes(q) : false : true);
+
+                    if(collection) {
+                        fetching = await fetch(`${config["media-endpoint"]}?q=source&microblog-collection=https://example.org/collections/${collection}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        const collectionUploads = await fetching.json();
+                        items = collectionUploads.items;
+                    }
+
+                    if(items.length > 25) {
+                        nextPage = true;
+                    }
+
+                    const fileExtensions = results.items.map(obj => {
+                        const url = obj.url;
+                        const extension = url.split('.').pop();
+                        return extension.trim();
+                    });
+                    const uniqueExtensions = new Set(fileExtensions);
+
+                    fetching = await fetch(`https://micro.blog/micropub?q=source&mp-destination=${encodeURIComponent(mpDestination)}&mp-channel=collections`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                    const collections = await fetching.json();
+
+                    content = `${utility.blogHeader('uploads')}
+                        <div id="uploads" class="mt-2">
+                            ${q || collection || type ? `
+                                <p class="text-center">Filtering on 
+                                    ${q ? ` term: ${q}` : 
+                                        collection ? ` collection: ${collections.items.filter(c => c.properties.uid[0] == collection)[0].properties.name[0]}` : 
+                                        type ? ` type: ${type}` : ''}
+                                    <a class="btn btn-link btn-action" rel="prefetch" swap-target="#main" swap-history="true" href="/uploads?destination=${encodeURIComponent(mpDestination)}" ><i class="icon icon-cross"></i></a>
+                                </p>
+                                ` : ''}
+                            <div>
+                                ${utility.getUploadHTML(items.slice(0, 25), config, mpDestination, Array.from(uniqueExtensions), q || type, collections.items)}
+                            </div>
+                            <p class="text-center">
+                                ${offset ? `<a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/uploads?destination=${encodeURIComponent(mpDestination)}&limit=50000${offset ? `&offset=${offset - 25}` : ''}${q ? `&q=${q}` : ''}${type ? `&type=${type}` : ''}" />Previous</a>` :''}
+                                ${nextPage ? `<a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/uploads?destination=${encodeURIComponent(mpDestination)}&limit=50000&offset=${offset ? offset + 25 : 25}${q ? `&q=${q}` : ''}${type ? `&type=${type}` : ''}" />Next</a>` : '' }
+                            </p>
+                        </div>`;
+
+                        // fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        // const categories = await fetching.json();
+                        // let nextPage = false;
+                        // const items = results.items
+                        //     .filter(p => req.url.includes("blog") ? p.properties["post-status"][0] == 'published' : p.properties["post-status"][0] == 'draft')
+                        //     .filter(p => category ? p.properties.category ? p.properties.category.includes(category) : false : true )
+                        
+                        // if(items.length > 25) {
+                        //     nextPage = true;
+                        // }
+
+                        // content = `${utility.blogHeader(req.url.includes("blog") ? 'blog' : 'draft')}
+                        //     <div id="blog" class="mt-2">
+                        //         <div>
+                        //             ${utility.getBlogHTML(items.slice(0, 25),config, mpDestination, categories,q || category || offset)}
+                        //         </div>
+                        //         <p class="text-center">
+                        //             ${offset ? `<a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?destination=${encodeURIComponent(mpDestination)}&limit=50000${offset ? `&offset=${offset - 25}` : ''}${q ? `&q=${q}` : ''}${category ? `&category=${category}` : ''}" />Previous</a>` :''}
+                        //             ${nextPage ? `<a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?destination=${encodeURIComponent(mpDestination)}&limit=50000&offset=${offset ? offset + 25 : 25}${q ? `&q=${q}` : ''}${category ? `&category=${category}` : ''}" />Next</a>` : '' }
+                        //         </p>
+                        //     </div>`;
                 } else if(req.url.includes("blog") || req.url.includes("drafts")) {
                     //-------
                     //  Blog
@@ -936,20 +950,24 @@ Deno.serve(async (req) => {
 
                         fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const categories = await fetching.json();
-
-                        if(results.items > 25) {
-                            // we need to add the offset link for paging....
+                        let nextPage = false;
+                        const items = results.items
+                            .filter(p => req.url.includes("blog") ? p.properties["post-status"][0] == 'published' : p.properties["post-status"][0] == 'draft')
+                            .filter(p => category ? p.properties.category ? p.properties.category.includes(category) : false : true )
+                        
+                        if(items.length > 25) {
+                            nextPage = true;
                         }
 
                         content = `${utility.blogHeader(req.url.includes("blog") ? 'blog' : 'draft')}
                             <div id="blog" class="mt-2">
                                 <div>
-                                    ${utility.getBlogHTML(results.items
-                                        .filter(p => req.url.includes("blog") ? p.properties["post-status"][0] == 'published' : p.properties["post-status"][0] == 'draft')
-                                        .filter(p => category ? p.properties.category ? p.properties.category.includes(category) : false : true ).slice(0, 25)
-                                        ,config, mpDestination, categories,q || category || offset)
-                                        }
+                                    ${utility.getBlogHTML(items.slice(0, 25),config, mpDestination, categories,q || category || offset)}
                                 </div>
+                                <p class="text-center">
+                                    ${offset ? `<a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?destination=${encodeURIComponent(mpDestination)}&limit=50000${offset ? `&offset=${offset - 25}` : ''}${q ? `&q=${q}` : ''}${category ? `&category=${category}` : ''}" />Previous</a>` :''}
+                                    ${nextPage ? `<a class="btn btn-link" rel="prefetch" swap-target="#main" swap-history="true" href="/blog?destination=${encodeURIComponent(mpDestination)}&limit=50000&offset=${offset ? offset + 25 : 25}${q ? `&q=${q}` : ''}${category ? `&category=${category}` : ''}" />Next</a>` : '' }
+                                </p>
                             </div>`;
                 } else if(req.url.includes("pages")) {
                     //-------
@@ -967,7 +985,7 @@ Deno.serve(async (req) => {
                         <div id="pages" class="mt-2">
                             <input id="pageXML" type="hidden" value="${result}" />
                         </div>`;
-                }
+                } 
 
 
                 
@@ -977,7 +995,7 @@ Deno.serve(async (req) => {
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
                     .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
                     .replaceAll('{{premium}}', mbUser.is_premium ? '' : 'hide')
-                , HTMLHeaders(nonce));
+                , HTMLHeaders(nonce, null, disableCSP));
             }
 
             return new Response(new TextDecoder().decode(await Deno.readFile("notfound.html")),
@@ -1112,8 +1130,16 @@ async function decryptMe(encrypted)
 // Helper method for returning a proper response header
 // can set a cookie if provided
 // the uuid is set per request to set a nonce
-function HTMLHeaders(uuid, cookie) {
+function HTMLHeaders(uuid, cookie, disable = false) {
     const csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com 'nonce-${uuid}';media-src *;img-src *`;
+    if(disable) {
+        return {
+            headers: {
+                "content-type": "text/html",
+                status: 200,
+            },
+        };    
+    }
     if(!cookie) {
         return {
             headers: {
