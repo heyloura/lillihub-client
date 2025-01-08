@@ -323,3 +323,22 @@ article > section > ul {
 .hide {
     display: none;
 }
+a {
+    color: var(--color-cy);
+    text-decoration: none;
+}
+a:hover {
+    color: var(--color-cy-hover);
+}
+a:visited {
+    color: var(--color-cy);
+}
+ul[role=menu] {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+ul[role=menu] li {
+ display: inline-block;
+}
+  
