@@ -337,8 +337,10 @@ ul[role=menubar] {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    background: var(--color-bg-secondary);
+    margin-bottom: 0.5em;
 }
 ul[role=menubar] li {
- display: inline-block;
+    display: inline-block;
+    padding: 6px 10px;
 }
-  
