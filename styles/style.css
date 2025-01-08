@@ -333,12 +333,12 @@ a:hover {
 a:visited {
     color: var(--color-cy);
 }
-ul[role=menu] {
+ul[role=menubar] {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
-ul[role=menu] li {
+ul[role=menubar] li {
  display: inline-block;
 }
   
