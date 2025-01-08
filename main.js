@@ -753,8 +753,24 @@ Deno.serve(async (req) => {
                     const posts = await mb.getMicroBlogTimelinePostsChronological(mbToken, id);
                     // content = `${utility.timelineHeader('timeline')}
                     //     <div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
-                    content = `${utility.timelineHeader('timeline')}
-                        <div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
+                    content = posts.map(p => `
+                        <article data-id="${p.id}">
+                            <header>
+                                <img src="${p.avatar}" loading="lazy">
+                                <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a>
+                            </header>
+                            <section >
+                                <ul role="menubar">
+                                    <li role="menuitem" tabindex="0">Reply</li>
+                                    <li role="menuitem" tabindex="0">Bookmark</li>
+                                    <li role="menuitem" tabindex="0">Embed</li>
+                                    <li role="menuitem" tabindex="0">Conversation</li>
+                                </ul>
+                                <span><a href="#">${p.name}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a></span>
+                                ${p.content}
+                            </section>
+                        </article>   
+                        `).join('');
                 } else if(req.url.includes("mentions")) {
                     //----------
                     //  Mentions

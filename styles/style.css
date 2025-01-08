@@ -293,3 +293,33 @@ ul {
         flex-direction: column;
     }
 }
+/* TIMELINE */
+article > header {
+    position: absolute;
+    overflow: hidden;
+    width: 80px;
+}
+article > header img {
+    height: 80px;
+    aspect-ratio: 1/1;
+    display: block;
+    border-radius: 5px;
+}
+article > section, article > aside, article > footer {
+    margin-left: calc(80px + 1em);
+    margin-top: 1em;
+}
+article > aside img {
+    height: 80px;
+    width: unset;
+    /* display: inline-block; */
+}
+article > section > p:first-of-type {
+    display: inline;
+}
+article > section > ul {
+    /* border: 1px solid var(--color-ui-normal);  */
+}
+.hide {
+    display: none;
+}
