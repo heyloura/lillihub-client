@@ -532,7 +532,7 @@ Deno.serve(async (req) => {
             const pages = ["pages", "notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies", "blog", "draft", "uploads", "collections", "webmentions"]
             if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
                 let disableCSP = false;
-                const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
+                const layout = new TextDecoder().decode(await Deno.readFile("layout_2.html"));
                 const parts = req.url.split('/');
                 let name = parts[parts.length - 1].split('?')[0];
                 let id = null;
@@ -752,7 +752,7 @@ Deno.serve(async (req) => {
                     //const posts = await fetching.json();
                     const posts = await mb.getMicroBlogTimelinePosts(mbToken, id);
                     content = `${utility.timelineHeader('timeline')}
-                        <div id="post-list" class="">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
+                        <div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
                 } else if(req.url.includes("mentions")) {
                     //----------
                     //  Mentions
@@ -990,7 +990,7 @@ Deno.serve(async (req) => {
 
                 
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
-                    .replaceAll('{{pages}}', content)
+                    .replaceAll('{{content}}', content)
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
                     .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')

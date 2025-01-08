@@ -1,0 +1,295 @@
+:root {
+    --flexoki-black: #100F0F;
+    --flexoki-black-rgb: 16, 15, 15;
+    --flexoki-paper: #FFFCF0;
+    --flexoki-paper-rgb: 254, 252, 240;
+    --flexoki-200-rgb: 206, 205, 195;
+    --flexoki-50: #F2F0E5;
+    --flexoki-100: #E6E4D9;
+    --flexoki-150: #DAD8CE;
+    --flexoki-200: #CECDC3;
+    --flexoki-300: #B7B5AC;
+    --flexoki-400: #9F9D96;
+    --flexoki-500: #878580;
+    --flexoki-600: #6F6E69;
+    --flexoki-700: #575653;
+    --flexoki-800: #403E3C;
+    --flexoki-850: #343331;
+    --flexoki-900: #282726;
+    --flexoki-950: #1C1B1A;
+    --flexoki-red-50: #FFE1D5;
+    --flexoki-red-100: #FFCABB;
+    --flexoki-red-150: #FDB2A2;
+    --flexoki-red-200: #F89A8A;
+    --flexoki-red-300: #E8705F;
+    --flexoki-red-400: #D14D41;
+    --flexoki-red-500: #C03E35;
+    --flexoki-red-600: #AF3029;
+    --flexoki-red-700: #942822;
+    --flexoki-red-800: #6C201C;
+    --flexoki-red-850: #551B18;
+    --flexoki-red-900: #3E1715;
+    --flexoki-red-950: #261312;
+    --flexoki-orange-50: #FFE7CE;
+    --flexoki-orange-100: #FED3AF;
+    --flexoki-orange-150: #FCC192;
+    --flexoki-orange-200: #F9AE77;
+    --flexoki-orange-300: #EC8B49;
+    --flexoki-orange-400: #DA702C;
+    --flexoki-orange-500: #CB6120;
+    --flexoki-orange-600: #BC5215;
+    --flexoki-orange-700: #9D4310;
+    --flexoki-orange-800: #71320D;
+    --flexoki-orange-850: #59290D;
+    --flexoki-orange-900: #40200D;
+    --flexoki-orange-950: #27180E;
+    --flexoki-yellow-50: #FAEEC6;
+    --flexoki-yellow-100: #F6E2A0;
+    --flexoki-yellow-150: #F1D67E;
+    --flexoki-yellow-200: #ECCB60;
+    --flexoki-yellow-300: #DFB431;
+    --flexoki-yellow-400: #D0A215;
+    --flexoki-yellow-500: #BE9207;
+    --flexoki-yellow-600: #AD8301;
+    --flexoki-yellow-700: #8E6B01;
+    --flexoki-yellow-800: #664D01;
+    --flexoki-yellow-850: #503D02;
+    --flexoki-yellow-900: #3A2D04;
+    --flexoki-yellow-950: #241E08;
+    --flexoki-green-50: #EDEECF;
+    --flexoki-green-100: #DDE2B2;
+    --flexoki-green-150: #CDD597;
+    --flexoki-green-200: #BEC97E;
+    --flexoki-green-300: #A0AF54;
+    --flexoki-green-400: #879A39;
+    --flexoki-green-500: #768D21;
+    --flexoki-green-600: #66800B;
+    --flexoki-green-700: #536907;
+    --flexoki-green-800: #3D4C07;
+    --flexoki-green-850: #313D07;
+    --flexoki-green-900: #252D09;
+    --flexoki-green-950: #1A1E0C;
+    --flexoki-cyan-50: #DDF1E4;
+    --flexoki-cyan-100: #BFE8D9;
+    --flexoki-cyan-150: #A2DECE;
+    --flexoki-cyan-200: #87D3C3;
+    --flexoki-cyan-300: #5ABDAC;
+    --flexoki-cyan-400: #3AA99F;
+    --flexoki-cyan-500: #2F968D;
+    --flexoki-cyan-600: #24837B;
+    --flexoki-cyan-700: #1C6C66;
+    --flexoki-cyan-800: #164F4A;
+    --flexoki-cyan-850: #143F3C;
+    --flexoki-cyan-900: #122F2C;
+    --flexoki-cyan-950: #101F1D;
+    --flexoki-blue-50: #E1ECEB;
+    --flexoki-blue-100: #C6DDE8;
+    --flexoki-blue-150: #ABCFE2;
+    --flexoki-blue-200: #92BFDB;
+    --flexoki-blue-300: #66A0C8;
+    --flexoki-blue-400: #4385BE;
+    --flexoki-blue-500: #3171B2;
+    --flexoki-blue-600: #205EA6;
+    --flexoki-blue-700: #1A4F8C;
+    --flexoki-blue-800: #163B66;
+    --flexoki-blue-850: #133051;
+    --flexoki-blue-900: #12253B;
+    --flexoki-blue-950: #101A24;
+    --flexoki-purple-50: #F0EAEC;
+    --flexoki-purple-100: #E2D9E9;
+    --flexoki-purple-150: #D3CAE6;
+    --flexoki-purple-200: #C4B9E0;
+    --flexoki-purple-300: #A699D0;
+    --flexoki-purple-400: #8B7EC8;
+    --flexoki-purple-500: #735EB5;
+    --flexoki-purple-600: #5E409D;
+    --flexoki-purple-700: #4F3685;
+    --flexoki-purple-800: #3C2A62;
+    --flexoki-purple-850: #31234E;
+    --flexoki-purple-900: #261C39;
+    --flexoki-purple-950: #1A1623;
+    --flexoki-magenta-50: #FEE4E5;
+    --flexoki-magenta-100: #FCCFDA;
+    --flexoki-magenta-150: #F9B9CF;
+    --flexoki-magenta-200: #F4A4C2;
+    --flexoki-magenta-300: #E47DA8;
+    --flexoki-magenta-400: #CE5D97;
+    --flexoki-magenta-500: #B74583;
+    --flexoki-magenta-600: #A02F6F;
+    --flexoki-magenta-700: #87285E;
+    --flexoki-magenta-800: #641F46;
+    --flexoki-magenta-850: #4F1B39;
+    --flexoki-magenta-900: #39172B;
+    --flexoki-magenta-950: #24131D;
+}
+:root, .theme-light {
+    --color-bg-primary: var(--flexoki-paper);
+    --color-bg-primary-rgb: var(--flexoki-paper-rgb);
+    --color-inverted-rgb: var(--flexoki-black-rgb);
+    --color-bg-secondary: var(--flexoki-50);
+    --color-tx-normal: var(--flexoki-black);
+    --color-tx-normal-rgb: var(--flexoki-black-rgb);
+    --color-tx-muted: var(--flexoki-600);
+    --color-tx-faint: var(--flexoki-300);
+    --color-ui-normal: var(--flexoki-100);
+    --color-ui-hover: var(--flexoki-150);
+    --color-ui-active: var(--flexoki-200);
+    --color-highlight: var(--flexoki-yellow-100);
+    --color-action: var(--flexoki-cyan-600);
+    --color-bg-hover: var(--flexoki-cyan-50);
+    --color-selection: rgba(187, 220, 206, 0.3);
+    --color-re: var(--flexoki-red-600);
+    --color-re-hover: var(--flexoki-red-400);
+    --color-or: var(--flexoki-orange-600);
+    --color-or-hover: var(--flexoki-orange-400);
+    --color-ye: var(--flexoki-yellow-600);
+    --color-ye-hover: var(--flexoki-yellow-400);
+    --color-gr: var(--flexoki-green-600);
+    --color-gr-hover: var(--flexoki-green-400);
+    --color-cy: var(--flexoki-cyan-600);
+    --color-cy-hover: var(--flexoki-cyan-400);
+    --color-bl: var(--flexoki-blue-600);
+    --color-bl-hover: var(--flexoki-blue-400);
+    --color-pu: var(--flexoki-purple-600);
+    --color-pu-hover: var(--flexoki-purple-400);
+    --color-ma: var(--flexoki-magenta-600);
+    --color-ma-hover: var(--flexoki-magenta-400);
+}
+.theme-dark {
+    --color-bg-primary: var(--flexoki-black);
+    --color-bg-primary-rgb: var(--flexoki-black-rgb);
+    --color-inverted-rgb: var(--flexoki-paper-rgb);
+    --color-bg-secondary: var(--flexoki-950);
+    --color-tx-normal: var(--flexoki-200);
+    --color-tx-normal-rgb: var(--flexoki-200-rgb);
+    --color-tx-muted: var(--flexoki-500);
+    --color-tx-faint: var(--flexoki-700);
+    --color-ui-normal: var(--flexoki-900);
+    --color-ui-hover: var(--flexoki-850);
+    --color-ui-active: var(--flexoki-800);
+    --color-highlight: var(--flexoki-yellow-900);
+    --color-action: var(--flexoki-cyan-400);
+    --color-bg-hover: var(--flexoki-cyan-950);
+    --color-selection: rgba(30,95,91,0.3);
+    --color-re: var(--flexoki-red-400);
+    --color-re-hover: var(--flexoki-red-600);
+    --color-or: var(--flexoki-orange-400);
+    --color-or-hover: var(--flexoki-orange-600);
+    --color-ye: var(--flexoki-yellow-400);
+    --color-ye-hover: var(--flexoki-yellow-600);
+    --color-gr: var(--flexoki-green-400);
+    --color-gr-hover: var(--flexoki-green-600);
+    --color-cy: var(--flexoki-cyan-400);
+    --color-cy-hover: var(--flexoki-cyan-600);
+    --color-bl: var(--flexoki-blue-400);
+    --color-bl-hover: var(--flexoki-blue-600);
+    --color-pu: var(--flexoki-purple-400);
+    --color-pu-hover: var(--flexoki-purple-600);
+    --color-ma: var(--flexoki-magenta-400);
+    --color-ma-hover: var(--flexoki-magenta-600);
+}
+
+/* https://alvaromontoro.com/blog/68055/ten-css-one-liners-for-almost-every-project */
+/* https://www.swyx.io/css-100-bytes */
+body {
+    background-color: var(--color-bg-primary);
+}
+body, input, select {        
+    margin: auto;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    accent-color: var(--color-cy);
+    padding: 1em;
+    font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    color: var(--color-tx-normal);
+}
+input, select {
+    padding: 0.25em;
+}
+img {
+    max-width: 100%;
+}
+p {
+    max-width: 65ch;
+}
+h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+    font-size: 1.5rem;
+    margin: 2em 0 1em;
+}
+:is(tbody, table) > tr:nth-child(odd) {
+    background: #0001;
+}
+td, th {
+    padding: 0.5em;
+}
+ul {
+    padding-left: 1em;
+}
+@media (prefers-reduced-motion) {
+    *, *::before, *::after {
+        animation-duration: 0s !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+/* CSS LAYOUT */
+.main-head {
+    grid-area: header;
+}
+.content {
+    grid-area: content;
+}
+.main-nav {
+    grid-area: nav;
+}
+.side {
+    grid-area: sidebar;
+}
+.ad {
+    grid-area: ad;
+}
+.main-footer {
+    grid-area: footer;
+}
+.wrapper {
+    display: grid;
+    gap: 20px;
+    grid-template-areas:
+      "header"
+      "nav"
+      "content"
+      "sidebar"
+      "ad"
+      "footer";
+}
+@media (min-width: 500px) {
+    .wrapper {
+        grid-template-columns: 1fr 3fr;
+        grid-template-areas:
+        "header  header"
+        "nav     nav"
+        "sidebar content"
+        "ad      footer";
+    }
+    nav ul {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+@media (min-width: 700px) {
+    .content {
+        max-width: clamp(320px, 90%, 70ch);
+    }
+    .wrapper {
+        grid-template-columns: 1fr 4fr 1fr;
+        grid-template-areas:
+        "header header  header"
+        "nav    content sidebar"
+        "nav    content ad"
+        "footer footer  footer";
+    }
+    nav ul {
+        flex-direction: column;
+    }
+}
