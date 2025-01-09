@@ -18,7 +18,7 @@
     </head>
     <body class="theme-light">
         <dialog>
-            <button class="evt-dialog-close" autofocus>Close</button>
+            <button type="button" class="evt-dialog-close" autofocus>Close</button>
             <p>This modal dialog has a groovy backdrop!</p>
         </dialog>
         <div class="wrapper">
@@ -48,7 +48,7 @@
                     dialog.showModal();
                 }
                 if(event.target.classList.contains('evt-dialog-close')) {
-                    dialog.showModal();
+                    dialog.close();
                 }
             });
         </script>

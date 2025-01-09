@@ -236,21 +236,33 @@ ul {
 /* CSS LAYOUT */
 .main-head {
     grid-area: header;
+    border: 1px solid var(--color-ui-normal);
+    border-radius: 0.5em;
 }
 .content {
     grid-area: content;
+    border: 1px solid var(--color-ui-normal);
+    border-radius: 0.5em;
 }
 .main-nav {
     grid-area: nav;
+    border: 1px solid var(--color-ui-normal);
+    border-radius: 0.5em;
 }
 .side {
     grid-area: sidebar;
+    border: 1px solid var(--color-ui-normal);
+    border-radius: 0.5em;
 }
 .ad {
     grid-area: ad;
+    border: 1px solid var(--color-ui-normal);
+    border-radius: 0.5em;
 }
 .main-footer {
     grid-area: footer;
+    border: 1px solid var(--color-ui-normal);
+    border-radius: 0.5em;
 }
 .wrapper {
     display: grid;
@@ -306,7 +318,7 @@ article > header img {
     height: 80px;
     aspect-ratio: 1/1;
     display: block;
-    border-radius: 5px;
+    border-radius: 0.5em;
 }
 article > section, article > aside, article > footer {
     margin-left: calc(80px + 1em);
