@@ -754,7 +754,7 @@ Deno.serve(async (req) => {
                     // content = `${utility.timelineHeader('timeline')}
                     //     <div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
                     content = posts.map(p => `
-                        <article data-id="${p.id}">
+                        <article id="${p.id}">
                             <header>
                                 <img src="${p.avatar}" loading="lazy">
                             </header>
@@ -763,7 +763,7 @@ Deno.serve(async (req) => {
                                     <li role="menuitem" tabindex="0">▼</li>
                                     <li role="menuitem" tabindex="0">Reply</li>
                                     ${p.conversation ? `<li role="menuitem" tabindex="0"><button class="evt-dialog-open" type="button">Conversation</button></li>` : ''}
-                                    <li role="menuitem" tabindex="0" class="right evt-timeline-mark">👁</li>
+                                    <li data-id="${p.id}" role="menuitem" tabindex="0" class="right evt-timeline-mark">👁</li>
                                 </ul>
                                 <span><a href="#">${p.name}</a>${p.mention ? ' ➤ ' : ''}</span>
                                 ${p.content}
