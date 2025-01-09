@@ -237,7 +237,7 @@ ul {
 /* Default layout for larger screens */
 .second-column {
     max-width: clamp(320px, 100%, calc(70ch + 85px));
-    margin-left: 300px;
+
 }
 .first-column {
     border: 1px solid var(--color-ui-normal);
