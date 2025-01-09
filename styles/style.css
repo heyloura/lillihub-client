@@ -295,7 +295,7 @@ ul {
 }
 /* TIMELINE */
 article {
-    min-height: 5em;
+    min-height: 6em;
 }
 article > header {
     position: absolute;

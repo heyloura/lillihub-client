@@ -757,7 +757,6 @@ Deno.serve(async (req) => {
                         <article data-id="${p.id}">
                             <header>
                                 <img src="${p.avatar}" loading="lazy">
-                                <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a>
                             </header>
                             <section >
                                 <ul role="menubar">
@@ -766,9 +765,12 @@ Deno.serve(async (req) => {
                                     <li role="menuitem" tabindex="0">Embed</li>
                                     <li role="menuitem" tabindex="0">Conversation</li>
                                 </ul>
-                                <span><a href="#">${p.name}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>${p.mention ? ' ➤ ' : ''}</span>
+                                <span><a href="#">${p.name}</a>${p.mention ? ' ➤ ' : ''}</span>
                                 ${p.content}
                             </section>
+                            <footer>
+                                <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>
+                            </footer>
                         </article>   
                         `).join('');
                 } else if(req.url.includes("mentions")) {
