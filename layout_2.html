@@ -49,12 +49,11 @@
                 if(event.target.classList.contains('evt-dialog-close')) {
                     dialog.close();
                 }
-                if(event.target.classList.contains('evt-show-first-column')) {
-                    if(document.getElementById('main').classList.contains('show-first-column')) {
-                        document.getElementById('main').classList.remove('show-first-column');
-                    } else {
-                        document.getElementById('main').classList.add('show-first-column');
-                    }
+                if(event.target.classList.contains('evt-timeline-mark')) {
+                    const id = event.target.getAttribute('data-id');
+                    fetch("/api/timeline/mark/" + id, { method: "get" })
+                            .then(response => response.text())
+                            .then(data => {});
                 }
             });
         </script>
