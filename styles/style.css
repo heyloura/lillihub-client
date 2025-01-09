@@ -235,7 +235,15 @@ ul {
 }
 /* CSS LAYOUT */
 /* Default layout for larger screens */
-.container {
+.second-column {
+    max-width: clamp(320px, 100%, calc(70ch + 85px));
+    margin-left: 300px;
+}
+.first-column {
+    border: 1px solid var(--color-ui-normal);
+}
+/* Default layout for larger screens */
+/* .container {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
     grid-gap: 20px;
@@ -254,7 +262,6 @@ ul {
 .third-column {
     grid-column: 3;
 }
-/* Media query for mobile screens */
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
@@ -269,7 +276,7 @@ ul {
     .container.show-first-column .first-column {
         transform: translateX(0);
     }
-}
+} */
 /* TIMELINE */
 article {
     min-height: 6em;
