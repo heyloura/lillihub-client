@@ -314,6 +314,7 @@ article > section, article > aside, article > footer {
 }
 article > section > footer {
     font-size: small;
+    margin-top: 0.5em;
 }
 article > aside img {
     height: 80px;

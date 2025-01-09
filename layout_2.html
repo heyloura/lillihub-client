@@ -43,7 +43,7 @@
         <script nonce="{{nonce}}">
             const dialog = document.querySelector("dialog");
 
-            document.addEventListener("input", (event) => {  
+            document.addEventListener("click", (event) => {  
                 if(event.target.classList.contains('evt-dialog-open')) {
                     dialog.showModal();
                 }
