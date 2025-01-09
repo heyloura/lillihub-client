@@ -758,19 +758,19 @@ Deno.serve(async (req) => {
                             <header>
                                 <img src="${p.avatar}" loading="lazy">
                             </header>
-                            <section >
+                            <section>
                                 <ul role="menubar">
                                     <li role="menuitem" tabindex="0">Reply</li>
                                     <li role="menuitem" tabindex="0">Bookmark</li>
                                     <li role="menuitem" tabindex="0">Embed</li>
-                                    ${p.conversation ? `<li role="menuitem" tabindex="0">Conversation</li>` : ''}
+                                    ${p.conversation ? `<li role="menuitem" tabindex="0"><button class="evt-dialog-open" type="button">Conversation</button></li>` : ''}
                                 </ul>
                                 <span><a href="#">${p.name}</a>${p.mention ? ' ➤ ' : ''}</span>
                                 ${p.content}
-                            </section>
-                            <footer>
-                                <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>
-                            </footer>
+                                <footer>
+                                    <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>
+                                </footer>
+                            </section> 
                         </article>   
                         `).join('');
                 } else if(req.url.includes("mentions")) {
