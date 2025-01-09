@@ -247,12 +247,13 @@ ul {
 
 .second-column {
     grid-column: 2;
+    max-width: clamp(320px, 90%, calc(70ch + 85px));
+    width: 100%;
 }
 
 .third-column {
     grid-column: 3;
 }
-
 /* Media query for mobile screens */
 @media (max-width: 768px) {
     .container {
@@ -272,6 +273,8 @@ ul {
 /* TIMELINE */
 article {
     min-height: 6em;
+    overflow: hidden;
+    overflow-wrap: anywhere;
 }
 article > header {
     position: absolute;
