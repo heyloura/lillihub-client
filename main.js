@@ -766,7 +766,7 @@ Deno.serve(async (req) => {
                                     <li role="menuitem" tabindex="0">Embed</li>
                                     <li role="menuitem" tabindex="0">Conversation</li>
                                 </ul>
-                                <span><a href="#">${p.name}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a></span>
+                                <span><a href="#">${p.name}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>${p.mention ? ' ➤ ' : ''}</span>
                                 ${p.content}
                             </section>
                         </article>   

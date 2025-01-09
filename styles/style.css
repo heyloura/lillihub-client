@@ -294,6 +294,9 @@ ul {
     }
 }
 /* TIMELINE */
+article {
+    min-height: 5em;
+}
 article > header {
     position: absolute;
     overflow: hidden;
