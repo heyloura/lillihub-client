@@ -312,6 +312,9 @@ article > section, article > aside, article > footer {
     margin-left: calc(80px + 1em);
     margin-top: 1em;
 }
+article > footer {
+    font-size: small;
+}
 article > aside img {
     height: 80px;
     width: unset;

@@ -763,7 +763,7 @@ Deno.serve(async (req) => {
                                     <li role="menuitem" tabindex="0">Reply</li>
                                     <li role="menuitem" tabindex="0">Bookmark</li>
                                     <li role="menuitem" tabindex="0">Embed</li>
-                                    <li role="menuitem" tabindex="0">Conversation</li>
+                                    ${p.conversation ? `<li role="menuitem" tabindex="0">Conversation</li>` : ''}
                                 </ul>
                                 <span><a href="#">${p.name}</a>${p.mention ? ' ➤ ' : ''}</span>
                                 ${p.content}
