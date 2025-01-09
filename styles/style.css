@@ -362,4 +362,5 @@ ul[role=menubar] {
 ul[role=menubar] li {
     display: inline-block;
     padding: 6px 10px;
+    color: var(--color-tx-muted);
 }
