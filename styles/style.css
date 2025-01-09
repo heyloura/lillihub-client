@@ -241,27 +241,9 @@ ul {
 }
 .first-column {
     border: 1px solid var(--color-ui-normal);
+    margin-top: 1em;
 }
-/* Default layout for larger screens */
-/* .container {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 20px;
-}
-
-.first-column {
-    grid-column: 1;
-}
-
-.second-column {
-    grid-column: 2;
-    max-width: clamp(320px, 90%, calc(70ch + 85px));
-    width: 100%;
-}
-
-.third-column {
-    grid-column: 3;
-}
+/*
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
