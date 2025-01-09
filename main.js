@@ -760,12 +760,11 @@ Deno.serve(async (req) => {
                             </header>
                             <section>
                                 <ul role="menubar">
+                                    <li role="menuitem" tabindex="0">▽</li>
                                     <li role="menuitem" tabindex="0">Reply</li>
-                                    <li role="menuitem" tabindex="0">Bookmark</li>
-                                    <li role="menuitem" tabindex="0">Embed</li>
                                     ${p.conversation ? `<li role="menuitem" tabindex="0"><button class="evt-dialog-open" type="button">Conversation</button></li>` : ''}
                                 </ul>
-                                <span><a href="#">${p.name}</a>${p.mention ? ' ➤ ' : ''}</span>
+                                <span><a href="#">${p.name}</a>${p.mention ? ' ▷ ' : ''}</span>
                                 ${p.content}
                                 <footer>
                                     <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>
