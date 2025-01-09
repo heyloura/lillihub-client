@@ -266,12 +266,21 @@ article > header img {
     height: 80px;
     aspect-ratio: 1/1;
     display: block;
-    border-radius: 0.5em;
+    border-radius: 0.25em;
 }
 article > section, article > aside, article > footer {
     margin-left: calc(80px + 1em);
     margin-top: 1em;
 }
+@media (max-width: 768px) {
+    article > section, article > aside, article > footer {
+        margin-left: 0px;
+        margin-top: 1em;
+    }
+    article > header img {
+        height: 42px;
+    }
+} 
 article > section > footer {
     font-size: small;
     margin-top: 0.5em;
