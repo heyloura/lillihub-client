@@ -1884,3 +1884,11 @@
             .status-bar-field:last-child {
                 border-right: 0;
             }
+/*CUSTOM*/
+body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--color-bg-primary);
+            max-width: 100ch;
+}
