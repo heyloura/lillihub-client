@@ -17,7 +17,44 @@
         <link rel="stylesheet" href="/styles/style.css">  
     </head>
     <body class="theme-dark">
-        <header></header>
+        <header>
+            <ul role="menubar" class="can-hover">
+                <li role="menuitem" tabindex="0" aria-haspopup="true">
+                  Lillihub
+                  <ul role="menu">
+                    <li role="menuitem">
+                      <a href="#menubar">
+                        Open <span>Ctrl+O</span>
+                      </a>
+                    </li>
+                    <li role="menuitem">
+                      <a href="#menubar">
+                        Save <span>Ctrl+S</span>
+                      </a>
+                    </li>
+                    <li role="menuitem" class="has-divider">
+                      <a href="#menubar">
+                        Save As... <span>Ctrl+Shift+S</span>
+                      </a>
+                    </li>
+                    <li role="menuitem"><a href="#menubar">Log out</a></li>
+                  </ul>
+                </li>
+                <li role="menuitem" tabindex="0" aria-haspopup="true">
+                  Timeline
+                  <ul role="menu">
+                    <li role="menuitem"><a href="#menubar">Undo</a></li>
+                    <li role="menuitem"><a href="#menubar">Copy</a></li>
+                    <li role="menuitem"><a href="#menubar">Cut</a></li>
+                    <li role="menuitem" class="has-divider"><a href="#menubar">Paste</a></li>
+                    <li role="menuitem"><a href="#menubar">Delete</a></li>
+                    <li role="menuitem"><a href="#menubar">Find...</a></li>
+                    <li role="menuitem"><a href="#menubar">Replace...</a></li>
+                    <li role="menuitem"><a href="#menubar">Go to...</a></li>
+                  </ul>
+                </li>
+            </ul>
+        </header>
         <main>{{content}}</main>
         <footer></footer>
         <script src="/scripts/showdown.js" type="text/javascript"></script>
