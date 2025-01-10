@@ -1890,5 +1890,7 @@ body {
             padding: 0;
             overflow: hidden;
             background-color: var(--color-bg-primary);
-            max-width: 100ch;
+}
+main {
+             max-width: 100ch;
 }
