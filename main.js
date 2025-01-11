@@ -532,7 +532,7 @@ Deno.serve(async (req) => {
             const pages = ["pages", "notebooks", "timeline", "users", "discover", "mentions", "following", "bookmarks", "settings", "replies", "blog", "draft", "uploads", "collections", "webmentions"]
             if (pages.some(v => req.url.includes(v)) && !req.url.includes('%3Ca%20href=')) {
                 let disableCSP = false;
-                const layout = new TextDecoder().decode(await Deno.readFile("layout_2.html"));
+                const layout = new TextDecoder().decode(await Deno.readFile("layout.html"));
                 const parts = req.url.split('/');
                 let name = parts[parts.length - 1].split('?')[0];
                 let id = null;
@@ -751,30 +751,30 @@ Deno.serve(async (req) => {
                     //fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                     //const posts = await fetching.json();
                     const posts = await mb.getMicroBlogTimelinePostsChronological(mbToken, id);
-                    // content = `${utility.timelineHeader('timeline')}
-                    //     <div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
-                    content = `
-                        ${posts.map(p => `
-                        <article id="${p.id}">
-                            <header>
-                                <img src="${p.avatar}" loading="lazy">
-                                ${p.name}
-                            </header>
-                            <section>
-                                <ul role="menubar">
-                                    <li role="menuitem" tabindex="0">▼</li>
-                                    <li role="menuitem" tabindex="0">Reply</li>
-                                    ${p.conversation ? `<li role="menuitem" tabindex="0"><button class="evt-dialog-open" type="button">Conversation</button></li>` : ''}
-                                    <li data-id="${p.id}" role="menuitem" tabindex="0" class="right evt-timeline-mark">👁</li>
-                                </ul>
-                                <span><a href="#">${p.name}</a>${p.mention ? ' ➤ ' : ''}</span>
-                                ${p.content}
-                                <footer>
-                                    <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>
-                                </footer>
-                            </section> 
-                        </article>   
-                        `).join('')}`;
+                    content = `${utility.timelineHeader('timeline')}
+                        <div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
+                    // content = `
+                    //     ${posts.map(p => `
+                    //     <article id="${p.id}">
+                    //         <header>
+                    //             <img src="${p.avatar}" loading="lazy">
+                    //             ${p.name}
+                    //         </header>
+                    //         <section>
+                    //             <ul role="menubar">
+                    //                 <li role="menuitem" tabindex="0">▼</li>
+                    //                 <li role="menuitem" tabindex="0">Reply</li>
+                    //                 ${p.conversation ? `<li role="menuitem" tabindex="0"><button class="evt-dialog-open" type="button">Conversation</button></li>` : ''}
+                    //                 <li data-id="${p.id}" role="menuitem" tabindex="0" class="right evt-timeline-mark">👁</li>
+                    //             </ul>
+                    //             <span><a href="#">${p.name}</a>${p.mention ? ' ➤ ' : ''}</span>
+                    //             ${p.content}
+                    //             <footer>
+                    //                 <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>
+                    //             </footer>
+                    //         </section> 
+                    //     </article>   
+                    //     `).join('')}`;
                 } else if(req.url.includes("mentions")) {
                     //----------
                     //  Mentions
