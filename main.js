@@ -1012,7 +1012,7 @@ Deno.serve(async (req) => {
 
                 
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
-                    .replaceAll('{{content}}', content)
+                    .replaceAll('{{pages}}', content)
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
                     .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
