@@ -9,10 +9,12 @@ export async function NotesTemplate(user, token, id) {
 
     const notes = eNotes.items.map(item => {
         return _noteTemplate
-            .replaceAll('{{content}}', `<div onclick="window.location.href = '/notes/${id}/update?id=${item.id}'" class="clearfix decryptMe">${item.content_text}</div>`)
+            .replaceAll('{{content}}', `<div class="clearfix decryptMe mt-2">${item.content_text}</div>`)
             .replaceAll('{{publishedDate}}', item.date_modified)
             .replaceAll('{{modified}}', item.date_modified)
-            .replaceAll('{{is_shared}}', item._microblog.is_shared ? '<i class="bi bi-share"></i> shared' : '');
+            .replaceAll('{{notebookId}}', id)
+            .replaceAll('{{id}}', item.id)
+            .replaceAll('{{is_shared}}', item._microblog.is_shared ? `<a target="_blank" href="${item._microblog.shared_url}" class="chip" style="text-decoration:none;"><i class="bi bi-share"></i> &nbsp;shared</a>` : '');
     }).join('');
 
     const content = _notesTemplate

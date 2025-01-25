@@ -79,9 +79,12 @@ a[href]:where(
     width: 100%;
 }
 .card-body img, .card-body video, sl-carousel {
-    width: calc(100% + (0.8rem * 2));
+    max-width: calc(100% + (0.8rem * 2));
     height: auto;
     margin-left: -0.8rem;
+}
+.post-img {
+    max-height: 500px;
 }
 hr {
     border:0;
@@ -507,4 +510,32 @@ td {
     border: .1rem solid var(--purple);
         border-top-color: var(--purplered);
         border-right-color: var(--purplered);
+}
+.card-body img.mini_cover {
+    width: 100px;
+    float: left;
+    margin: 1em; 
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,.5);
+    z-index: 500;
+}
+
+.overlay > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 501;
+}
+.fadeout {
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+} 
+.no-pointer {
+    cursor:default !important;
 }

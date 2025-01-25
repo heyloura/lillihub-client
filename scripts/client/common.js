@@ -38,7 +38,13 @@ function liveSearch(selector, searchboxId) {
 }
 
 function addLoading(elem) {
-    elem.classList.add("loading");
+    //elem.classList.add("loading");
+    document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`)
+}
+
+function toggleCard(card) {
+    card.classList.toggle('expanded'); // Toggle the 'expanded' class//card.classList.add('fadeout');
+    card.classList.toggle('fadeout');
 }
 
 function toggleSummary(el, e) {

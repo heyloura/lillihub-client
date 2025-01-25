@@ -7,7 +7,7 @@ const _shoelacejs = await Deno.readTextFile("scripts/client/shoelace.js");
 function NavBarContent(user) {
     return `<section class="navbar-section mt-1 mb-2">
         <div class="btn-group btn-group-block">
-            <a onclick="addLoading(this)" href="/" class="btn btn-link"><i class="bi bi-view-list green-text"></i></a>
+            <a onclick="addLoading(this)" href="/" class="btn btn-link"><i class="bi bi-card-list green-text"></i></a>
             ${ user && user.lillihub && user.lillihub.display != 'both' ? '<a onclick="addLoading(this)" href="/conversations" class="btn btn-link"><i class="bi bi-chat green-text"></i></a>' : '' }
             ${ user && !user.error ? `
             <a onclick="addLoading(this)" href="/discover" class="btn btn-link"><i class="bi bi-search greenblue-text"></i></a>
@@ -110,6 +110,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                     <meta name="theme-color" content="#000000">
                     <meta name="apple-mobile-web-app-title" content="Lillihub">
                     <link rel="manifest" href="/manifest.webmanifest">
+                    <meta name="mobile-web-app-capable" content="yes">
                     <style>
                         ${CSSThemeColors(user && user.lillihub ? user.lillihub.darktheme : false)}
                     </style>

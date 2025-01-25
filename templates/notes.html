@@ -9,19 +9,28 @@
     <div class="clearfix"></div>
     <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
         <div class="input-group">
-            <input type="search" id="searchbox" oninput="liveSearch('.card', 'searchbox')" class="form-input" placeholder="Search" />
+            <input list="noteTags" type="search" id="searchbox" oninput="liveSearch('.card', 'searchbox')" class="form-input" placeholder="Search" />
         </div>
     </div>
+    <datalist id="noteTags"></datalist>
     {{notes}}
     <style>
     .card {
         background-color: {{color}} !important;
         cursor: pointer;
-        transition: all .2s ease-in-out;
     }
     .card:hover {
         border: {{light}} !important;
-        transform: scale(1.025);
+    }
+    .card {
+        max-height: 500px; /* Set a maximum height */
+        overflow: hidden; /* Hide overflow text */
+        transition: max-height 0.3s ease, opacity 0.3s ease; /* Smooth transition */
+        opacity: 1; /* Initial opacity */
+    }
+    .card.expanded {
+        max-height: 5000px; /* Set to a larger height when expanded */
+        opacity: 1; /* Fully visible */
     }
     @media (prefers-color-scheme: dark) {
         .card {
@@ -70,11 +79,49 @@
         async function decryptNotes() {
             if(localStorage.getItem("notes_key"))
             {
-                const converter = new showdown.Converter();
+                const datalist = new Set();
+                const converter = new showdown.Converter({	
+                        metadata: true,
+                        parseImgDimensions: true,
+                        strikethrough: true,
+                        tables: true,
+                        ghCodeBlocks: true,
+                        smoothLivePreview: true,
+                        simpleLineBreaks: true,
+                        emoji: true, 
+                    });
                 const cards = document.querySelectorAll('.decryptMe');
                 for (var i = 0; i < cards.length; i++) {
-                    cards[i].innerHTML = converter.makeHtml(await decryptWithKey(cards[i].innerHTML));
+                    const markdown = await decryptWithKey(cards[i].innerHTML);
+                    const metadata = converter.getMetadata();
+                    if(metadata && metadata.title) {
+                        cards[i].closest('.card').querySelector('.title').innerHTML = '&nbsp;' + metadata.title;
+                    }
+                    if(metadata && metadata.tags) {
+                        let tags = metadata.tags.replace('[','').replace(']','').split(',');
+                        cards[i].closest('.card').querySelector('.tags').innerHTML = tags.map(t => {
+                            datalist.add(t);
+                            return `<span class="chip">#${t}</span>`;}).join(''); 
+                    }
+                    cards[i].innerHTML = converter.makeHtml(markdown);
                 }
+
+                datalist.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = `#${value}`;
+                    document.getElementById('noteTags').appendChild(option);
+                });
+
+                const allCards = document.querySelectorAll('.card');
+                allCards.forEach(card => {
+                    const height = window.getComputedStyle(card).height;
+                    if (height === '500px') {
+                        card.classList.add('fadeout');
+                    } else {
+                        card.setAttribute('onclick', '');
+                        card.classList.add('no-pointer');
+                    }
+                });
             }
         }
 

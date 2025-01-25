@@ -117,8 +117,13 @@ async function getFeed(items, user, seen, token, timeline) {
 
         if(item._microblog && item._microblog.is_conversation) {
             const conversation = await getConversation(item.id, token);
-            convo = conversation.items[conversation.items.length - 1];
-            conversations = conversation.items;
+            if(conversation && conversation.items && conversation.items.length > 0) {
+                convo = conversation.items[conversation.items.length - 1];
+                conversations = conversation.items;
+            } else {
+                convo = {};
+                conversations = [];
+            }   
         }
 
         if(!seen.has(convo.id)) {

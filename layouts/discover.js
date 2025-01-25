@@ -53,7 +53,7 @@ export async function DiscoverTemplate(user, token, uuid, url) {
             _loginTemplate
                 .replaceAll('{{uuid}}', uuid)
                 .replaceAll('{{appURL}}', url)) : '')
-        .replaceAll('{{tagmojis}}', tagmojis)
+        .replaceAll('{{tagmojis}}', !user ? '' : tagmojis)
 
     return HTMLPage(`Discover`, content, user);
 }

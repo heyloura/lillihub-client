@@ -39,16 +39,21 @@ export function cleanFormatHTML (str, exclude) {
     function resize (html) {
         const images = html.querySelectorAll("img");
         const parents = [];
+        let swipe = true;
         for (let i = 0; i < images.length; i++) {
             const image = images[i];
             if(image.getAttribute('width') == undefined || image.getAttribute('width') == '' || image.getAttribute('width') == '1' || parseInt(image.getAttribute('width')) > 190 )
             {
                 image.setAttribute('width', '');
-                image.setAttribute('height', '');    
+                image.setAttribute('height', '');  
+                if(images.length == 1) {
+                    image.setAttribute('class','post-img');
+                }   
             }
             else
             {
                 image.setAttribute('class','small-img');
+                swipe = false;
             }
             if(images.length > 1)
             {
@@ -62,7 +67,7 @@ export function cleanFormatHTML (str, exclude) {
             }
         }
         //let's assemble the swipeable images
-        if(parents.length > 0) {
+        if(parents.length > 0 && swipe) {
             try {
                 const container = html.createElement('sl-carousel');
                 container.setAttribute('pagination','');
@@ -127,6 +132,8 @@ export function cleanFormatHTML (str, exclude) {
     const builder = new ammonia.AmmoniaBuilder();
     builder.tags.add("video");
     builder.tagAttributes.set("video", new Set(["src","width","height","controls","poster"]));
+    builder.tags.add("img");
+    builder.tagAttributes.set("img", new Set(["src","width","height","class"]));
     const cleaner = builder.build();
     const cleaned = cleaner.clean(str);
     const parser = new DOMParser();

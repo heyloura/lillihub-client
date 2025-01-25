@@ -1,14 +1,15 @@
-<div style="padding: 1em;" class="card mt-2">
-    <div class="card-body">{{content}}</div>
-    <div class="card-footer">Updated: 
-        <sl-format-date month="long" 
+<div style="padding: 1em;" class="card mt-2" onclick="toggleCard(this)">
+    <div class="card-footer text-muted" style="font-size: small;">
+        <a onclick="addLoading(this)" href="/notes/{{notebookId}}/update?id={{id}}" class="btn btn-link btn-sm"><i class="bi bi-pencil"></i><span class="title"><sl-format-date month="long" 
             day="numeric" 
             year="numeric" 
             hour="numeric" 
             minute="numeric" 
             hour-format="12" 
             date="{{modified}}">{{modified}}
-        </sl-format-date>
-        <small>{{is_shared}}</small>
+        </sl-format-date></span></a>
+        {{is_shared}}
+        <span class="tags"></span>
     </div>
+    <div class="card-body">{{content}}</div>
 </div>

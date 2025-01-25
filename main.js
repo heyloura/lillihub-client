@@ -362,14 +362,6 @@ async function handler(req) {
     }
 
     if(NOTEBOOKS_ROUTE.exec(req.url) && user) {
-        if(user.plan != 'premium') {
-            return new Response(HTMLPage(`Notebooks`,`<div class="container><p><b>You need to be a premium micro.blog user to access notebooks</b></p></div>"`, user), {
-                status: 200,
-                headers: {
-                    "content-type": "text/html",
-                },
-            });
-        }
 
         return new Response(await NotebooksTemplate(user, accessTokenValue), {
             status: 200,
@@ -382,15 +374,6 @@ async function handler(req) {
     if(NOTES_ROUTE.exec(req.url) && user) {
         const id = NOTES_ROUTE.exec(req.url).pathname.groups.id;
 
-        if(user.plan != 'premium') {
-            return new Response(HTMLPage(`Notebooks`,`<div class="container><p><b>You need to be a premium micro.blog user to access notebooks</b></p></div>"`, user), {
-                status: 200,
-                headers: {
-                    "content-type": "text/html",
-                },
-            });
-        }
-
         return new Response(await NotesTemplate(user, accessTokenValue, id), {
             status: 200,
             headers: {
@@ -400,15 +383,6 @@ async function handler(req) {
     }
 
     if(UPDATE_NOTES_ROUTE.exec(req.url) && user) {
-        if(user.plan != 'premium') {
-            return new Response(HTMLPage(`Notebooks`,`<div class="container><p><b>You need to be a premium micro.blog user to access notebooks</b></p></div>"`, user), {
-                status: 200,
-                headers: {
-                    "content-type": "text/html",
-                },
-            });
-        }
-
         const id = UPDATE_NOTES_ROUTE.exec(req.url).pathname.groups.id;
 
         return new Response(await NoteTemplate(user, accessTokenValue, id, req), {
@@ -625,15 +599,15 @@ async function handler(req) {
                 "Authorization": "Bearer " + accessTokenValue
             }
         });
-        if (!posting.ok) {
-            console.log(`${user.username} tried to add a bookmark ${url} and ${await posting.text()}`);
-            return new Response(`<p>Error :-(</p>`, {
-                status: 200,
-                headers: {
-                    "content-type": "text/html",
-                },
-            });
-        }
+        // if (!posting.ok) {
+        //     console.log(`${user.username} tried to add a bookmark ${url} and ${await posting.text()}`);
+        //     return new Response(`<p>Error :-(</p>`, {
+        //         status: 200,
+        //         headers: {
+        //             "content-type": "text/html",
+        //         },
+        //     });
+        // }
 
         if(user.plan == 'premium' && tags) {
             const fetchingBookmarks = await fetch(`https://micro.blog/posts/bookmarks`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } } );
@@ -1079,14 +1053,6 @@ async function handler(req) {
     }
 
  
-
-
-
-
-
-
-
-
     /********************************************************
      * Unauthenticated Routes
      * NOTE: All routes must create and set a state cookie
@@ -1175,23 +1141,25 @@ async function handler(req) {
 
                 const kv = await Deno.openKv();
                
-                const userKV = await kv.get([user.username, 'global']);
-                if(userKV && !userKV.value) {
-                    const starterFavs = { favorites: ['manton', 'jean', 'news', 'help'], feeds: [], display: 'both' };
-                    await kv.set([user.username, 'global'], starterFavs);
-                    user.lillihub = starterFavs;
-                } else {   
-                    user.lillihub = userKV.value;
+                if(user.username) {
+                    const userKV = await kv.get([user.username, 'global']);
+                    if(userKV && !userKV.value) {
+                        const starterFavs = { favorites: ['manton', 'news', 'help'], feeds: [], display: 'both' };
+                        await kv.set([user.username, 'global'], starterFavs);
+                        user.lillihub = starterFavs;
+                    } else {   
+                        user.lillihub = userKV.value;
+                    }
                 }
 
                 SESSION[user.username] = user;
-                let expiresOn = new Date();
+                const expiresOn = new Date();
                 expiresOn.setDate( expiresOn.getDate() + 399); //chrome limits to 400 days
                 const page =  new Response(HTMLPage(`Redirect`, `<h3 class="container">You have been logged in. Redirecting to your timeline</h3>`, user, req.url.split('?')[0].replaceAll('/auth','')), {
                     status: 200,
                     headers: {
                         "content-type": "text/html",
-                        "set-cookie": `atoken=${accessToken};SameSite=Strict;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`
+                        "set-cookie": `atoken=${accessToken};SameSite=Lax;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`
                     },
                 });
                 return page;
@@ -1208,11 +1176,11 @@ async function handler(req) {
     }
 
     if(LOGOUT_ROUTE.exec(req.url)) {
-        return new Response(HTMLPage(`Logout`, `<h1>You have been logged out.</h1>`), {
+        return new Response(HTMLPage(`Logout`, `<h2>You have been logged out. Redirecting to homepage</h2>`, user, req.url.split('?')[0].replaceAll('/logout','')), {
             status: 200,
             headers: {
                 "content-type": "text/html",
-                "set-cookie": `atoken=undefined;SameSite=Strict;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+                "set-cookie": `atoken=undefined;SameSite=Lax;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT`
             },
         });
     }
