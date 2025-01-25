@@ -1,4 +1,4 @@
-import { DOMParser } from "https://esm.sh/linkedom@0.16.8";
+import { DOMParser } from "npm:linkedom";
 import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
 await ammonia.init();
 
@@ -145,7 +145,7 @@ export function cleanFormatHTML (str, exclude) {
     escapeCharacters(doc);
 
     if(!exclude || !filterOut(exclude, doc.toString())) {
-    return doc.toString().replaceAll('<div />', '').replaceAll('&amp;nbsp;',' ').replaceAll('&nbsp;', ' ');
+        return doc.toString().replaceAll('<div />', '').replaceAll('&amp;nbsp;',' ').replaceAll('&nbsp;', ' ');
     }
     return '';
 }
