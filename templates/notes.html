@@ -80,7 +80,9 @@
             if(localStorage.getItem("notes_key"))
             {
                 const datalist = new Set();
-                const converter = new showdown.Converter({	
+                const cards = document.querySelectorAll('.decryptMe');
+                for (var i = 0; i < cards.length; i++) {
+                    const converter = new showdown.Converter({	
                         metadata: true,
                         parseImgDimensions: true,
                         strikethrough: true,
@@ -90,20 +92,21 @@
                         simpleLineBreaks: true,
                         emoji: true, 
                     });
-                const cards = document.querySelectorAll('.decryptMe');
-                for (var i = 0; i < cards.length; i++) {
                     const markdown = await decryptWithKey(cards[i].innerHTML);
+                    const html = converter.makeHtml(markdown);
                     const metadata = converter.getMetadata();
+                    const card = cards[i].parentNode.parentNode;
+                    console.log(card)
                     if(metadata && metadata.title) {
-                        cards[i].closest('.card').querySelector('.title').innerHTML = '&nbsp;' + metadata.title;
+                        card.querySelector('.title').innerHTML = '&nbsp;' + metadata.title;
                     }
                     if(metadata && metadata.tags) {
                         let tags = metadata.tags.replace('[','').replace(']','').split(',');
-                        cards[i].closest('.card').querySelector('.tags').innerHTML = tags.map(t => {
+                        card.querySelector('.tags').innerHTML = tags.map(t => {
                             datalist.add(t);
                             return `<span class="chip">#${t}</span>`;}).join(''); 
                     }
-                    cards[i].innerHTML = converter.makeHtml(markdown);
+                    cards[i].innerHTML = html;
                 }
 
                 datalist.forEach(value => {

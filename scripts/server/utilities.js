@@ -47,12 +47,13 @@ export function cleanFormatHTML (str, exclude) {
                 image.setAttribute('width', '');
                 image.setAttribute('height', '');  
                 if(images.length == 1) {
-                    image.setAttribute('class','post-img');
+                    image.classList.add('post-img');
                 }   
             }
             else
             {
-                image.setAttribute('class','small-img');
+                //image.setAttribute('class','small-img');
+                image.classList.add('small-img');
                 swipe = false;
             }
             if(images.length > 1)

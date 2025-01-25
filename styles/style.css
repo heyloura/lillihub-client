@@ -511,10 +511,12 @@ td {
         border-top-color: var(--purplered);
         border-right-color: var(--purplered);
 }
-.card-body img.mini_cover {
-    width: 100px;
+
+.mini_cover {
+    width: 100px !important;
     float: left;
     margin: 1em; 
+    padding-left: 1em;
 }
 .overlay {
     position: fixed;

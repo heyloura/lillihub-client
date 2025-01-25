@@ -1,20 +1,22 @@
 <style>{{easyMDECSS}}</style>
 <script>{{easyMDEJS}}</script>
 
-<ul class="breadcrumb">
+<ul class="breadcrumb pl-2">
     <li class="breadcrumb-item">
         <a onclick="addLoading(this)" href="/notes/{{id}}">{{name}}</a>
     </li>
     <li class="breadcrumb-item">
-        <a href="#">Update</a>
+        <a href="#">{{breadcrumb}}</a>
     </li>
 </ul>
+{{viewVersion}}
 <div class="box">
     <input type="hidden" id="original" value="{{originalValue}}" />
     <textarea id="content"></textarea>
 </div>
+{{versions}}
 {{editDelete}}
-<button onclick="addLoading(this)" class="btn btn-primary mt-2 float-right" id="saveNoteBtn">Save Note</button>
+<button onclick="addLoading(this)" class="btn btn-primary m-2 float-right" id="saveNoteBtn">Save Note</button>
 <div style="clear:both"></div>
 <script type="module">
     const easymde = new EasyMDE({

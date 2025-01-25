@@ -1009,13 +1009,6 @@ async function handler(req) {
                 "Authorization": "Bearer " + accessTokenValue
             }
         });
-
-        if (!posting.ok) {
-            console.log('ADD_NOTE', await posting.text());
-            return ReturnIframeResponse('Unsuccessful.');
-        }
-
-        return ReturnIframeResponse(`Note saved.`);
     }
 
     if(DELETE_NOTE.exec(req.url) && user) {
