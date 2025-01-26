@@ -3,7 +3,7 @@ import { PostTemplate } from "./_post.js";
 import { getConversation } from "../scripts/server/mb.js";
 
 const _lillihubTemplate = new TextDecoder().decode(await Deno.readFile("templates/lillihub.html"));
-const _lillihubToken = JSON.parse(Deno.env.get("LILLIHUB_TOKEN") ?? "{}");
+const _lillihubToken = Deno.env.get("LILLIHUB_TOKEN");
 
 export async function LillihubTemplate(user, token, replyTo = 0) {
     const seen = new Set();
