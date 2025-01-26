@@ -38,12 +38,13 @@ export async function MediaTemplate(user, token, req) {
         return _mediaItemTemplate
             .replaceAll('{{url}}', item.url)
             .replaceAll('{{alt}}', item.alt ? item.alt : '')
-            .replaceAll('{{altDisp}}', item.alt ? `<p class="p-2"><i class="bi bi-robot"></i> ${item.alt}</p>` : '')
+            .replaceAll('{{altDisp}}', item.alt ? `<p class="p-2 bg-secondary"><i class="bi bi-robot"></i> ${item.alt}</p>` : '')
             .replaceAll('{{altEncoded}}', item.alt ? encodeURIComponent(item.alt) : '')
             .replaceAll('{{encodedUrl}}',encodeURIComponent(item.url))
             .replaceAll('{{destination}}', mpDestination)
             .replaceAll('{{published}}',item.published)
             .replaceAll('{{publishedDisplay}}', item.published.split('T')[0])
+            .replaceAll('{{show}}', item.url.includes('.jpg') || item.url.includes('.jpeg') || item.url.includes('.png') ? '' : 'hide')
     })).join('');
 
     const content = _mediaTemplate

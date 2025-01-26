@@ -1,13 +1,4 @@
-<div class="btn-group">
-    {{followIframe}}
-    <div class="dropdown dropdown-right">
-        <a href="javascript:;" class="btn btn-link dropdown-toggle" tabindex="0">
-            <i class="bi bi-three-dots-vertical"></i>
-        </a>
-        <ul class="menu">           
-            <li class="menu-item">{{bookmarkIFrame}}</li>
-            <li class="menu-item"><a onclick="addLoading(this)" href="/post?quote={{id}}">Quote Post</a></li>
-            <li class="menu-item"><a onclick="addLoading(this)" href="/timeline/{{id}}">View Post</a></li>
-        </ul>
-    </div>
-</div>
+{{followIframe}}
+{{bookmarkIFrame}}
+<a class="btn btn-link" onclick="addLoading(this)" href="/post?quote={{id}}"><i class="bi bi-blockquote-right"></i></a>
+<a class="btn btn-link" onclick="addLoading(this)" href="/timeline/{{id}}"><i class="bi bi-binoculars"></i></a>

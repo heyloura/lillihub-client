@@ -69,8 +69,14 @@ export async function UserTemplate(user, token, id, photos = false) {
         
                 if(item._microblog && item._microblog.is_conversation && item._microblog.is_mention) {
                     const conversation = await getConversation(item.id, token);
-                    convo = conversation.items[conversation.items.length - 1];
-                    conversations = conversation.items;
+                    if(conversation && conversation.items && conversation.items.length > 0) {
+                        convo = conversation.items[conversation.items.length - 1];
+                        conversations = conversation.items;
+                    } else {
+                        convo = {};
+                        conversations = [];
+                    }
+                    
                 }
 
                 if(!seen.has(convo.id)) {
@@ -122,5 +128,5 @@ export async function UserTemplate(user, token, id, photos = false) {
         .replaceAll('{{feed}}', photos ? `<div class="image-gallery">${feed}</div>` : feed)
         .replaceAll('{{username}}', results._microblog == null ? '': results._microblog.username);
 
-    return HTMLPage(id, content, user)
+    return HTMLPage('User', content, user)
 }

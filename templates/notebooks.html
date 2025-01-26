@@ -17,9 +17,9 @@
     <div class="no-border panel mb-2 mt-2 p-2 bg-primary hide-if-user-has-javascript" style="clear:both">
         <p>Accessing notes requires JavaScript to be enabled.</p>
     </div>
-    <div class="hide-if-user-has-no-javascript no-border panel mb-2 mt-2 p-2" style="clear:both">
+    <div id="enter_notes_key" class="hide-if-user-has-no-javascript no-border panel mb-2 mt-2 p-2" style="clear:both">
         <p>Notes are encrypted in the browser before sending them to the server, so neither Lillihub nor Micro.blog sees the note text.</p>
-        <div id="enter_notes_key">
+        <div>
             <p>You will need to enter your secret key into Lillihub to access/create your notes within the app. The key is saved in your browser's
             local storage and is never sent to Lillihub. You can review this file's source code to confirm.</p>
             <div class="input-group">

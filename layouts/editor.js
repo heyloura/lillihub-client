@@ -19,6 +19,7 @@ export async function EditorTemplate(user, token, req) {
     const shelf = searchParams.get('shelf');
     const link = searchParams.get('link');
     const alt = searchParams.get('alt');
+    const area = searchParams.get('area');
     let post = undefined;
     let quoteback = '';
     let bookPost = '';

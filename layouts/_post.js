@@ -98,13 +98,13 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                                         .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme))) : '')
                             .replaceAll('{{id}}', id)
                             .replaceAll('{{url}}', post.url)
-                            .replaceAll('{{bookmarkIFrame}}', 
+                            .replaceAll('{{bookmarkIFrame}}', !post._microblog.is_bookmark ?
                                 _bookmarkIframeTemplate
                                     .replaceAll('{{url}}', post.url)
                                     .replaceAll('{{src}}',
                                         _bookmarkFormTemplate
                                             .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme))
-                                            .replaceAll('{{url}}', post.url)))
+                                            .replaceAll('{{url}}', post.url)) : '')
                          : '')
                     .replaceAll('{{content}}', cleanFormatHTML(post.content_html, user ? user.lillihub.exclude : ''))
                     .replaceAll('{{publishedDate}}', post.date_published)

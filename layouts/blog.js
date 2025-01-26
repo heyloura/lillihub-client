@@ -31,10 +31,19 @@ export async function BlogTemplate(user, token, req) {
     const fetchingCategories = await fetch(`https://micro.blog/micropub?q=category`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const categories = await fetchingCategories.json();
 
-    let categoriesHTML = categories.categories.map((item) =>
-        `<span class="chip" ${category == item ? 'style="background-color:var(--purplered);"' : ''} ><a onclick="addLoading(this)" ${category == item ? 'style="color:var(--crust);"' : ''} href="/posts?destination=${encodeURIComponent(mpDestination)}&category=${encodeURIComponent(item)}">${item}</a></span>`
-    ).join('');
-    categoriesHTML = category ? categoriesHTML + `<span class="chip"><a onclick="addLoading(this)" href="/posts?destination=${encodeURIComponent(mpDestination)}"><em>Clear Selection</em></a></span>` : categoriesHTML;
+    const categoriesCheckboxList = categories.categories ? categories.categories.map(item => {
+        return `<li class="menu-item"><a onclick="addLoading(this)" ${category == item ? 'style="color:var(--crust);"' : ''} href="/posts?destination=${encodeURIComponent(mpDestination)}&category=${encodeURIComponent(item)}${status ? '&status=draft' : ''}">${item}</a></li>`;
+    }).join('') : '';
+
+    const categoriesDropdown = _dropdownTemplate
+        .replaceAll('{{title}}', '')
+        .replaceAll('{{icon}}', `<span id="categoriesDropdown" class="${category ? 'badge' : ''}"><i class="bi bi-tags"></i></span>`)
+        .replaceAll('{{menuItems}}', categoriesCheckboxList + `<a onclick="addLoading(this)" href="/posts?destination=${encodeURIComponent(mpDestination)}${status ? '&status=draft' : ''}"><em>Clear Selection</em></a>`);
+
+    // let categoriesHTML = categories.categories.map((item) =>
+    //     `<span class="chip" ${category == item ? 'style="background-color:var(--purplered);"' : ''} ><a onclick="addLoading(this)" ${category == item ? 'style="color:var(--crust);"' : ''} href="/posts?destination=${encodeURIComponent(mpDestination)}&category=${encodeURIComponent(item)}">${item}</a></span>`
+    // ).join('');
+    // categoriesHTML = category ? categoriesHTML + `<span class="chip"><a onclick="addLoading(this)" href="/posts?destination=${encodeURIComponent(mpDestination)}"><em>Clear Selection</em></a></span>` : categoriesHTML;
 
     const destinationDropdown = _dropdownTemplate
         .replaceAll('{{title}}', config.destination.filter(d => d.uid == mpDestination)[0].name)
@@ -42,7 +51,7 @@ export async function BlogTemplate(user, token, req) {
         .replaceAll('{{menuItems}}', destinationSelect);
 
     //https://micro.blog/micropub?q=source&filter=daughter&limit=3&offset=2
-    const fetchingPosts = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=${category ? '5000' : '25'}${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+    const fetchingPosts = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=${category || status ? '5000' : '25'}${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const results = await fetchingPosts.json();
 
     const feed = results.items.filter(p => p.properties["post-status"][0] == (status ? 'draft' : 'published')).map(item => {
@@ -56,7 +65,7 @@ export async function BlogTemplate(user, token, req) {
             .replaceAll('{{username}}', user.username)
             .replaceAll('{{new}}', '')
             .replaceAll('{{tags}}', '')
-            .replaceAll('{{actions}}', `<a onclick="addLoading(this)" href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}">Edit post</a>`)
+            .replaceAll('{{actions}}', `<a class="btn btn-link" onclick="addLoading(this)" href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}&area=blog"><i class="bi bi-pencil"></i></a>`)
             .replaceAll('{{content}}', item.properties["name"][0] ? `<details><summary><b>${item.properties["name"][0]}</b></summary>${text}</details>` : text)
             .replaceAll('{{publishedDate}}', item.properties["published"][0])
             .replaceAll('{{relativeDate}}', item.properties["published"][0])
@@ -72,11 +81,12 @@ export async function BlogTemplate(user, token, req) {
         .replaceAll('{{destinationDropdown}}', destinationDropdown)
         .replaceAll('{{postsActive}}', status ? '' : 'class="active"')
         .replaceAll('{{draftActive}}', status ? 'class="active"' : '')
+        .replaceAll('{{status}}', status ? 'draft' : 'posts')
         .replaceAll('{{q}}', q ? q : '')
         .replaceAll('{{feed}}', feed)
         .replaceAll('{{destination}}', encodeURIComponent(mpDestination))
-        .replaceAll('{{categoriesHTML}}', categoriesHTML)
+        .replaceAll('{{categoriesHTML}}', categoriesDropdown)
         .replaceAll('{{nextHref}}', href)
 
-    return HTMLPage('Posts', content, user);
+    return HTMLPage(status ? 'Draft' : 'Posts', content, user);
 }

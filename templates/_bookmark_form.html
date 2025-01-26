@@ -9,7 +9,7 @@
                 font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
                 font-size: 16px;
                 line-height: 24px;
-                background: var(--mantle);
+                background-color: var(--base);
                 color: var(--text);
                 overflow: hidden;
             }
@@ -17,28 +17,14 @@
                 overflow: hidden;
             }
             button {
+                font-size: 1.2em;
                 border: 0;
                 padding: 0;
                 margin: 0;
-                font-size: 1em;
-                color: var(--text);
+                background: var(--base);
+                color: var(--purple);
                 cursor: pointer;
-                background:0 0;
-                box-shadow:none;
-                margin-top:0;
-                padding:0 .4rem;
-                position:relative;
-                text-decoration:none;
-                border-radius:.1rem;
-                color:inherit;
-                display:block;
-                margin:0 -.4rem;
-                padding:.2rem .4rem;
-                text-decoration:none;
             }
-
-            form:hover{background:#f1f1fc;color:#5755d9}
-
             .loading {
                 color: transparent !important;
                 min-height: .8rem;
@@ -74,7 +60,12 @@
         <form method='POST' action='/bookmarks/new'>
             <input class='form-input' type='hidden' name='url' value='{{url}}' />
             <input type='hidden' name='redirect' value='false' />
-            <button onclick='addLoading(this)' type='submit' class='btn btn-primary btn-block'>Bookmark Post</button>
+            <button onclick='addLoading(this)' type='submit'>
+                <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='var(--purple)' class='bi bi-person-add' viewBox='0 0 20 20'>
+                    <path d='M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z'/>
+                    <path d='M8 4a.5.5 0 0 1 .5.5V6H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V7H6a.5.5 0 0 1 0-1h1.5V4.5A.5.5 0 0 1 8 4'/>
+                </svg>
+            </button>
         </form>
     </body>
     <script>

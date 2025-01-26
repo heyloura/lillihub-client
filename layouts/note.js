@@ -66,6 +66,6 @@ export async function NoteTemplate(user, token, id, req) {
         .replaceAll('{{versions}}', editId ?  versions : '')
         .replaceAll('{{viewVersion}}', viewVersion)
         .replaceAll('{{breadcrumb}}', editId ?  'Update' : 'New')
-
-    return HTMLPage(`Note: ${eNotes._microblog.notebook.name}`, content, user);
+    //: ${eNotes._microblog.notebook.name}
+    return HTMLPage(`Note`, content, user);
 }

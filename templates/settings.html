@@ -28,4 +28,9 @@
     </p>
     <p>Have Lillihub combine posts and conversations on the home page. This removes the conversation icon from the navigation bar.</p>
     {{timelineSettings}}
+    <hr class="mt-2"/>
+    <p class="pt-2">
+        <b>Private Notes</b>
+    </p>
+    <button class="btn btn-link d-inline" onclick="addLoading(this);localStorage.setItem('notes_key', '');window.location.href = '/notes';"><i class="bi bi-trash"></i> Clear out your secret key.</button>
 </div>

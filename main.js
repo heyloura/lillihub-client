@@ -19,6 +19,7 @@ import { MentionsTemplate } from "./layouts/mentions.js";
 import { RepliesTemplate } from "./layouts/replies.js";
 import { BookmarksTemplate } from "./layouts/bookmarks.js";
 import { BookshelvesTemplate } from "./layouts/bookshelves.js";
+import { BooksTemplate } from "./layouts/books.js";
 import { BookshelfTemplate } from "./layouts/bookshelf.js";
 import { EditorTemplate } from "./layouts/editor.js";
 import { BlogTemplate } from "./layouts/blog.js";
@@ -27,8 +28,10 @@ import { NotebooksTemplate } from "./layouts/notebooks.js";
 import { NotesTemplate } from "./layouts/notes.js";
 import { NoteTemplate } from "./layouts/note.js";
 import { TimelineTemplate } from "./layouts/timeline.js";
+import { LillihubTemplate } from "./layouts/lillihub.js";
 import { DiscoverTemplate } from "./layouts/discover.js";
 import { TagmojiTemplate } from "./layouts/tagmoji.js";
+import { FavoritesTemplate } from "./layouts/favorites.js";
 import { UserTemplate } from "./layouts/user.js";
 import { ConversationsTemplate } from "./layouts/conversations.js";
 import { ConversationTemplate } from "./layouts/conversation.js";
@@ -54,6 +57,7 @@ const MENTIONS_ROUTE = new URLPattern({ pathname: "/mentions" });
 const REPLIES_ROUTE = new URLPattern({ pathname: "/replies" });
 const BOOKMARKS_ROUTE = new URLPattern({ pathname: "/bookmarks" });
 const BOOKSHELVES_ROUTE = new URLPattern({ pathname: "/bookshelves" });
+const BOOKS_ROUTE = new URLPattern({ pathname: "/books" });
 const BOOKSHELF_ROUTE = new URLPattern({ pathname: "/bookshelves/shelf/:id" });
 const BOOK_ROUTE = new URLPattern({ pathname: "/bookshelves/shelf/:shelfid/book/:id" });
 const NOTEBOOKS_ROUTE = new URLPattern({ pathname: "/notes" });
@@ -62,11 +66,13 @@ const UPDATE_NOTES_ROUTE = new URLPattern({ pathname: "/notes/:id/update" });
 const SETTINGS_ROUTE = new URLPattern({ pathname: "/settings" });
 const POST_ROUTE = new URLPattern({ pathname: "/post" });
 const TIMELINE_POST_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
+const FAVORITES_ROUTE = new URLPattern({ pathname: "/favorites" });
 const POSTS_ROUTE = new URLPattern({ pathname: "/posts" });
 const MEDIA_ROUTE = new URLPattern({ pathname: "/media" });
 const LOGOUT_ROUTE = new URLPattern({ pathname: "/logout" });
 const AUTH_ROUTE = new URLPattern({ pathname: "/auth" });
 const ROBOT_ROUTE = new URLPattern({pathname: "/robots.txt"})
+const LILLIHUB_ROUTE = new URLPattern({pathname: "/lillihub"})
 
 const ADD_REPLY = new URLPattern({ pathname: "/replies/add" });
 const UNFOLLOW_USER = new URLPattern({ pathname: "/users/unfollow" });
@@ -94,8 +100,6 @@ const UPLOAD_MEDIA_ROUTE = new URLPattern({ pathname: "/media/upload" });
 const DELETE_MEDIA_ROUTE = new URLPattern({ pathname: "/media/delete" });
 const GET_CONVERSATION_ROUTE = new URLPattern({ pathname: "/conversation/:id" });
 const ADD_BOOK = new URLPattern({ pathname: "/book/add" });
-
-
 
 const SESSION = {};
 
@@ -143,7 +147,7 @@ async function handler(req) {
     }
 
     if(LILLIHUB_ICON_ROUTE.exec(req.url)){
-        return new Response(new Uint8Array(await Deno.readFile("static/lillihub-512.png")), {
+        return new Response(new Uint8Array(await Deno.readFile("static/logo-lillihub.png")), {
             status: 200,
             headers: {
                 "content-type": "image/png",
@@ -210,6 +214,24 @@ async function handler(req) {
     /********************************************************
      * Authenticated Only Routes
      ********************************************************/
+    if(FAVORITES_ROUTE.exec(req.url) && user) {
+        return new Response(await FavoritesTemplate(user, accessTokenValue), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+            },
+        });
+    }
+
+    if(LILLIHUB_ROUTE.exec(req.url) && user) {
+        return new Response(await LillihubTemplate(user, accessTokenValue), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+            },
+        });
+    }
+
     if(HOME_ROUTE.exec(req.url) && user) {
         return new Response(await TimelineTemplate(user, accessTokenValue, req), {
             status: 200,
@@ -295,6 +317,15 @@ async function handler(req) {
 
     if(BOOKMARKS_ROUTE.exec(req.url) && user) {
         return new Response(await BookmarksTemplate(user, accessTokenValue, req), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+            },
+        });
+    }
+
+    if(BOOKS_ROUTE.exec(req.url) && user) {
+        return new Response(await BooksTemplate(user, accessTokenValue), {
             status: 200,
             headers: {
                 "content-type": "text/html",
@@ -645,7 +676,7 @@ async function handler(req) {
             });
         }
        
-        return new Response(`<p>Bookmarked</p>`, {
+        return new Response(`<p></p>`, {
             status: 200,
             headers: {
                 "content-type": "text/html",

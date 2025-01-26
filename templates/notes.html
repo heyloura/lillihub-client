@@ -3,8 +3,10 @@
     <div class="no-border panel mb-2 mt-2 p-2 bg-primary hide-if-user-has-javascript" style="clear:both">
         <p>Notes require JavaScript to be enabled.</p>
     </div>
-    <div class="btn-group btn-group-block mt-2 float-right">
-        <a onclick="addLoading(this)" href="/notes/{{id}}/update" class="btn btn-link"><i class="bi bi-pencil"></i> Note</a>
+    <div class="btn-group float-right" style="position: relative;
+    z-index: 500;
+    margin-top: -55px;">
+        <a onclick="addLoading(this)" href="/notes/{{id}}/update" class="btn bg-light purple-text"><i class="bi bi-pencil"></i> Note</a>
     </div>
     <div class="clearfix"></div>
     <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
@@ -16,11 +18,7 @@
     {{notes}}
     <style>
     .card {
-        background-color: {{color}} !important;
         cursor: pointer;
-    }
-    .card:hover {
-        border: {{light}} !important;
     }
     .card {
         max-height: 500px; /* Set a maximum height */
@@ -31,11 +29,6 @@
     .card.expanded {
         max-height: 5000px; /* Set to a larger height when expanded */
         opacity: 1; /* Fully visible */
-    }
-    @media (prefers-color-scheme: dark) {
-        .card {
-            background-color: {{dark}} !important;
-        }
     }
     </style>
     <script type="module">

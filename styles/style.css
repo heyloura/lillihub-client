@@ -40,6 +40,42 @@ html {
 .purplered-text {
     color: var(--purplered) !important;
 }
+.red-border {
+    border-color: var(--red) !important;
+}
+.redorange-border {
+    border-color: var(--redorange) !important;
+}
+.orange-border {
+    border-color: var(--orange) !important;
+}
+.orangeyellow-border {
+    border-color: var(--orangeyellow) !important;
+}
+.yellow-border {
+    border-color: var(--yellow) !important;
+}
+.yellowgreen-border {
+    border-color: var(--yellowgreen) !important;
+}
+.green-border {
+    border-color: var(--green) !important;
+}
+.greenblue-border {
+    border-color: var(--greenblue) !important;
+}
+.blue-border {
+    border-color: var(--blue) !important;
+}
+.bluepurple-border {
+    border-color: var(--bluepurple) !important;
+}
+.purple-border {
+    border-color: var(--purple) !important;
+}
+.purplered-border {
+    border-color: var(--purplered) !important;
+}
 a {
     color: var(--blue);
 }
@@ -218,7 +254,8 @@ header {
 .small-img, .conversation .small-img {
     width: unset !important;
     height: unset !important;
-    margin-left: 0rem !important;;
+    margin-left: 0rem !important;
+    max-width: 100% !important;
 }
 footer .btn-group-block {
     width:100%;
@@ -271,6 +308,16 @@ footer .btn-group-block {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.4rem;
     grid-auto-rows: minmax(100px, auto);
+}
+.book-tile{
+    display:inline-block;
+    width:100%
+}
+@media screen and (min-width: 650px)
+{
+    .book-tile{
+        width:50%
+    }
 }
 @media screen and (min-width: 650px)
 {
@@ -540,4 +587,7 @@ td {
 } 
 .no-pointer {
     cursor:default !important;
+}
+.hide {
+    display: none !important;
 }

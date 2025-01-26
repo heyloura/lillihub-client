@@ -24,6 +24,7 @@ export async function BookshelfTemplate(user, token, id) {
     const content = _bookshelfTemplate
         .replaceAll('{{id}}', id)
         .replaceAll('{{feed}}', feed)
+        .replaceAll('{{title}}', results.title.replaceAll('Micro.blog - ',''))
 
-    return HTMLPage(results.title.replaceAll('Micro.blog - ',''), content, user);
+    return HTMLPage('Bookshelf', content, user);
 }

@@ -1,4 +1,4 @@
-const version = '0.0.02';
+const version = '0.0.03';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -12,12 +12,13 @@ self.addEventListener('install', function(event) {
     // Cache the offline core
     event.waitUntil(caches.open(coreID).then(function (cache) {
         // javascript
-        // cache.add(new Request(`${url}scripts/timeline.js`));
+        cache.add(new Request(`https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js`));
 
-        // //styles
-        // cache.add(new Request(`${url}styles/main.css`));
+        // styles
+        cache.add(new Request(`https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css`));
+        cache.add(new Request(`https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css`));
 
-        // //static
+        // static
         // cache.add(new Request(`${url}manifest.webmanifest`));
         // cache.add(new Request(`${url}favicon.ico`));
         // cache.add(new Request(`${url}logo.png`));
