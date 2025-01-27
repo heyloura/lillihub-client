@@ -64,3 +64,28 @@ async function loadConversation(el, id) {
         return null;
     }
 }
+
+
+const events = ["pagehide", "pageshow", "unload", "load"];
+
+const eventLogger = (event) => {
+  switch (event.type) {
+    case "pagehide":
+    case "pageshow": {
+      let isPersisted = event.persisted ? "persisted" : "not persisted";
+      console.log(`Event: ${event.type} - ${isPersisted}`);
+
+      const loader = document.getElementById('loader');
+      if(loader) {
+        loader.remove();
+      }
+
+      break;
+    }
+    default:
+      console.log(`Event: ${event.type}`);
+      break;
+  }
+};
+
+events.forEach((eventName) => window.addEventListener(eventName, eventLogger));
