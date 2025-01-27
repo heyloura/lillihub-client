@@ -182,28 +182,29 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                             <div class="navbar bg-light p-1">
                                 <section class="navbar-section mt-1 mb-2">
                                     <div class="dropdown">
-                                        <div class="btn-group"><button onclick="addLoading(this);window.location.reload();" class="btn btn-link purple-text">${area == "blog" ? 'Blog Management' : 
+                                        <div class="btn-group">
+                                            <button class="btn btn-link dropdown-toggle" tabindex="0">${area == "blog" ? 'Blog Management' : 
                                                         area == "bookmarks" ? 'Bookmarks' : 
                                                         area == "notes" ? 'Private Notes' : 
                                                         title == "Editor" ? 'Editor' : 
                                                         area == "bookshelves" ? 'Bookshelves' : '<figure class="avatar avatar-sm bg-secondary"><img height="48" width="48" src="https://cdn.micro.blog/images/icons/favicon_64.png" loading="lazy"></figure> Timeline'}
+                                            <i class="bi bi-caret-down-fill"></i>
                                                         </button>
-                                                <a class="btn btn-link dropdown-toggle pl-0" tabindex="0"><i class="bi bi-caret-down-fill"></i></a>
                                             <ul class="menu">
                                                                             <li class="menu-item">
-                                                        <a href="/posts">Blog Management</a>
+                                                        <a onclick="addLoading(this)" href="/posts">Blog Management</a>
                                                     </li>
                                                     <li class="menu-item">
-                                                        <a href="/bookmarks">Bookmarks</a>
+                                                        <a onclick="addLoading(this)" href="/bookmarks">Bookmarks</a>
                                                     </li>
                                                     <li class="menu-item">
-                                                        <a href="/bookshelves">Bookshelves</a>
+                                                        <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
                                                     </li>
                                                     <li class="menu-item">
-                                                        <a href="/"><figure class="avatar avatar-sm bg-secondary"><img height="48" width="48" src="https://cdn.micro.blog/images/icons/favicon_64.png" loading="lazy"></figure> Timeline</a>
+                                                        <a onclick="addLoading(this)" href="/"><figure class="avatar avatar-sm bg-secondary"><img height="48" width="48" src="https://cdn.micro.blog/images/icons/favicon_64.png" loading="lazy"></figure> Timeline</a>
                                                     </li>
                                                     <li class="menu-item">
-                                                        <a href="/notes">Private Notes</a>
+                                                        <a onclick="addLoading(this)" href="/notes">Private Notes</a>
                                                     </li>
                                                     <li class="menu-item">
                                                         <hr />
