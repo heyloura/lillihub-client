@@ -24,7 +24,7 @@ export async function TimelineTemplate(user, token, req) {
 
     timeline.seen = userKV && userKV.value && userKV.value.seen ? userKV.value.seen : [];
 
-    const fetching = await fetch(`https://micro.blog/posts/timeline?count=15${last ? `&before_id=${last}` : ''}${before ? `&since_id=${before}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
+    const fetching = await fetch(`https://micro.blog/posts/timeline?count=${user.lillihub.display == 'classic' ? '40' : '15'}${last ? `&before_id=${last}` : ''}${before ? `&since_id=${before}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
     const results = await fetching.json();
 
     if(!results || !results.items || results.items.length == 0) {
@@ -74,6 +74,11 @@ async function getFeed(items, user, seen, token, timeline) {
         }
         let conversations = [];
         let convo = item;
+
+
+        if(user.lillihub.display == 'classic') { 
+            return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '', false, true, false, true)
+        }
 
         if(item._microblog && item._microblog.is_conversation) {
             const conversation = await getConversation(item.id, token);

@@ -1,4 +1,4 @@
-const version = '0.0.03';
+const version = '0.0.15';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -13,15 +13,17 @@ self.addEventListener('install', function(event) {
     event.waitUntil(caches.open(coreID).then(function (cache) {
         // javascript
         cache.add(new Request(`https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js`));
+        cache.add(new Request(`https://cdn.jsdelivr.net/npm/showdown@2.0.3/dist/showdown.min.js`));
+        
 
         // styles
         cache.add(new Request(`https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css`));
         cache.add(new Request(`https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css`));
 
         // static
-        // cache.add(new Request(`${url}manifest.webmanifest`));
-        // cache.add(new Request(`${url}favicon.ico`));
-        // cache.add(new Request(`${url}logo.png`));
+        cache.add(new Request(`${url}manifest.webmanifest`));
+        cache.add(new Request(`${url}favicon.ico`));
+        cache.add(new Request(`${url}lillihub-512.png`));
         return cache;
     }));
 
@@ -54,8 +56,71 @@ self.addEventListener('activate', function (event) {
     }));
 });
 
+self.addEventListener("message", function(event) {
+	var data = event.data;
+
+	if (data.command == "trimCache") {
+		trimCache(coreID, 50);
+		trimCache(imageID, 75);
+		trimCache(pageID, 50);
+	}
+});
+
+var trimCache = function (cacheName, maxItems) {
+    caches.open(cacheName)
+        .then(function (cache) {
+            cache.keys()
+                .then(function (keys) {
+                    if (keys.length > maxItems) {
+                        self.console.log('trimCache: ' + cacheName + ', ' + keys.length);
+                        cache.delete(keys[0])
+                            .then(trimCache(cacheName, maxItems));
+                    }
+                });
+        });
+};
+
 self.addEventListener('fetch', async function (event) {
-    if(event.request.url.includes('.html')){
-        self.console.log(event.request);
+    if(!(event.request.destination == 'image' || event.request.destination == 'style' || event.request.destination == 'script' || event.request.destination == 'manifest')) {
+        return;
+    }
+    console.log(event.request);
+    try {
+        event.respondWith((async () => {
+            //self.console.log(event.request);
+            const cached = await caches.match(event.request, {ignoreVary: true});
+            if (cached) {
+                return cached;
+            }
+
+            try {
+                const response = await fetch(event.request);
+                const copy = response.clone();
+                // var headers = new Headers(copy.headers);
+                // headers.append('sw-fetched-on', new Date().getTime());
+                // var body = await copy.blob();
+                
+                if (event.request.headers.get('Accept').includes('image')) {
+                    const cache = await caches.open(imageID);
+                    await cache.put(event.request, copy);
+                } 
+                if (event.request.url.includes('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace')) {
+                    const cache = await caches.open(coreID);
+                    await cache.put(event.request, copy);
+                } 
+                // else if (event.request.destination) {
+                //     let cache = await caches.open(pageID);
+                //     await cache.put(event.request, copy);
+                // }
+
+                return response;
+            } catch {
+                //self.console.log('fetch issue, is offline cache it is');
+                //return caches.match(`${url}/timeline/`, {ignoreVary: true});
+            }
+        })());
+    } catch {
+        self.console.log('event.respondWith issue so....');
+        //return caches.match(`${url}/timeline/`, {ignoreVary: true});
     }
 });

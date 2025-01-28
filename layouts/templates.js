@@ -172,7 +172,13 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
                     <title>${title}</title>
                     <noscript><style>.hide-if-user-has-no-javascript { display: none }</style></noscript>
-                    <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js') }</script>
+                    <script>if('serviceWorker' in navigator){ 
+                        navigator.serviceWorker.register('/sw.js'); 
+                        window.addEventListener("load", function() {
+                            if (navigator.serviceWorker.controller != null) {
+                                navigator.serviceWorker.controller.postMessage({"command":"trimCache"});
+                            }
+                        });}</script>
                     <script>document.write('<style>.hide-if-user-has-javascript{display:none}</style>');</script>
                     <style>${_style}</style>
                 </head>
@@ -234,12 +240,12 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                     : '' }
                     <div class="content-page container grid-md">
                         <div class="columns">
-                            <div class="column col-1 hide-sm">
+                            <div id="app-sidebar" class="column ${area == "notes" ? 'col-3' : 'col-1'} hide-sm">
                                 <div class="navbar p-fixed sidenav">
                                     ${title != "Editor" ? NavBarContent(user, area, title) : ''}
                                 </div>
                             </div>
-                            <div class="column col-11-md col-11-lg col-11-xl col-12-sm">${contentHTML}</div>
+                            <div class="column ${area == "notes" ? 'col-9-md col-9-lg col-9-xl' : 'col-11-md col-11-lg col-11-xl'} col-12-sm">${contentHTML}</div>
                         </div>           
                     </div>
                     <footer class="p-1 bg-light show-sm app-footer">

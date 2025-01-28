@@ -1168,7 +1168,7 @@ async function handler(req) {
                 if(user.username) {
                     const userKV = await kv.get([user.username, 'global']);
                     if(userKV && !userKV.value) {
-                        const starterFavs = { favorites: ['manton', 'news', 'help'], feeds: [], display: 'both' };
+                        const starterFavs = { favorites: ['news', 'help', 'lillihub'], feeds: [], display: 'classic' };
                         await kv.set([user.username, 'global'], starterFavs);
                         user.lillihub = starterFavs;
                     } else {   
@@ -1179,7 +1179,7 @@ async function handler(req) {
                 SESSION[user.username] = user;
                 const expiresOn = new Date();
                 expiresOn.setDate( expiresOn.getDate() + 399); //chrome limits to 400 days
-                const page =  new Response(HTMLPage(`Redirect`, `<h3 class="container">You have been logged in. Redirecting to your timeline</h3>`, user, req.url.split('?')[0].replaceAll('/auth','')), {
+                const page =  new Response(HTMLPage(`Redirect`, `<h3 style="text-align:center;" class="container mt-2">You have been logged in. Redirecting to your timeline</h3>`, user, req.url.split('?')[0].replaceAll('/auth','')), {
                     status: 200,
                     headers: {
                         "content-type": "text/html",

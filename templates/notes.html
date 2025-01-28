@@ -16,6 +16,9 @@
     </div>
     <datalist id="noteTags"></datalist>
     {{notes}}
+    <template id="notebooks">
+        {{notebooks}}
+    </template>
     <style>
     .card {
         cursor: pointer;
@@ -89,7 +92,6 @@
                     const html = converter.makeHtml(markdown);
                     const metadata = converter.getMetadata();
                     const card = cards[i].parentNode.parentNode;
-                    console.log(card)
                     if(metadata && metadata.title) {
                         card.querySelector('.title').innerHTML = '&nbsp;' + metadata.title;
                     }
@@ -113,8 +115,9 @@
                     const height = window.getComputedStyle(card).height;
                     if (height === '500px') {
                         card.classList.add('fadeout');
+                        card.querySelector('.expandBtn').classList.remove('hide')
                     } else {
-                        card.setAttribute('onclick', '');
+                        //card.setAttribute('onclick', '');
                         card.classList.add('no-pointer');
                     }
                 });
@@ -138,11 +141,13 @@
         }
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", async function(event) {
+                document.getElementById('app-sidebar').innerHTML = document.getElementById('notebooks').innerHTML;
                 await decryptNotes();
             });
         }
         else
         {
+            document.getElementById('app-sidebar').innerHTML = document.getElementById('notebooks').innerHTML;
             await decryptNotes();
         }
     </script>

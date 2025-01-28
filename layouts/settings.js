@@ -15,6 +15,7 @@ export function SettingsTemplate(user) {
         .replaceAll('{{timelineSettings}}', 
             _settingsTimelineTemplate.replaceAll('{{both}}', user.lillihub.display == 'both' ? 'selected="selected"' : '')
                 .replaceAll('{{posts}}', user.lillihub.display == 'posts' ? 'selected="selected"' : '')
-                .replaceAll('{{conversations}}', user.lillihub.display == 'conversations' ? 'selected="selected"' : ''))
+                .replaceAll('{{conversations}}', user.lillihub.display == 'conversations' ? 'selected="selected"' : '')
+                .replaceAll('{{classic}}', user.lillihub.display == 'classic' ? 'selected="selected"' : ''))
         , user);
 }

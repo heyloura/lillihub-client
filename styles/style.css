@@ -104,12 +104,6 @@ a[href]:not(:where(
     )) {
     text-decoration: underline;
 }
-a[href]:where(
-    [href^="#"],
-    [href^="/"]:not([href^="//"]),
-    ):visited {
-    color: var(--blue);
-}
 .off-canvas-content {
     padding: 0 !important;
     width: 100%;
@@ -313,10 +307,17 @@ footer .btn-group-block {
     display:inline-block;
     width:100%
 }
+.replyIframe {
+    position: relative;overflow: hidden;width: 100%;padding-top: 63%;
+}
+
 @media screen and (min-width: 650px)
 {
     .book-tile{
         width:50%
+    }
+    .replyIframe {
+        position: relative;overflow: hidden;width: 100%;padding-top: 56.25%;
     }
 }
 @media screen and (min-width: 650px)

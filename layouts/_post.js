@@ -1,6 +1,7 @@
 import { filterOut, cleanFormatHTML } from "../scripts/server/utilities.js";
 import { getIsFollowingUser } from "../scripts/server/mb.js";
 import { CSSThemeColors } from "./templates.js";
+import { SingleTemplate } from "./single.js";
 
 const _conversationTemplate = new TextDecoder().decode(await Deno.readFile("templates/_conversation.html"));
 const _replyTemplate = new TextDecoder().decode(await Deno.readFile("templates/_reply.html"));
@@ -14,7 +15,7 @@ const _bookmarkFormTemplate = new TextDecoder().decode(await Deno.readFile("temp
 const _bookmarkIframeTemplate = new TextDecoder().decode(await Deno.readFile("templates/_bookmark_iframe.html"));
 
 
-export async function PostTemplate(id, post, conversation, user = false, token = '', lastTimestamp = 0, customTag = '', open = false, getFollowing = true, clientConvoLoad = false) {
+export async function PostTemplate(id, post, conversation, user = false, token = '', lastTimestamp = 0, customTag = '', open = false, getFollowing = true, clientConvoLoad = false, viewSingleConvoLoad = false) {
     const isConversation = conversation && conversation.length > 0;
 
     let isFollowingUser = false;
@@ -57,7 +58,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                 ) : ''
         ).join('') : '';
 
-    const avatars = conversation && Array.isArray(conversation) ? conversation.slice(0, Math.min(5, conversation.length - 1)).map(function (person) {
+    const avatars = isConversation && conversation && Array.isArray(conversation) ? conversation.slice(0, Math.min(5, conversation.length - 1)).map(function (person) {
             return `<figure class="avatar avatar-sm ${lastTimestamp != 0 && person && person._microblog && person._microblog.date_timestamp > lastTimestamp ? 'badge' : ''}">
                     <img loading="lazy" src="${person.author.avatar}" height="48" width="48"/>
                 </figure>`
@@ -65,6 +66,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
 
 
     const reply = user ? _replyTemplate
+        .replaceAll('{{open}}', open ? 'open' : '')
         .replaceAll('{{src}}', 
             _replyFormTemplate
                 .replaceAll('{{id}}', post.id)
@@ -76,13 +78,17 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                 .replaceAll('{{response}}','')
             ) : '';
 
-    const comments = _commentsTemplate
+    let comments = _commentsTemplate
         .replaceAll('{{open}}', open ? 'open' : '')
         .replaceAll('{{avatars}}', avatars)
         .replaceAll('{{convoCount}}', clientConvoLoad ? 'View ' : isConversation ? conversation.length - 1 : 0)
         .replaceAll('{{conversations}}', conversations ? conversations : '')
         .replaceAll('{{reply}}', reply)
         .replaceAll('{{clientConvoLoad}}', clientConvoLoad ? `loadConversation(this,${id});` : '');
+
+    if(viewSingleConvoLoad) {
+        comments = reply;
+    }
 
     return !filterOut(user ?  user.lillihub.exclude : '', post.content_html) ? 
         _postTemplate.replaceAll('{{avatar}}',post.author.avatar) 
@@ -111,6 +117,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                     .replaceAll('{{relativeDate}}', post._microblog.date_relative)
                     .replaceAll('{{url}}', post.url)
                     .replaceAll('{{id}}', post.id)
+                    .replaceAll('{{single}}', viewSingleConvoLoad ? `<a class="btn btn-link btn-sm" onclick="addLoading(this)" href="/timeline/${post.id}"><i class="bi bi-chat"></i> view comments</a>` : '')
                     .replaceAll('{{comments}}', user && ((isConversation && conversation.length - 1 > 0) || (clientConvoLoad && post._microblog.is_conversation) ) ? comments : '')
                     .replaceAll('{{reply}}', user ? (conversation == undefined || conversation.length == 0) && !(clientConvoLoad && post._microblog.is_conversation) ? reply : '' : '')
         : ''

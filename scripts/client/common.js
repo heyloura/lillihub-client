@@ -43,8 +43,8 @@ function addLoading(elem) {
 }
 
 function toggleCard(card) {
-    card.classList.toggle('expanded'); // Toggle the 'expanded' class//card.classList.add('fadeout');
-    card.classList.toggle('fadeout');
+    card.parentNode.parentNode.classList.toggle('expanded'); // Toggle the 'expanded' class//card.classList.add('fadeout');
+    card.parentNode.parentNode.classList.toggle('fadeout');
 }
 
 function toggleSummary(el, e) {
