@@ -22,5 +22,5 @@ export async function RepliesTemplate(user, token) {
         .replaceAll('{{repliesActive}}', 'active')
         .replaceAll('{{feed}}', feed)
 
-    return HTMLPage('Replies', content, user);
+    return HTMLPage(token, 'Replies', content, user);
 }

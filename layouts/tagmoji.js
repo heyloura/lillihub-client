@@ -26,5 +26,5 @@ export async function TagmojiTemplate(user, token, id) {
         <p>Some recent ${id} posts from the community.</p>
     </div>${feed}`;
 
-    return HTMLPage(id, content, user);
+    return HTMLPage(token, id, content, user);
 }

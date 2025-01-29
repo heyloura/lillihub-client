@@ -34,5 +34,5 @@ export async function NotesTemplate(user, token, id) {
         .replaceAll('{{notes}}', notes)
         .replaceAll('{{notebooks}}', `<ul class="pl-0" style="list-style: none; font-size:small;">${notebooks}</ul>`)
 
-    return HTMLPage('Notes', content, user, '', `<li><a class="btn btn-primary" onclick="addLoading(this)" href="/notes/${id}/update"><i class="bi bi-pencil-square"></i> New Note</a></li>` + notebooks);
+    return HTMLPage(token, 'Notes', content, user, '', `<li><a class="btn btn-primary" onclick="addLoading(this)" href="/notes/${id}/update"><i class="bi bi-pencil-square"></i> New Note</a></li>` + notebooks);
 }

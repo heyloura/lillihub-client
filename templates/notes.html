@@ -3,6 +3,28 @@
     <div class="no-border panel mb-2 mt-2 p-2 bg-primary hide-if-user-has-javascript" style="clear:both">
         <p>Notes require JavaScript to be enabled.</p>
     </div>
+    <div id="enter_notes_key" class="hide-if-user-has-no-javascript no-border panel mb-2 mt-2 p-2" style="clear:both">
+        <p>Notes are encrypted in the browser before sending them to the server, so neither Lillihub nor Micro.blog sees the note text.</p>
+        <div>
+            <p>You will need to enter your secret key into Lillihub to access/create your notes within the app. The key is saved in your browser's
+            local storage and is never sent to Lillihub. You can review this file's source code to confirm.</p>
+            <div class="input-group">
+                <input id="notes_key" type="text" class="form-input bg-light" placeholder="Micro.blog Key">
+                <button class="btn btn-primary" onclick="addLoading(this);localStorage.setItem('notes_key', document.getElementById('notes_key').value);window.location.href = '/notes';"><i class="bi bi-save"></i></button>
+            </div>
+        </div>
+        <div id="hide_notes_key">
+            <p><button class="btn btn-link d-inline" onclick="addLoading(this);localStorage.setItem('notes_key', '');window.location.href = '/notes';"><i class="bi bi-trash"></i> Clear out your secret key.</button></p>           
+        </div>
+    </div>
+    <ul id="notebooks" class="hide-if-user-has-no-javascript" style="clear:both;">{{notebooks}}</ul>
+    <script>
+        document.getElementById('hide_notes_key').style.display = 'none';
+        if(localStorage.getItem("notes_key")) {
+            document.getElementById('enter_notes_key').style.display = 'none';
+            document.getElementById('hide_notes_key').style.display = 'block';
+        }
+    </script>
     <div class="clearfix"></div>
     <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
         <div class="input-group">

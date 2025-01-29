@@ -53,5 +53,5 @@ export async function MediaTemplate(user, token, req) {
         .replaceAll('{{destination}}', mpDestination)
         .replaceAll('{{offset}}', offset ? offset + 50 : '50')
 
-    return HTMLPage('Media', content, user);
+    return HTMLPage(token, 'Media', content, user);
 }

@@ -43,5 +43,5 @@ export async function UsersTemplate(user, token, type, url) {
         .replaceAll('{{feed}}', feed)
         .replaceAll('{{message}}', type != 'following' ? '<p style="text-align:center;"><a onclick="addLoading(this)" href="https://micro.blog/account/muting">Manage blocked and muted users on micro.blog</a><p>' : '');
     
-    return HTMLPage(type, content, user)
+    return HTMLPage(token, type, content, user)
 }

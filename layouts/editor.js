@@ -106,5 +106,5 @@ export async function EditorTemplate(user, token, req) {
         .replaceAll('{{publishSelected}}', post && post.properties["post-status"][0] == 'published' ? `selected="selected"` : '' )
         .replaceAll('{{draftSelected}}', post && post.properties["post-status"][0] == 'draft' ? `selected="selected"` : '' )
 
-    return HTMLPage('Editor', content, user);
+    return HTMLPage(token, 'Editor', content, user);
 }

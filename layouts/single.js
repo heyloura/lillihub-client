@@ -16,5 +16,5 @@ export async function SingleTemplate(user, token, id, replyTo = 0) {
 
     const content = await PostTemplate(id, convo, conversation.items, user, token, 0, action, true, id, replyTo);
 
-    return HTMLPage(id, content, user);
+    return HTMLPage(token, id, content, user);
 }

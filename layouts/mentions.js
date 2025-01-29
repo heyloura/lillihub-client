@@ -37,5 +37,5 @@ export async function MentionsTemplate(user, token, replyTo = 0) {
         .replaceAll('{{repliesActive}}', '')
         .replaceAll('{{feed}}', feed)
 
-    return HTMLPage('Mentions', content, user);
+    return HTMLPage(token, 'Mentions', content, user);
 }

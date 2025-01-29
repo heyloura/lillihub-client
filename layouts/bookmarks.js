@@ -129,5 +129,5 @@ export async function BookmarksTemplate(user, token, req) {
         .replaceAll('{{tags}}', user.plan == 'premium' ? `<p class="pt-2"><b>Tags</b><br/><br/>${tagsHTML}<br/></p>` : '')
         .replaceAll('{{feed}}', feed)
 
-    return HTMLPage('Bookmarks', content, user);
+    return HTMLPage(token, 'Bookmarks', content, user);
 }

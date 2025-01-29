@@ -88,5 +88,5 @@ export async function BlogTemplate(user, token, req) {
         .replaceAll('{{categoriesHTML}}', categoriesDropdown)
         .replaceAll('{{nextHref}}', href)
 
-    return HTMLPage(status ? 'Draft' : 'Posts', content, user);
+    return HTMLPage(token, status ? 'Draft' : 'Posts', content, user);
 }

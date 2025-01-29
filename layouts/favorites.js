@@ -43,5 +43,5 @@ export async function FavoritesTemplate(user, token, req) {
         }
     }))).join('') : '';
     
-    return HTMLPage('Favorites', _favoritesTemplate.replaceAll('{{favorites}}', favorites + favoritePages), user);
+    return HTMLPage(token, 'Favorites', _favoritesTemplate.replaceAll('{{favorites}}', favorites + favoritePages), user);
 }

@@ -9,7 +9,7 @@ export function SettingsTemplate(user) {
     const exculde = user.lillihub.exclude ? user.lillihub.exclude : '';
     const darktheme = user.lillihub.darktheme ? 'checked="checked"' : '';
 
-    return HTMLPage(`Settings`, _settingsTemplate
+    return HTMLPage(token, `Settings`, _settingsTemplate
         .replaceAll('{{exclude}}',exculde)
         .replaceAll('{{darktheme}}',darktheme)
         .replaceAll('{{timelineSettings}}', 

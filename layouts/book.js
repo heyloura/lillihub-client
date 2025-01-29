@@ -26,5 +26,5 @@ export async function BookTemplate(user, token, shelfid, id) {
         return '';
     }))).join('');
 
-    return HTMLPage('Edit book', content, user);
+    return HTMLPage(token, 'Edit book', content, user);
 }

@@ -13,5 +13,5 @@ export async function BookshelvesTemplate(user, token, replyTo = 0) {
     const content = _bookshelvesTemplate
         .replaceAll('{{feed}}', shelvesHTML);
 
-    return HTMLPage(`Bookshelves`, content, user);
+    return HTMLPage(token, `Bookshelves`, content, user);
 }

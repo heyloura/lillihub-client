@@ -63,7 +63,7 @@ export async function TimelineTemplate(user, token, req) {
         .replaceAll('{{beforeId}}', beforeId)
         .replaceAll('{{lastId}}', lastPostId);
     
-    return HTMLPage('Timeline', result, user);
+    return HTMLPage(token, 'Timeline', result, user);
 }
 
 async function getFeed(items, user, seen, token, timeline) {

@@ -47,5 +47,5 @@ export async function LillihubTemplate(user, token, replyTo = 0) {
     const content = _lillihubTemplate
         .replaceAll('{{feed}}', feed)
 
-    return HTMLPage('Lillihub Feed', content, user);
+    return HTMLPage(token, 'Lillihub Feed', content, user);
 }

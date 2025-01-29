@@ -33,5 +33,5 @@ export async function BooksTemplate(user, token, replyTo = 0) {
         .replaceAll('{{feed}}', feed);
 
 
-    return HTMLPage(`Books`, content, user);
+    return HTMLPage(token, `Books`, content, user);
 }

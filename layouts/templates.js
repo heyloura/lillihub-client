@@ -137,7 +137,7 @@ export function CSSThemeColors(dark = false) {
 
 // <style>${_shoelacecss}</style>
 // <script type="module">${_shoelacejs}</script>
-export function HTMLPage(title, contentHTML, user, redirect = '', navContent) {
+export async function HTMLPage(token, title, contentHTML, user, redirect = '', navContent) {
     let area = '';
 
     if(title == 'Bookmarks') {
@@ -151,6 +151,14 @@ export function HTMLPage(title, contentHTML, user, redirect = '', navContent) {
     }
     if(title == 'Notebooks' || title == 'Notes' || title == 'Note') {
         area = 'notes';
+    }
+
+    if(token) {
+        const fetchingNotebooks = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+        const resultsNotebooks = await fetchingNotebooks.json();
+        const notebooks = resultsNotebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
+            return `<li class="menu-item"><a onclick="addLoading(this)" href="/notes/${item.id}" class="btn btn-link">${item.title}</a></li>`;
+        }).join('');
     }
 
     return `<!DOCTYPE html>
@@ -205,11 +213,15 @@ export function HTMLPage(title, contentHTML, user, redirect = '', navContent) {
                                     <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
                                 </li>
                                 <li class="menu-item">
-                                    <a onclick="addLoading(this)" href="/"><figure class="avatar avatar-sm bg-secondary"><img height="48" width="48" src="https://cdn.micro.blog/images/icons/favicon_64.png" loading="lazy"></figure> Timeline</a>
+                                    <a onclick="addLoading(this)" href="/">Timeline</a>
                                 </li>
                                 <li class="menu-item">
-                                    <a onclick="addLoading(this)" href="/notes">Private Notes</a>
+                                    <hr />
                                 </li>
+                                ${notebooks}
+                                <!--<li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/notes">Private Notes</a>
+                                </li>--
                                 <li class="menu-item">
                                     <hr />
                                 </li>

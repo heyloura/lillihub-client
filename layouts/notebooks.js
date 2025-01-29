@@ -14,5 +14,5 @@ export async function NotebooksTemplate(user, token) {
     const content = _notebooksTemplate
         .replaceAll('{{notebooks}}', notebooks)
 
-    return HTMLPage('Notebooks', content, user, '', notebooks);
+    return HTMLPage(token, 'Notebooks', content, user, '', notebooks);
 }

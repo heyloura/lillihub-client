@@ -105,5 +105,5 @@ export async function UserTemplate(user, token, id, photos = false) {
         .replaceAll('{{feed}}', photos ? `<div class="image-gallery">${feed}</div>` : feed)
         .replaceAll('{{username}}', results._microblog == null ? '': results._microblog.username);
 
-    return HTMLPage('User', content, user)
+    return HTMLPage(token, 'User', content, user)
 }

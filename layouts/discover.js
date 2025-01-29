@@ -55,5 +55,5 @@ export async function DiscoverTemplate(user, token, uuid, url) {
                 .replaceAll('{{appURL}}', url)) : '')
         .replaceAll('{{tagmojis}}', !user ? '' : tagmojis)
 
-    return HTMLPage(`Discover`, content, user);
+    return HTMLPage(token, `Discover`, content, user);
 }

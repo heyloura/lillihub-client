@@ -78,5 +78,5 @@ export async function ConversationsTemplate(user, token, req) {
         .replaceAll('{{beforeId}}', beforeId)
         .replaceAll('{{lastId}}', lastPostId);
     
-    return HTMLPage('Conversations', result, user);
+    return HTMLPage(token, 'Conversations', result, user);
 }
