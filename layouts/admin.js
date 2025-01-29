@@ -48,20 +48,18 @@ export async function AdminTemplate(user, token) {
     for (const entry of allEntries) {
         if(entry.key[1] == "timeline" || entry.key[1] == "conversation" ) {
             timeline += `<tr>
-                <td><input type="checkbox" name="entry[]" value="${JSON.stringify(entry.key)}" /></td>
                 <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
                 <td>${getMonthsBetween(new Date(entry.value.viewed), new Date(), false)} month(s): ${entry.value.viewed}</td>
             </tr>`;
         } else if(entry.key[1] == "global") {
             count++;
             entry.value.display = 'classic';
-            //await kv.set(entry.key, entry.value);
+            await kv.set(entry.key, entry.value);
             timeline += `<tr>
-                <td><input type="checkbox" name="entry[]" value="${JSON.stringify(entry.key)}" /></td>
                 <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
                 <td>${JSON.stringify(entry.value.display)}
-                    ${JSON.stringify(entry.value.favorites) != '["manton","jean","news","help"]' ? 'custom favorites<br/>' : ''}
-                    ${JSON.stringify(entry.value.feeds) != '[]' ? 'custom feeds<br/>' : ''}</td>
+                    ${JSON.stringify(entry.value.favorites) != '["manton","jean","news","help"]' ? '<br/>custom favorites' : ''}
+                    ${JSON.stringify(entry.value.feeds) != '[]' ? '<br/>custom feeds' : ''}</td>
             </tr>`;
         } else {
             //kv.delete(entry.key);
