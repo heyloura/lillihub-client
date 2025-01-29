@@ -152,11 +152,11 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
     if(title == 'Notebooks' || title == 'Notes' || title == 'Note') {
         area = 'notes';
     }
-
+    let notebooks = '';
     if(token) {
         const fetchingNotebooks = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
         const resultsNotebooks = await fetchingNotebooks.json();
-        const notebooks = resultsNotebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
+        notebooks = resultsNotebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
             return `<li class="menu-item"><a onclick="addLoading(this)" href="/notes/${item.id}" class="btn btn-link">${item.title}</a></li>`;
         }).join('');
     }
