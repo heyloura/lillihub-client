@@ -45,6 +45,7 @@ function NavBarContent(user, area, title) {
     }
     return `<section class="mt-1 mb-2 scroll-container">
         <ul class="pl-0 horizontal-list" style="list-style:none">
+            <li><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>
             <li><a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-card-list green-text"></i> Timeline</a></li>
             ${ user && user.lillihub && user.lillihub.display != 'both' && user.lillihub.display != 'classic' ? `<li><a onclick="addLoading(this)" href="/conversations" class="green-text btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i></a> Conversation</li>` : '' }
             ${ user && !user.error ? `
@@ -180,15 +181,64 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                             }
                         });}</script>
                     <script>document.write('<style>.hide-if-user-has-javascript{display:none}</style>');</script>
+                    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
                     <style>${_style}</style>
                 </head>
                 <body id="top" class="body-content">
+
+
+
+                <div class="off-canvas">
+                    <div id="sidebar" class="off-canvas-sidebar">
+                        <ul class="menu">
+                                <li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/posts">Blog Management</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/bookmarks">Bookmarks</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/"><figure class="avatar avatar-sm bg-secondary"><img height="48" width="48" src="https://cdn.micro.blog/images/icons/favicon_64.png" loading="lazy"></figure> Timeline</a>
+                                </li>
+                                <li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/notes">Private Notes</a>
+                                </li>
+                                <li class="menu-item">
+                                    <hr />
+                                </li>
+                                <li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/user/${user.username}"><figure class="avatar avatar-sm"><img height="48" width="48" src="${user.avatar}" alt="${user.username} Avatar" loading="lazy"></figure> @${user.username}</a>
+                                </li>
+                                <li class="menu-item"><a onclick="addLoading(this)" href="/settings">Settings</a></li>
+                                <li class="menu-item"><a onclick="addLoading(this)" href="/logout">Logout</a></li>
+                                <li class="menu-item"><small>
+                                    <a onclick="addLoading(this)" href="https://docs.lillihub.com">Documentation</a> · <a onclick="addLoading(this)" href="https://github.com/heyloura/lillihub-client">Github</a> 
+                                    <!--· Buy Me a Coffee--> · Version 0.2.5<br/>
+                                    Designed and built with ♥ by <a onclick="addLoading(this)" href="https://heyloura.com">Loura</a>. 
+                                    Licensed under the MIT License.</small></li>
+                        </ul>
+                    </div>
+
+                    <a class="off-canvas-overlay" href="#close"></a>
+
+                    <div class="off-canvas-content">
+                        
+
+
+
+
+
+
+
                     <div class="content-page container grid-md">
                         ${ user && !user.error ? `
                         <header class="app-header">
                             <div class="navbar bg-light p-1">
                                 <section class="navbar-section mt-1 mb-2">
-                                    <div class="dropdown">
+                                    <!--<div class="dropdown">
                                         <div class="btn-group">
                                             <button class="btn btn-link dropdown-toggle" tabindex="0">${area == "blog" ? 'Blog Management' : 
                                                         area == "bookmarks" ? 'Bookmarks' : 
@@ -197,45 +247,14 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                                                         area == "bookshelves" ? 'Bookshelves' : '<figure class="avatar avatar-sm bg-secondary"><img height="48" width="48" src="https://cdn.micro.blog/images/icons/favicon_64.png" loading="lazy"></figure> Timeline'}
                                             <i class="bi bi-caret-down-fill"></i>
                                                         </button>
-                                            <ul class="menu">
-                                                                            <li class="menu-item">
-                                                        <a onclick="addLoading(this)" href="/posts">Blog Management</a>
-                                                    </li>
-                                                    <li class="menu-item">
-                                                        <a onclick="addLoading(this)" href="/bookmarks">Bookmarks</a>
-                                                    </li>
-                                                    <li class="menu-item">
-                                                        <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
-                                                    </li>
-                                                    <li class="menu-item">
-                                                        <a onclick="addLoading(this)" href="/"><figure class="avatar avatar-sm bg-secondary"><img height="48" width="48" src="https://cdn.micro.blog/images/icons/favicon_64.png" loading="lazy"></figure> Timeline</a>
-                                                    </li>
-                                                    <li class="menu-item">
-                                                        <a onclick="addLoading(this)" href="/notes">Private Notes</a>
-                                                    </li>
-                                                    <li class="menu-item">
-                                                        <hr />
-                                                    </li>
-                                                    <li class="menu-item">
-                                                        <a onclick="addLoading(this)" href="/user/${user.username}"><figure class="avatar avatar-sm"><img height="48" width="48" src="${user.avatar}" alt="${user.username} Avatar" loading="lazy"></figure> @${user.username}</a>
-                                                    </li>
-                                                    <li class="menu-item"><a onclick="addLoading(this)" href="/settings">Settings</a></li>
-                                                    <li class="menu-item"><a onclick="addLoading(this)" href="/logout">Logout</a></li>
-                                                    <li class="menu-item"><small>
-                                                        <a onclick="addLoading(this)" href="https://docs.lillihub.com">Documentation</a> · <a onclick="addLoading(this)" href="https://github.com/heyloura/lillihub-client">Github</a> 
-                                                        <!--· Buy Me a Coffee--> · Version 0.2.5<br/>
-                                                        Designed and built with ♥ by <a onclick="addLoading(this)" href="https://heyloura.com">Loura</a>. 
-                                                        Licensed under the MIT License.</small></li>
-                                            </ul>
+
                                         </div>
-                                    </div>
+                                    </div>-->
+                                    <!-- off-screen toggle button -->
+                                    <a class="off-canvas-toggle btn btn-primary btn-action" href="#sidebar">
+                                        <i class="bi bi-list"></i>
+                                    </a>
                                 </section>
-                                ${ title != "Editor" && title != "Notebooks" && title != "Notes" && title != "Note"  ?
-                                `<section class="navbar-section mt-1 mb-2">
-                                    <div class="btn-group btn-group-block">
-                                        <a href="/post" class="btn purple-text bg-light dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a>
-                                    </div>
-                                </section>` : '' }
                             </div>
                         </header>`
                     : '' }
@@ -253,6 +272,22 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                             ${title != "Editor" ? NavBarContent(user, area, title) : ''}
                         </div>
                     </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+                </div>
+
+
                 </body>
                 <style>.small-img{width:unset!important;margin-left:unset!important;}</style>
                 <script>${_commonjs}</script>

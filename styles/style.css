@@ -323,6 +323,13 @@ footer .btn-group-block {
 .horizontal-list li {
     display: inline; /* Display items in a line */
 }
+
+.horizontal-list li a {
+    border-top-width: 0 !important;
+    border-right-width: 0 !important;
+    border-left-width: 0 !important;
+}
+
 @media screen and (min-width: 650px)
 {
     .scroll-container {
