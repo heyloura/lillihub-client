@@ -141,13 +141,13 @@
         }
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", async function(event) {
-                document.getElementById('app-sidebar').innerHTML = document.getElementById('notebooks').innerHTML;
+                //document.getElementById('app-sidebar').innerHTML = document.getElementById('notebooks').innerHTML;
                 await decryptNotes();
             });
         }
         else
         {
-            document.getElementById('app-sidebar').innerHTML = document.getElementById('notebooks').innerHTML;
+            //document.getElementById('app-sidebar').innerHTML = document.getElementById('notebooks').innerHTML;
             await decryptNotes();
         }
     </script>
