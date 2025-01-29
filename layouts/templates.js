@@ -181,7 +181,6 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                             }
                         });}</script>
                     <script>document.write('<style>.hide-if-user-has-javascript{display:none}</style>');</script>
-                    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
                     <style>${_style}</style>
                 </head>
                 <body id="top" class="body-content">
@@ -190,7 +189,8 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
 
                 <div class="off-canvas">
                     <div id="sidebar" class="off-canvas-sidebar">
-                        <ul class="menu">
+                        <p style="text-align:center;"><img loading="lazy" src="/lillihub-512.png" width="130"/></p>
+                        <ul class="menu bg-light" style="max-width:260px;box-shadow:none;">
                                 <li class="menu-item">
                                     <a onclick="addLoading(this)" href="/posts">Blog Management</a>
                                 </li>
