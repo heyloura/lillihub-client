@@ -15,34 +15,7 @@ export async function UserTemplate(user, token, id, photos = false) {
     let results = [];
 
     if(!token) {
-        // Return public feed.    
-        if(photos) {
-            const fetching = await fetch(`https://micro.blog/posts/${id}/photos`, { method: "GET" });
-
-            try {
-                results = await fetching.json();
-
-                feed = (await Promise.all(results.items.map(async (item) => {
-                    return `<a target="_blank" href="${item.url}"><img loading="lazy" src="${item._microblog.thumbnail_url}" alt="" /></a>`;
-                }))).join('');
-            } catch(error) {
-                console.log(`error loading https://micro.blog/posts/${id}/photos, ${error}`);
-                feed = 'Could not fetch results from Micro.blog';
-            }
-        }
-        else {
-            const fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET" });
-                
-            try {
-                results = await fetching.json();
-                feed = (await Promise.all(results.items.map(async (item) => {
-                    return await PostTemplate(item.id, item, item.is_conversation, user, token, 0, '', false);
-                }))).join('');
-            } catch(error) {
-                console.log(`error loading https://micro.blog/posts/${id}, ${error}`);
-                feed = 'Could not fetch results from Micro.blog';
-            }
-        }
+        feed = 'Could not fetch results from Micro.blog';
     } else {
         if(photos) {
             const fetching = await fetch(`https://micro.blog/posts/${id}/photos`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
@@ -60,12 +33,16 @@ export async function UserTemplate(user, token, id, photos = false) {
             const seen = new Set();
             feed = (await Promise.all(results.items.map(async (item) => {
     
-                if(item == null){
+                if(item == null) {
                     return '';
                 }
 
                 let conversations = [];
                 let convo = item;
+
+                if(user.lillihub.display == 'classic') { 
+                    return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '', false, true, false, true)
+                }
         
                 if(item._microblog && item._microblog.is_conversation && item._microblog.is_mention) {
                     const conversation = await getConversation(item.id, token);
