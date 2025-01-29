@@ -52,7 +52,7 @@ function NavBarContent(user, area, title) {
             <li><a onclick="addLoading(this)" href="/mentions" class="btn ${title == "Mentions" ? 'bg-light blue-border' : 'btn-link'} blue-text"><i class="bi bi-at blue-text"></i> Mentions</a></li>
             <li><a onclick="addLoading(this)" href="/replies" class="btn ${title == "Replies" ? 'bg-light bluepurple-border' : 'btn-link'} bluepurple-text"><i class="bi bi-reply bluepurple-text"></i> Replies</a></li>
             <li><a onclick="addLoading(this)" href="/users/following" class="btn ${title == "following" || title == "muted" || title == "blocked" ? 'bg-light purple-border' : 'btn-link'} purple-text"><i class="bi bi-people purple-text"></i> Following</a></li>
-            <li><a onclick="addLoading(this)" href="/favorites" class="btn ${title == "Favorites" ? 'bg-light purplered-border' : 'btn-link'} purplered-text"><i class="bi bi-star purplered-text"></i></a> Favorites</li>
+            <li><a onclick="addLoading(this)" href="/favorites" class="btn ${title == "Favorites" ? 'bg-light purplered-border' : 'btn-link'} purplered-text"><i class="bi bi-star purplered-text"></i> Favorites</a></li>
             ` : '' }
         </ul>
     </section>`;

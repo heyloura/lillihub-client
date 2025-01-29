@@ -328,6 +328,9 @@ footer .btn-group-block {
 }
 @media screen and (min-width: 650px)
 {
+    .scroll-container {
+        overflow-x: hidden;
+    }
     .book-tile{
         width:50%
     }
