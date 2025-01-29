@@ -235,7 +235,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
 
                     <div class="content-page container grid-md">
                         ${ user && !user.error ? `
-                        <a class="off-canvas-toggle btn btn-primary btn-action" style="left: unset;right: .4rem;" href="#sidebar">
+                        <a class="off-canvas-toggle btn btn-primary btn-action" style="left: unset;right: .4rem;position:fixed;" href="#sidebar">
                                         <i class="bi bi-list"></i>
                                     </a>`
                     : '' }

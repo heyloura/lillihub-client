@@ -620,3 +620,6 @@ td {
 .hide {
     display: none !important;
 }
+div.tile-action.btn-group > a {
+    margin-top: -2px;
+}
