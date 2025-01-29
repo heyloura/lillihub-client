@@ -10,5 +10,5 @@ export async function AdminTemplate(user, token) {
         results += `<li>${entry.key}: ${entry.value}</li>`;
     }
 
-    return HTMLPage(token, `Admin`, `<ul>${results}</ul>`);
+    return HTMLPage(token, `Admin`, `<ul>${results}</ul>`, user);
 }
