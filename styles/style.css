@@ -335,11 +335,10 @@ footer .btn-group-block {
         position: relative;overflow: hidden;width: 100%;padding-top: 56.25%;
     }
     .horizontal-list {
-        display: unset;
+        display: block;
     }
-    
     .horizontal-list li {
-        display: unset;
+        display: block;
     }
 }
 @media screen and (min-width: 650px)

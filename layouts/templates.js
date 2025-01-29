@@ -8,12 +8,12 @@ function NavBarContent(user, area, title) {
     if(area == "blog") {
         return `<section class="mt-1 mb-2 scroll-container">
             <ul class="pl-0 horizontal-list" style="list-style:none">
-                <li><a onclick="addLoading(this)" href="/posts" class="btn ${title == "Posts" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-window-stack green-text"></i></a></li>
-                <li><a onclick="addLoading(this)" href="/posts?status=draft" class="btn ${title == "Draft" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-pencil greenblue-text"></i></a></li>
-                <!--<li><a onclick="addLoading(this)" href="/pages" class="btn btn-link"><i class="bi bi-files blue-text"></i></a></li>-->
-                <li><a onclick="addLoading(this)" href="/media" class="btn ${title == "Media" ? 'bg-light bluepurple-border' : 'btn-link'} bluepurple-text"><i class="bi bi-images bluepurple-text"></i></a></li>
-                <li><!--<a onclick="addLoading(this)" href="/collections" class="btn btn-link purple-text"><i class="bi bi-collection purple-text"></i></a></li>
-                <li><a onclick="addLoading(this)" href="/webmentions" class="btn btn-link purplered-text"><i class="bi bi-chat-square-dots purplered-text"></i></a></li>-->
+                <li><a onclick="addLoading(this)" href="/posts" class="btn ${title == "Posts" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-window-stack green-text"></i> Posts</a></li>
+                <li><a onclick="addLoading(this)" href="/posts?status=draft" class="btn ${title == "Draft" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-pencil greenblue-text"></i> Drafts</a></li>
+                <!--<li><a onclick="addLoading(this)" href="/pages" class="btn btn-link"><i class="bi bi-files blue-text"></i></a> Pages</li>-->
+                <li><a onclick="addLoading(this)" href="/media" class="btn ${title == "Media" ? 'bg-light bluepurple-border' : 'btn-link'} bluepurple-text"><i class="bi bi-images bluepurple-text"></i> Uploads</a></li>
+                <li><!--<a onclick="addLoading(this)" href="/collections" class="btn btn-link purple-text"><i class="bi bi-collection purple-text"></i></a> Collections</li>
+                <li><a onclick="addLoading(this)" href="/webmentions" class="btn btn-link purplered-text"><i class="bi bi-chat-square-dots purplered-text"></i> Webmentions</a></li>-->
             </ul>
         </section>`;
     }
@@ -31,8 +31,8 @@ function NavBarContent(user, area, title) {
     if(area == "bookshelves") {
         return `<section class="mt-1 mb-2 scroll-container" >
             <ul class="pl-0 horizontal-list" style="list-style:none">
-                <li><a onclick="addLoading(this)" href="/bookshelves" class="btn ${title == "Bookshelves" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-book green-text"></i></a></li>
-                <li><a onclick="addLoading(this)" href="/books" class="btn ${title == "Books" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search-heart greenblue-text"></i></a></li>
+                <li><a onclick="addLoading(this)" href="/bookshelves" class="btn ${title == "Bookshelves" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-book green-text"></i> Bookshelves</a></li>
+                <li><a onclick="addLoading(this)" href="/books" class="btn ${title == "Books" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search-heart greenblue-text"></i> Books</a></li>
             </ul>
         </section>`;
     }
@@ -45,14 +45,14 @@ function NavBarContent(user, area, title) {
     }
     return `<section class="mt-1 mb-2 scroll-container">
         <ul class="pl-0 horizontal-list" style="list-style:none">
-            <li><a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-card-list green-text"></i></a></li>
-            ${ user && user.lillihub && user.lillihub.display != 'both' && user.lillihub.display != 'classic' ? `<li><a onclick="addLoading(this)" href="/conversations" class="green-text btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i></a></li>` : '' }
+            <li><a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-card-list green-text"></i> Timeline</a></li>
+            ${ user && user.lillihub && user.lillihub.display != 'both' && user.lillihub.display != 'classic' ? `<li><a onclick="addLoading(this)" href="/conversations" class="green-text btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i></a> Conversation</li>` : '' }
             ${ user && !user.error ? `
-            <li><a onclick="addLoading(this)" href="/discover" class="btn ${discoverTitle ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search greenblue-text"></i></a></li>
-            <li><a onclick="addLoading(this)" href="/mentions" class="btn ${title == "Mentions" ? 'bg-light blue-border' : 'btn-link'} blue-text"><i class="bi bi-at blue-text"></i></a></li>
-            <li><a onclick="addLoading(this)" href="/replies" class="btn ${title == "Replies" ? 'bg-light bluepurple-border' : 'btn-link'} bluepurple-text"><i class="bi bi-reply bluepurple-text"></i></a></li>
-            <li><a onclick="addLoading(this)" href="/users/following" class="btn ${title == "following" || title == "muted" || title == "blocked" ? 'bg-light purple-border' : 'btn-link'} purple-text"><i class="bi bi-people purple-text"></i></a></li>
-            <li><a onclick="addLoading(this)" href="/favorites" class="btn ${title == "Favorites" ? 'bg-light purplered-border' : 'btn-link'} purplered-text"><i class="bi bi-star purplered-text"></i></a></li>
+            <li><a onclick="addLoading(this)" href="/discover" class="btn ${discoverTitle ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search greenblue-text"></i> Discover</a></li>
+            <li><a onclick="addLoading(this)" href="/mentions" class="btn ${title == "Mentions" ? 'bg-light blue-border' : 'btn-link'} blue-text"><i class="bi bi-at blue-text"></i> Mentions</a></li>
+            <li><a onclick="addLoading(this)" href="/replies" class="btn ${title == "Replies" ? 'bg-light bluepurple-border' : 'btn-link'} bluepurple-text"><i class="bi bi-reply bluepurple-text"></i> Replies</a></li>
+            <li><a onclick="addLoading(this)" href="/users/following" class="btn ${title == "following" || title == "muted" || title == "blocked" ? 'bg-light purple-border' : 'btn-link'} purple-text"><i class="bi bi-people purple-text"></i> Following</a></li>
+            <li><a onclick="addLoading(this)" href="/favorites" class="btn ${title == "Favorites" ? 'bg-light purplered-border' : 'btn-link'} purplered-text"><i class="bi bi-star purplered-text"></i></a> Favorites</li>
             ` : '' }
         </ul>
     </section>`;
