@@ -36,6 +36,7 @@ import { UserTemplate } from "./layouts/user.js";
 import { ConversationsTemplate } from "./layouts/conversations.js";
 import { ConversationTemplate } from "./layouts/conversation.js";
 import { BookTemplate } from "./layouts/book.js";
+import { AdminTemplate } from "./layouts/admin.js";
 
 const _replyFormTemplate = new TextDecoder().decode(await Deno.readFile("templates/_reply_form.html"));
 
@@ -71,8 +72,9 @@ const POSTS_ROUTE = new URLPattern({ pathname: "/posts" });
 const MEDIA_ROUTE = new URLPattern({ pathname: "/media" });
 const LOGOUT_ROUTE = new URLPattern({ pathname: "/logout" });
 const AUTH_ROUTE = new URLPattern({ pathname: "/auth" });
-const ROBOT_ROUTE = new URLPattern({pathname: "/robots.txt"})
-const LILLIHUB_ROUTE = new URLPattern({pathname: "/lillihub"})
+const ROBOT_ROUTE = new URLPattern({pathname: "/robots.txt"});
+const LILLIHUB_ROUTE = new URLPattern({pathname: "/lillihub"});
+const ADMIN_ROUTE = new URLPattern({pathname: "/lillihub-admin"});
 
 const ADD_REPLY = new URLPattern({ pathname: "/replies/add" });
 const UNFOLLOW_USER = new URLPattern({ pathname: "/users/unfollow" });
@@ -214,6 +216,22 @@ async function handler(req) {
     /********************************************************
      * Authenticated Only Routes
      ********************************************************/
+    if(ADMIN_ROUTE_ROUTE.exec(req.url) && user) {
+
+        if(user.username == "heyloura") {
+            return new Response(await AdminTemplate(user, accessTokenValue), {
+                status: 200,
+                headers: {
+                    "content-type": "text/html",
+                },
+            });
+        }
+
+        return new Response('', {
+            status: 401,
+        });
+    }
+
     if(FAVORITES_ROUTE.exec(req.url) && user) {
         return new Response(await FavoritesTemplate(user, accessTokenValue), {
             status: 200,
