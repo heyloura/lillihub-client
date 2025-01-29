@@ -672,6 +672,7 @@ display: none !important;
 }
 table, th, td {
     border: .05rem solid var(--crust);
+    overflow-wrap: anywhere;
   }
   table {
     border-collapse: collapse;
