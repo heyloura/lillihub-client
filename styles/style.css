@@ -337,7 +337,7 @@ footer .btn-group-block {
     border-left-width: 0 !important;
 }
 
-@media screen and (min-width: 1360)
+@media screen and (min-width: 1360px)
 {
     .canvas-sidebar {
         transform: translateX(0);
