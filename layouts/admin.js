@@ -57,10 +57,7 @@ export async function AdminTemplate(user, token) {
                 <td>${JSON.stringify(entry.value.display)}</td>
             </tr>`;
         } else {
-            old += `<tr>
-                <td><input type="checkbox" name="entry[]" value="${JSON.stringify(entry.key)}" /></td>
-                <td>${JSON.stringify(entry.key)}: ${JSON.stringify(entry.value)}</td>
-            </tr>`;
+            kv.delete(entry.key);
         }
 
     }
