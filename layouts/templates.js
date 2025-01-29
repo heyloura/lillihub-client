@@ -6,15 +6,15 @@ const _shoelacejs = await Deno.readTextFile("scripts/client/shoelace.js");
 
 function NavBarContent(user, area, title) {
     if(area == "blog") {
-        return `<section class="navbar-section mt-1 mb-2">
-            <div class="btn-group btn-group-block">
-                <a onclick="addLoading(this)" href="/posts" class="btn ${title == "Posts" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-window-stack green-text"></i></a>
-                <a onclick="addLoading(this)" href="/posts?status=draft" class="btn ${title == "Draft" ? 'bg-light greenblue-border' : 'btn-link'}"><i class="bi bi-pencil greenblue-text"></i></a>
-                <!--<a onclick="addLoading(this)" href="/pages" class="btn btn-link"><i class="bi bi-files blue-text"></i></a>-->
-                <a onclick="addLoading(this)" href="/media" class="btn ${title == "Media" ? 'bg-light bluepurple-border' : 'btn-link'}"><i class="bi bi-images bluepurple-text"></i></a>
-                <!--<a onclick="addLoading(this)" href="/collections" class="btn btn-link"><i class="bi bi-collection purple-text"></i></a>
-                <a onclick="addLoading(this)" href="/webmentions" class="btn btn-link"><i class="bi bi-chat-square-dots purplered-text"></i></a>-->
-            </div>
+        return `<section class="mt-1 mb-2 scroll-container">
+            <ul class="pl-0 horizontal-list" style="list-style:none">
+                <li><a onclick="addLoading(this)" href="/posts" class="btn ${title == "Posts" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-window-stack green-text"></i></a></li>
+                <li><a onclick="addLoading(this)" href="/posts?status=draft" class="btn ${title == "Draft" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-pencil greenblue-text"></i></a></li>
+                <!--<li><a onclick="addLoading(this)" href="/pages" class="btn btn-link"><i class="bi bi-files blue-text"></i></a></li>-->
+                <li><a onclick="addLoading(this)" href="/media" class="btn ${title == "Media" ? 'bg-light bluepurple-border' : 'btn-link'} bluepurple-text"><i class="bi bi-images bluepurple-text"></i></a></li>
+                <li><!--<a onclick="addLoading(this)" href="/collections" class="btn btn-link purple-text"><i class="bi bi-collection purple-text"></i></a></li>
+                <li><a onclick="addLoading(this)" href="/webmentions" class="btn btn-link purplered-text"><i class="bi bi-chat-square-dots purplered-text"></i></a></li>-->
+            </ul>
         </section>`;
     }
     if(area == "bookmarks") {
@@ -29,32 +29,32 @@ function NavBarContent(user, area, title) {
         return '';
     }
     if(area == "bookshelves") {
-        return `<section class="navbar-section mt-1 mb-2">
-            <div class="btn-group btn-group-block">
-                <a onclick="addLoading(this)" href="/bookshelves" class="btn ${title == "Bookshelves" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-book green-text"></i></a>
-                <a onclick="addLoading(this)" href="/books" class="btn ${title == "Books" ? 'bg-light greenblue-border' : 'btn-link'}"><i class="bi bi-search-heart greenblue-text"></i></a>
-            </div>
+        return `<section class="mt-1 mb-2 scroll-container" >
+            <ul class="pl-0 horizontal-list" style="list-style:none">
+                <li><a onclick="addLoading(this)" href="/bookshelves" class="btn ${title == "Bookshelves" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-book green-text"></i></a></li>
+                <li><a onclick="addLoading(this)" href="/books" class="btn ${title == "Books" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search-heart greenblue-text"></i></a></li>
+            </ul>
         </section>`;
     }
     if(area == "notes") {
         return '';
     }
     let discoverTitle = title != "Timeline" && title != "Conversation" && title != "Mentions" && title != "Replies" && title != "following" && title != "Favorites" && title != "muted" && title != "blocked";
-    if(parseInt(title)) {
+    if(parseInt(title) || title.includes('User')) {
         discoverTitle = false;
     }
-    return `<section class="navbar-section mt-1 mb-2">
-        <div class="btn-group btn-group-block">
-            <a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-card-list green-text"></i></a>
-            ${ user && user.lillihub && user.lillihub.display != 'both' ? `<a onclick="addLoading(this)" href="/conversations" class="btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i></a>` : '' }
+    return `<section class="mt-1 mb-2 scroll-container">
+        <ul class="pl-0 horizontal-list" style="list-style:none">
+            <li><a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-card-list green-text"></i></a></li>
+            ${ user && user.lillihub && user.lillihub.display != 'both' && user.lillihub.display != 'classic' ? `<li><a onclick="addLoading(this)" href="/conversations" class="green-text btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i></a></li>` : '' }
             ${ user && !user.error ? `
-            <a onclick="addLoading(this)" href="/discover" class="btn ${discoverTitle ? 'bg-light greenblue-border' : 'btn-link'}"><i class="bi bi-search greenblue-text"></i></a>
-            <a onclick="addLoading(this)" href="/mentions" class="btn ${title == "Mentions" ? 'bg-light blue-border' : 'btn-link'}"><i class="bi bi-at blue-text"></i></a>
-            <a onclick="addLoading(this)" href="/replies" class="btn ${title == "Replies" ? 'bg-light bluepurple-border' : 'btn-link'}"><i class="bi bi-reply bluepurple-text"></i></a>
-            <a onclick="addLoading(this)" href="/users/following" class="btn ${title == "following" || title == "muted" || title == "blocked" ? 'bg-light purple-border' : 'btn-link'}"><i class="bi bi-people purple-text"></i></a>
-            <a onclick="addLoading(this)" href="/favorites" class="btn ${title == "Favorites" ? 'bg-light purplered-border' : 'btn-link'}"><i class="bi bi-star purplered-text"></i></a>
+            <li><a onclick="addLoading(this)" href="/discover" class="btn ${discoverTitle ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search greenblue-text"></i></a></li>
+            <li><a onclick="addLoading(this)" href="/mentions" class="btn ${title == "Mentions" ? 'bg-light blue-border' : 'btn-link'} blue-text"><i class="bi bi-at blue-text"></i></a></li>
+            <li><a onclick="addLoading(this)" href="/replies" class="btn ${title == "Replies" ? 'bg-light bluepurple-border' : 'btn-link'} bluepurple-text"><i class="bi bi-reply bluepurple-text"></i></a></li>
+            <li><a onclick="addLoading(this)" href="/users/following" class="btn ${title == "following" || title == "muted" || title == "blocked" ? 'bg-light purple-border' : 'btn-link'} purple-text"><i class="bi bi-people purple-text"></i></a></li>
+            <li><a onclick="addLoading(this)" href="/favorites" class="btn ${title == "Favorites" ? 'bg-light purplered-border' : 'btn-link'} purplered-text"><i class="bi bi-star purplered-text"></i></a></li>
             ` : '' }
-        </div>
+        </ul>
     </section>`;
 }
 
@@ -183,7 +183,8 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                     <style>${_style}</style>
                 </head>
                 <body id="top" class="body-content">
-                    ${ user && !user.error ? `
+                    <div class="content-page container grid-md">
+                        ${ user && !user.error ? `
                         <header class="app-header">
                             <div class="navbar bg-light p-1">
                                 <section class="navbar-section mt-1 mb-2">
@@ -238,14 +239,13 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                             </div>
                         </header>`
                     : '' }
-                    <div class="content-page container grid-md">
                         <div class="columns">
-                            <div id="app-sidebar" class="column ${area == "notes" ? 'col-3' : 'col-1'} hide-sm">
+                            <div id="app-sidebar" class="column col-3 hide-sm">
                                 <div class="navbar p-fixed sidenav">
                                     ${title != "Editor" ? NavBarContent(user, area, title) : ''}
                                 </div>
                             </div>
-                            <div class="column ${area == "notes" ? 'col-9-md col-9-lg col-9-xl' : 'col-11-md col-11-lg col-11-xl'} col-12-sm">${contentHTML}</div>
+                            <div class="column col-9-md col-9-lg col-9-xl col-12-sm">${contentHTML}</div>
                         </div>           
                     </div>
                     <footer class="p-1 bg-light show-sm app-footer">

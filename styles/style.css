@@ -308,9 +308,24 @@ footer .btn-group-block {
     width:100%
 }
 .replyIframe {
-    position: relative;overflow: hidden;width: 100%;padding-top: 63%;
+    position: relative;overflow: hidden;width: 100%;padding-top: 70%;
+}
+.scroll-container {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent line breaks */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
+.horizontal-list {
+    display: inline-block; /* Make list items display in a row */
+    padding: 0;
+    margin: 0;
+    list-style-type: none; /* Remove bullet points */
+}
+
+.horizontal-list li {
+    display: inline; /* Display items in a line */
+}
 @media screen and (min-width: 650px)
 {
     .book-tile{
@@ -318,6 +333,13 @@ footer .btn-group-block {
     }
     .replyIframe {
         position: relative;overflow: hidden;width: 100%;padding-top: 56.25%;
+    }
+    .horizontal-list {
+        display: unset;
+    }
+    
+    .horizontal-list li {
+        display: unset;
     }
 }
 @media screen and (min-width: 650px)
