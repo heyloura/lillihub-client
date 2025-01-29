@@ -1,4 +1,4 @@
-const version = '0.0.15';
+const version = '0.0.16';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -14,11 +14,12 @@ self.addEventListener('install', function(event) {
         // javascript
         cache.add(new Request(`https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js`));
         cache.add(new Request(`https://cdn.jsdelivr.net/npm/showdown@2.0.3/dist/showdown.min.js`));
-        
+        cache.add(new Request(`https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js`));
 
         // styles
         cache.add(new Request(`https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css`));
         cache.add(new Request(`https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css`));
+        cache.add(new Request(`https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css`));
 
         // static
         cache.add(new Request(`${url}manifest.webmanifest`));
