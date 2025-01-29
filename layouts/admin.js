@@ -8,9 +8,9 @@ export async function AdminTemplate(user, token) {
     let results = '';
     for (const entry of allEntries) {
         results += `<tr>
-            <td><input type="checkbox" name="entry[]" value="${entry.key}" /></td>
-            <td>${entry.key.split(',')[0]}</td>
-            <td>${entry.key.split(',')[1]}</td>
+            <td><input type="checkbox" name="entry[]" value="${JSON.stringify(entry.key)}" /></td>
+            <td>${JSON.stringify(entry.key).split(',')[0]}</td>
+            <td>${JSON.stringify(entry.key).split(',')[1]}</td>
             <td>${JSON.stringify(entry.value.viewed)}</td>
         </tr>`;
     }
