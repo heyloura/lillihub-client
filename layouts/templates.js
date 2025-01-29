@@ -221,7 +221,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                                 ${notebooks}
                                 <!--<li class="menu-item">
                                     <a onclick="addLoading(this)" href="/notes">Private Notes</a>
-                                </li>--
+                                </li>-->
                                 <li class="menu-item">
                                     <hr />
                                 </li>

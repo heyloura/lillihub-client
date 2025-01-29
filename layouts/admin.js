@@ -1,8 +1,14 @@
 
 import { HTMLPage } from "./templates.js";
 
-export function AdminTemplate(user) {
-    //const kv = await Deno.openKv();
+export function AdminTemplate(user, token) {
+    const kv = await Deno.openKv();
+    const allEntries = await Array.fromAsync(kv.list({prefix:[]}));
 
-    return HTMLPage(token, `Admin`, 'Hello World');
+    let results = '';
+    for (const entry of allEntries) {
+        results += `<li>${entry.key}: ${entry.value}</li>`;
+    }
+
+    return HTMLPage(token, `Admin`, `<ul>${results}</ul>`);
 }
