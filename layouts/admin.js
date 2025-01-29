@@ -7,8 +7,8 @@ export async function AdminTemplate(user, token) {
 
     let results = '';
     for (const entry of allEntries) {
-        results += `<li>${entry.key}: ${entry.value}</li>`;
+        results += `<tr><td>${entry.key}</td><td>${JSON.stringify(entry.value)}</td></tr>`;
     }
 
-    return HTMLPage(token, `Admin`, `<ul>${results}</ul>`, user);
+    return HTMLPage(token, `Admin`, `<table class="table">${results}</table>`, user);
 }
