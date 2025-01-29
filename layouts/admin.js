@@ -1,7 +1,7 @@
 
 import { HTMLPage } from "./templates.js";
 
-export function AdminTemplate(user, token) {
+export async function AdminTemplate(user, token) {
     const kv = await Deno.openKv();
     const allEntries = await Array.fromAsync(kv.list({prefix:[]}));
 
