@@ -54,12 +54,14 @@ export async function AdminTemplate(user, token) {
             </tr>`;
         } else if(entry.key[1] == "global") {
             count++;
+            entry.value.display = 'classic';
+            //await kv.set(entry.key, entry.value);
             timeline += `<tr>
                 <td><input type="checkbox" name="entry[]" value="${JSON.stringify(entry.key)}" /></td>
                 <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
-                <td>${JSON.stringify(entry.value.display)}<br/>
-                    ${JSON.stringify(entry.value.favorites) != '["manton","jean","news","help"]' ? 'custom favorites' : ''}<br/>
-                    ${JSON.stringify(entry.value.feeds) != '[]' ? 'custom feeds' : ''}</td>
+                <td>${JSON.stringify(entry.value.display)}
+                    ${JSON.stringify(entry.value.favorites) != '["manton","jean","news","help"]' ? 'custom favorites<br/>' : ''}
+                    ${JSON.stringify(entry.value.feeds) != '[]' ? 'custom feeds<br/>' : ''}</td>
             </tr>`;
         } else {
             //kv.delete(entry.key);
