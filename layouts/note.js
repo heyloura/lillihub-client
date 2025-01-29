@@ -4,6 +4,9 @@ const _noteTemplate = new TextDecoder().decode(await Deno.readFile("templates/no
 const _easyMDEJS = await Deno.readTextFile("scripts/client/easymde.min.js");
 const _easyMDECSS = await Deno.readTextFile("styles/easymde.min.css");
 
+const colors = ["green-text","greenblue-text", "blue-text", "bluepurple-text", "purple-text", "purplered-text", "red-text", "redorange-text", "orange-text", "orangeyellow-text", "yellowgreen-text"];
+const borderColors = ["green-border","greenblue-border", "blue-border", "bluepurple-border", "purple-border", "purplered-border", "red-border", "redorange-border", "orange-border", "orangeyellow-border", "yellowgreen-border"];
+
 export async function NoteTemplate(user, token, id, req) {
     if(req.url.includes('%3Ca%20href=')){
         console.log('huh?')
@@ -55,6 +58,12 @@ export async function NoteTemplate(user, token, id, req) {
         </details>` : '';
     }
 
+    const fetchingNotebooks = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+    const resultsNotebooks = await fetchingNotebooks.json();
+    const notebooks = resultsNotebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
+        return `<li><a onclick="addLoading(this)" href="/notes/${item.id}" class="btn btn-link ${colors[i%11]} ${item.id == id ? borderColors[i%11] : ''}">${item.title}</a></li>`;
+    }).join('');
+
     const content = _noteTemplate
         .replaceAll('{{id}}', id)
         .replaceAll('{{easyMDECSS}}', _easyMDECSS)
@@ -67,5 +76,5 @@ export async function NoteTemplate(user, token, id, req) {
         .replaceAll('{{viewVersion}}', viewVersion)
         .replaceAll('{{breadcrumb}}', editId ?  'Update' : 'New')
     //: ${eNotes._microblog.notebook.name}
-    return HTMLPage(`Note`, content, user);
+    return HTMLPage(`Note`, content, user, '', notebooks);
 }
