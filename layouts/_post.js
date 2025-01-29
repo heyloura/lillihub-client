@@ -117,7 +117,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                     .replaceAll('{{relativeDate}}', post._microblog.date_relative)
                     .replaceAll('{{url}}', post.url)
                     .replaceAll('{{id}}', post.id)
-                    .replaceAll('{{single}}', viewSingleConvoLoad ? `<a class="btn btn-link btn-sm" onclick="addLoading(this)" href="/timeline/${post.id}"><i class="bi bi-chat"></i> view comments</a>` : '')
+                    .replaceAll('{{single}}', viewSingleConvoLoad && post._microblog.is_conversation ? `<a class="btn btn-link btn-sm" onclick="addLoading(this)" href="/timeline/${post.id}"><i class="bi bi-chat"></i> view comments</a>` : '')
                     .replaceAll('{{comments}}', user && ((isConversation && conversation.length - 1 > 0) || (clientConvoLoad && post._microblog.is_conversation) ) ? comments : '')
                     .replaceAll('{{reply}}', user ? (conversation == undefined || conversation.length == 0) && !(clientConvoLoad && post._microblog.is_conversation) ? reply : '' : '')
         : ''
