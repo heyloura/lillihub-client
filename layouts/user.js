@@ -41,7 +41,7 @@ export async function UserTemplate(user, token, id, photos = false) {
                 let convo = item;
 
                 if(user.lillihub.display == 'classic') { 
-                    return await PostTemplate(item.id, convo, conversations, user, token, timeline.last, '', false, true, false, true)
+                    return await PostTemplate(item.id, convo, conversations, user, token, 0, '', false, true, false, true)
                 }
         
                 if(item._microblog && item._microblog.is_conversation && item._microblog.is_mention) {
