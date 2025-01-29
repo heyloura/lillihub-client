@@ -48,15 +48,13 @@ export async function AdminTemplate(user, token) {
             timeline += `<tr>
                 <td><input type="checkbox" name="entry[]" value="${JSON.stringify(entry.key)}" /></td>
                 <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
-                <td>${getMonthsBetween(new Date(entry.value.viewed), new Date(), true)} month(s): ${entry.value.viewed}</td>
+                <td>${getMonthsBetween(new Date(entry.value.viewed), new Date(), false)} month(s): ${entry.value.viewed}</td>
             </tr>`;
         } else if(entry.key[1] == "global") {
             timeline += `<tr>
                 <td><input type="checkbox" name="entry[]" value="${JSON.stringify(entry.key)}" /></td>
                 <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
-                <td>${JSON.stringify(entry.value.favorites)}<br/>
-                ${JSON.stringify(entry.value.feeds)}<br/>
-                ${JSON.stringify(entry.value.display)}</td>
+                <td>${JSON.stringify(entry.value.display)}</td>
             </tr>`;
         } else {
             old += `<tr>
