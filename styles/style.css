@@ -108,6 +108,9 @@ a[href]:not(:where(
     padding: 0 !important;
     width: 100%;
 }
+.off-canvas .off-canvas-sidebar {
+    background: var(--base) !important;
+}
 .card-body img, .card-body video, sl-carousel {
     max-width: calc(100% + (0.8rem * 2));
     height: auto;
