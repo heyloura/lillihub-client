@@ -241,7 +241,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                     : '' }
                         <div class="columns">
                             <div id="app-sidebar" class="column col-3 hide-sm">
-                                <div class="navbar p-fixed sidenav">
+                                <div class="p-fixed sidenav">
                                     ${title != "Editor" ? NavBarContent(user, area, title) : ''}
                                 </div>
                             </div>
@@ -249,7 +249,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                         </div>           
                     </div>
                     <footer class="p-1 bg-light show-sm app-footer">
-                        <div class="navbar">
+                        <div class="bottomNav">
                             ${title != "Editor" ? NavBarContent(user, area, title) : ''}
                         </div>
                     </footer>

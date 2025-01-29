@@ -311,8 +311,12 @@ footer .btn-group-block {
     overflow-x: auto; /* Enable horizontal scrolling */
     white-space: nowrap; /* Prevent line breaks */
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    height: 86px;
 }
-
+.bottomNav {
+    height: 43px;
+    overflow: hidden;
+}
 .horizontal-list {
     display: inline-block; /* Make list items display in a row */
     padding: 0;
@@ -334,6 +338,7 @@ footer .btn-group-block {
 {
     .scroll-container {
         overflow-x: hidden;
+        height: unset;
     }
     .book-tile{
         width:50%
