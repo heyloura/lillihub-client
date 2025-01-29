@@ -216,7 +216,7 @@ async function handler(req) {
     /********************************************************
      * Authenticated Only Routes
      ********************************************************/
-    if(ADMIN_ROUTE_ROUTE.exec(req.url) && user) {
+    if(ADMIN_ROUTE.exec(req.url) && user) {
 
         if(user.username == "heyloura") {
             return new Response(await AdminTemplate(user, accessTokenValue), {
