@@ -4,7 +4,7 @@ const _shoelacecss = await Deno.readTextFile("styles/shoelace.css");
 const _commonjs = await Deno.readTextFile("scripts/client/common.js");
 const _shoelacejs = await Deno.readTextFile("scripts/client/shoelace.js");
 
-function NavBarContent(user, area, title) {
+function NavBarContent(user, area, title, navContent) {
     if(area == "blog") {
         return `<section class="mt-1 mb-2 scroll-container">
             <ul class="pl-0 horizontal-list" style="list-style:none">
@@ -37,7 +37,11 @@ function NavBarContent(user, area, title) {
         </section>`;
     }
     if(area == "notes") {
-        return '';
+        return `<section class="mt-1 mb-2 scroll-container">
+            <ul class="pl-0 horizontal-list" style="list-style:none">
+                ${navContent}
+            </ul>
+        </section>`
     }
     let discoverTitle = title != "Timeline" && title != "Conversation" && title != "Mentions" && title != "Replies" && title != "following" && title != "Favorites" && title != "muted" && title != "blocked";
     if(parseInt(title) || title.includes('User')) {
@@ -47,7 +51,7 @@ function NavBarContent(user, area, title) {
         <ul class="pl-0 horizontal-list" style="list-style:none">
             <li><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>
             <li><a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-card-list green-text"></i> Timeline</a></li>
-            ${ user && user.lillihub && user.lillihub.display != 'both' && user.lillihub.display != 'classic' ? `<li><a onclick="addLoading(this)" href="/conversations" class="green-text btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i></a> Conversation</li>` : '' }
+            ${ user && user.lillihub && user.lillihub.display != 'both' && user.lillihub.display != 'classic' ? `<li><a onclick="addLoading(this)" href="/conversations" class="green-text btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i> Conversation</a></li>` : '' }
             ${ user && !user.error ? `
             <li><a onclick="addLoading(this)" href="/discover" class="btn ${discoverTitle ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search greenblue-text"></i> Discover</a></li>
             <li><a onclick="addLoading(this)" href="/mentions" class="btn ${title == "Mentions" ? 'bg-light blue-border' : 'btn-link'} blue-text"><i class="bi bi-at blue-text"></i> Mentions</a></li>
@@ -133,7 +137,7 @@ export function CSSThemeColors(dark = false) {
 
 // <style>${_shoelacecss}</style>
 // <script type="module">${_shoelacejs}</script>
-export function HTMLPage(title, contentHTML, user, redirect = '') {
+export function HTMLPage(title, contentHTML, user, redirect = '', navContent) {
     let area = '';
 
     if(title == 'Bookmarks') {
@@ -242,7 +246,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                         <div class="columns">
                             <div id="app-sidebar" class="column col-3 hide-sm">
                                 <div class="p-fixed sidenav">
-                                    ${title != "Editor" ? NavBarContent(user, area, title) : ''}
+                                    ${title != "Editor" ? NavBarContent(user, area, title, navContent) : ''}
                                 </div>
                             </div>
                             <div class="column col-9-md col-9-lg col-9-xl col-12-sm">${contentHTML}</div>
@@ -250,7 +254,7 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
                     </div>
                     <footer class="p-1 bg-light show-sm app-footer">
                         <div class="bottomNav">
-                            ${title != "Editor" ? NavBarContent(user, area, title) : ''}
+                            ${title != "Editor" ? NavBarContent(user, area, title, navContent) : ''}
                         </div>
                     </footer>
 
