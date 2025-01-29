@@ -43,6 +43,8 @@ export async function AdminTemplate(user, token) {
 
     let timeline = '';
     let old = '';
+    let count = 0;
+    let viewed = [];
     for (const entry of allEntries) {
         if(entry.key[1] == "timeline" || entry.key[1] == "conversation" ) {
             timeline += `<tr>
@@ -51,6 +53,7 @@ export async function AdminTemplate(user, token) {
                 <td>${getMonthsBetween(new Date(entry.value.viewed), new Date(), false)} month(s): ${entry.value.viewed}</td>
             </tr>`;
         } else if(entry.key[1] == "global") {
+            count++;
             timeline += `<tr>
                 <td><input type="checkbox" name="entry[]" value="${JSON.stringify(entry.key)}" /></td>
                 <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
@@ -64,5 +67,5 @@ export async function AdminTemplate(user, token) {
 
     }
 
-    return HTMLPage(token, `Admin`, `<h1>Current</h1><table class="table">${timeline}</table>`, user);
+    return HTMLPage(token, `Admin`, `<h1>Current (${count})</h1><table class="table">${timeline}</table>`, user);
 }
