@@ -15,6 +15,10 @@ export async function MentionsTemplate(user, token, replyTo = 0) {
             return '';
         }
 
+        if(user.lillihub.display == 'classic') { 
+            return await PostTemplate(item.id, item, [], user, token, 0, '', false, true, false, true)
+        }
+
         const conversation = await getConversation(item.id, token);
 
         if(conversation) {
