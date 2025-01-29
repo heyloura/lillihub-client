@@ -235,28 +235,9 @@ export function HTMLPage(title, contentHTML, user, redirect = '') {
 
                     <div class="content-page container grid-md">
                         ${ user && !user.error ? `
-                        <header class="app-header">
-                            <div class="navbar bg-light p-1">
-                                <section class="navbar-section mt-1 mb-2">
-                                    <!--<div class="dropdown">
-                                        <div class="btn-group">
-                                            <button class="btn btn-link dropdown-toggle" tabindex="0">${area == "blog" ? 'Blog Management' : 
-                                                        area == "bookmarks" ? 'Bookmarks' : 
-                                                        area == "notes" ? 'Private Notes' : 
-                                                        title == "Editor" ? 'Editor' : 
-                                                        area == "bookshelves" ? 'Bookshelves' : '<figure class="avatar avatar-sm bg-secondary"><img height="48" width="48" src="https://cdn.micro.blog/images/icons/favicon_64.png" loading="lazy"></figure> Timeline'}
-                                            <i class="bi bi-caret-down-fill"></i>
-                                                        </button>
-
-                                        </div>
-                                    </div>-->
-                                    <!-- off-screen toggle button -->
-                                    <a class="off-canvas-toggle btn btn-primary btn-action" href="#sidebar">
+                        <a class="off-canvas-toggle btn btn-primary btn-action" style="left: unset;right: .4rem;" href="#sidebar">
                                         <i class="bi bi-list"></i>
-                                    </a>
-                                </section>
-                            </div>
-                        </header>`
+                                    </a>`
                     : '' }
                         <div class="columns">
                             <div id="app-sidebar" class="column col-3 hide-sm">
