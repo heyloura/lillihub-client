@@ -161,13 +161,14 @@ a {
     color: var(--blue);
 }
 a:hover {
-    color: var(--purple);
+    /* color: var(--purple); */
+    color: var(--blue);
 }
 a:active {
     color: var(--purple);
 }
 a:visited {
-    color: var(--purplered);
+    color: var(--blue);
 }
 .btn.btn-link 
 {
@@ -175,7 +176,11 @@ a:visited {
 }
 .btn.btn-link:hover
 {
-    color: var(--purplered);
+    color: var(--purple);
+}
+.btn.btn-link:visited
+{
+    color: var(--purple);
 }
 a[href]:not(:where(
     /* exclude hash only links */
