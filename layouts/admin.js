@@ -53,8 +53,8 @@ export async function AdminTemplate(user, token) {
             </tr>`;
         } else if(entry.key[1] == "global") {
             count++;
-            entry.value.display = 'classic';
-            await kv.set(entry.key, entry.value);
+            //entry.value.display = 'classic';
+            //await kv.set(entry.key, entry.value);
             timeline += `<tr>
                 <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
                 <td>${JSON.stringify(entry.value.display)}
