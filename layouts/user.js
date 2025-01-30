@@ -40,6 +40,7 @@ export async function UserTemplate(user, token, id, photos = false) {
         {
             let results = {};
             const fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
+            let result = await fetching.text();
             if(tryParseJSONObject(result)){
                 results = JSON.parse(result);
             } else {
