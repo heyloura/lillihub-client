@@ -23,6 +23,7 @@ export async function UserTemplate(user, token, id, photos = false) {
 
     let feed;
     let actions = '';
+    let results = {};
 
     if(!token) {
         feed = 'Could not fetch results from Micro.blog';
@@ -37,12 +38,10 @@ export async function UserTemplate(user, token, id, photos = false) {
         }
         else
         {
-            let results = {};
             const fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
             let result = await fetching.text();
             if(tryParseJSONObject(result)){
                 results = JSON.parse(result);
-                console.log(results)
             } else {
                 return HTMLPage(token, `User`, `<p>Micro.blog did not return results for that user.</p>`, user);
             }
