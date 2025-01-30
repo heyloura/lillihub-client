@@ -49,7 +49,7 @@ function NavBarContent(user, area, title, navContent) {
     }
     return `<section class="mt-1 mb-2 scroll-container">
         <ul class="pl-0 horizontal-list" style="list-style:none">
-            <li><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>
+            <li class="menuAction"><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>
             <li><a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-card-list green-text"></i> Timeline</a></li>
             ${ user && user.lillihub && user.lillihub.display != 'both' && user.lillihub.display != 'classic' ? `<li><a onclick="addLoading(this)" href="/conversations" class="green-text btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i> Conversation</a></li>` : '' }
             ${ user && !user.error ? `

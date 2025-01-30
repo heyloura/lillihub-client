@@ -416,18 +416,11 @@ footer .btn-group-block {
     border-right-width: 0 !important;
     border-left-width: 0 !important;
 }
-
-@media screen and (min-width: 1360px)
-{
-    .canvas-sidebar {
-        transform: translateX(0);
-    }
-    .off-canvas-toggle {
-        display: none;
-    }
-}
 @media screen and (min-width: 650px)
 {
+    .menuAction {
+        margin-bottom: 3em;
+    }
     .scroll-container {
         overflow-x: hidden;
         height: unset;
