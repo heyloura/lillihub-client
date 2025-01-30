@@ -193,6 +193,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                             }
                         });}</script>
                     <script>document.write('<style>.hide-if-user-has-javascript{display:none}</style>');</script>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
                     <style>${_style}</style>
                 </head>
                 <body id="top" class="body-content">

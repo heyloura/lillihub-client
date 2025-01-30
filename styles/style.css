@@ -664,7 +664,7 @@ display: none !important;
     padding-bottom: 0 !important;
 }
 table, th, td {
-    border: .05rem solid var(--crust);
+    border: .05rem solid var(--crust) !important;
     overflow-wrap: anywhere;
   }
   table {
@@ -713,4 +713,7 @@ td {
 }
 div.tile-action.btn-group > a {
     margin-top: -2px;
+}
+.table.table-striped tbody tr:nth-of-type(odd) {
+    background: var(--crust) !important;
 }
