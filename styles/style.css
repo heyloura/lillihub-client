@@ -158,33 +158,33 @@ html {
     border-color: var(--purplered) !important;
 }
 a {
-    color: var(--purple);
+    color: var(--greenblue);
 }
 a:hover {
     /* color: var(--purple); */
-    color: var(--purple);
+    color: var(--greenblue);
 }
 a:active {
-    color: var(--purple);
+    color: var(--greenblue);
 }
 a:visited {
-    color: var(--blue);
+    color: var(--greenblue);
 }
 .btn.btn-link 
 {
-    color: var(--purple);
+    color: var(--greenblue);
 }
 .btn.btn-link:hover
 {
-    color: var(--purple);
+    color: var(--greenblue);
 }
 .btn.btn-link:visited
 {
-    color: var(--purple);
+    color: var(--greenblue);
 }
 .btn.btn-link:active
 {
-    color: var(--purple);
+    color: var(--greenblue);
 }
 a[href]:not(:where(
     /* exclude hash only links */
@@ -193,7 +193,7 @@ a[href]:not(:where(
     [href^="/"]:not([href^="//"]),
     )) {
     text-decoration: underline;
-    color: var(--blue);
+    color: var(--greenblue);
 }
 a[href]:visited:not(:where(
     /* exclude hash only links */
@@ -202,7 +202,7 @@ a[href]:visited:not(:where(
     [href^="/"]:not([href^="//"]),
     )) {
     text-decoration: underline;
-    color: var(--blue);
+    color: var(--greenblue);
 }
 a[href]:active:not(:where(
     /* exclude hash only links */
@@ -211,7 +211,7 @@ a[href]:active:not(:where(
     [href^="/"]:not([href^="//"]),
     )) {
     text-decoration: underline;
-    color: var(--blue);
+    color: var(--greenblue);
 }
 .off-canvas-content {
     padding: 0 !important;
