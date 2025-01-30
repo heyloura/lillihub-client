@@ -93,8 +93,8 @@ export async function UserTemplate(user, token, id, photos = false) {
         const blockedFetching = await fetch(`https://micro.blog/users/muting`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
         const blocked = await blockedFetching.json();
     
-        mutedUser = muted ? muted.filter(mute => mute && mute.username == results._microblog.username).length > 0 : false;
-        blockedUser = blocked ? blocked.filter(block => block && block.username == results._microblog.username).length > 0 : false;
+        mutedUser = muted ? muted.filter(mute => mute && results && results._microblog && mute.username == results._microblog.username).length > 0 : false;
+        blockedUser = blocked ? blocked.filter(block => block && results && results._microblog && block.username == results._microblog.username).length > 0 : false;
 
         const followForm = _followTemplate.replaceAll('{{src}}', 
             _followFormTemplate.replaceAll('{{username}}', results._microblog.username)
