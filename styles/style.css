@@ -158,11 +158,11 @@ html {
     border-color: var(--purplered) !important;
 }
 a {
-    color: var(--blue);
+    color: var(--purple);
 }
 a:hover {
     /* color: var(--purple); */
-    color: var(--blue);
+    color: var(--purple);
 }
 a:active {
     color: var(--purple);
@@ -182,6 +182,10 @@ a:visited {
 {
     color: var(--purple);
 }
+.btn.btn-link:active
+{
+    color: var(--purple);
+}
 a[href]:not(:where(
     /* exclude hash only links */
     [href^="#"],
@@ -189,6 +193,25 @@ a[href]:not(:where(
     [href^="/"]:not([href^="//"]),
     )) {
     text-decoration: underline;
+    color: var(--blue);
+}
+a[href]:visited:not(:where(
+    /* exclude hash only links */
+    [href^="#"],
+    /* exclude relative but not double slash only links */
+    [href^="/"]:not([href^="//"]),
+    )) {
+    text-decoration: underline;
+    color: var(--blue);
+}
+a[href]:active:not(:where(
+    /* exclude hash only links */
+    [href^="#"],
+    /* exclude relative but not double slash only links */
+    [href^="/"]:not([href^="//"]),
+    )) {
+    text-decoration: underline;
+    color: var(--blue);
 }
 .off-canvas-content {
     padding: 0 !important;
