@@ -5,7 +5,7 @@ const _settingsTemplate = new TextDecoder().decode(await Deno.readFile("template
 const _settingsTimelineTemplate = new TextDecoder().decode(await Deno.readFile("templates/_timeline_settings.html"));
 
 
-export function SettingsTemplate(user) {
+export function SettingsTemplate(user, token) {
     const exculde = user.lillihub.exclude ? user.lillihub.exclude : '';
     const darktheme = user.lillihub.darktheme ? 'checked="checked"' : '';
 

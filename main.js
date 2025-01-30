@@ -269,7 +269,7 @@ async function handler(req) {
     }
 
     if(SETTINGS_ROUTE.exec(req.url) && user) {
-        return new Response(await SettingsTemplate(user), {
+        return new Response(await SettingsTemplate(user, accessTokenValue), {
             status: 200,
             headers: {
                 "content-type": "text/html",
