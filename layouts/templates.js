@@ -96,7 +96,7 @@ export function CSSThemeColors(dark = false) {
         --base: #fcfcfc;
         --mantle: #e6e9ef;
         --crust: #dce0e8;           
-        --red: #de324c;
+        /*--red: #de324c;
         --redorange: #E95E56;
         --orange: #f4895f;
         --orangeyellow: #F6B567;
@@ -107,7 +107,19 @@ export function CSSThemeColors(dark = false) {
         --blue: #369acc;
         --bluepurple: #6678B7;
         --purple: #9656a2;
-        --purplered: #BA4477;
+        --purplered: #BA4477;*/
+        --red: #DD314B;
+        --redorange: #E22B22;
+        --orange: #D2460F;
+        --orangeyellow: #AE640A;
+        --yellow: #897306;
+        --yellowgreen: #6D7D26;
+        --green: #3C833A;
+        --greenblue: #3D7F7B;
+        --blue: #2A7DA7;
+        --bluepurple: #5F72B4;
+        --purple: #9D5BA9;
+        --purplered: #BE5080;
     }
     /*@media (prefers-color-scheme: dark) {
         :root {
