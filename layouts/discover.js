@@ -29,7 +29,7 @@ export async function DiscoverTemplate(user, token, uuid, url) {
     if(tryParseJSONObject(result)){
         results = JSON.parse(result);
     } else {
-        return HTMLPage(`Discover`, `<p>Micro.blog did not return results.</p>`, user);
+        return HTMLPage(token, `Discover`, `<p>Micro.blog did not return results.</p>`, user);
     }
 
     const tagmojis = results._microblog.tagmoji.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)).map((item) =>

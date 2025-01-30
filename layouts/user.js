@@ -8,6 +8,17 @@ const _followTemplate = new TextDecoder().decode(await Deno.readFile("templates/
 const _followFormTemplate = new TextDecoder().decode(await Deno.readFile("templates/_follow_form.html"));
 const _unFollowFormTemplate = new TextDecoder().decode(await Deno.readFile("templates/_follow_unfollow_form.html"));
 
+function tryParseJSONObject (jsonString){
+    try {
+        var o = JSON.parse(jsonString);
+        if (o && typeof o === "object") {
+            return o;
+        }
+    }
+    catch (e) { }
+    return false;
+};
+
 export async function UserTemplate(user, token, id, photos = false) {
 
     let feed;
@@ -27,8 +38,13 @@ export async function UserTemplate(user, token, id, photos = false) {
         }
         else
         {
+            let results = {};
             const fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
-            results = await fetching.json();
+            if(tryParseJSONObject(result)){
+                results = JSON.parse(result);
+            } else {
+                return HTMLPage(token, `User`, `<p>Micro.blog did not return results for that user.</p>`, user);
+            }
             
             const seen = new Set();
             feed = (await Promise.all(results.items.map(async (item) => {
