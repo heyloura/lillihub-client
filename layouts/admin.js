@@ -55,12 +55,12 @@ export async function AdminTemplate(user, token) {
             count++;
             //entry.value.display = 'classic';
             //await kv.set(entry.key, entry.value);
-            timeline += `<tr>
-                <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
-                <td>${JSON.stringify(entry.value.display)}
-                    ${JSON.stringify(entry.value.favorites) != '["manton","jean","news","help"]' ? '<br/>custom favorites' : ''}
-                    ${JSON.stringify(entry.value.feeds) != '[]' ? '<br/>custom feeds' : ''}</td>
-            </tr>`;
+            //timeline += `<tr>
+            //    <td><a href="/user/${entry.key[0]}">${entry.key[0]}</a></td>
+            //     <td>${JSON.stringify(entry.value.display)}
+            //        ${JSON.stringify(entry.value.favorites) != '["manton","jean","news","help"]' ? '<br/>custom favorites' : ''}
+            //        ${JSON.stringify(entry.value.feeds) != '[]' ? '<br/>custom feeds' : ''}</td>
+            //</tr>`;
         } else {
             //kv.delete(entry.key);
         }
