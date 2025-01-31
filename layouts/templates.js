@@ -184,7 +184,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
         const fetchingBookshelves = await fetch(`https://micro.blog/books/bookshelves`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
         const resultsBookshelves = await fetchingBookshelves.json();
         bookshelves = resultsBookshelves.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
-            `<li class="menu-item"><a onclick="addLoading(this)" href="/bookshelves/shelf/${item.id}">${item.title} - ${item._microblog.books_count}</a></li>`
+            `<li class="menu-item"><a onclick="addLoading(this)" href="/bookshelves/shelf/${item.id}">${item.title}</a></li>`
         ).join('');
     }
 
