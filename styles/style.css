@@ -764,3 +764,4 @@ div.tile-action.btn-group > a {
     padding: 0 .4rem;
     transform: translateY(-.65rem);
 }
+.menu-item>a:hover{background:var(--crust);color:var(--purplered)}

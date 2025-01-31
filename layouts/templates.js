@@ -39,8 +39,8 @@ function NavBarContent(user, area, title, navContent) {
     if(area == "bookshelves") {
         return `<section class="mt-1 mb-2 scroll-container" >
             <ul class="pl-0 horizontal-list" style="list-style:none">
-                <li><a onclick="addLoading(this)" href="/bookshelves" class="btn ${title == "Bookshelves" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-book green-text"></i> Bookshelves</a></li>
                 <li><a onclick="addLoading(this)" href="/books" class="btn ${title == "Books" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search-heart greenblue-text"></i> Books</a></li>
+                ${navContent}            
             </ul>
         </section>`;
     }
