@@ -173,12 +173,19 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
         area = 'notes';
     }
     let notebooks = '';
+    let bookshelves = '';
     if(token) {
         const fetchingNotebooks = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
         const resultsNotebooks = await fetchingNotebooks.json();
         notebooks = resultsNotebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
             return `<li class="menu-item"><a onclick="addLoading(this)" href="/notes/${item.id}">${item.title}</a></li>`;
         }).join('');
+
+        const fetchingBookshelves = await fetch(`https://micro.blog/books/bookshelves`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+        const resultsBookshelves = await fetchingBookshelves.json();
+        bookshelves = resultsBookshelves.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
+            `<li class="menu-item"><a onclick="addLoading(this)" href="/bookshelves/shelf/${item.id}">${item.title} - ${item._microblog.books_count}</a></li>`
+        ).join('');
     }
 
     return `<!DOCTYPE html>
@@ -230,15 +237,15 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                                 <li class="menu-item">
                                     <a onclick="addLoading(this)" href="/bookmarks">Bookmarks</a>
                                 </li>
-                                <li class="menu-item">
+                                <li class="divider" data-content="Bookshelves"></li>
+                                ${bookshelves}
+                                <!--<li class="menu-item">
                                     <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
-                                </li>
+                                </li>-->
                                 <li class="menu-item">
                                     <a onclick="addLoading(this)" href="/">Timeline</a>
                                 </li>
-                                <li class="menu-item">
-                                    <hr />
-                                </li>
+                                <li class="divider" data-content="Private Notes"></li>
                                 ${notebooks}
                                 <!--<li class="menu-item">
                                     <a onclick="addLoading(this)" href="/notes">Private Notes</a>
