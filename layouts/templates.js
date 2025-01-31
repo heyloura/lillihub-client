@@ -32,7 +32,7 @@ function NavBarContent(user, area, title, navContent) {
         // }
         return `<section class="mt-1 mb-2 scroll-container">
             <ul class="pl-0 horizontal-list" style="list-style:none">
-                ${user.plan != 'premium' ? '' : navContent}
+                ${navContent}
             </ul>
         </section>`;
     }

@@ -133,11 +133,11 @@ export async function BookmarksTemplate(user, token, req) {
     return HTMLPage(token, 'Bookmarks', content, user, '', 
         `<li class="menuAction"><form class="m-2" autocomplete="off" method="POST" action="/bookmarks/new" >
             <input style="width:150px;" class="form-input" type="url" name="url" placeholder="url...">
-            <input style="width:150px;" type="hidden" name="redirect" value="true" />
-            ${user.plan == 'premium' ? `<input class="form-input" list="tags-list" type="text" name="tags" value="${tagParam ? tagParam : ''}" placeholder="add tags..." />` : ''}
+            <input type="hidden" name="redirect" value="true" />
+            ${user.plan == 'premium' ? `<input style="width:150px;" class="form-input" list="tags-list" type="text" name="tags" value="${tagParam ? tagParam : ''}" placeholder="add tags..." />` : ''}
             ${user.plan == 'premium' ? `<datalist id="tags-list">${tagsDataList}</datalist>` : ''}
             <button onclick="addLoading(this)" type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> Add Bookmark</button>
         </form></li>
-        ${user.plan == 'premium' ? `<li class="menuAction"><a href="/highlights" class="btn btn-link green-text" tabindex="0"><i class="bi bi-highlighter"></i> Highlights</a></li>` : ''}
+        ${user.plan == 'premium' ? `<!--<li class="menuAction"><a href="/highlights" class="btn btn-link green-text" tabindex="0"><i class="bi bi-highlighter"></i> Highlights</a></li>-->` : ''}
         ${user.plan == 'premium' ? `${tagsHTML}` : ''}`);
 }
