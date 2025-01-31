@@ -237,7 +237,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                                 <li class="menu-item">
                                     <a onclick="addLoading(this)" href="/posts">Blog Management</a>
                                 </li>
-                                <li class="menu-item">
+                                <li class="menu-item menuAction">
                                     <a onclick="addLoading(this)" href="/bookmarks">Bookmarks</a>
                                 </li>
                                 <li class="divider" data-content="Private Notes"></li>
@@ -245,12 +245,13 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                                 <!--<li class="menu-item">
                                     <a onclick="addLoading(this)" href="/notes">Private Notes</a>
                                 </li>-->
+                                <li class="menu-item menuAction"></li>
                                 <li class="divider" data-content="Bookshelves"></li>
                                 ${bookshelves}
                                 <!--<li class="menu-item">
                                     <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
                                 </li>-->
-                                <li class="menu-item">
+                                <li class="menu-item menuAction">
                                     <hr />
                                 </li>
                                 <li class="menu-item">
