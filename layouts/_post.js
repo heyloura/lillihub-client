@@ -120,5 +120,6 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                     .replaceAll('{{single}}', viewSingleConvoLoad && post._microblog.is_conversation ? `<a class="btn btn-link btn-sm" onclick="addLoading(this)" href="/timeline/${post.id}#${post.id}"><i class="bi bi-chat"></i> view comments</a>` : '')
                     .replaceAll('{{comments}}', user && ((isConversation && conversation.length - 1 > 0) || (clientConvoLoad && post._microblog.is_conversation) ) ? comments : '')
                     .replaceAll('{{reply}}', user ? (conversation == undefined || conversation.length == 0) && !(clientConvoLoad && post._microblog.is_conversation) ? reply : '' : '')
+                    .replaceAll('{{preview}}', post && post._microblog && post._microblog.is_linkpost ? `<previewbox-link href="${post.url}"></previewbox-link>` : '')
         : ''
 }
