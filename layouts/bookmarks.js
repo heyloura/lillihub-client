@@ -58,9 +58,9 @@ export async function BookmarksTemplate(user, token, req) {
 
         tags.sort();
         tagsHTML = tags.map((item, i) =>
-            `<li><a onclick="addLoading(this)" class="btn btn-link ${colors[i%11]} ${tagParam == item ? borderColors[i%11] : ''}" href="/bookmarks?tag=${encodeURIComponent(item)}">${item}</a></li>`
+            `<li><a onclick="addLoading(this)" class="btn btn-link ${colors[i%11]} ${tagParam == item ? borderColors[i%11] : ''}" href="/bookmarks?tag=${encodeURIComponent(item)}">${item}</a>${tagParam == item ? `<a onclick="addLoading(this)" href="/bookmarks" class="btn btn-link btn-icon"><i class="bi bi-cross"></i></a>` : ''}</li>`
         ).join('');
-        tagsHTML = tagParam ? tagsHTML + `<li><a onclick="addLoading(this)" href="/bookmarks"><em>Clear Selection</em></a></li>` : tagsHTML;
+        //tagsHTML = tagParam ? tagsHTML + `<li><a onclick="addLoading(this)" href="/bookmarks"><em>Clear Selection</em></a></li>` : tagsHTML;
         
         tagsDataList = tags.map((item) => `<option value="${item}"></option>`).join('');
         
@@ -131,11 +131,13 @@ export async function BookmarksTemplate(user, token, req) {
         .replaceAll('{{feed}}', feed)
 
     return HTMLPage(token, 'Bookmarks', content, user, '', 
-        `<li class="menuAction"><form autocomplete="off" method="POST" action="/bookmarks/new" >
-            <input class="form-input" type="url" name="url" placeholder="url...">
-            <input type="hidden" name="redirect" value="true" />
+        `<li class="menuAction"><form class="m-2" autocomplete="off" method="POST" action="/bookmarks/new" >
+            <input style="width:150px;" class="form-input" type="url" name="url" placeholder="url...">
+            <input style="width:150px;" type="hidden" name="redirect" value="true" />
             ${user.plan == 'premium' ? `<input class="form-input" list="tags-list" type="text" name="tags" value="${tagParam ? tagParam : ''}" placeholder="add tags..." />` : ''}
             ${user.plan == 'premium' ? `<datalist id="tags-list">${tagsDataList}</datalist>` : ''}
             <button onclick="addLoading(this)" type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> Add Bookmark</button>
-        </form></li>${user.plan == 'premium' ? `${tagsHTML}` : ''}`);
+        </form></li>
+        ${user.plan == 'premium' ? `<li class="menuAction"><a href="/highlights" class="btn btn-link green-text" tabindex="0"><i class="bi bi-highlighter"></i> Highlights</a></li>` : ''}
+        ${user.plan == 'premium' ? `${tagsHTML}` : ''}`);
 }
