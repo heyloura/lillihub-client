@@ -11,7 +11,7 @@ export async function NotesTemplate(user, token, id) {
 
     const notes = eNotes.items.map(item => {
         return _noteTemplate
-            .replaceAll('{{content}}', `<div class="clearfix decryptMe mt-2">${item.content_text}</div>`)
+            .replaceAll('{{content}}', item._microblog.is_shared ? `<div class="clearfix mt-2">${item.content_html}</div>` : `<div class="clearfix decryptMe mt-2">${item.content_text}</div>`)
             .replaceAll('{{publishedDate}}', item.date_modified)
             .replaceAll('{{modified}}', item.date_modified)
             .replaceAll('{{notebookId}}', id)
