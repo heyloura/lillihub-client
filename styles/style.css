@@ -453,6 +453,7 @@ footer .btn-group-block {
     .scroll-container {
         overflow-x: hidden;
         height: unset;
+        scrollbar-width: none;
     }
     .book-tile{
         width:50%
@@ -463,7 +464,6 @@ footer .btn-group-block {
     .horizontal-list {
         display: block;
         max-height: calc(100vh - 6em);
-        scrollbar-width: thin;
     }
     .horizontal-list li {
         display: block;

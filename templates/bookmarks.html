@@ -1,6 +1,6 @@
 <style>.purple-chip { background-color: var(--purplered); color: var(--base);}</style>
 <div class="container bookmarks">
-    <p class="pt-2"><b>Add a bookmark</b></p>
+    <!--<p class="pt-2"><b>Add a bookmark</b></p>
     <div class="no-border m-2 p-2">
         <form autocomplete="off" method="POST" action="/bookmarks/new" >
             <div class="form-group">
@@ -16,7 +16,7 @@
     </div>
     <div style="clear:both;"></div>
     {{tags}}   
-    <p class="pt-2 hide-if-user-has-no-javascript"><b>Search bookmarks</b></p>
+    <p class="pt-2 hide-if-user-has-no-javascript"><b>Search bookmarks</b></p> -->
     <div class="no-border m-2 p-2 hide-if-user-has-no-javascript">
         <div class="input-group">
             <input type="search" oninput="liveSearch('.card', 'searchbox')" id="searchbox" class="form-input" placeholder="Search Page" />

@@ -130,5 +130,12 @@ export async function BookmarksTemplate(user, token, req) {
         .replaceAll('{{tags}}', '')
         .replaceAll('{{feed}}', feed)
 
-    return HTMLPage(token, 'Bookmarks', content, user, '', user.plan == 'premium' ? `${tagsHTML}` : '');
+    return HTMLPage(token, 'Bookmarks', content, user, '', 
+        `<li class="menuAction"><form autocomplete="off" method="POST" action="/bookmarks/new" >
+            <input class="form-input" type="url" name="url" placeholder="url...">
+            <input type="hidden" name="redirect" value="true" />
+            ${user.plan == 'premium' ? `<input class="form-input" list="tags-list" type="text" name="tags" value="${tagParam ? tagParam : ''}" placeholder="add tags..." />` : ''}
+            ${user.plan == 'premium' ? `<datalist id="tags-list">${tagsDataList}</datalist>` : ''}
+            <button onclick="addLoading(this)" type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> Add Bookmark</button>
+        </form></li>${user.plan == 'premium' ? `${tagsHTML}` : ''}`);
 }
