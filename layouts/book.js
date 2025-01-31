@@ -26,5 +26,9 @@ export async function BookTemplate(user, token, shelfid, id) {
         return '';
     }))).join('');
 
-    return HTMLPage(token, 'Edit book', content, user);
+    const bookshelves = shelves.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) =>
+        `<li><a onclick="addLoading(this)" class="btn btn-link ${colors[i%11]} ${shelfid == item.id ? borderColors[i%11] : ''}" href="/bookshelves/shelf/${item.id}">${item.title}</a></li>`
+    ).join('');
+
+    return HTMLPage(token, 'Edit book', content, user, '', bookshelves );
 }

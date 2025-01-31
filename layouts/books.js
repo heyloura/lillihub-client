@@ -35,10 +35,8 @@ export async function BooksTemplate(user, token, replyTo = 0) {
     const content = _booksTemplate
         .replaceAll('{{feed}}', feed);
 
-    const fetchingBookshelves = await fetch(`https://micro.blog/books/bookshelves`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
-    const resultsBookshelves = await fetchingBookshelves.json();
-    const bookshelves = resultsBookshelves.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) =>
-        `<li><a onclick="addLoading(this)" class="btn btn-link ${colors[i%11]} ${id == item.id ? borderColors[i%11] : ''}" href="/bookshelves/shelf/${item.id}">${item.title}</a></li>`
+    const bookshelves = shelves.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) =>
+        `<li><a onclick="addLoading(this)" class="btn btn-link ${colors[i%11]}" href="/bookshelves/shelf/${item.id}">${item.title}</a></li>`
     ).join('');
 
 
