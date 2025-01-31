@@ -765,3 +765,6 @@ div.tile-action.btn-group > a {
     transform: translateY(-.65rem);
 }
 .menu-item>a:hover{background:var(--crust);color:var(--purplered)}
+previewbox-link {
+    width: 300px;
+}
