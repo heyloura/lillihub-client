@@ -1,6 +1,8 @@
 import { HTMLPage } from "./templates.js";
 
 const _bookTemplate = new TextDecoder().decode(await Deno.readFile("templates/book.html"));
+const colors = ["green-text","greenblue-text", "blue-text", "bluepurple-text", "purple-text", "purplered-text", "red-text", "redorange-text", "orange-text", "orangeyellow-text", "yellowgreen-text"];
+const borderColors = ["green-border","greenblue-border", "blue-border", "bluepurple-border", "purple-border", "purplered-border", "red-border", "redorange-border", "orange-border", "orangeyellow-border", "yellowgreen-border"];
 
 export async function BookTemplate(user, token, shelfid, id) {
     const fetching = await fetch(`https://micro.blog/books/bookshelves/${shelfid}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
