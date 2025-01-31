@@ -126,8 +126,8 @@ export async function BookmarksTemplate(user, token, req) {
     const content = _bookmarksTemplate
         .replaceAll('{{tagInput}}',user.plan == 'premium' ? `<input class="form-input" list="tags-list" type="text" name="tags" value="${tagParam ? tagParam : ''}" placeholder="add tags..." />` : '')
         .replaceAll('{{tagsDataList}}', user.plan == 'premium' ? `<datalist id="tags-list">${tagsDataList}</datalist>` : '')
-        .replaceAll('{{tags}}', user.plan == 'premium' ? `<p class="pt-2"><b>Tags</b><br/><br/>${tagsHTML}<br/></p>` : '')
+        .replaceAll('{{tags}}', '')
         .replaceAll('{{feed}}', feed)
 
-    return HTMLPage(token, 'Bookmarks', content, user);
+    return HTMLPage(token, 'Bookmarks', content, user, '', user.plan == 'premium' ? `<li>${tagsHTML}</li>` : '');
 }

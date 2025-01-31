@@ -30,7 +30,12 @@ function NavBarContent(user, area, title, navContent) {
         //         </div>
         //     </section>`;
         // }
-        return '';
+        return `<section class="mt-1 mb-2 scroll-container">
+            <ul class="pl-0 horizontal-list" style="list-style:none">
+                ${user.plan != 'premium' ? '' : `<li class="menuAction"><a href="/highlights" class="btn btn-link green-text" tabindex="0"><i class="bi bi-highlighter"></i> Highlights</a></li>`}
+                ${user.plan != 'premium' ? '' : navContent}
+            </ul>
+        </section>`;
     }
     if(area == "bookshelves") {
         return `<section class="mt-1 mb-2 scroll-container" >
