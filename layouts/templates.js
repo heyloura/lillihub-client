@@ -261,7 +261,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                                 <li class="menu-item"><a onclick="addLoading(this)" href="/settings">Settings</a></li>
                                 <li class="menu-item"><a onclick="addLoading(this)" href="/logout">Logout</a></li>
                                 <li class="menu-item"><small>
-                                    <a onclick="addLoading(this)" href="https://docs.lillihub.com">Documentation</a> · <a onclick="addLoading(this)" href="https://github.com/heyloura/lillihub-client">Github</a> 
+                                    <!--<a onclick="addLoading(this)" href="https://docs.lillihub.com">Documentation</a>--> · <a onclick="addLoading(this)" href="https://github.com/heyloura/lillihub-client">Github</a> 
                                     <!--· Buy Me a Coffee--> · Version 0.2.5<br/>
                                     Designed and built with ♥ by <a onclick="addLoading(this)" href="https://heyloura.com">Loura</a>. 
                                     Licensed under the MIT License.</small></li>
