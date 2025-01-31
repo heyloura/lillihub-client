@@ -1,6 +1,7 @@
 import { HTMLPage } from "./templates.js";
 
-const _postTemplate = new TextDecoder().decode(await Deno.readFile("templates/_post.html"));
+//const _postTemplate = new TextDecoder().decode(await Deno.readFile("templates/_post.html"));
+const _blogPostTemplate = new TextDecoder().decode(await Deno.readFile("templates/_blogpost.html"));
 const _dropdownTemplate = new TextDecoder().decode(await Deno.readFile("templates/_dropdown.html"));
 const _blogTemplate = new TextDecoder().decode(await Deno.readFile("templates/blog.html"));
 
@@ -10,8 +11,12 @@ export async function BlogTemplate(user, token, req) {
     const destination = searchParams.get('destination');
     const q = searchParams.get('q');
     const offset = searchParams.get('offset');
-    const status = searchParams.get('status');
+    let status = searchParams.get('status');
     const category = searchParams.get('category');
+
+    if(status != 'draft') {
+        status = '';
+    }
 
     const fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     const config = await fetching.json();
@@ -60,19 +65,14 @@ export async function BlogTemplate(user, token, req) {
         if(category && item.properties.category.indexOf(category) == -1) {
             return '';
         }
-        return _postTemplate.replaceAll('{{avatar}}', user.avatar) 
-            .replaceAll('{{name}}', user.name)
-            .replaceAll('{{username}}', user.username)
-            .replaceAll('{{new}}', '')
-            .replaceAll('{{tags}}', '')
-            .replaceAll('{{actions}}', `<a class="btn btn-link" onclick="addLoading(this)" href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}&area=blog"><i class="bi bi-pencil"></i></a>`)
-            .replaceAll('{{content}}', item.properties["name"][0] ? `<details><summary><b>${item.properties["name"][0]}</b></summary>${text}</details>` : text)
+        return _blogPostTemplate
+            .replaceAll('{{title}}', item.properties["name"][0] ? item.properties["name"][0] : '')
+            .replaceAll('{{actions}}', `<a class="btn btn-link" onclick="addLoading(this)" href="/post?edit=${encodeURIComponent(item.properties["url"][0])}&destination=${encodeURIComponent(mpDestination)}&area=blog"><i class="bi bi-pencil"></i> ${item.properties["name"][0] ? item.properties["name"][0] : item.properties["published"][0]}</a>`)
+            .replaceAll('{{content}}', text)
             .replaceAll('{{publishedDate}}', item.properties["published"][0])
             .replaceAll('{{relativeDate}}', item.properties["published"][0])
             .replaceAll('{{url}}', item.properties["url"][0])
-            .replaceAll('{{id}}', '')
-            .replaceAll('{{comments}}', item.properties.category.map(item => `<span class="chip"><a href="/posts?destination=${encodeURIComponent(mpDestination)}&category=${encodeURIComponent(item)}">${item}</a></span>`).join(''))
-            .replaceAll('{{reply}}', '');
+            .replaceAll('{{tags}}', item.properties.category.map(item => `<span class="chip"><a href="/posts?destination=${encodeURIComponent(mpDestination)}&category=${encodeURIComponent(item)}">${item}</a></span>`).join(''));
         
     }).join('');
 

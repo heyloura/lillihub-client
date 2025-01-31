@@ -1,4 +1,5 @@
-<div class="media">
+<div class="media book-tile">
+    <p><sl-format-date month="numeric" day="numeric" year="numeric" hour="numeric" minute="numeric" hour-format="12" date="{{published}}">{{publishedDisplay}}</sl-format-date></p>
     <div class="tile mt-2 mb-2 p-2">
         <div class="tile-icon {{show}}">
             <img style="object-fit: cover;" width="80" height="80" src="{{url}}" alt="{{alt}}">
@@ -8,7 +9,7 @@
                 <a target="_blank" href="{{url}}">{{url}}</a>  
             </p>
         </div>
-        <div class="tile-action">
+        <!--<div class="tile-action">
             <div class="btn-group">
                 <div class="dropdown dropdown-right">
                     <a href="javascript:;" class="btn btn-link dropdown-toggle" tabindex="0">
@@ -29,9 +30,17 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
     {{altDisp}} 
-    <p><sl-format-date month="numeric" day="numeric" year="numeric" hour="numeric" minute="numeric" hour-format="12" date="{{published}}">{{publishedDisplay}}</sl-format-date></p>
+    <p style="text-align:center;"><a class="btn btm-sm" onclick="addLoading(this)" href="/post?img={{encodedUrl}}&alt={{altEncoded}}">Create Post</a></p>
+    <details>
+        <summary class="c-hand">Delete?</summary>
+        <form action="/media/delete" method="POST">
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <input type="hidden" name="url" value="{{url}}" />
+            <button onclick="if(confirm('You are about to delete this upload. This action cannot be undone.')){addLoading(this)}" type="submit" class="btn btn-xs red-border red-text">Confirm Delete</button>
+        </form>
+    </details>
     <hr />
 </div>

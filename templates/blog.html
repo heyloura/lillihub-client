@@ -1,3 +1,4 @@
+<script src="https://cdn.jsdelivr.net/npm/showdown@2.0.3/dist/showdown.min.js" defer></script>
 <div class="container my-posts">
     <div class="no-border mb-2">
         <div class="following-search">
@@ -19,3 +20,65 @@
     {{feed}}
     <a onclick="addLoading(this)" href="{{nextHref}}" class="btn btn-link m-2 float-right">Next</a>
 </div>
+<style>
+    .card {
+        cursor: pointer;
+    }
+    .card {
+        max-height: 500px; /* Set a maximum height */
+        overflow: hidden; /* Hide overflow text */
+        transition: max-height 0.3s ease, opacity 0.3s ease; /* Smooth transition */
+        opacity: 1; /* Initial opacity */
+    }
+    .card.expanded {
+        max-height: 5000px; /* Set to a larger height when expanded */
+        opacity: 1; /* Fully visible */
+    }
+    </style>
+    <script type="module">
+        async function processBlogPosts() {
+            const cards = document.querySelectorAll('.card-body');
+                for (var i = 0; i < cards.length; i++) {
+                    const converter = new showdown.Converter({	
+                        metadata: true,
+                        parseImgDimensions: true,
+                        strikethrough: true,
+                        tables: true,
+                        ghCodeBlocks: true,
+                        smoothLivePreview: true,
+                        simpleLineBreaks: true,
+                        emoji: true, 
+                    });
+                    const markdown = cards[i].getAttribute('data-markdown'); 
+                    const html = converter.makeHtml(markdown);
+                    const card = cards[i].parentNode;
+                    cards[i].innerHTML = html;
+                }
+
+                const allCards = document.querySelectorAll('.card');
+                allCards.forEach(card => {
+                    const height = window.getComputedStyle(card).height;
+                    if (height === '500px') {
+                        card.classList.add('fadeout');
+                        card.querySelector('.expandBtn').classList.remove('hide')
+                    } else {
+                        //card.setAttribute('onclick', '');
+                        card.classList.add('no-pointer');
+                    }
+                });
+
+                hljs.highlightAll();
+        }
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", async function(event) {
+                //document.getElementById('app-sidebar').innerHTML = document.getElementById('notebooks').innerHTML;
+                await processBlogPosts();
+            });
+        }
+        else
+        {
+            //document.getElementById('app-sidebar').innerHTML = document.getElementById('notebooks').innerHTML;
+            await processBlogPosts();
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

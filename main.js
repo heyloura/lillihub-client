@@ -686,7 +686,7 @@ async function handler(req) {
         }
 
         if(redirect && redirect == 'true') {
-            return new Response(HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">Bookmark has been added. Redirecting back...</h3>`, user, req.url.replaceAll('/new','')), {
+            return new Response(await HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">Bookmark has been added. Redirecting back...</h3>`, user, req.url.replaceAll('/new','')), {
                 status: 200,
                 headers: {
                     "content-type": "text/html",
@@ -716,7 +716,7 @@ async function handler(req) {
             console.log(`${user.username} tried to unbookmark and ${await posting.text()}`);
         }
 
-        return new Response(HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">Bookmark has been removed. Redirecting back...</h3>`, user, req.url.replaceAll('/unbookmark','')), {
+        return new Response(await HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">Bookmark has been removed. Redirecting back...</h3>`, user, req.url.replaceAll('/unbookmark','')), {
             status: 200,
             headers: {
                 "content-type": "text/html",
@@ -758,7 +758,7 @@ async function handler(req) {
             }
         }
 
-        return new Response(HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">Bookmark tags have been updated. Redirecting back...</h3>`, user, req.url.replaceAll('/update','')), {
+        return new Response(await HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">Bookmark tags have been updated. Redirecting back...</h3>`, user, req.url.replaceAll('/update','')), {
             status: 200,
             headers: {
                 "content-type": "text/html",
@@ -798,7 +798,7 @@ async function handler(req) {
         const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + accessTokenValue, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
         if (!posting.ok) {
             console.log(`${user.username} tried to add a post and ${await posting.text()}`);
-            return new Response(HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">An error was encountered while posting. Redirecting back...</h3>`, user, req.url.replaceAll('/unbookmark','')), {
+            return new Response(await HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">An error was encountered while posting. Redirecting back...</h3>`, user, req.url.replaceAll('/unbookmark','')), {
                 status: 200,
                 headers: {
                     "content-type": "text/html",
@@ -841,7 +841,7 @@ async function handler(req) {
         const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: JSON.stringify(updatePost), headers: { "Authorization": "Bearer " + accessTokenValue, "Content-Type": "application/json" } });
         if (!posting.ok) {
             console.log(`${user.username} tried to update a post and ${await posting.text()}`);
-            return new Response(HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">An error was encountered while updating a post. Redirecting back...</h3>`, user, req.url.replaceAll('/edit','')), {
+            return new Response(await HTMLPage(accessTokenValue, `Redirect`, `<h3 class="container">An error was encountered while updating a post. Redirecting back...</h3>`, user, req.url.replaceAll('/edit','')), {
                 status: 200,
                 headers: {
                     "content-type": "text/html",
@@ -1197,7 +1197,7 @@ async function handler(req) {
                 SESSION[user.username] = user;
                 const expiresOn = new Date();
                 expiresOn.setDate( expiresOn.getDate() + 399); //chrome limits to 400 days
-                const page =  new Response(HTMLPage(accessTokenValue, `Redirect`, `<h3 style="text-align:center;" class="container mt-2">You have been logged in. Redirecting to your timeline</h3>`, user, req.url.split('?')[0].replaceAll('/auth','')), {
+                const page =  new Response(await HTMLPage(accessTokenValue, `Redirect`, `<h3 style="text-align:center;" class="container mt-2">You have been logged in. Redirecting to your timeline</h3>`, user, req.url.split('?')[0].replaceAll('/auth','')), {
                     status: 200,
                     headers: {
                         "content-type": "text/html",
@@ -1209,7 +1209,7 @@ async function handler(req) {
         }
 
         // change this to an error response
-        return new Response(HTMLPage(null, `auth`, `<h1>Authentication Error</h1>`), {
+        return new Response(await HTMLPage(null, `auth`, `<h1>Authentication Error</h1>`), {
             status: 200,
             headers: {
                 "content-type": "text/html",
@@ -1218,7 +1218,7 @@ async function handler(req) {
     }
 
     if(LOGOUT_ROUTE.exec(req.url)) {
-        return new Response(HTMLPage(null, `Logout`, `<h2>You have been logged out. Redirecting to homepage</h2>`, user, req.url.split('?')[0].replaceAll('/logout','')), {
+        return new Response(await HTMLPage(null, `Logout`, `<h2>You have been logged out. Redirecting to homepage</h2>`, user, req.url.split('?')[0].replaceAll('/logout','')), {
             status: 200,
             headers: {
                 "content-type": "text/html",

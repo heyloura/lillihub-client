@@ -4,10 +4,14 @@ const _shoelacecss = await Deno.readTextFile("styles/shoelace.css");
 const _commonjs = await Deno.readTextFile("scripts/client/common.js");
 const _shoelacejs = await Deno.readTextFile("scripts/client/shoelace.js");
 
+const _dropdownTemplate = new TextDecoder().decode(await Deno.readFile("templates/_dropdown.html"));
+
+
 function NavBarContent(user, area, title, navContent) {
-    if(area == "blog") {
+    if(area == "blog" || title == 'Post') {
         return `<section class="mt-1 mb-2 scroll-container">
             <ul class="pl-0 horizontal-list" style="list-style:none">
+                ${title == 'Post' || title == 'Media' ? '' : `<li class="menuAction"><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>`}
                 <li><a onclick="addLoading(this)" href="/posts" class="btn ${title == "Posts" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-window-stack green-text"></i> Posts</a></li>
                 <li><a onclick="addLoading(this)" href="/posts?status=draft" class="btn ${title == "Draft" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-pencil greenblue-text"></i> Drafts</a></li>
                 <!--<li><a onclick="addLoading(this)" href="/pages" class="btn btn-link"><i class="bi bi-files blue-text"></i></a> Pages</li>-->
@@ -49,7 +53,7 @@ function NavBarContent(user, area, title, navContent) {
     }
     return `<section class="mt-1 mb-2 scroll-container">
         <ul class="pl-0 horizontal-list" style="list-style:none">
-            <li class="menuAction"><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>
+            ${title == 'Editor' ? '' : `<li class="menuAction"><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>`}
             <li><a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-card-list green-text"></i> Timeline</a></li>
             ${ user && user.lillihub && user.lillihub.display != 'both' && user.lillihub.display != 'classic' ? `<li><a onclick="addLoading(this)" href="/conversations" class="green-text btn ${title == "Conversation" ? 'bg-light green-border' : 'btn-link'}"><i class="bi bi-chat green-text"></i> Conversation</a></li>` : '' }
             ${ user && !user.error ? `
@@ -151,7 +155,7 @@ export function CSSThemeColors(dark = false) {
 // <script type="module">${_shoelacejs}</script>
 export async function HTMLPage(token, title, contentHTML, user, redirect = '', navContent) {
     let area = '';
-
+    
     if(title == 'Bookmarks') {
         area = 'bookmarks';
     }
@@ -271,7 +275,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                         <div class="columns">
                             <div id="app-sidebar" class="column col-3 hide-sm">
                                 <div class="p-fixed sidenav">
-                                    ${title != "Editor" ? NavBarContent(user, area, title, navContent) : ''}
+                                    ${NavBarContent(user, area, title, navContent)}
                                 </div>
                             </div>
                             <div class="column col-9-md col-9-lg col-9-xl col-12-sm">${contentHTML}</div>
@@ -279,7 +283,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                     </div>
                     <footer class="p-1 bg-light show-sm app-footer">
                         <div class="bottomNav">
-                            ${title != "Editor" ? NavBarContent(user, area, title, navContent) : ''}
+                            ${NavBarContent(user, area, title, navContent)}
                         </div>
                     </footer>
 

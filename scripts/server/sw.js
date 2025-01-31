@@ -1,4 +1,4 @@
-const version = '0.0.16';
+const version = '0.0.17';
 const url = ''
 
 const coreID = `${version}_core`;
@@ -85,7 +85,6 @@ self.addEventListener('fetch', async function (event) {
     if(!(event.request.destination == 'image' || event.request.destination == 'style' || event.request.destination == 'script' || event.request.destination == 'manifest')) {
         return;
     }
-    console.log(event.request);
     try {
         event.respondWith((async () => {
             //self.console.log(event.request);

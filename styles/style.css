@@ -225,9 +225,6 @@ a[href]:active:not(:where(
     height: auto;
     margin-left: -0.8rem;
 }
-.post-img {
-    max-height: 500px;
-}
 hr {
     border:0;
     border-top: 0.05rem solid var(--mantle);
@@ -446,6 +443,10 @@ footer .btn-group-block {
 }
 @media screen and (min-width: 650px)
 {
+    .post-img {
+        max-height: 500px;
+        margin: 0px auto;
+    }
     .menuAction {
         margin-bottom: 3em;
     }

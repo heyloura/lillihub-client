@@ -15,7 +15,7 @@ export async function MediaTemplate(user, token, req) {
     const config = await fetching.json();
     
     if(!config.destination || config.destination.length == 0) {
-        return HTMLPage('Posts', `<p><mark>No blog is configured.</mark></p>`, user);
+        return HTMLPage(token, 'Posts', `<p><mark>No blog is configured.</mark></p>`, user);
     }
 
     const defaultDestination = config.destination.filter(d => d["microblog-default"]) ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
@@ -38,7 +38,7 @@ export async function MediaTemplate(user, token, req) {
         return _mediaItemTemplate
             .replaceAll('{{url}}', item.url)
             .replaceAll('{{alt}}', item.alt ? item.alt : '')
-            .replaceAll('{{altDisp}}', item.alt ? `<p class="p-2 bg-secondary"><i class="bi bi-robot"></i> ${item.alt}</p>` : '')
+            .replaceAll('{{altDisp}}', item.alt ? `<p class="p-2 m-2 bg-secondary"><i class="bi bi-robot"></i> ${item.alt}</p>` : '')
             .replaceAll('{{altEncoded}}', item.alt ? encodeURIComponent(item.alt) : '')
             .replaceAll('{{encodedUrl}}',encodeURIComponent(item.url))
             .replaceAll('{{destination}}', mpDestination)
@@ -53,5 +53,5 @@ export async function MediaTemplate(user, token, req) {
         .replaceAll('{{destination}}', mpDestination)
         .replaceAll('{{offset}}', offset ? offset + 50 : '50')
 
-    return HTMLPage(token, 'Media', content, user);
+    return HTMLPage(token, 'Media', content, user,);
 }
