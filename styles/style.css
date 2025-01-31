@@ -441,8 +441,15 @@ footer .btn-group-block {
     border-right-width: 0 !important;
     border-left-width: 0 !important;
 }
+
+.horizontal-list form, .horizontal-list form input {
+    display: inline;
+}
 @media screen and (min-width: 650px)
 {
+    .horizontal-list form, .horizontal-list form input {
+        display: block;
+    }
     .post-img {
         max-height: 500px;
         margin: 0px auto;
