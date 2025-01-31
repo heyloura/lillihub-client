@@ -23,6 +23,7 @@ export async function NoteTemplate(user, token, id, req) {
     let deleteNote = '';
     let versions = '';
     let viewVersion = '';
+    let isShared = false;
 
     if(vid){
         let fetching = await fetch(`https://micro.blog/notes/${editId}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
@@ -34,7 +35,7 @@ export async function NoteTemplate(user, token, id, req) {
         let fetching = await fetch(`https://micro.blog/notes/${editId}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
         const eNote = await fetching.json();
         originalValue = eNote.content_text;
-
+        isShared = eNote._microblog.is_shared;
         deleteNote = `<details class="mt-2" style="display: inline;">
             <summary class="p-2">Delete?</summary>
             <form class="p-2" method='POST' action='/note/delete'>
@@ -66,6 +67,7 @@ export async function NoteTemplate(user, token, id, req) {
 
     const content = _noteTemplate
         .replaceAll('{{id}}', id)
+        .replaceAll('{{is_shared}}', isShared ? 'true' : 'false')
         .replaceAll('{{easyMDECSS}}', _easyMDECSS)
         .replaceAll('{{easyMDEJS}}', _easyMDEJS)
         .replaceAll('{{name}}', eNotes._microblog.notebook.name)

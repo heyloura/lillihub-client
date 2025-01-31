@@ -111,8 +111,13 @@
 
     async function registerClick() {
         let note = easymde.value();
+        let eNote = '';
         if(note) {
-            const eNote = await encryptWithKey(note);
+            if({{is_shared}}) {
+                eNote = note;
+            } else {
+                eNote = await encryptWithKey(note);
+            }      
             const form = new URLSearchParams();
             form.append("text", eNote);
             form.append("notebook_id", {{id}});
