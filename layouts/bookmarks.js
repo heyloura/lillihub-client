@@ -5,7 +5,8 @@ const _bookmarkTemplate = new TextDecoder().decode(await Deno.readFile("template
 const _summaryTemplate = new TextDecoder().decode(await Deno.readFile("templates/_summary.html"));
 const _bookmarksTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookmarks.html"));
 const _dropDownTemplate = new TextDecoder().decode(await Deno.readFile("templates/_dropdown.html"));
-
+const colors = ["green-text","greenblue-text", "blue-text", "bluepurple-text", "purple-text", "purplered-text", "red-text", "redorange-text", "orange-text", "orangeyellow-text", "yellowgreen-text"];
+const borderColors = ["green-border","greenblue-border", "blue-border", "bluepurple-border", "purple-border", "purplered-border", "red-border", "redorange-border", "orange-border", "orangeyellow-border", "yellowgreen-border"];
 
 export async function BookmarksTemplate(user, token, req) {
     const searchParams = new URLSearchParams(req.url.split('?')[1]);
@@ -56,10 +57,10 @@ export async function BookmarksTemplate(user, token, req) {
         const tags = await tagFetching.json();
 
         tags.sort();
-        tagsHTML = tags.map((item) =>
-            `<span class="chip" ${tagParam == item ? 'style="background-color:var(--purplered);"' : ''}><a onclick="addLoading(this)" ${tagParam == item ? 'style="color:var(--crust);"' : ''} href="/bookmarks?tag=${encodeURIComponent(item)}">${item}</a></span>`
+        tagsHTML = tags.map((item, i) =>
+            `<li><a onclick="addLoading(this)" class="btn btn-link ${colors[i%11]} ${tagParam == item ? borderColors[i%11] : ''}" href="/bookmarks?tag=${encodeURIComponent(item)}">${item}</a></li>`
         ).join('');
-        tagsHTML = tagParam ? tagsHTML + `<span class="chip"><a onclick="addLoading(this)" href="/bookmarks"><em>Clear Selection</em></a></span>` : tagsHTML;
+        tagsHTML = tagParam ? tagsHTML + `<li><a onclick="addLoading(this)" href="/bookmarks"><em>Clear Selection</em></a></li>` : tagsHTML;
         
         tagsDataList = tags.map((item) => `<option value="${item}"></option>`).join('');
         
@@ -129,5 +130,5 @@ export async function BookmarksTemplate(user, token, req) {
         .replaceAll('{{tags}}', '')
         .replaceAll('{{feed}}', feed)
 
-    return HTMLPage(token, 'Bookmarks', content, user, '', user.plan == 'premium' ? `<li>${tagsHTML}</li>` : '');
+    return HTMLPage(token, 'Bookmarks', content, user, '', user.plan == 'premium' ? `${tagsHTML}` : '');
 }

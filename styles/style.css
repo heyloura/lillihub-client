@@ -462,6 +462,8 @@ footer .btn-group-block {
     }
     .horizontal-list {
         display: block;
+        max-height: calc(100vh - 6em);
+        scrollbar-width: thin;
     }
     .horizontal-list li {
         display: block;
