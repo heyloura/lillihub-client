@@ -232,23 +232,23 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                         <p style="text-align:center;"><img loading="lazy" src="/lillihub-512.png" width="130"/></p>
                         <ul class="menu bg-light" style="max-width:260px;box-shadow:none;">
                                 <li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/">Timeline</a>
+                                </li>
+                                <li class="menu-item">
                                     <a onclick="addLoading(this)" href="/posts">Blog Management</a>
                                 </li>
                                 <li class="menu-item">
                                     <a onclick="addLoading(this)" href="/bookmarks">Bookmarks</a>
                                 </li>
-                                <li class="divider" data-content="Bookshelves"></li>
-                                ${bookshelves}
-                                <!--<li class="menu-item">
-                                    <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
-                                </li>-->
-                                <li class="menu-item">
-                                    <a onclick="addLoading(this)" href="/">Timeline</a>
-                                </li>
                                 <li class="divider" data-content="Private Notes"></li>
                                 ${notebooks}
                                 <!--<li class="menu-item">
                                     <a onclick="addLoading(this)" href="/notes">Private Notes</a>
+                                </li>-->
+                                <li class="divider" data-content="Bookshelves"></li>
+                                ${bookshelves}
+                                <!--<li class="menu-item">
+                                    <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
                                 </li>-->
                                 <li class="menu-item">
                                     <hr />

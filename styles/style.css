@@ -755,3 +755,12 @@ div.tile-action.btn-group > a {
 .table.table-striped tbody tr:nth-of-type(odd) {
     background: var(--crust) !important;
 }
+.divider-vert[data-content]::after, .divider[data-content]::after {
+    background: var(--base);
+    color: var(--greenblue);
+    content: attr(data-content);
+    display: inline-block;
+    font-size: .7rem;
+    padding: 0 .4rem;
+    transform: translateY(-.65rem);
+}
