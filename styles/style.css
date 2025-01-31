@@ -766,5 +766,6 @@ div.tile-action.btn-group > a {
 }
 .menu-item>a:hover{background:var(--crust);color:var(--purplered)}
 previewbox-link {
-    width: 300px;
+    margin-top: 1em;
+    max-width: 445px;
 }
