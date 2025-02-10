@@ -19,12 +19,18 @@ export async function NotesTemplate(user, token, id) {
             .replaceAll('{{is_shared}}', item._microblog.is_shared ? `<a target="_blank" href="${item._microblog.shared_url}" class="chip" style="text-decoration:none;"><i class="bi bi-share"></i> &nbsp;shared</a>` : '');
     }).join('');
 
-    const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
-    const results = await fetching.json();
+    let notebooks = '';
+    try {
+        const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+        const results = await fetching.json();
+    
+        const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
+            return `<li><a onclick="addLoading(this)" href="/notes/${item.id}" class="btn btn-link ${colors[i%11]} ${item.id == id ? borderColors[i%11] : ''}">${item.title}</a></li>`;
+        }).join('');
+    } catch (error) {
+        notebooks = `<li>Micro.blog returned ${error}</li>`
+    }
 
-    const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
-        return `<li><a onclick="addLoading(this)" href="/notes/${item.id}" class="btn btn-link ${colors[i%11]} ${item.id == id ? borderColors[i%11] : ''}">${item.title}</a></li>`;
-    }).join('');
 
     const content = _notesTemplate
         .replaceAll('{{id}}', id)

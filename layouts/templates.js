@@ -175,17 +175,25 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
     let notebooks = '';
     let bookshelves = '';
     if(token) {
-        const fetchingNotebooks = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
-        const resultsNotebooks = await fetchingNotebooks.json();
-        notebooks = resultsNotebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
-            return `<li class="menu-item"><a onclick="addLoading(this)" href="/notes/${item.id}">${item.title}</a></li>`;
-        }).join('');
+        try {
+            const fetchingNotebooks = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+            const resultsNotebooks = await fetchingNotebooks.json();
+            notebooks = resultsNotebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
+                return `<li class="menu-item"><a onclick="addLoading(this)" href="/notes/${item.id}">${item.title}</a></li>`;
+            }).join('');
+        } catch(error) {
+            console.log(error);
+        }
 
-        const fetchingBookshelves = await fetch(`https://micro.blog/books/bookshelves`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
-        const resultsBookshelves = await fetchingBookshelves.json();
-        bookshelves = resultsBookshelves.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
-            `<li class="menu-item"><a onclick="addLoading(this)" href="/bookshelves/shelf/${item.id}">${item.title}</a></li>`
-        ).join('');
+        try {
+            const fetchingBookshelves = await fetch(`https://micro.blog/books/bookshelves`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+            const resultsBookshelves = await fetchingBookshelves.json();
+            bookshelves = resultsBookshelves.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item) =>
+                `<li class="menu-item"><a onclick="addLoading(this)" href="/bookshelves/shelf/${item.id}">${item.title}</a></li>`
+            ).join('');
+        } catch(error) {
+            console.log(error);
+        }
     }
 
     return `<!DOCTYPE html>
@@ -256,7 +264,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                                     <hr />
                                 </li>
                                 <li class="menu-item">
-                                    <a onclick="addLoading(this)" href="/user/${user.username}"><figure class="avatar avatar-sm"><img height="48" width="48" src="${user.avatar}" alt="${user.username} Avatar" loading="lazy"></figure> @${user.username}</a>
+                                    <a onclick="addLoading(this)" href="/user/${user && user.username  ? user.username : ''}"><figure class="avatar avatar-sm"><img height="48" width="48" src="${user && user.avatar  ? user.avatar : ''}" alt="${user && user.username  ? user.username : ''} Avatar" loading="lazy"></figure> @${user && user.username  ? user.username : ''}</a>
                                 </li>
                                 <li class="menu-item"><a onclick="addLoading(this)" href="/settings">Settings</a></li>
                                 <li class="menu-item"><a onclick="addLoading(this)" href="/logout">Logout</a></li>
