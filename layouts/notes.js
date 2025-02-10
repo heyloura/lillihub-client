@@ -24,7 +24,7 @@ export async function NotesTemplate(user, token, id) {
         const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
         const results = await fetching.json();
     
-        const notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
+        notebooks = results.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map((item,i) => {
             return `<li><a onclick="addLoading(this)" href="/notes/${item.id}" class="btn btn-link ${colors[i%11]} ${item.id == id ? borderColors[i%11] : ''}">${item.title}</a></li>`;
         }).join('');
     } catch (error) {
