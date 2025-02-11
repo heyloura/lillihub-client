@@ -44,7 +44,7 @@ export async function NoteTemplate(user, token, id, req) {
         isShared = eNote._microblog.is_shared;
         deleteNote = `<details class="mt-2" style="display: inline;">
             <summary class="p-2">Delete?</summary>
-            <form class="p-2" method='POST' action='/note/delete'>
+            <form class="p-2" method='POST' action='/note/delete' onsubmit="return confirm('Are you sure you want to delete this note? This action cannot be undone.')">
                 <input type="hidden" name="id" value="${editId}" />
                 <input type="hidden" name="notebookId" value="${id}" />
                 <button type="submit" onclick="addLoading(this)" class="btn btn-sm mt-2">Delete Note</button>

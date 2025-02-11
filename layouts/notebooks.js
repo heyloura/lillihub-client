@@ -11,7 +11,7 @@ export async function NotebooksTemplate(user, token) {
         return `
         <li>
             <a class="btn text-left btn-link ${colors[i%11]}" onclick="addLoading(this)" href="/notes/${item.id}">${item.title}</a>
-            <div class="dropdown dropdown-right"><button class="btn btn-link dropdown-toggle" tabindex="0"><i class="bi bi-three-dots-vertical"></i></button>
+            <div class="dropdown"><button class="btn btn-link dropdown-toggle" tabindex="0"><i class="bi bi-three-dots-vertical"></i></button>
                 <ul class="menu text-left">
                     <li class="menu-item"><a onclick="rename(${item.id},'${item.title}')" href="javascript:void(0)">Rename</a></li>
                     <li class="menu-item"><a onclick="if(confirm('Are you sure you want to delete this notebook? It will also delete <b>all</b> notes this notebook contains. This action cannot be undone.')){deleteConfirmed(${item.id})}" class="red-text" href="javascript:void(0)">Delete</a></li>
