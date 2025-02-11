@@ -3,6 +3,7 @@ import { HTMLPage } from "./templates.js";
 const _noteTemplate = new TextDecoder().decode(await Deno.readFile("templates/note.html"));
 const _easyMDEJS = await Deno.readTextFile("scripts/client/easymde.min.js");
 const _easyMDECSS = await Deno.readTextFile("styles/easymde.min.css");
+const _compressor = await Deno.readTextFile("scripts/client/compressor.min.js");
 
 const colors = ["green-text","greenblue-text", "blue-text", "bluepurple-text", "purple-text", "purplered-text", "red-text", "redorange-text", "orange-text", "orangeyellow-text", "yellowgreen-text"];
 const borderColors = ["green-border","greenblue-border", "blue-border", "bluepurple-border", "purple-border", "purplered-border", "red-border", "redorange-border", "orange-border", "orangeyellow-border", "yellowgreen-border"];
@@ -12,6 +13,11 @@ export async function NoteTemplate(user, token, id, req) {
         console.log('huh?')
         return;
     }
+
+    let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+    const config = await fetching.json();
+
+    const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
 
     const searchParams = new URLSearchParams(req.url.split('?')[1]);
     const editId = searchParams.get('id');
@@ -70,13 +76,16 @@ export async function NoteTemplate(user, token, id, req) {
         .replaceAll('{{is_shared}}', isShared ? 'true' : 'false')
         .replaceAll('{{easyMDECSS}}', _easyMDECSS)
         .replaceAll('{{easyMDEJS}}', _easyMDEJS)
+        .replaceAll('{{compressor}}', _compressor)
         .replaceAll('{{name}}', eNotes._microblog.notebook.name)
         .replaceAll('{{originalValue}}', originalValue)
         .replaceAll('{{editAppend}}', editId ? `form.append("id", ${editId}); ` : '')
         .replaceAll('{{editDelete}}', editId ?  deleteNote : '')
         .replaceAll('{{versions}}', editId ?  versions : '')
+        .replaceAll('{{vid}}', vid ?  vid : '')
         .replaceAll('{{viewVersion}}', viewVersion)
         .replaceAll('{{breadcrumb}}', editId ?  'Update' : 'New')
+        .replaceAll('{{mpDestination}}', defaultDestination)
     //: ${eNotes._microblog.notebook.name}
     return HTMLPage(token, `Note`, content, user, '', notebooks);
 }

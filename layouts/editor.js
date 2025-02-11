@@ -91,6 +91,7 @@ export async function EditorTemplate(user, token, req) {
         .replaceAll('{{easyMDEJS}}',_easyMDEJS)
         .replaceAll('{{easyMDECSS}}',_easyMDECSS)
         .replaceAll('{{compressor}}',_compressor)
+        .replaceAll('{{url}}', edit ? edit : '')
         .replaceAll('{{editOrAdd}}', edit ? 'edit' : 'add')
         .replaceAll('{{destinationDropdown}}', config.destination && config.destination.length > 1 ? destinationDropdown : `<span class="mt-2">${config.destination.filter(d => d.uid == mpDestination)[0].name}</span>`)
         .replaceAll('{{categoriesDropdown}}', categories.categories && categories.categories.length > 0 ? categoriesDropdown : '' )

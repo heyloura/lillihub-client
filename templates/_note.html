@@ -11,6 +11,7 @@
         <button class="hide btn btn-link expandBtn" onclick="toggleCard(this)"><i class="bi bi-arrows-expand"></i></button>
         {{is_shared}}
         <span class="tags"></span>
+        <button class="btn btn-link" onclick="openModal({{notebookId}},{{id}},{{is_shared_bool}})"><i class="bi bi-three-dots-vertical"></i></button>
     </div>
     <div class="card-body">{{content}}</div>
 </div>

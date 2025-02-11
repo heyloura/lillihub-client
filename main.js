@@ -96,6 +96,10 @@ const SETTINGS_TIMELINE = new URLPattern({ pathname: "/settings/timeline" });
 const ADD_NOTE = new URLPattern({ pathname: "/note/update" });
 const DELETE_NOTE = new URLPattern({ pathname: "/note/delete" });
 const ADD_NOTEBOOK = new URLPattern({ pathname: "/notebook/add" });
+const RENAME_NOTEBOOK = new URLPattern({ pathname: "/notebook/rename" });
+const DELETE_NOTEBOOK = new URLPattern({ pathname: "/notebook/delete" });
+const MOVE_NOTE = new URLPattern({ pathname: "/notes/notebook/move" });
+const COPY_NOTE = new URLPattern({ pathname: "/notes/notebook/copy" });
 const ADD_POST = new URLPattern({ pathname: "/post/add" });
 const EDIT_POST = new URLPattern({ pathname: "/post/edit" });
 const UPLOAD_MEDIA_ROUTE = new URLPattern({ pathname: "/media/upload" });
@@ -1092,6 +1096,127 @@ async function handler(req) {
         });
 
         return Response.redirect(req.url.replaceAll('/notebook/add', '/notes'));
+    }
+
+    if(RENAME_NOTEBOOK.exec(req.url) && user) {
+        const value = await req.formData();
+        const name = value.get('name');
+        const notebook_id = value.get('notebook_id');
+
+        const form = new URLSearchParams();
+        form.append("name", name);
+        form.append("id", notebook_id);
+
+        const posting = await fetch('https://micro.blog/notes/notebooks', {
+            method: "POST",
+            body: form.toString(),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "Authorization": "Bearer " + accessTokenValue
+            }
+        });
+
+        return new Response(JSON.stringify(await posting.text()), {
+            status: 200,
+            headers: {
+                "content-type": "text/plain",
+            },
+        });    
+    }
+
+    if(DELETE_NOTEBOOK.exec(req.url) && user) {
+        const value = await req.formData();
+        const notebook_id = value.get('notebook_id');
+
+        const posting = await fetch('https://micro.blog/notes/notebooks/' + notebook_id, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "Authorization": "Bearer " + accessTokenValue
+            }
+        });
+
+        return new Response(JSON.stringify(await posting.text()), {
+            status: 200,
+            headers: {
+                "content-type": "text/plain",
+            },
+        });    
+    }
+
+    if(COPY_NOTE.exec(req.url) && user) {
+        const value = await req.formData();
+        const notebook = value.get('notebook');
+        const id = value.get('id');
+
+        // create new note in notebook
+        const fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } } );
+        const eNote = await fetching.json();
+
+        const formBody = new URLSearchParams();
+        formBody.append("notebook_id", notebook);
+        formBody.append("text", eNote.content_text);
+
+        const posting = await fetch('https://micro.blog/notes', {
+            method: "POST",
+            body: formBody.toString(),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "Authorization": "Bearer " + accessTokenValue
+            }
+        });
+        
+        return new Response(JSON.stringify(await posting.text()), {
+            status: 200,
+            headers: {
+                "content-type": "text/plain",
+            },
+        }); 
+    }
+
+    if(MOVE_NOTE.exec(req.url) && user) {
+        const value = await req.formData();
+        const notebook = value.get('notebook[]');
+        const id = value.get('id');
+
+        // create new note in notebook
+        let fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } } );
+        const eNote = await fetching.json();
+
+        const formBody = new URLSearchParams();
+        formBody.append("notebook_id", notebook);
+        formBody.append("text", eNote.content_text);
+
+        let posting = await fetch('https://micro.blog/notes', {
+            method: "POST",
+            body: formBody.toString(),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "Authorization": "Bearer " + accessTokenValue
+            }
+        });
+        
+        if(posting.ok) {
+            posting = await fetch(`https://micro.blog/notes/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + accessTokenValue
+                }
+            });
+            return new Response(JSON.stringify(await posting.text()), {
+                status: 200,
+                headers: {
+                    "content-type": "text/plain",
+                },
+            }); 
+        }
+        
+        return new Response(JSON.stringify(await posting.text()), {
+            status: 200,
+            headers: {
+                "content-type": "text/plain",
+            },
+        }); 
     }
 
  

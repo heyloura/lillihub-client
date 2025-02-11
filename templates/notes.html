@@ -35,6 +35,33 @@
     <template id="notebooks">
         {{notebooks}}
     </template>
+    <div class="modal" id="modal">
+        <a onclick="closeModal()" href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <div class="modal-header">
+            <a onclick="closeModal()" href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+            <div class="modal-title h5">Notebook actions</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <input type="hidden" id="noteId" />
+                    <input type="hidden" id="notebookId" />
+                    <button id="copyNotebook" class="btn btn-primary" onclick="addLoading(this);copyNote();">Copy Note</button>
+                    <button id="exportMarkdown" class="btn btn-primary" onclick="downloadMarkdown();">Download Markdown</button>
+                    <button class="btn btn-primary" onclick="downloadHTML();">Download HTML</button>
+                    <div id="moveNotebook">
+                        <hr/>
+                        <p><mark>Note:</mark> Moving a note creates a copy of the note in the selected notebook and then
+                        deletes the original. This <b>will</b> lose versioning of the note. Before preceeding back up any
+                        note versions you wish to retain.</p>
+                        {{radioList}}
+                        <br/>
+                        <button class="btn btn-primary" onclick="addLoading(this);moveNotebook();">Move Notebook</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <style>
     .card {
         cursor: pointer;
@@ -50,6 +77,79 @@
         opacity: 1; /* Fully visible */
     }
     </style>
+    <script>
+        function openModal(notebookId, id, shared) {
+            if(shared) {
+                document.getElementById('moveNotebook').classList.add('hide');
+                document.getElementById('copyNotebook').classList.add('hide');
+                document.getElementById('exportMarkdown').classList.add('hide');
+            }
+            document.getElementById('noteId').value = id;
+            document.getElementById('notebookId').value = notebookId;
+            document.getElementById('modal').classList.add('active');
+        }
+        async function copyNote() {
+            let id =  document.getElementById('noteId').value;
+            let notebookId =  document.getElementById('notebookId').value ;
+
+            const form = new URLSearchParams();
+            form.append("id", id);
+            form.append("notebook", notebookId);
+
+            const posting = await fetch('notebook/copy', {
+                method: "POST",
+                body: form.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                }
+            }).then(data => {
+                window.location.reload();
+            });
+        }
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        async function moveNotebook() {
+            let id =  document.getElementById('noteId').value;
+            const form = new URLSearchParams();
+            form.append("id", id);
+            form.append("notebook[]", document.querySelector('input[name="notebooks[]"]:checked').value);
+
+            const posting = await fetch('notebook/move', {
+                method: "POST",
+                body: form.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                }
+            }).then(data => {
+                window.location.reload();
+            });
+        }
+        function downloadHTML() {
+            let id =  document.getElementById('noteId').value;
+            var html = document.getElementById(id).innerHTML;
+            var title = document.getElementById(id).getAttribute('data-title') + '.html';
+            download(title, html);
+        }
+        function downloadMarkdown() {
+            let id =  document.getElementById('noteId').value;
+            var markdown = document.getElementById(id).getAttribute('data-markdown');
+            var title = document.getElementById(id).getAttribute('data-title') + '.md';
+            download(title, markdown);
+        }
+        function download(filename, text) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+    </script>
     <script type="module">
         const imported_key = localStorage.getItem("notes_key") ? await crypto.subtle.importKey(
             'raw',
@@ -92,32 +192,37 @@
             if(localStorage.getItem("notes_key"))
             {
                 const datalist = new Set();
-                const cards = document.querySelectorAll('.decryptMe');
+                const cards = document.querySelectorAll('.note');
                 for (var i = 0; i < cards.length; i++) {
-                    const converter = new showdown.Converter({	
-                        metadata: true,
-                        parseImgDimensions: true,
-                        strikethrough: true,
-                        tables: true,
-                        ghCodeBlocks: true,
-                        smoothLivePreview: true,
-                        simpleLineBreaks: true,
-                        emoji: true, 
-                    });
-                    const markdown = await decryptWithKey(cards[i].innerHTML);
-                    const html = converter.makeHtml(markdown);
-                    const metadata = converter.getMetadata();
-                    const card = cards[i].parentNode.parentNode;
-                    if(metadata && metadata.title) {
-                        card.querySelector('.title').innerHTML = '&nbsp;' + metadata.title;
+                    if(cards[i].classList.contains('decryptMe')) {
+                            const converter = new showdown.Converter({	
+                            metadata: true,
+                            parseImgDimensions: true,
+                            strikethrough: true,
+                            tables: true,
+                            ghCodeBlocks: true,
+                            smoothLivePreview: true,
+                            simpleLineBreaks: true,
+                            emoji: true, 
+                        });
+                        const markdown = await decryptWithKey(cards[i].innerHTML);
+                        cards[i].setAttribute('data-markdown',markdown);
+                        const html = converter.makeHtml(markdown);
+                        const metadata = converter.getMetadata();
+                        const card = cards[i].parentNode.parentNode;
+                        if(metadata && metadata.title) {
+                            card.querySelector('.title').innerHTML = '&nbsp;' + metadata.title;
+                            cards[i].setAttribute('data-title',metadata.title);
+                        }
+                        if(metadata && metadata.tags) {
+                            let tags = metadata.tags.replace('[','').replace(']','').split(',');
+                            card.querySelector('.tags').innerHTML = tags.map(t => {
+                                datalist.add(t);
+                                return `<span class="chip">#${t}</span>`;}).join(''); 
+                        }
+                        cards[i].innerHTML = html;
                     }
-                    if(metadata && metadata.tags) {
-                        let tags = metadata.tags.replace('[','').replace(']','').split(',');
-                        card.querySelector('.tags').innerHTML = tags.map(t => {
-                            datalist.add(t);
-                            return `<span class="chip">#${t}</span>`;}).join(''); 
-                    }
-                    cards[i].innerHTML = html;
+
                 }
 
                 datalist.forEach(value => {

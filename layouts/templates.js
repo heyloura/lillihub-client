@@ -48,6 +48,8 @@ function NavBarContent(user, area, title, navContent) {
         return `<section class="mt-1 mb-2 scroll-container">
             <ul class="pl-0 horizontal-list" style="list-style:none">
                 ${navContent}
+                <li class="divider"></li>
+                <li><a onclick="addLoading(this)" href="/notes" class="btn btn-link text-muted"><i class="bi bi-gear"></i> Note Settings</a></li>
             </ul>
         </section>`
     }
@@ -246,21 +248,19 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                                 <li class="menu-item">
                                     <a onclick="addLoading(this)" href="/posts">Blog Management</a>
                                 </li>
-                                <li class="menu-item menuAction">
+                                <li class="menu-item sidebarMenuAction">
                                     <a onclick="addLoading(this)" href="/bookmarks">Bookmarks</a>
                                 </li>
                                 <li class="divider" data-content="Private Notes"></li>
                                 ${notebooks}
-                                <!--<li class="menu-item">
-                                    <a onclick="addLoading(this)" href="/notes">Private Notes</a>
-                                </li>-->
-                                <li class="menu-item menuAction"></li>
+                                <li class="menu-item"><a onclick="addLoading(this)" href="/notes" class="text-muted">Note Settings <i class="bi bi-gear"></i></a></li>
+                                <li class="menu-item sidebarMenuAction"></li>
                                 <li class="divider" data-content="Bookshelves"></li>
                                 ${bookshelves}
                                 <!--<li class="menu-item">
                                     <a onclick="addLoading(this)" href="/bookshelves">Bookshelves</a>
                                 </li>-->
-                                <li class="menu-item menuAction">
+                                <li class="menu-item sidebarMenuAction">
                                     <hr />
                                 </li>
                                 <li class="menu-item">

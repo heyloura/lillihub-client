@@ -2,10 +2,6 @@
     #notebooks {
         list-style: none;
     }
-    #notebooks a {
-        display: block;
-        width: 100%;
-    }
 </style>
 <div class="container ">
     <form id="add_notebook" method="POST" action="/notebook/add">
@@ -32,6 +28,25 @@
         </div>
     </div>
     <ul id="notebooks" class="hide-if-user-has-no-javascript" style="clear:both;">{{notebooks}}</ul>
+    <div class="modal" id="modal">
+        <a onclick="closeModal()" href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <div class="modal-header">
+            <a onclick="closeModal()" href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+            <div class="modal-title h5">Rename notebook</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <p>You can move this note to a new notebook.</p>
+                    <input type="hidden" id="notebook-id"/>
+                    <input class="form-input" type="text" id="notebook-name"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="addLoading(this);saveRename();">Save</button>
+            </div>
+        </div>
+    </div>
     <script>
         document.getElementById('hide_notes_key').style.display = 'none';
         document.getElementById('notebooks').style.display = 'none';
@@ -41,6 +56,56 @@
             document.getElementById('hide_notes_key').style.display = 'block';
             document.getElementById('notebooks').style.display = 'block';
             document.getElementById('add_notebook').style.display = 'block';
+        }
+        // hide sidebar
+        document.getElementById('app-sidebar').style.display = 'none';
+        
+        document.addEventListener('DOMContentLoaded', function(event) {
+            document.querySelector('.app-footer').style.display = 'none';
+            document.querySelector('.app-footer').classList.remove('show-sm');
+        });
+        
+        // add rename and delete
+        function rename(id, name) {
+            document.getElementById('notebook-name').value = name;
+            document.getElementById('notebook-id').value = id;
+            document.getElementById('modal').classList.add('active');
+        }
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        async function saveRename() {
+            var id = document.getElementById('notebook-id').value;
+            var name = document.getElementById('notebook-name').value;
+
+            const form = new URLSearchParams();
+            form.append("name", name);
+            form.append("notebook_id", id);
+                
+            const posting = await fetch('/notebook/rename', {
+                method: "POST",
+                body: form.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                }
+            }).then(data => {
+                window.location.href = '/notes';
+            }); 
+        }
+        async function deleteConfirmed(id) {
+            alert('called');
+            const form = new URLSearchParams();
+            form.append("notebook_id", id);
+                
+            const posting = await fetch('/notebook/delete', {
+                method: "POST",
+                body: form.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                }
+            }).then(data => {
+                window.location.href = '/notes';
+            }); 
         }
     </script>
 </div>

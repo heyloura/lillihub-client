@@ -445,6 +445,23 @@ footer .btn-group-block {
 .horizontal-list form, .horizontal-list form input {
     display: inline;
 }
+
+.modal-container .modal-header {
+    color: var(--text);
+}
+
+.modal-container {
+    background: var(--crust)
+}
+
+.modal.active .modal-overlay, .modal:target .modal-overlay {
+    background: #000;
+    opacity: 50%;
+}
+
+.sidebarMenuAction {
+    margin-bottom: 3em;
+}
 @media screen and (min-width: 650px)
 {
     .horizontal-list form, .horizontal-list form input {
@@ -670,7 +687,7 @@ color: var(--text)!important;
 }
 @media (max-height: 500px) {
 .app-footer, .app-header {
-display: none !important;
+display: none;
 }
 .content-page {
 margin-top: 0rem;

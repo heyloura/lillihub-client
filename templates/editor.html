@@ -36,7 +36,7 @@ textarea:focus, textarea:active {
                     <option value="publish" {{publishSelected}}>publish</option>
                     <option value="draft" {{draftSelected}}>draft</option>
                 </select>
-                <button onclick="addLoading(this)" type="submit" class="btn btn-primary">Save & Submit</button>
+                <button id="saveBtn" type="submit" class="btn btn-primary">Save & Submit</button>
             </div>
         </div>
     </form>
@@ -57,6 +57,10 @@ textarea:focus, textarea:active {
     }
 </script>
 <script>
+    if(localStorage.getItem('smde_post-{{mpDestination}}-{{url}}')) {
+        document.getElementById('content').innerHTML = '';
+    }
+
     const easymde = new EasyMDE({
         element: document.getElementById('content'),
         uploadImage: true,
@@ -64,45 +68,25 @@ textarea:focus, textarea:active {
         nativeSpellCheck: true,
         minHeight: '50vh',
         showIcons: ["code"],
-        previewImagesInEditor: true,
-        status: ["upload-image", "autosave", "lines", "words", "cursor", {
-            className: "keystrokes",
-            defaultValue: (el) => { },
-            onUpdate: (el) => {
-                const keystrokes = Number(el.getAttribute('data-keystrokes'));
-                const content = easymde.value() || '';
-                const images = content.split('![');
-                let text = images[0];
-                
-                if(images.length > 1) {
-                    for(let i = 0; i<images.length; i = i + 2) {
-                        let subchunks = images[i + 1] ? images[i + 1].split(')') : [];
-                        subchunks[0] = '';
-                        text += subchunks.join('');
-                    }
-                }
-
-                const chunks = text.split('](');
-                let count = chunks[0].replace('[','').length;
-                if(chunks.length > 1) {
-                    for(let i = 1; i < chunks.length; i++) {
-                        let subchunks = chunks[i].replace('[','').split(')');
-                        if(subchunks.length > 1) {
-                            count += subchunks[1].length;
-                        }
-                    }
-                } else {
-                    count = text.length;
-                }
-                el.innerHTML = 'characters: ' + count + '/300';
-                if(count > 300) {
-                    el.classList.add('overage');
-                }
-                else {
-                    el.classList.remove('overage');
-                }
+        previewImagesInEditor: false,
+        autosave: {
+            enabled: true,
+            uniqueId: "post-{{mpDestination}}-{{url}}",
+            delay: 1000,
+            submit_delay: 5000,
+            timeFormat: {
+                locale: 'en-US',
+                format: {
+                    year: 'numeric',
+                    month: 'long',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                },
             },
-        }],
+            text: "Autosaved: "
+        },
+        status: ["upload-image", "autosave", "lines", "words", "cursor"],
         imageUploadFunction: async (image, onSuccess, onError) => {
             let formData = new FormData();
             formData.append("destination", "{{mpDestination}}"); 
@@ -137,4 +121,20 @@ textarea:focus, textarea:active {
             });
         },
     });
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", async function(event) {
+            document.getElementById("saveBtn").onclick = registerClick;
+        });
+    }
+    else
+    {
+        document.getElementById("saveBtn").onclick = registerClick;
+    }
+
+    async function registerClick() {
+        addLoading();
+        let note = easymde.value();
+        easymde.clearAutosavedValue();
+    }
 </script>

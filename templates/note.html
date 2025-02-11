@@ -1,5 +1,6 @@
 <style>{{easyMDECSS}}</style>
 <script>{{easyMDEJS}}</script>
+<script>{{compressor}}</script>
 
 <ul class="breadcrumb pl-2">
     <li class="breadcrumb-item">
@@ -10,24 +11,100 @@
     </li>
 </ul>
 {{viewVersion}}
+<!-- form switch control -->
+<div class="form-group">
+    <label class="form-switch">
+        <input id="autosave" type="checkbox">
+        <i class="form-icon"></i> Enable autosave (Note: this saves the unencrypted value in your localStorage)
+    </label>
+</div>
 <div class="box">
     <input type="hidden" id="original" value="{{originalValue}}" />
     <textarea id="content"></textarea>
 </div>
+<button onclick="addLoading(this)" class="btn btn-primary m-2 float-right" id="saveNoteBtn">Save Note</button>
+<p><mark>Note:</mark> Images that are dragged/dropped or copied in are saved to your default Micro.blog media upload and are <b>not</b> encrypted.</p>
 {{versions}}
 {{editDelete}}
-<button onclick="addLoading(this)" class="btn btn-primary m-2 float-right" id="saveNoteBtn">Save Note</button>
 <div style="clear:both"></div>
 <script type="module">
-    const easymde = new EasyMDE({
+
+    var options = {
         element: document.getElementById('content'),
-        uploadImage: false,
+        uploadImage: true,
         minHeight: '50vh',
         showIcons: ["code"],
         nativeSpellcheck: true,
         inputStyle: 'contenteditable',
-        status: ["lines", "words", "cursor"],
-    });
+        status: ["upload-image", "autosave", "lines", "words", "cursor"],
+        imageUploadFunction: async (image, onSuccess, onError) => {
+            let formData = new FormData();
+            formData.append("destination", "{{mpDestination}}"); 
+            new Compressor(image, {
+                quality: 0.95,
+                maxHeight: 1920,
+                maxWidth: 1920,
+                success(result) {
+                    console.log('new size: ' + result.size /1024 /1024 + ' MB');
+                    if(result.size /1024 /1024 > 3) {
+                        new Compressor(result, {
+                            quality: 0.85,
+                            maxHeight: 1920,
+                            maxWidth: 1920,
+                            success(result) {
+                                console.log('another compress size: ' + result.size /1024 /1024 + ' MB');
+                                formData.append("media", result, result.name);
+                                fetch('/media/upload', { method: "POST", body: formData })
+                                    .then(response => console.log(response.status) || response)
+                                    .then(response => response.text())
+                                    .then(body => onSuccess(body));
+                            },
+                        });
+                    } else {
+                        formData.append("media", result, result.name);
+                        fetch('/media/upload', { method: "POST", body: formData })
+                            .then(response => console.log(response.status) || response)
+                            .then(response => response.text())
+                            .then(body => onSuccess(body));
+                    }
+                },
+            });
+        },
+        autosave: {
+            enabled: localStorage.getItem('autosave-note-{{id}}-{{vid}}') ? true : false,
+            uniqueId: "note-{{id}}-{{vid}}",
+            delay: 1000,
+            submit_delay: 5000,
+            timeFormat: {
+                locale: 'en-US',
+                format: {
+                    year: 'numeric',
+                    month: 'long',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                },
+            },
+            text: "Autosaved: "
+        },
+    };
+
+    let easymde = new EasyMDE(options);
+
+    function autoSaveToggled(evt) {
+        if(document.getElementById('autosave').checked) {
+            localStorage.setItem('autosave-note-{{id}}-{{vid}}','true');
+            options.autosave.enabled = true;
+            easymde.toTextArea();
+            easymde = new EasyMDE(options);
+        } else {
+            localStorage.setItem('autosave-note-{{id}}-{{vid}}','');
+            options.autosave.enabled = false;
+            localStorage.setItem('smde_note-{{id}}-{{vid}}','');
+            easymde.toTextArea();
+            easymde = new EasyMDE(options);
+        }
+    }
 
     const imported_key = localStorage.getItem("notes_key") ? await crypto.subtle.importKey(
         'raw',
@@ -95,24 +172,50 @@
 
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", async function(event) {
-            if({{is_shared}}) {
-                easymde.value(document.getElementById("original").value);
-            } else {
-                easymde.value(await decryptWithKey(document.getElementById("original").value));
+            if(localStorage.getItem('autosave-note-{{id}}-{{vid}}')) {
+                if(!localStorage.getItem('smde_note-{{id}}-{{vid}}')) {
+                    if({{is_shared}}) {
+                        easymde.value(document.getElementById("original").value);
+                    } else {
+                        easymde.value(await decryptWithKey(document.getElementById("original").value));
+                    }
+                }
+            }
+            else {
+                if({{is_shared}}) {
+                    easymde.value(document.getElementById("original").value);
+                } else {
+                    easymde.value(await decryptWithKey(document.getElementById("original").value));
+                }
             }
             document.getElementById("saveNoteBtn").onclick = registerClick;
+            document.getElementById("autosave").addEventListener('change', autoSaveToggled);
+            document.getElementById("autosave").checked = localStorage.getItem('autosave-note-{{id}}-{{vid}}') ? true : false;
         });
     }
     else
     {
         if(document.getElementById("original").value) {
-            if({{is_shared}}) {
-                easymde.value(document.getElementById("original").value);
-            } else {
-                easymde.value(await decryptWithKey(document.getElementById("original").value));
+            if(localStorage.getItem('autosave-note-{{id}}-{{vid}}')) {
+                if(!localStorage.getItem('smde_note-{{id}}-{{vid}}')) {
+                    if({{is_shared}}) {
+                        easymde.value(document.getElementById("original").value);
+                    } else {
+                        easymde.value(await decryptWithKey(document.getElementById("original").value));
+                    }
+                }
+            }
+            else {
+                if({{is_shared}}) {
+                    easymde.value(document.getElementById("original").value);
+                } else {
+                    easymde.value(await decryptWithKey(document.getElementById("original").value));
+                }
             }
         }
         document.getElementById("saveNoteBtn").onclick = registerClick;
+        document.getElementById("autosave").addEventListener('change', autoSaveToggled);
+        document.getElementById("autosave").checked = localStorage.getItem('autosave-note-{{id}}-{{vid}}') ? true : false;
     }
 
     async function registerClick() {
@@ -136,7 +239,33 @@
                     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
                 }
             });
+            localStorage.setItem('smde_note-{{id}}-{{vid}}','')
             window.location.href = '/notes/{{id}}';
         }
+    }
+
+    function downloadHTML() {
+        let id =  document.getElementById('noteId').value;
+        var html = document.getElementById(id).innerHTML;
+        var title = document.getElementById(id).getAttribute('data-title') + '.html';
+        download(title, html);
+    }
+    function downloadMarkdown() {
+        let id =  document.getElementById('noteId').value;
+        var markdown = document.getElementById(id).getAttribute('data-markdown');
+        var title = document.getElementById(id).getAttribute('data-title') + '.md';
+        download(title, markdown);
+    }
+    function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
     }
 </script>
