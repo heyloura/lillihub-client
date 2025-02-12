@@ -26,7 +26,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
         isFollowingUser = following.is_you || following.is_following;
     }
 
-    const uniqueRepliers = isConversation ? [...new Set(conversation.map(comment => comment ? comment.author._microblog.username : ''))] : [post.author._microblog.username];
+    const uniqueRepliers = isConversation ? [...new Set(conversation.map(comment => comment && comment.author && comment.author._microblog ? comment.author._microblog.username : ''))] : post && post.author && post.author._microblog ? [post.author._microblog.username] : [''];
     const replyCheckboxes = uniqueRepliers.map(function (person) {
             return `<label><input {{${person}}} type='checkbox' name='replyingTo[]' value='${person}'/> @${person}</label> `
         }).join(' ');
@@ -36,11 +36,11 @@ export async function PostTemplate(id, post, conversation, user = false, token =
             _conversationTemplate
                 .replaceAll('{{id}}', item.id)
                 .replaceAll('{{avatar}}', item.author.avatar)
-                .replaceAll('{{username}}', item.author._microblog.username)
+                .replaceAll('{{username}}', item && item.author && item.author._microblog ? item.author._microblog.username : '')
                 .replaceAll('{{name}}', item.author.name)
                 .replaceAll('{{publishedDate}}', item.date_published)
-                .replaceAll('{{relativeDate}}', item._microblog.date_relative)
-                .replaceAll('{{new}}', lastTimestamp != 0 ? item._microblog.date_timestamp > lastTimestamp ? 'new' : '' : '')
+                .replaceAll('{{relativeDate}}', item && item._microblog ? item._microblog.date_relative : '')
+                .replaceAll('{{new}}', lastTimestamp != 0 && item && item._microblog ? item._microblog.date_timestamp > lastTimestamp ? 'new' : '' : '')
                 .replaceAll('{{content}}', cleanFormatHTML(item.content_html, user ?  user.lillihub.exclude : ''))
                 .replaceAll(
                     '{{reply}}', 
@@ -50,8 +50,8 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                                 .replaceAll('{{id}}', item.id)
                                 .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme))
                                 .replaceAll('{{backgroundColor}}', 'var(--mantle)')
-                                .replaceAll('{{checkboxes}}', replyCheckboxes.replaceAll(`{{${item.author._microblog.username}}}`,`checked='checked'`))
-                                .replaceAll('{{checkboxes64}}', btoa(replyCheckboxes.replaceAll(`{{${item.author._microblog.username}}}`,`checked='checked'`)))
+                                .replaceAll('{{checkboxes}}', replyCheckboxes.replaceAll(`{{${item && item.author && item.author._microblog ? item.author._microblog.username : ''}}}`,`checked='checked'`))
+                                .replaceAll('{{checkboxes64}}', btoa(replyCheckboxes.replaceAll(`{{${item && item.author && item.author._microblog ? item.author._microblog.username : ''}}}`,`checked='checked'`)))
                                 .replaceAll('{{buttonText}}','Send Reply')
                                 .replaceAll('{{response}}','')
                             ) : ''
@@ -72,8 +72,8 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                 .replaceAll('{{id}}', post.id)
                 .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme))
                 .replaceAll('{{backgroundColor}}', 'var(--base)')
-                .replaceAll('{{checkboxes}}', replyCheckboxes.replaceAll(`{{${post.author._microblog.username}}}`,`checked='checked'`))
-                .replaceAll('{{checkboxes64}}', btoa(replyCheckboxes.replaceAll(`{{${post.author._microblog.username}}}`,`checked='checked'`)))
+                .replaceAll('{{checkboxes}}', replyCheckboxes.replaceAll(`{{${post && post.author && post.author._microblog ? post.author._microblog.username : ''}}}`,`checked='checked'`))
+                .replaceAll('{{checkboxes64}}', btoa(replyCheckboxes.replaceAll(`{{${post && post.author && post.author._microblog ? post.author._microblog.username : ''}}}`,`checked='checked'`)))
                 .replaceAll('{{buttonText}}','Send Reply')
                 .replaceAll('{{response}}','')
             ) : '';
@@ -93,14 +93,14 @@ export async function PostTemplate(id, post, conversation, user = false, token =
     return !filterOut(user ?  user.lillihub.exclude : '', post.content_html) ? 
         _postTemplate.replaceAll('{{avatar}}',post.author.avatar) 
                     .replaceAll('{{name}}',post.author.name)
-                    .replaceAll('{{username}}',post.author._microblog.username)
+                    .replaceAll('{{username}}',post && post.author && post.author._microblog ? post.author._microblog.username : '')
                     .replaceAll('{{new}}', notSeen ?  'badge' : '')
                     .replaceAll('{{tags}}', customTag ? customTag : '')
                     .replaceAll('{{actions}}', user ? 
                         _actionsTemplate
                             .replaceAll('{{followIframe}}', !isFollowingUser && getFollowing ? 
                                 _followTemplate.replaceAll('{{src}}', 
-                                    _followFormTemplate.replaceAll('{{username}}',post.author._microblog.username)
+                                    _followFormTemplate.replaceAll('{{username}}',post && post.author && post.author._microblog ? post.author._microblog.username : '')
                                         .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme))) : '')
                             .replaceAll('{{id}}', id)
                             .replaceAll('{{url}}', post.url)
