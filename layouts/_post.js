@@ -112,7 +112,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                                             .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme))
                                             .replaceAll('{{url}}', post.url)) : '')
                          : '')
-                    .replaceAll('{{content}}', cleanFormatHTML(post.content_html, user ? user.lillihub.exclude : ''))
+                    .replaceAll('{{content}}', post.content_html ? cleanFormatHTML(post.content_html, user ? user.lillihub.exclude : '') : '')
                     .replaceAll('{{publishedDate}}', post.date_published)
                     .replaceAll('{{relativeDate}}', post && post._microblog ? post._microblog.date_relative : '')
                     .replaceAll('{{url}}', post.url)
