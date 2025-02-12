@@ -75,7 +75,7 @@ export async function UserTemplate(user, token, id, photos = false) {
                 if(!seen.has(convo.id)) {
                     seen.add(convo.id);
 
-                    if(item._microblog.is_mention) {
+                    if(item && item._microblog && item._microblog.is_mention) {
                         return await PostTemplate(item.id, convo, conversations, user, token, 0, '', false, true, false); 
                     }
                     return await PostTemplate(item.id, convo, conversations, user, token, 0, '', false, true, true);    

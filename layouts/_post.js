@@ -21,7 +21,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
     let isFollowingUser = false;
     const notSeen = lastTimestamp != 0 ? post._microblog.date_timestamp > lastTimestamp: false;
 
-    if(getFollowing && user && !user.error) {
+    if(getFollowing && user && !user.error && post && post.author && post.author._microblog) {
         const following = await getIsFollowingUser(post.author._microblog.username, token);
         isFollowingUser = following.is_you || following.is_following;
     }
