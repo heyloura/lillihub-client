@@ -91,8 +91,8 @@ export async function PostTemplate(id, post, conversation, user = false, token =
     }
 
     return !filterOut(user ?  user.lillihub.exclude : '', post.content_html) ? 
-        _postTemplate.replaceAll('{{avatar}}',post.author.avatar) 
-                    .replaceAll('{{name}}',post.author.name)
+        _postTemplate.replaceAll('{{avatar}}',post && post.author ? post.author.avatar : '') 
+                    .replaceAll('{{name}}',post && post.author ? post.author.name : '')
                     .replaceAll('{{username}}',post && post.author && post.author._microblog ? post.author._microblog.username : '')
                     .replaceAll('{{new}}', notSeen ?  'badge' : '')
                     .replaceAll('{{tags}}', customTag ? customTag : '')
