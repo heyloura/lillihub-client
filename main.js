@@ -778,12 +778,16 @@ async function handler(req) {
         const content = value.get('content');
         const status = value.get('status');
         const name = value.get('name');
+        const summary = value.get('summary');
 
         const formBody = new URLSearchParams();
         formBody.append("mp-destination", destination);
         formBody.append("h", "entry");
         formBody.append("content", content);
        
+        if(summary) {
+            formBody.append("summary", summary);
+        }
         if(name){
             formBody.append("name", name);
         }

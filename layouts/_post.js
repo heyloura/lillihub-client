@@ -59,9 +59,14 @@ export async function PostTemplate(id, post, conversation, user = false, token =
         ).join('') : '';
 
     const avatars = isConversation && conversation && Array.isArray(conversation) ? conversation.slice(0, Math.min(5, conversation.length - 1)).map(function (person) {
+        if(person && person.author && person.author.avatar) {
             return `<figure class="avatar avatar-sm ${lastTimestamp != 0 && person && person._microblog && person._microblog.date_timestamp > lastTimestamp ? 'badge' : ''}">
                     <img loading="lazy" src="${person.author.avatar}" height="48" width="48"/>
                 </figure>`
+        } else {
+            return '';
+        }
+
         }).join(' ') : '';
 
 
@@ -112,7 +117,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                                             .replaceAll('{{CSSThemeColors}}', CSSThemeColors(user.lillihub.darktheme))
                                             .replaceAll('{{url}}', post.url)) : '')
                          : '')
-                    .replaceAll('{{content}}', post.content_html ? cleanFormatHTML(post.content_html, user ? user.lillihub.exclude : '') : '')
+                    .replaceAll('{{content}}', post.content_html ? cleanFormatHTML(post.content_html, user && user.lillihub ? user.lillihub.exclude : '') : '')
                     .replaceAll('{{publishedDate}}', post.date_published)
                     .replaceAll('{{relativeDate}}', post && post._microblog ? post._microblog.date_relative : '')
                     .replaceAll('{{url}}', post.url)
@@ -120,6 +125,7 @@ export async function PostTemplate(id, post, conversation, user = false, token =
                     .replaceAll('{{single}}', viewSingleConvoLoad && post && post._microblog && post._microblog.is_conversation ? `<a class="btn btn-link btn-sm" onclick="addLoading(this)" href="/timeline/${post.id}#${post.id}"><i class="bi bi-chat"></i> view comments</a>` : '')
                     .replaceAll('{{comments}}', user && ((isConversation && conversation.length - 1 > 0) || (clientConvoLoad && post && post._microblog && post._microblog.is_conversation) ) ? comments : '')
                     .replaceAll('{{reply}}', user ? (conversation == undefined || conversation.length == 0) && !(clientConvoLoad && post && post._microblog && post._microblog.is_conversation) ? reply : '' : '')
+                    .replaceAll('{{summary}}', post && post.summary ? `<div class="post-summary">${cleanFormatHTML(post.summary, user && user.lillihub ? user.lillihub.exclude : '')}</div>` : '')
                     .replaceAll('{{preview}}', post && post._microblog && post._microblog.is_linkpost ? `<previewbox-link href="${post.url}"></previewbox-link>` : '')
         : ''
 }
