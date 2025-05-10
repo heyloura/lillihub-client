@@ -141,6 +141,13 @@ Deno.serve(async (req) => {
 
     let user = false;
     const following = [];
+
+    if(new URLPattern({ pathname: "/logout" }).exec(req.url)) {
+        const layout = new TextDecoder().decode(await Deno.readFile("signin.html"));
+        return new Response(layout.replaceAll('{{nonce}}', nonce)
+              .replace('{{year}}', new Date().getFullYear()),
+          HTMLHeaders(nonce,`atoken=undefined;SameSite=Lax;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT`));
+    }
     if(mbToken) {
         const mbUser = await mb.getMicroBlogUser(mbToken);
 
@@ -626,7 +633,7 @@ Deno.serve(async (req) => {
                     let tagmoji = await fetching.json();
                     // put JSON check here or something.....
                     if(id != 'discover') {
-                        fetching = await fetch(`https://micro.blog/posts/discover${id != "original" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+                        fetching = await fetch(`https://micro.blog/posts/discover${id != "original" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const posts = await fetching.json();
                         content = `${utility.timelineHeader('discover')}<div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
                     } else {
@@ -748,33 +755,9 @@ Deno.serve(async (req) => {
                     //----------
                     id = name;
                     name = "timeline";
-                    //fetching = await fetch(`https://micro.blog/posts/timeline?count=40${id != "timeline" ? `&before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
-                    //const posts = await fetching.json();
                     const posts = await mb.getMicroBlogTimelinePostsChronological(mbToken, id);
                     content = `${utility.timelineHeader('timeline')}
                         <div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
-                    // content = `
-                    //     ${posts.map(p => `
-                    //     <article id="${p.id}">
-                    //         <header>
-                    //             <img src="${p.avatar}" loading="lazy">
-                    //             ${p.name}
-                    //         </header>
-                    //         <section>
-                    //             <ul role="menubar">
-                    //                 <li role="menuitem" tabindex="0">▼</li>
-                    //                 <li role="menuitem" tabindex="0">Reply</li>
-                    //                 ${p.conversation ? `<li role="menuitem" tabindex="0"><button class="evt-dialog-open" type="button">Conversation</button></li>` : ''}
-                    //                 <li data-id="${p.id}" role="menuitem" tabindex="0" class="right evt-timeline-mark">👁</li>
-                    //             </ul>
-                    //             <span><a href="#">${p.name}</a>${p.mention ? ' ➤ ' : ''}</span>
-                    //             ${p.content}
-                    //             <footer>
-                    //                 <a rel="prefetch" href="/timeline/users/${p.username}" class="text-gray">@${p.username}</a> · <a target="_blank" href="${p.url}" class="text-gray">${p.relative}</a>
-                    //             </footer>
-                    //         </section> 
-                    //     </article>   
-                    //     `).join('')}`;
                 } else if(req.url.includes("mentions")) {
                     //----------
                     //  Mentions
@@ -1036,7 +1019,31 @@ Deno.serve(async (req) => {
         // We don't have a user, they can only see the homepage,
         // and the authentication routes
         // -----------------------------------------------------
-        
+        if(new URLPattern({ pathname: "/tokenLogin" }).exec(req.url)) {
+            const layout = new TextDecoder().decode(await Deno.readFile("login.html"));
+            const state = crypto.randomUUID();
+            return new Response(
+                layout.replace('{{nonce}}', nonce)
+                    .replace('{{state}}', state)
+                    .replaceAll('{{appURL}}', req.url.endsWith('/') ? req.url.slice(0, -1) : req.url)
+                    .replace('{{year}}', new Date().getFullYear()),
+                HTMLHeaders(nonce)
+            );
+        } 
+
+        if(new URLPattern({ pathname: "/login" }).exec(req.url)) {
+            const value = await req.formData();
+            const token = value.get('token');
+            const expiresOn = new Date();
+            const accessToken = await encryptMe(token);
+            expiresOn.setDate( expiresOn.getDate() + 399); //chrome limits to 400 days
+                              
+            const layout = new TextDecoder().decode(await Deno.readFile("loggingIn.html"));
+            return new Response(layout.replaceAll('{{nonce}}', nonce)
+                  .replace('{{year}}', new Date().getFullYear()),
+              HTMLHeaders(nonce,`atoken=${accessToken};SameSite=Lax;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`));
+        } 
+
         // Is it the redirect back from indieauth?
         if(new URLPattern({ pathname: "/auth" }).exec(req.url)) {
             const stateCookie = getCookieValue(req, 'state');

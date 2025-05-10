@@ -870,6 +870,7 @@ function flattenedMicroBlogPost(post) {
 
 export function postHTML(post, stranger, isConvo, convoId) {
     post = flattenedMicroBlogPost(post);
+
     const multipleImgs = !post.linkpost && post.content.split('<img').length > 2;
 
     if(multipleImgs) {
@@ -886,7 +887,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                         </div>` : ''}
         <article id="post${isConvo ? '-convo' : ''}-${post.id}" 
             data-id="${post.id}" 
-            class="card parent ${isConvo ? 'timeline-content pt-0 mt-0' : ''} ${convoId && convoId === post.id ? 'highlight' : ''}" 
+            class="card parent ${isConvo ? 'timeline-content pt-0' : ''} ${convoId && convoId === post.id ? 'highlight' : ''}" 
             data-reply="${post.username}" 
             data-avatar="${post.avatar}" 
             data-id="${post.id}" 
@@ -902,9 +903,18 @@ export function postHTML(post, stranger, isConvo, convoId) {
             data-favorite="${post.favorite}">
             <header id="header-${post.id}" class="card-header pt-1 mt-0 pb-1 mb-0 pl-1 pr-0">
                 <div>   
-                    <div class="card-top pl-1">
-                        ${getAvatar(post, isConvo ? 'avatar' : 'avatar')}
-                        <div class="card-title h5 d-inline">${post.name.split(':')[0]}</div>           
+                    <div class="card-top pl-1 d-flex">
+                        ${getAvatar(post, isConvo ? 'avatar-lg' : 'avatar-lg')}
+                        <div class="card-title px-2">
+                            <div>
+                                <span class="text-bold">${post.name.split(':')[0]}</span>
+                                <br/>
+                                <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray text-small">
+                                    ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
+                                    @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
+                                </a> 
+                            </div>
+                        </div>           
                     </div>
                 </div>
             </header>
@@ -912,27 +922,24 @@ export function postHTML(post, stranger, isConvo, convoId) {
                 ${post.content}
             </main>
             ${multipleImgs ? `<div data-id="${post.id}" class='gallery'></div>` : ''}
-            <div class="card-footer">
-                <div class="card-subtitle postFooter">
-                    <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}" class="text-gray">
-                        ${stranger ? '<i class="icon icon-people text-gray"></i> ' : ''}
-                        @${post.username.split('@')[0].split('.')[0]}${post.username.includes('@') || post.username.includes('.') ? ' <i class="icon icon-location"></i>' : ''}
-                    </a> · 
+            <div class="card-footer d-flex">
+                <div class="card-subtitle"> 
                     <a target="_blank" href="${post.url}" class="text-gray">${post.relative}</a>
                 </div>
                 <div class="card-buttons postBtns d-inline">
                     <div class="btn-group">
-                        <div class="dropdown">
+                        <div class="dropdown dropdown-right">
                             <button type="button" class="btn btn-link btn-action dropdown-toggle" tabindex="0">
-                                <i class="icon icon-caret"></i>
+                                <i class="icon icon-more-vert"></i>
                             </button>
                             <ul class="menu bg-dark">
+                                <li class="menu-item"><a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i> Add Comment</a></li>
                                 <li class="menu-item"><a rel="prefetch" href="/timeline/posts/${post.id}" swap-target="#main" class="btn btn-link">View Post</a></li>
                                 <li class="menu-item"><button data-url="${post.url}" type="button" class="btn btn-link bookmarkPost">Bookmark Post</button></li>
                                 <li class="menu-item"><button data-id="${post.id}" data-url="${post.url}" data-name="${post.username}" type="button" class="btn btn-link quotePost">Quote Post</button></li>
                             </ul>
                         </div>
-                        <a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>
+                        <!--<a data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="btn btn-link btn-action replyBtn"><i data-avatar="${post.avatar}" data-id="${post.id}" data-name="${post.username}" class="replyBtn icon icon-edit"></i></a>-->
                         ${!isConvo && (post.conversation || post.mention) ? `<button type="button" data-id="${post.id}" class="btn btn-link btn-action convoBtn"><i data-id="${post.id}" class="icon icon-message convoBtn"></i></button>` : ''}
                     </div>
                 </div>

@@ -2831,7 +2831,7 @@ summary.accordion-header::-webkit-details-marker {
 
 .avatar {
   background: var(--primary);
-  border-radius: 50%;
+  border-radius: 15%;
   color: rgba(255,255,255,.85);
   display: inline-block;
   font-size: .8rem;
@@ -2869,7 +2869,7 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .avatar img {
-  border-radius: 50%;
+  border-radius: 15%;
   height: 100%;
   position: relative;
   width: 100%;
@@ -6277,7 +6277,7 @@ a,pre,code {
 }
 
 .card-buttons {
-  min-width: 107px;
+  /* min-width: 107px; */
 }
 
 article main {
@@ -6902,6 +6902,12 @@ article footer {
   vertical-align: sub;
   display: inline;
  }
+
+.card-subtitle {
+  margin-top: 0.5em;
+ }
+
+
 
 @media (min-width: 960px) {
   #destinationsSwitch {

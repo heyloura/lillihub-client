@@ -174,12 +174,12 @@ export async function getMicroBlogTimelinePostsChronological(accessToken, lastId
             }
         }
     }
-    let reversed = posts.reverse();
-    const index = reversed.findIndex(obj => obj.id === marker.id);
-    if (index !== -1) {
-        reversed = reversed.slice(index);
-    }
-    return reversed.map(r => flattenedMicroBlogPost(r));
+    // let reversed = posts.reverse();
+    // const index = reversed.findIndex(obj => obj.id === marker.id);
+    // if (index !== -1) {
+    //     reversed = reversed.slice(index);
+    // }
+    return posts;
 }
 
 // export async function getMicroBlogDiscoverPhotoPosts(accessToken) {

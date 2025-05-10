@@ -31,18 +31,14 @@
                     </div>
                     <p class="empty-title h5">Welcome to Lillihub</p>
                     <p class="empty-subtitle">A delightful Micro.blog client</p>
-                    <p class="empty-subtitle">Use your <em>https://username.micro.blog</em> to login. Have a custom domain configured with Micro.blog? Use that instead. Or <a href="/tokenLogin">login</a> with an app token.</a></p>
+                    <p class="empty-subtitle">Use your Micro.blog app token to login. Or <a href="/signin">sign in</a> with indie auth.</a></p>
                     <div class="empty-action input-group input-inline">
-                        <form action="https://micro.blog/indieauth/auth" method="get">
-                            <input id="me" type="url" placeholder="https://..." name="me" class="form-input">
-                            <input type="hidden" name="client_id" value="{{appURL}}"/>
-                            <input type="hidden" name="redirect_uri" value="{{appURL}}/auth"/>
-                            <input type="hidden" name="state" value="{{state}}"/>
-                            <input type="hidden" name="scope" value="create"/>
-                            <input type="hidden" name="response_type" value="code"/>
-                            <br/>
-                            <button type="submit" class="btn btn-primary input-group-btn">Sign in</button>                            
-                        </form>
+                        <form method="post" action="/login">
+                          <div class="field border">
+                              <input name="token" type="password" placeholder="token" class="form-input">
+                          </div>
+                          <button class="btn btn-primary input-group-btn">Login</button>
+                      </form>
                     </div>
                     <p class="empty-subtitle">🐸 &copy; {{year}}</p>
                 </div>
