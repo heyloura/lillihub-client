@@ -68,6 +68,7 @@
                 </nav>
                 <aside class="padding">
                     <h6>Recent Mentions</h6>
+                    <div class="medium-space l m"></div>
                     <div id="mentions-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
@@ -77,6 +78,7 @@
                 </aside>
                 <aside class="padding">
                     <h6>Recent Replies</h6>
+                    <div class="medium-space l m"></div>
                     <div id="replies-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
@@ -86,6 +88,7 @@
                 </aside>
                 <aside class="padding">
                     <h6>Following</h6>
+                    <div class="medium-space l m"></div>
                     <div id="following-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
@@ -165,15 +168,8 @@
                     </div>
                     <div class="s12 m12 l3">
                         <aside class="padding">
-                            <h6>New on Micro.blog</h6>
-                            <div id="new">
-                                <div class="center-align middle-align"> 
-                                    <progress class="circle"></progress>
-                                </div>
-                            </div>
-                        </aside>
-                        <aside class="padding">
                             <h6>Discover photos</h6>
+                            <div class="medium-space l m"></div>
                             <div id="photos">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -182,7 +178,17 @@
                             <p class="right-align"><a href="#" class="primary-text">View All</a></p>
                         </aside>
                         <aside class="padding">
-                            <h6>Discover</h6>
+                            <h6>New on Micro.blog</h6>
+                            <div class="medium-space l m"></div>
+                            <div id="new">
+                                <div class="center-align middle-align"> 
+                                    <progress class="circle"></progress>
+                                </div>
+                            </div>
+                        </aside>
+                        <aside class="padding">
+                            <h6>Curated Discover</h6>
+                            <div class="medium-space l m"></div>
                             <div id="discover">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -363,7 +369,9 @@
                 if(data.length <= 0) {
                     document.getElementById("following").innerHTML = '<p>Your favorites will show here</p>'
                 } else {
-                     document.getElementById("following").innerHTML = JSON.stringify(data);
+                    var following = [... document.querySelectorAll('#following option')];
+                    console.log(following.filter(f => data.includes(f.value)));
+                    document.getElementById("following").innerHTML = JSON.stringify(following.filter(f => data.includes(f.value)));
                 }
                 document.getElementById("following-sidebar").innerHTML = document.getElementById("following").innerHTML;
             });
