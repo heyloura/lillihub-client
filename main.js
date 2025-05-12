@@ -518,6 +518,18 @@ Deno.serve(async (req) => {
                 return new Response(JSON.stringify(results), JSONHeaders());
             }
 
+            if((new URLPattern({ pathname: "/api/discover/photos" })).exec(req.url)) {
+                const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const results = await fetching.json();
+                return new Response(JSON.stringify(results), JSONHeaders());
+            }
+            
+            if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
+                const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const results = await fetching.json();
+                return new Response(JSON.stringify(results), JSONHeaders());
+            }
+
             if((new URLPattern({ pathname: "/api/following/favorites" })).exec(req.url)) {
                 console.log(userKV);
                 return new Response(JSON.stringify(userKV.value && userKV.value.favorites? userKV.value.favorites : []), JSONHeaders());

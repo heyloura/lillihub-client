@@ -161,7 +161,33 @@
                         <div id="main">{{pages}}</div>
                     </div>
                     <div class="s12 m12 l3">
-
+                        <aside class="padding">
+                            <h6>Find someone new</h6>
+                            <div id="new">
+                                <div class="center-align middle-align"> 
+                                    <progress class="circle"></progress>
+                                </div>
+                            </div>
+                        </aside>
+                        <aside class="padding">
+                            <h6>Recent discover photos</h6>
+                            <div id="photos">
+                                <div class="center-align middle-align"> 
+                                    <progress class="circle"></progress>
+                                </div>
+                            </div>
+                            <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                        </aside>
+                        <aside class="padding">
+                            <h6>Recent discover</h6>
+                            <div id="discover">
+                                <div class="center-align middle-align"> 
+                                    <progress class="circle"></progress>
+                                </div>
+                            </div>
+                            <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                        </aside>
+                        <div id="feeds"></div>
                     </div>
                 </div>
             </div>
@@ -173,8 +199,16 @@
                 </svg>
             </button>
             <nav class="wrap">
-                <h6>Create a post on</h6>    
-                <div class="field border label l m">
+                <h6>Create a post on</h6> 
+                <div class="field border label">
+                    <select>
+                        <option>Item 1</option>
+                        <option>Item 2</option>
+                        <option>Item 3</option>
+                    </select>
+                    <label>Selected Blog</label>
+                </div>  
+                <!--<div class="field border label l m">
                     <input placeholder=" "><label>Community</label>
                     <i class="tiny">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
@@ -187,7 +221,7 @@
                         <li><i class="tiny">people</i><span>r/svelte</span></li>
                         <li><i class="tiny">people</i><span>r/svelte</span></li>
                     </menu>
-                </div>
+                </div>-->
             </nav>
             <div class="medium-space l m"></div>
             <div class="field border label">
@@ -295,6 +329,27 @@
                 document.getElementById("replies-sidebar").innerHTML = document.getElementById("replies").innerHTML;
                 register_links();
             });
+            fetch("/api/discover", { method: "get" })
+            .then(response => response.json())
+            .then(data => {
+                let items = data.items.slice(0, 3);
+                document.getElementById("new").innerHTML = items.map(i => {return JSON.stringify(i) }).join('');
+                //register_links();
+            });
+            fetch("/api/discover/photos", { method: "get" })
+            .then(response => response.json())
+            .then(data => {
+                let items = data.items.slice(0, 3);
+                document.getElementById("photos").innerHTML = items.map(i => {return JSON.stringify(i) }).join('');
+                //register_links();
+            });
+            fetch("/api/discover", { method: "get" })
+            .then(response => response.json())
+            .then(data => {
+                let items = data.items.slice(0, 3);
+                document.getElementById("discover").innerHTML = items.map(i => {return JSON.stringify(i) }).join('');
+                //register_links();
+            });
             fetch("/api/following/favorites", { method: "get" })
             .then(response => response.json())
             .then(data => {
@@ -302,7 +357,7 @@
                 if(data.length <= 0) {
                     document.getElementById("following").innerHTML = '<p>Your favorites will show here</p>'
                 } else {
-                     document.getElementById("following").innerHTML = '<p>Build this here</p>'
+                     document.getElementById("following").innerHTML = JSON.stringify(data);
                 }
                 document.getElementById("following-sidebar").innerHTML = document.getElementById("following").innerHTML;
             });
