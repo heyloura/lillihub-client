@@ -40,18 +40,20 @@
                 </button>
             </nav>
             <dialog id="apps-menu-drawer" class="left">
+                <header>
+                    <nav>
+                    <img width="60" src="/logo.png">
+                    <h6 class="max">Lillihub</h6>
+                    <div class="max"></div>
+                    <button data-ui="#apps-menu-drawer" class="circle transparent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                            </svg>
+                    </button>
+                    </nav>
+                </header>
                 <nav class="drawer">
-                    <header>
-                      <nav>
-                        <img width="60" src="/logo.png">
-                        <h6 class="max">Lillihub</h6>
-                        <button data-ui="#apps-menu-drawer" class="circle transparent">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                              </svg>
-                        </button>
-                      </nav>
-                    </header>
+
                     <!-- <div class="timeline-only">
                         <a rel="prefetch" swap-target="#main" swap-history="false" href="/timeline">Timeline</a>
                         <a rel="prefetch" swap-target="#main" swap-history="false" href="/discover">Discover</a>
@@ -68,7 +70,7 @@
                 </nav>
                 <aside class="padding">
                     <h6>Recent Mentions</h6>
-                    <div class="medium-space l m"></div>
+                    <div class="medium-space s"></div>
                     <div id="mentions-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
@@ -78,7 +80,7 @@
                 </aside>
                 <aside class="padding">
                     <h6>Recent Replies</h6>
-                    <div class="medium-space l m"></div>
+                    <div class="medium-space s"></div>
                     <div id="replies-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
@@ -88,7 +90,7 @@
                 </aside>
                 <aside class="padding">
                     <h6>Following</h6>
-                    <div class="medium-space l m"></div>
+                    <div class="medium-space s"></div>
                     <div id="following-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
@@ -104,6 +106,7 @@
                     <div class="m l m12 l3">
                         <aside class="padding">
                             <h6>Recent Mentions</h6>
+                            <div class="medium-space l m"></div>
                             <div id="mentions">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -113,6 +116,7 @@
                         </aside>
                         <aside class="padding">
                             <h6>Recent Replies</h6>
+                            <div class="medium-space l m"></div>
                             <div id="replies">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -122,6 +126,7 @@
                         </aside>
                         <aside class="padding">
                             <h6>Following</h6>
+                            <div class="medium-space l m"></div>
                             <div id="following">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -131,9 +136,6 @@
                         </aside>
                     </div>
                     <div class="s12 m12 l6">
-                        <button class="circle left-round bottom-round extra small-elevate s">
-                            <i>add</i>
-                        </button>
                         <article class="no-elevate tertiary-container m l">
                             <div class="row">
                                 <img class="medium round" src="{{avatar}}">
@@ -201,6 +203,66 @@
                 </div>
             </div>
         </main>
+        <footer class="s">
+            <nav>
+                <button data-ui="#dialog-more" class="circle transparent">
+                    <i class="tiny"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid-fill" viewBox="0 0 16 16">
+                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5z"/>
+                    </svg></i>
+                </button>
+                <div class="max"></div>
+                <button class="square round extra primary">
+                    <i class="tiny"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                    </svg></i>
+                </button>
+            </nav>
+            <dialog id="dialog-more" class="left">
+                <header class="fixed front">
+                    <nav>
+                        <div class="max truncate">
+                        </div>
+                        <button data-ui="#dialog-more" class="circle transparent">
+                            <i>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                </svg>
+                            </i>
+                        </button>
+                    </nav>
+                </header>
+                <aside class="padding">
+                    <h6>Discover photos</h6>
+                    <div class="medium-space l m"></div>
+                    <div id="photos">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                </aside>
+                <aside class="padding">
+                    <h6>New on Micro.blog</h6>
+                    <div class="medium-space l m"></div>
+                    <div id="new">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                </aside>
+                <aside class="padding">
+                    <h6>Curated Discover</h6>
+                    <div class="medium-space l m"></div>
+                    <div id="discover">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                </aside>
+                <div id="feeds"></div>
+            </dialog>
+        </footer>
         <datalist id="following">
             {{following}}
         </datalist>
