@@ -505,13 +505,13 @@
         }
         loaders['.conversation'] = () => {
             alert('conversation loaded!')
-            document.getElementById('titleBar') = `${document.querySelector('.conversation').getAttribute('data-name')}'s Post`;
+            document.getElementById('titleBar').innerHTML = `${document.querySelector('.conversation').getAttribute('data-name')}'s Post`;
             document.getElementById('goBack').classList.remove('hide');
             document.getElementById('menu').classList.add('hide');
 
             return () => {  // unloader function
                 alert('conversation unloaded!')
-                document.getElementById('titleBar') = `Timeline`;
+                document.getElementById('titleBar').innerHTML = `Timeline`;
                 document.getElementById('goBack').classList.add('hide');
                 document.getElementById('menu').classList.remove('hide');
             };  
