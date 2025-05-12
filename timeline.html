@@ -145,7 +145,7 @@
                                     </i>
                                     <div class="tooltip bottom">Create Media Post</div>
                                 </button>
-                                <!-- <button class="transparent circle">
+                                <button class="transparent circle">
                                     <i>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
                                             <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9q-.13 0-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
@@ -153,7 +153,7 @@
                                         </svg>
                                     </i>
                                     <div class="tooltip bottom">Create Link Post</div>
-                                </button> -->
+                                </button>
                             </div>
                         </article>
                         <div class="medium-space l m"></div>
@@ -276,7 +276,7 @@
                     </p>
                     </article>` }).join('');
                 document.getElementById("mentions-sidebar").innerHTML = document.getElementById("mentions").innerHTML;
-                Swap();
+                register_links();
             });
             fetch("/api/replies", { method: "get" })
             .then(response => response.json())
@@ -285,7 +285,7 @@
                 document.getElementById("replies").innerHTML = items.map(i => {return `<article class="no-elevate">
                     <p>
                         ${i.content_html.replace('<p>','').replace('</p>', '').replaceAll('@{{username}}','')}
-                        <a class="grey-text" rel="prefetch" swap-target="#main" swap-history="false" href="/timeline/posts/${i.id}">
+                        <a class="grey-text" rel="prefetch" swap-target="#main" swap-history="true" swap-history-restore="#main" href="/timeline/posts/${i.id}">
                         ${i._microblog.date_relative}&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
                                 </svg>
@@ -293,7 +293,7 @@
                     </p>
                     </article>` }).join('');
                 document.getElementById("replies-sidebar").innerHTML = document.getElementById("replies").innerHTML;
-                Swap();
+                register_links();
             });
             fetch("/api/following/favorites", { method: "get" })
             .then(response => response.json())
@@ -313,58 +313,53 @@
         ** MIT Licence - https://github.com/josephernest/Swap
         ** UPDATED - https://news.ycombinator.com/item?id=36008516
         *************************************************************/
-        function Swap() {
-            "use strict";
-            var loaders = {}, unloaders = {};
-            register_links();
-            new MutationObserver(dom_changes).observe(document.querySelector("html"), { childList: true, subtree: true });
-            window.addEventListener("popstate", () => update(location.href, "[swap-history-restore]", false, "body"));
-            window.addEventListener("DOMContentLoaded", dom_load);
-            function update(href, target, pushstate, fallback = null) {
-                if(!href.includes('#')) {
-                    //document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay blur"><progress class="circle"></progress></div>`)
-                    fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
-                        var tmp = document.createElement('html');
-                        tmp.innerHTML = html;
-                        (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
-                        if (pushstate)
-                            history.pushState({}, "", href);
-                        register_links();  
-                    }).finally(() => {
-                        //document.getElementById('loader').remove();
-                    });
-                }
+        var loaders = {}, unloaders = {};
+        register_links();
+        new MutationObserver(dom_changes).observe(document.querySelector("html"), { childList: true, subtree: true });
+        window.addEventListener("popstate", () => update(location.href, "[swap-history-restore]", false, "body"));
+        window.addEventListener("DOMContentLoaded", dom_load);
+        function update(href, target, pushstate, fallback = null) {
+            if(!href.includes('#')) {
+                //document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay blur"><progress class="circle"></progress></div>`)
+                fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
+                    var tmp = document.createElement('html');
+                    tmp.innerHTML = html;
+                    (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
+                    if (pushstate)
+                        history.pushState({}, "", href);
+                    register_links();  
+                }).finally(() => {
+                    //document.getElementById('loader').remove();
+                });
             }
-            function register_links() {
-                for (const elt of document.querySelectorAll('*[swap-target]')) {
-                    elt.onclick = e => {
-                        update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
-                        e.preventDefault();
-                    }
-                }
-            }
-            function dom_changes(mutations) {
-                for (var selector in unloaders)
-                    for (var m of mutations)
-                        for (var n of m.removedNodes)
-                            if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector))) {
-                                unloaders[selector]();
-                                delete unloaders[selector];
-                            }
-                for (var selector in loaders)
-                    for (var m of mutations)
-                        for (var n of m.addedNodes) 
-                            if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector)))
-                                    unloaders[selector] = loaders[selector]();
-            }
-            function dom_load() {
-                for (var selector in loaders)
-                    if (document.querySelector(selector))
-                            unloaders[selector] = loaders[selector]();
-            }
-            return {loaders: loaders};
         }
-        Swap();
+        function register_links() {
+            for (const elt of document.querySelectorAll('*[swap-target]')) {
+                elt.onclick = e => {
+                    update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
+                    e.preventDefault();
+                }
+            }
+        }
+        function dom_changes(mutations) {
+            for (var selector in unloaders)
+                for (var m of mutations)
+                    for (var n of m.removedNodes)
+                        if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector))) {
+                            unloaders[selector]();
+                            delete unloaders[selector];
+                        }
+            for (var selector in loaders)
+                for (var m of mutations)
+                    for (var n of m.addedNodes) 
+                        if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector)))
+                                unloaders[selector] = loaders[selector]();
+        }
+        function dom_load() {
+            for (var selector in loaders)
+                if (document.querySelector(selector))
+                        unloaders[selector] = loaders[selector]();
+        }
         </script>
     </body>
 </html>
