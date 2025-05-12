@@ -531,7 +531,7 @@ Deno.serve(async (req) => {
                     }
                     if(src) {
                         return { content: `<article class="no-padding">
-                                            <img class="responsive medium" src="src="${src}"">
+                                            <img class="responsive medium" src="${src}">
                                             </article>` };
                     }
                     return {};
@@ -543,7 +543,7 @@ Deno.serve(async (req) => {
                 console.log(_lillihubToken);
                 const results = await mb.getMicroBlogTimelinePostsChronological(_lillihubToken);
                 console.log(results);
-                let data = results.items.map(n => {return { content: utility.postHTML(n) }});
+                let data = results.map(n => {return { content: utility.postHTML(n) }});
                 return new Response(JSON.stringify(data), JSONHeaders());
             }
             
