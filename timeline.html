@@ -165,7 +165,7 @@
                     </div>
                     <div class="s12 m12 l3">
                         <aside class="padding">
-                            <h6>New across Micro.blog</h6>
+                            <h6>New on Micro.blog</h6>
                             <div id="new">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -173,7 +173,7 @@
                             </div>
                         </aside>
                         <aside class="padding">
-                            <h6>Recent discover photos</h6>
+                            <h6>Discover photos</h6>
                             <div id="photos">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -182,7 +182,7 @@
                             <p class="right-align"><a href="#" class="primary-text">View All</a></p>
                         </aside>
                         <aside class="padding">
-                            <h6>Recent discover</h6>
+                            <h6>Discover</h6>
                             <div id="discover">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -335,7 +335,7 @@
                 document.getElementById("replies-sidebar").innerHTML = document.getElementById("replies").innerHTML;
                 register_links();
             });
-            fetch("/api/discover", { method: "get" })
+            fetch("/api/discover/lillihub", { method: "get" })
             .then(response => response.json())
             .then(data => {
                 let items = data.slice(0, 5);
