@@ -158,7 +158,7 @@
                         </article>
                         <div class="medium-space l m"></div>
                         <div id="newPost"></div>
-                        <div id="main">{{pages}}</div>
+                        <div id="main" swap-history-restore="#main">{{pages}}</div>
                     </div>
                     <div class="s12 m12 l3">
                         <aside class="padding">
@@ -302,7 +302,7 @@
                             <path d="M6 12.796V3.204L11.481 8zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753"/>
                         </svg>
                         ${i.content_html.replace('<p>','').replace('</p>', '').replace('</a> ', '</a>').replaceAll('@{{username}}','')}
-                        <a class="grey-text" rel="prefetch" swap-target="#main" swap-history="true" swap-history-restore="#main" href="/timeline/posts/${i.id}">
+                        <a class="grey-text" rel="prefetch" swap-target="#main" swap-history="true"  href="/timeline/posts/${i.id}">
                         ${i._microblog.date_relative}&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
                                 </svg>
@@ -319,7 +319,7 @@
                 document.getElementById("replies").innerHTML = items.map(i => {return `<article class="no-elevate">
                     <p>
                         ${i.content_html.replace('<p>','').replace('</p>', '').replaceAll('@{{username}}','')}
-                        <a class="grey-text" rel="prefetch" swap-target="#main" swap-history="true" swap-history-restore="#main" href="/timeline/posts/${i.id}">
+                        <a class="grey-text" rel="prefetch" swap-target="#main" swap-history="true"  href="/timeline/posts/${i.id}">
                         ${i._microblog.date_relative}&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
                                 </svg>
