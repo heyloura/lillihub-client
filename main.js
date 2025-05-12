@@ -522,10 +522,18 @@ Deno.serve(async (req) => {
                 const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 const results = await fetching.json();
                 let data = results.items.map(n => {
-                    console.log(n.content_html);
-                    console.log(n.content_html.split('src="')[1]);
-                    console.log(n.content_html.split('src="')[1].split('"')[0]);
-                    return { content: `<article><div class="post"><img src="${n.content_html.split('src="')[1].split('"')[0]}" class="single" /></div></article>` }});
+                    let src = n.content_html;
+                    if(src) {
+                        src = src.split('src="')[1];
+                    }
+                    if(src) {
+                        src = src.split('"')[0];
+                    }
+                    if(src) {
+                        return { content: `<article><div class="post"><img src="${src}" class="single" /></div></article>` };
+                    }
+                    return {};
+                });
                 return new Response(JSON.stringify(data), JSONHeaders());
             }
 
