@@ -778,7 +778,20 @@ Deno.serve(async (req) => {
                         data-name="${original &&  original.author && original.author._microblog && original.author._microblog.username ? original.author._microblog.username : ''}"
                         data-id="${id}"
                         data-avatar="${original &&  original.author && original.author.avatar ? original.author.avatar : ''}"
-                        >${post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join('')}</div>`;
+                        ><h6>Post</h6>${post.items.slice(0).reverse().map((n,i) => {
+                            if(i == 1) {
+                                return '<h6>Replies</h6>' + utility.postHTML(n, null, true, id);
+                            }
+                            return utility.postHTML(n, null, true, id)
+                        }).join('')}</div>`;
+                    return new Response(new TextDecoder().decode(await Deno.readFile("timeline.html")).replaceAll('{{nonce}}', nonce)
+                        .replaceAll('{{pages}}', content)
+                        .replaceAll('{{avatar}}', mbUser.avatar)
+                        .replaceAll('{{username}}', mbUser.username)
+                        .replaceAll('{{pageName}}', 'Timeline')
+                        .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
+                    , HTMLHeaders(nonce, null, false));
+                    
                 } else if(req.url.includes("timeline")) {
                     //----------
                     //  Timeline
