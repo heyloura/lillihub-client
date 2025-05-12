@@ -349,9 +349,9 @@
             fetch("/api/discover", { method: "get" })
             .then(response => response.json())
             .then(data => {
-                let items = data.items.slice(0, 3);
+                let items = data.slice(0, 5);
                 document.getElementById("discover").innerHTML = items.map(i => {return i.content }).join('');
-                //register_links();
+                register_links();
             });
             fetch("/api/following/favorites", { method: "get" })
             .then(response => response.json())
