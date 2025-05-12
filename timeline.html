@@ -203,16 +203,16 @@
                 </div>
             </div>
         </main>
-        <footer class="s">
+        <footer class="s fixed">
             <nav>
                 <button data-ui="#dialog-more" class="circle transparent">
-                    <i class="tiny"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid-fill" viewBox="0 0 16 16">
+                    <i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid-fill" viewBox="0 0 16 16">
                         <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5z"/>
                     </svg></i>
                 </button>
                 <div class="max"></div>
                 <button class="square round extra primary">
-                    <i class="tiny"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
                     </svg></i>
                 </button>
@@ -233,8 +233,8 @@
                 </header>
                 <aside class="padding">
                     <h6>Discover photos</h6>
-                    <div class="medium-space l m"></div>
-                    <div id="photos">
+                    <div class="medium-space"></div>
+                    <div id="photos-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
                         </div>
@@ -243,8 +243,8 @@
                 </aside>
                 <aside class="padding">
                     <h6>New on Micro.blog</h6>
-                    <div class="medium-space l m"></div>
-                    <div id="new">
+                    <div class="medium-space"></div>
+                    <div id="new-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
                         </div>
@@ -252,8 +252,8 @@
                 </aside>
                 <aside class="padding">
                     <h6>Curated Discover</h6>
-                    <div class="medium-space l m"></div>
-                    <div id="discover">
+                    <div class="medium-space"></div>
+                    <div id="discover-sidebar">
                         <div class="center-align middle-align"> 
                             <progress class="circle"></progress>
                         </div>
@@ -408,6 +408,7 @@
             .then(data => {
                 let items = data.slice(0, 5);
                 document.getElementById("new").innerHTML = items.map(i => {return i.content }).join('');
+                document.getElementById("new-sidebar").innerHTML = document.getElementById("new").innerHTML;
                 register_links();
             });
             fetch("/api/discover/photos", { method: "get" })
@@ -415,6 +416,7 @@
             .then(data => {
                 let items = data.slice(0, 5);
                 document.getElementById("photos").innerHTML = items.map(i => {return i.content }).join('');
+                document.getElementById("photos-sidebar").innerHTML = document.getElementById("photos").innerHTML;
                 register_links();
             });
             fetch("/api/discover", { method: "get" })
@@ -422,6 +424,7 @@
             .then(data => {
                 let items = data.slice(0, 5);
                 document.getElementById("discover").innerHTML = items.map(i => {return i.content }).join('');
+                document.getElementById("discover-sidebar").innerHTML = document.getElementById("discover").innerHTML;
                 register_links();
             });
             fetch("/api/following/favorites", { method: "get" })
