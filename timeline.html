@@ -165,7 +165,7 @@
                     </div>
                     <div class="s12 m12 l3">
                         <aside class="padding">
-                            <h6>Find someone new</h6>
+                            <h6>New across Micro.blog</h6>
                             <div id="new">
                                 <div class="center-align middle-align"> 
                                     <progress class="circle"></progress>
@@ -195,6 +195,9 @@
                 </div>
             </div>
         </main>
+        <datalist id="following">
+            {{following}}
+        </datalist>
         <dialog id="dialog-post" class="modal">
             <button class="right-align transparent circle" type="button" data-ui="#dialog-post">
                 <svg evt-click="apps-menu-close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
@@ -335,15 +338,15 @@
             fetch("/api/discover", { method: "get" })
             .then(response => response.json())
             .then(data => {
-                //let items = data.items.slice(0, 3);
-                //document.getElementById("new").innerHTML = items.map(i => {return JSON.stringify(i) }).join('');
-                //register_links();
+                let items = data.slice(0, 5);
+                document.getElementById("new").innerHTML = items.map(i => {return i.content }).join('');
+                register_links();
             });
             fetch("/api/discover/photos", { method: "get" })
             .then(response => response.json())
             .then(data => {
                 let items = data.slice(0, 5);
-                document.getElementById("discover").innerHTML = items.map(i => {return i.content }).join('');
+                document.getElementById("photos").innerHTML = items.map(i => {return i.content }).join('');
                 register_links();
             });
             fetch("/api/discover", { method: "get" })

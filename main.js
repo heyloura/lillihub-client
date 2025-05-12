@@ -524,6 +524,13 @@ Deno.serve(async (req) => {
                 let data = results.items.map(n => {return { content: utility.postHTML(n) }});
                 return new Response(JSON.stringify(data), JSONHeaders());
             }
+
+            if((new URLPattern({ pathname: "/api/discover/lillihub" })).exec(req.url)) {
+                const fetching = await fetch(`https://micro.blog/posts`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+                const results = await fetching.json();
+                let data = results.items.map(n => {return { content: utility.postHTML(n) }});
+                return new Response(JSON.stringify(data), JSONHeaders());
+            }
             
             if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
                 const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -767,9 +774,9 @@ Deno.serve(async (req) => {
                     name = "notebook";
 
                 } else if(req.url.includes("posts")) {
-                    //-------
-                    //  Posts
-                    //-------
+                    //------------------------
+                    //  Posts / Conversations
+                    //------------------------
                     id = name;
                     name = "timeline";
                     fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
@@ -790,7 +797,8 @@ Deno.serve(async (req) => {
                         .replaceAll('{{pages}}', content)
                         .replaceAll('{{avatar}}', mbUser.avatar)
                         .replaceAll('{{username}}', mbUser.username)
-                        .replaceAll('{{pageName}}', 'Timeline')
+                        .replaceAll('{{following}}', following.map(f => { return `<option data-avatar="${f.avatar}" value="${f.username}">${f.name} (@${f.username})</option>`}).join(''))
+                        .replaceAll('{{pageName}}', `${original &&  original.author && original.author._microblog && original.author._microblog.username ? original.author._microblog.username : ''}'s Post`)
                         .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
                     , HTMLHeaders(nonce, null, false));
 
@@ -807,6 +815,7 @@ Deno.serve(async (req) => {
                         .replaceAll('{{avatar}}', mbUser.avatar)
                         .replaceAll('{{username}}', mbUser.username)
                         .replaceAll('{{pageName}}', 'Timeline')
+                        .replaceAll('{{following}}', following.map(f => { return `<option data-avatar="${f.avatar}" value="${f.username}">${f.name} (@${f.username})</option>`}).join(''))
                         .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
                     , HTMLHeaders(nonce, null, false));
 
