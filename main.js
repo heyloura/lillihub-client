@@ -521,7 +521,8 @@ Deno.serve(async (req) => {
             if((new URLPattern({ pathname: "/api/discover/photos" })).exec(req.url)) {
                 const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 const results = await fetching.json();
-                return new Response(JSON.stringify(results), JSONHeaders());
+                let data = results.items.map(n => {return { content: utility.postHTML(n) }});
+                return new Response(JSON.stringify(data), JSONHeaders());
             }
             
             if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
