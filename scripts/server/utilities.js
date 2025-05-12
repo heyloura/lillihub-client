@@ -1,3 +1,4 @@
+import { DOMParser } from "npm:linkedom";
 export function settingsHTML() {
     return `
         <div class="card mb-2">
@@ -349,7 +350,7 @@ async function getNoteEditor(notebookId, n) {
     `;
 }
 
-export function getBogSelect(config, mpDestination, id) {
+export function getBlogSelect(config, mpDestination, id) {
     const destinations = config.destination ? config.destination.map(item => {
         if(item.uid != mpDestination) {
             return `<li class="menu-item"><a class="changeDestination" href="?destination=${encodeURIComponent(item.uid)}">${item.name}</a></li>`;
@@ -380,7 +381,7 @@ export async function getEditor(repliers, username, mbToken, destination, name, 
         const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
         mpDestination = destination ? destination : defaultDestination;
 
-        destinations = getBogSelect(config, mpDestination, 'destinationDropdown');
+        destinations = getBlogSelect(config, mpDestination, 'destinationDropdown');
     
         fetching = await fetch(`https://micro.blog/micropub?q=syndicate-to&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
         const syndicate = await fetching.json();
@@ -422,7 +423,37 @@ export async function getEditor(repliers, username, mbToken, destination, name, 
 
 
     return `
-        <form id="editor" class="card no-border">
+        <dialog id="dialog-post">
+            <nav class="wrap">
+                <h6>Create a post on</h6><div class="field border label l m">
+                    <input placeholder=" "><label>Community</label>
+                    <i class="tiny">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                        </svg>
+                    </i>
+                    <menu>
+                        ${destinations}
+                        <li><i class="tiny">people</i><span>r/svelte</span></li>
+                        <li><i class="tiny">people</i><span>r/svelte</span></li>
+                        <li><i class="tiny">people</i><span>r/svelte</span></li>
+                    </menu>
+                </div>
+            </nav>
+            <div class="medium-space l m"></div>
+            <div class="medium-height large-width">
+                <div class="tabs scroll left-align l m">
+                    <a data-ui="#post" tabindex="0" class="active"><i>news</i><span>Post</span></a>
+                    <a data-ui="#image-video" tabindex="0" class=""><i>image</i><span>Image &amp; Video</span></a>
+                    <a data-ui="#link" tabindex="0" class=""><i>link</i><span>Link</span></a>
+                    <a class="grey-text"><i>insert_chart</i><span>Pool</span></a>
+                </div>
+                <div class="medium-space"></div>
+                <div class="page top active" id="post">
+                    <div class="field border label s">
+                        <input placeholder=" "><label>Community</label><i>arrow_drop_down</i><menu><li><i class="tiny">people</i><span>r/svelte</span></li><li><i class="tiny">people</i><span>r/svelte</span></li><li><i class="tiny">people</i><span>r/svelte</span></li></menu></div><div class="field border label"><input placeholder=" "><label>Title</label></div><div class="field border label extra textarea"><textarea placeholder=" "></textarea><label>Text (optional)</label></div></div><div class="page top" id="image-video"><div class="field border label s"><input placeholder=" "><label>Community</label><i>arrow_drop_down</i><menu><li><i class="tiny">people</i><span>r/svelte</span></li><li><i class="tiny">people</i><span>r/svelte</span></li><li><i class="tiny">people</i><span>r/svelte</span></li></menu></div><div class="row"><div class="max"><div class="field border label"><input placeholder=" "><label>Title</label></div></div><button><span>Select a file</span><input type="file"></button></div></div><div class="page top" id="link"><div class="field border label s"><input placeholder=" "><label>Community</label><i>arrow_drop_down</i><menu><li><i class="tiny">people</i><span>r/svelte</span></li><li><i class="tiny">people</i><span>r/svelte</span></li><li><i class="tiny">people</i><span>r/svelte</span></li></menu></div><div class="field border label"><input placeholder=" "><label>Title</label></div><div class="field border label"><textarea></textarea><label>Url</label></div></div><div class="page top" id="pool"></div></div><footer class="fixed"><nav class="right-align"><button class="border" data-ui="#dialog-post">Cancel</button><button data-ui="#dialog-post">Confirm</button></nav></footer>
+        </dialog>
+        <!--<form id="editor" class="card no-border">
             <input type="hidden" name="postingType" id="postingType" />
             <input type="hidden" name="omgApi" id="omgApi" />
             <input type="hidden" name="omgAddess" id="omgAddess" />
@@ -438,23 +469,52 @@ export async function getEditor(repliers, username, mbToken, destination, name, 
                     <textarea name="content" rows="10" id="content" id="post" class="form-input grow-me">${content ? content : ''}</textarea>
                 </div>
             </div>
-            <div id="editor-footer" class="card-footer mb-2">
-                <div id="markdownBtns" class="btn-group"> 
-                    <button id="editor-bold-btn" type="button" class="btn btn-link editor-bold"><b class="editor-bold">b</b></button>
-                    <button id="editor-italic-btn" type="button" class="btn btn-link editor-italic"><em class="editor-italic">i</em></button>
-                    <button id="editor-code-btn" type="button" class="btn btn-link editor-code"><i class="icon icon-resize-horiz editor-code"></i></button>
-                    <button id="editor-upload-btn" type="button" class="btn btn-link editor-upload"><i class="icon icon-upload editor-upload"></i></button>
-                    <div class="dropdown">
-                        <button type="button" class="btn btn-link dropdown-toggle" tabindex="0">
-                            <i class="icon icon-link"></i></i>
-                        </button>
-                        <ul class="menu bg-dark">
-                            <li class="menu-item editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="#">Markdown image</a></li>
-                            <li class="menu-item"><a id="editor-link-markdown-btn" class="editor-link" href="#">Markdown link</a></li>
-                        </ul>
-                    </div>
-                    <button id="editor-preview-btn" type="button" class="btn btn-link editor-preview">preview</button>
-                </div>
+            <div id="editor-footer">
+                <nav class="no-space small" id="markdownBtns">
+                    <button id="editor-bold-btn" type="button" class="transparent editor-bold no-round small">
+                        <i class="small editor-bold"">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-type-bold" viewBox="0 0 16 16">
+                                <path d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 0 0 1.852-2.14c0-1.51-1.162-2.46-3.014-2.46H3.843V13zM5.908 4.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908V4.673zm0 6.788V8.598h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907z"/>
+                            </svg>
+                        </i>
+                    </button>
+                    <button id="editor-italic-btn" type="button" class="no-round transparent editor-italic small">
+                        <i class="editor-italic small">
+                            <svg class="editor-italic" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-type-italic" viewBox="0 0 16 16">
+                                <path d="M7.991 11.674 9.53 4.455c.123-.595.246-.71 1.347-.807l.11-.52H7.211l-.11.52c1.06.096 1.128.212 1.005.807L6.57 11.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z"/>
+                            </svg>
+                        </i>
+                    </button>
+                    <button id="editor-code-btn" type="button" class="no-round transparent editor-code small">
+                        <i class="small editor-code">
+                            <svg class="editor-code" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-code" viewBox="0 0 16 16">
+                            <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8z"/>
+                            </svg>
+                        </i>
+                    </button>
+                    <button id="editor-upload-btn" type="button" class="no-round transparent editor-upload small">
+                        <i class="tiny editor-upload">
+                            <svg class="editor-upload" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+                            </svg>
+                        </i>
+                    </button>
+                    <button type="button" class="no-round transparent small">
+                        <i class="tiny">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
+                            <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9q-.13 0-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                            <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4 4 0 0 1-.82 1H12a3 3 0 1 0 0-6z"/>
+                            </svg>
+                        </i>
+                        <menu>
+                            <li class="editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="#">image</a></li>
+                            <li><a id="editor-link-markdown-btn" class="editor-link" href="#">link</a></li>
+                        </menu>
+                    </button>
+                    <button id="editor-preview-btn" type="button" class="no-round transparent editor-preview">preview</button>
+                </nav>
+                
                 <div class="btn-group float-right">
                     <select id="postStatus" name="status" class="form-select">
                         <option value="publish" ${status && status != 'draft' ? 'selected="selected"' : ''}>Publish</option>
@@ -462,9 +522,10 @@ export async function getEditor(repliers, username, mbToken, destination, name, 
                     </select>
                     <button id="editor-action" type="button" class="btn btn-primary">Post</button>
                 </div>
+                
                 <div id="topBarBtns" class="btn-group">
                     ${destinations}
-                    <button type="button" class="btn btn-link toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button> 
+                    <button type="button" class="circle transparent toggleMainReplyBox"><i class="icon icon-people toggleMainReplyBox"></i></button> 
                     <div id="postingBtns" class="btn-group"> 
                         ${categoriesList}
                         ${syndicates}
@@ -472,9 +533,9 @@ export async function getEditor(repliers, username, mbToken, destination, name, 
                 </div>
                 <br/>
                 <p id="editor-status"></p>
-                <!--<p><b>Note:</b> file upload is limited to 3MB.</p>-->
+                <p><b>Note:</b> file upload is limited to 3MB.</p>
             </div>   
-        </form>
+        </form>-->
     `;
 }
 
@@ -529,7 +590,7 @@ export function getBlogHTML(posts, config, mpDestination, categories, clear) {
     <div class="container grid-xl">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
+                ${getBlogSelect(config, mpDestination, 'destinationsSwitch')}
                     <div class="form-group">
                         <label class="form-label">Search your blog</label>
                         <div class="input-group">
@@ -622,7 +683,7 @@ export function getUploadHTML(posts, config, mpDestination, fileExtensions, clea
     <div class="container grid-xl">
             <div class="columns">
                 <div class="column col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-3 col-3">
-                ${getBogSelect(config, mpDestination, 'destinationsSwitch')}
+                ${getBlogSelect(config, mpDestination, 'destinationsSwitch')}
                     <div class="form-group">
                         <label class="form-label">Search your uploads</label>
                         <div class="input-group">
@@ -847,16 +908,18 @@ function getAvatar(p, size) {
 }
 
 function flattenedMicroBlogPost(post) {
+    let regex = /(height|width)=".*?";/gi;
     return {
         id: post && post.id ? post.id : 0,
-        content: post &&  post.content_html ? post.content_html : '',
+        content_html: post &&  post.content_html ? formatHTML(post.content_html.replace(regex,'')) : '',
+        summary: post && post.summary ? post.summary : '',
         url: post &&  post.url ? post.url : '',
-        published: post &&  post.date_published ? post.date_published : '',
+        date_published: post &&  post.date_published ? post.date_published : '',
         name: post &&  post.author && post.author.name ? post.author.name : '',
         authorUrl: post &&  post.author && post.author.url ? post.author.url : '',
         avatar: post &&  post.author && post.author.avatar ? post.author.avatar : '',
         username: post &&  post.author && post.author._microblog && post.author._microblog.username ? post.author._microblog.username : '',
-        relative: post &&  post._microblog && post._microblog.date_relative ? post._microblog.date_relative : '',
+        date_relative: post &&  post._microblog && post._microblog.date_relative ? post._microblog.date_relative : '',
         timestamp: post &&  post._microblog && post._microblog.date_timestamp ? post._microblog.date_timestamp : '',
         favorite: post &&  post._microblog && post._microblog.is_favorite ? post._microblog.is_favorite : false,
         bookmark: post &&  post._microblog && post._microblog.is_bookmark ? post._microblog.is_bookmark : false,
@@ -868,17 +931,172 @@ function flattenedMicroBlogPost(post) {
     };
 }
 
+function formatHTML (str) {
+    function resize (html) {
+        const images = html.querySelectorAll("img");
+        const parents = [];
+        for (let i = 0; i < images.length; i++) {
+            const image = images[i];
+            if(images.length > 1)
+            {
+                let parent;
+                image.classList.add('small-width');
+                image.classList.add('small-height');
+                if (image.parentNode.nodeName.toLowerCase() == "a"){
+                    parent = image.parentNode;             
+                } else {
+                    parent = image;
+                }
+                parents.push(parent);
+            } else {
+                image.classList.add('single');
+            }
+        }
+        //let's assemble the swipeable images
+        if(parents.length > 0) {
+            try {
+                const container = html.createElement('div');
+                container.classList.add('row');
+                container.classList.add('scroll');
+                for(let i = 0; i < parents.length; i++)
+                {
+                    parents[i].parentNode.removeChild(parents[i]);
+                    container.appendChild(parents[i]);
+                }
+                html.appendChild(container);
+            } catch {
+                // continue on without messing with the images
+            }
+        }
+        const videos = html.querySelectorAll("video");
+        for (let i = 0; i < videos.length; i++) {
+            const video = videos[i];
+            video.setAttribute('loading', 'lazy');
+        }
+
+    }
+    
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(str);
+    resize(doc);
+
+    return doc.toString().replaceAll('<div />', '').replaceAll('&amp;nbsp;',' ').replaceAll('&nbsp;', ' ');
+}
+
 export function postHTML(post, stranger, isConvo, convoId) {
     post = flattenedMicroBlogPost(post);
 
-    const multipleImgs = !post.linkpost && post.content.split('<img').length > 2;
+    // const multipleImgs = !post.linkpost && post.content_html.split('<img').length > 2;
 
-    if(multipleImgs) {
-        post.content = post.content.replaceAll('<img', `<img data-gallery='${post.id}'`);
-    }
+    // if(multipleImgs) {
+    //     post.content = post.content_html.replaceAll('<img', `<img data-gallery='${post.id}'`);
+    // }
 
-    post.content.replaceAll('<script', `<div`);
-    post.content.replaceAll('</script', `</div`);
+    post.content_html.replaceAll('<script', `<div`);
+    post.content_html.replaceAll('</script', `</div`);
+
+    return `
+    <article class="no-elevate"
+        id="post${isConvo ? '-convo' : ''}-${post.id}" 
+        data-id="${post.id}" 
+        class="card parent ${isConvo ? 'timeline-content pt-0' : ''} ${convoId && convoId === post.id ? 'highlight' : ''}" 
+        data-reply="${post.username}" 
+        data-avatar="${post.avatar}" 
+        data-id="${post.id}" 
+        data-processed="false" 
+        data-url="${post.url}" 
+        data-mention="${post.mention}" 
+        data-conversation="${post.conversation}" 
+        data-timestamp="${post.timestamp}" 
+        data-published="${post.published}" 
+        data-deletable="${post.deletable}" 
+        data-linkpost="${post.linkpost}" 
+        data-bookmark="${post.bookmark}" 
+        data-favorite="${post.favorite}"
+    >
+        <div class="row top-align">
+            <div class="max">
+                <div>
+                    <div class="row">
+                        <img class="round" src="${post.avatar}">
+                        <div class="max">
+                            <h6 class="no-margin">${post.name}</h6>
+                            <label class="grey-text">${post.username ? ` <a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${post.username}">@${post.username}</a>` : ''}</label>
+                        </div>
+                    </div>
+                        <div class="medium-space"></div>
+                        <div class="post">
+                            ${post.conversation ? `<!--<article data-parent-of="${post.id}" data-processed="false" class="border round surface-variant"><progress class="circle center"></progress></article>-->` : ''}
+                            ${post.content_html}${post.summary}
+                        </div>
+                        <div class="medium-space"></div>
+                        <div class="clear">
+                            <nav class="no-space grey-text">
+                                <div class="max">
+                                    <a class="grey-text" href="${post.url}">
+                                    ${post.date_relative} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                                <button class="transparent circle wave">
+                                    <i class="small">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+                                        </svg>
+                                    </i>
+                                    <menu class="top no-wrap left">
+                                        <li data-ui="#dialog-reply">Comment</li>
+                                    </menu>  
+                                </button>
+                                ${post.conversation && !isConvo ? `<a data-ui="#dialog-${post.id}" rel="prefetch" swap-target="#conversation-${post.id}" swap-history="false"  href="/timeline/posts/${post.id}" class="button transparent circle wave">
+                                    <i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
+                                            <path d="M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"/>
+                                            <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
+                                        </svg>
+                                    </i>
+                                    </a>` : ``}
+                                <dialog id="dialog-${post.id}" class="right">
+                                    <header class="fixed front">
+                                        <nav>
+                                            <div class="max truncate">
+                                                <h5>Conversation</h5>
+                                            </div>
+                                            <button data-ui="#dialog-${post.id}" class="circle transparent">
+                                                <i>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                                    </svg>
+                                                </i>
+                                            </button>
+                                        </nav>
+                                    </header>
+                                    <div class="convo">
+                                        <div id="conversation-${post.id}">
+                                            <progress class="circle center"></progress>
+                                        </div>
+                                    <div>
+                                </dialog>
+                            </nav>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+        ${!post.is_conversation ? `<dialog id="dialog-reply-${post.id}" class="bottom">
+            <header class="fixed front">
+                <nav>
+                    <div class="max truncate">
+                        <h5>Reply</h5>
+                    </div>
+                    <button evt-click="close" data-id="reply-${post.id}" class="circle transparent"><i evt-click="close" data-id="reply-${post.id}">close</i></button>
+                </nav>
+            </header>
+        </dialog>` : '' }
+    </article>
+    `;
     
     return ` 
         ${isConvo ? `<div class="timeline-item">

@@ -13,69 +13,50 @@ function liveSearch(selector, searchboxId) {
         }
     }
 }
-// let touchstartX = 0;
-// let touchendX = 0;
-// function checkDirection() {
-//     if (touchendX < touchstartX - 50) {
-//         history.back();
+// function masonryLayout(id, imageArray) 
+// {
+//     let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
+//     let column1 = '<div class="masonry-column-1">';
+//     let column2 = '<div class="masonry-column-2">';
+//     for(var i = 0; i < imageArray.length; i++) {
+//         let column = i % 2;
+//         if(column == 0) {
+//             column1 += '<img data-id="'+id+'" src="'+imageArray[i]+'">';
+//         }
+//         if(column == 1) {
+//             column2 += '<img data-id="'+id+'" src="'+imageArray[i]+'">';
+//         } 
 //     }
-//     if (touchendX > touchstartX) return;
+//     return grid + column1 + '</div>' + column2 + '</div>' + '</div>';
 // }
-// function gestures(elId) {
-//     // set up gesture navigation
-//     document.getElementById(elId).addEventListener('touchstart', e => {
-//         touchstartX = e.changedTouches[0].screenX
-//     })
+// function buildMasonry() {
+//     let galleries = document.querySelectorAll('.gallery');
 
-//     document.getElementById(elId).addEventListener('touchend', e => {
-//     touchendX = e.changedTouches[0].screenX
-//         checkDirection()
-//     })
+//     for(let i = 0; i < galleries.length; i++) {
+//         let loaded = galleries[i].getAttribute('data-loaded');
+//         if(!loaded) {
+//             let id = galleries[i].getAttribute('data-id');
+//             let imgs = document.querySelectorAll('[data-gallery="'+id+'"]');
+//             let imageArray = [];
+//             for(let j = 0; j < imgs.length; j++) {
+//                 imageArray.push(imgs[j].getAttribute('src'));
+//                 imgs[j].remove();
+//             }
+//             galleries[i].innerHTML = masonryLayout(id, imageArray);
+//             galleries[i].setAttribute('data-loaded', 'true');
+//         }
+//     }
 // }
-function masonryLayout(id, imageArray) 
-{
-    let grid = '<div class="masonry-layout columns-2" id="masonry-'+id+'" data-id="'+id+'" >';
-    let column1 = '<div class="masonry-column-1">';
-    let column2 = '<div class="masonry-column-2">';
-    for(var i = 0; i < imageArray.length; i++) {
-        let column = i % 2;
-        if(column == 0) {
-            column1 += '<img data-id="'+id+'" src="'+imageArray[i]+'">';
-        }
-        if(column == 1) {
-            column2 += '<img data-id="'+id+'" src="'+imageArray[i]+'">';
-        } 
-    }
-    return grid + column1 + '</div>' + column2 + '</div>' + '</div>';
-}
-function buildMasonry() {
-    let galleries = document.querySelectorAll('.gallery');
-
-    for(let i = 0; i < galleries.length; i++) {
-        let loaded = galleries[i].getAttribute('data-loaded');
-        if(!loaded) {
-            let id = galleries[i].getAttribute('data-id');
-            let imgs = document.querySelectorAll('[data-gallery="'+id+'"]');
-            let imageArray = [];
-            for(let j = 0; j < imgs.length; j++) {
-                imageArray.push(imgs[j].getAttribute('src'));
-                imgs[j].remove();
-            }
-            galleries[i].innerHTML = masonryLayout(id, imageArray);
-            galleries[i].setAttribute('data-loaded', 'true');
-        }
-    }
-}
-if ('storage' in navigator && 'estimate' in navigator.storage) {
-    navigator.storage.estimate().then(({usage, quota}) => {
-      console.log(`Using ${usage} out of ${quota} bytes.`);
-    }).catch(error => {
-      console.error('Loading storage estimate failed:');
-      console.log(error.stack);
-    });
-  } else {
-    console.error('navigator.storage.estimate API unavailable.');
-}
+// if ('storage' in navigator && 'estimate' in navigator.storage) {
+//     navigator.storage.estimate().then(({usage, quota}) => {
+//       console.log(`Using ${usage} out of ${quota} bytes.`);
+//     }).catch(error => {
+//       console.error('Loading storage estimate failed:');
+//       console.log(error.stack);
+//     });
+//   } else {
+//     console.error('navigator.storage.estimate API unavailable.');
+// }
 function objectToTableRows(obj) {
     let html = '';
 
@@ -289,98 +270,98 @@ function loadParent() {
         ids.add(element.getAttribute('data-id'));
     });
 
-    children.forEach((child) => {
-        let id = child.getAttribute('data-id');
-        child.classList.remove('parent');
-        child.classList.add('child');
-        child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
-        child.setAttribute('data-processed', 'true');
-        const btn = child.querySelector('.convoBtn');
+    // children.forEach((child) => {
+    //     let id = child.getAttribute('data-id');
+    //     child.classList.remove('parent');
+    //     child.classList.add('child');
+    //     child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
+    //     child.setAttribute('data-processed', 'true');
+    //     const btn = child.querySelector('.convoBtn');
 
-        var promise = fetch("/api/timeline/parent/" + id, { method: "get" })
-        .then(response => response.text())
-        .then(data => {
-            var doc = new DOMParser().parseFromString(data, "text/html");
-            var parent = child.parentNode;
-            var articles = doc.querySelectorAll('article');
-            var parentArticle = articles[0];
-            var children = new Set();
+    //     var promise = fetch("/api/timeline/parent/" + id, { method: "get" })
+    //     .then(response => response.text())
+    //     .then(data => {
+    //         var doc = new DOMParser().parseFromString(data, "text/html");
+    //         var parent = child.parentNode;
+    //         var articles = doc.querySelectorAll('article');
+    //         var parentArticle = articles[0];
+    //         var children = new Set();
 
-            articles.forEach(element => {
-                if(ids.has(element.getAttribute('data-id')) && element.getAttribute('data-id') != parentArticle.getAttribute('data-id')) {
-                    element.classList.remove('parent');
-                    children.add(element);
-                }
-            });
+    //         articles.forEach(element => {
+    //             if(ids.has(element.getAttribute('data-id')) && element.getAttribute('data-id') != parentArticle.getAttribute('data-id')) {
+    //                 element.classList.remove('parent');
+    //                 children.add(element);
+    //             }
+    //         });
             
-            if(parentArticle.children.length == 3) {
-                //clean up for gallery
-                const galleryImgs = doc.querySelectorAll('article:first-child img');
-                galleryImgs.forEach((img) => {
-                    img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
-                    console.log(img);
-                });
-                parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
-            }
+    //         if(parentArticle.children.length == 3) {
+    //             //clean up for gallery
+    //             const galleryImgs = doc.querySelectorAll('article:first-child img');
+    //             galleryImgs.forEach((img) => {
+    //                 img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
+    //                 console.log(img);
+    //             });
+    //             parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
+    //         }
 
-            if(parent && parentArticle && child) {
-                const moveTo = parentArticle.querySelector('.postBtns .btn-group');
-                moveTo.appendChild(btn);
+    //         if(parent && parentArticle && child) {
+    //             const moveTo = parentArticle.querySelector('.postBtns .btn-group');
+    //             moveTo.appendChild(btn);
 
-                btn.onclick = e => {
-                    update(btn.getAttribute('href'), btn.getAttribute('swap-target'), btn.getAttribute('swap-history'));
-                    e.preventDefault();
-                }
+    //             btn.onclick = e => {
+    //                 update(btn.getAttribute('href'), btn.getAttribute('swap-target'), btn.getAttribute('swap-history'));
+    //                 e.preventDefault();
+    //             }
 
-                child.insertAdjacentHTML( 'beforebegin', `<div class="timeline">${parentArticle.outerHTML}${[...children].map(element => {
-                    return `<div class="timeline-item child">
-                                <div class="timeline-left">
-                                    <span class="timeline-icon"></span>
-                                </div>
-                                <div class="timeline-content child">
-                                    ${element.outerHTML}
-                                </div>
-                            </div>`
-                }).join('')}</div>`);
-                child.remove();
-            }
+    //             child.insertAdjacentHTML( 'beforebegin', `<div class="timeline">${parentArticle.outerHTML}${[...children].map(element => {
+    //                 return `<div class="timeline-item child">
+    //                             <div class="timeline-left">
+    //                                 <span class="timeline-icon"></span>
+    //                             </div>
+    //                             <div class="timeline-content child">
+    //                                 ${element.outerHTML}
+    //                             </div>
+    //                         </div>`
+    //             }).join('')}</div>`);
+    //             child.remove();
+    //         }
 
-            const visibleParent = document.getElementById(`post-${parentArticle.getAttribute('data-id')}`); 
-            if(visibleParent) {
-                visibleParent.remove();
-            }
+    //         const visibleParent = document.getElementById(`post-${parentArticle.getAttribute('data-id')}`); 
+    //         if(visibleParent) {
+    //             visibleParent.remove();
+    //         }
 
-            children.forEach(id => {
-                if(document.getElementById(`post-${id.getAttribute('data-id')}`)) {
-                    document.getElementById(`post-${id.getAttribute('data-id')}`).remove();
-                }
-            });
+    //         children.forEach(id => {
+    //             if(document.getElementById(`post-${id.getAttribute('data-id')}`)) {
+    //                 document.getElementById(`post-${id.getAttribute('data-id')}`).remove();
+    //             }
+    //         });
 
-            document.getElementById('loading-' + id).remove();
-        });
+    //         document.getElementById('loading-' + id).remove();
+    //     });
 
-        promises.push(promise);
-    });
+    //     promises.push(promise);
+    // });
 
-    Promise.all(promises).then(results => {
-        var parents = document.querySelectorAll('.parent');
-        parents = [...parents];
-        let singles = new Set();
-        parents.forEach((parent) => {
-            let id = parent.getAttribute('data-id');
-            if(parent.parentNode.getAttribute('id') && !parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
-                parent.children[0].style.borderBottom = 0;
-                if(parent.children.length > 1 && parent.children[1].nodeName == 'MAIN') {
-                    parent.children[1].remove();
-                }
-                if(parent.children.length > 2 && parent.children[1].nodeName == 'DIV') {
-                    parent.children[2].remove();
-                }                                
-            }
-            singles.add(id);
-        });
-        buildMasonry();
-    });
+    // Promise.all(promises).then(results => {
+    //     var parents = document.querySelectorAll('.parent');
+    //     parents = [...parents];
+    //     let singles = new Set();
+    //     parents.forEach((parent) => {
+    //         let id = parent.getAttribute('data-id');
+    //         if(parent.parentNode.getAttribute('id') && !parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
+    //             parent.children[0].style.borderBottom = 0;
+    //             if(parent.children.length > 1 && parent.children[1].nodeName == 'MAIN') {
+    //                 parent.children[1].remove();
+    //             }
+    //             if(parent.children.length > 2 && parent.children[1].nodeName == 'DIV') {
+    //                 parent.children[2].remove();
+    //             }                                
+    //         }
+    //         singles.add(id);
+    //     });
+    //     //buildMasonry();
+    // });
 }
 
 /************************************************************
@@ -719,6 +700,7 @@ function loadTimeline() {
     convoSource = 'timeline';
     document.title = "Lillihub: Timeline";
     document.getElementById("titleBar").innerHTML = "Timeline";
+    document.getElementById("newPost").innerHTML = document.getElementById('editorTemplate').innerHTML;
     //document.querySelector(`#timelineLink`).classList.add("active");
 
     if(localStorage.getItem('post_setting') === 'none') {
@@ -756,7 +738,7 @@ function loadTimeline() {
     }
 
     loadParent();
-    buildMasonry();
+    //buildMasonry();
     hljs.highlightAll();
 }
 
@@ -770,7 +752,7 @@ Swap.loaders['#post-list'] = () => {
 }
 
 function loadConversation() {
-    buildMasonry();
+    //buildMasonry();
     hljs.highlightAll();
     document.getElementById('conversationModal').classList.add("active");
 }
@@ -787,7 +769,7 @@ function loadDiscover() {
     document.title = "Lillihub: Discover";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Discover";
-    buildMasonry();
+    //buildMasonry();
     hljs.highlightAll();
     convoSource = 'discover';
 }
@@ -818,7 +800,7 @@ function loadMentions() {
     document.title = "Lillihub: Mentions";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Mentions";
-    buildMasonry();
+    //buildMasonry();
     hljs.highlightAll();
 }
 
@@ -834,7 +816,7 @@ function loadReplies() {
     document.title = "Lillihub: Replies";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Replies";
-    buildMasonry();
+    //buildMasonry();
     hljs.highlightAll();
 }
 
@@ -850,7 +832,7 @@ function loadFollowing() {
     document.title = "Lillihub: Following";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById("titleBar").innerHTML = "Following";
-    buildMasonry();
+    //buildMasonry();
     hljs.highlightAll();
 }
 
@@ -1558,7 +1540,21 @@ document.addEventListener("click", async (item) => {
 // For when a user does a manual page refresh
 //--------------------------------------------
 function loadPage() {
-    //gestures('main');
+    // document.addEventListener("click", async (event) => {
+    //     if(!event.target.getAttribute('evt-click')) {
+    //         return;
+    //     } else {
+    //         if(event.target.getAttribute('evt-click') == 'apps-menu') {
+    //             document.getElementById('apps-menu-drawer').showModal();
+    //         }
+    //         if(event.target.getAttribute('evt-click') == 'apps-menu-close') {
+    //             document.getElementById('apps-menu-drawer').close();
+    //         }
+    //         if(event.target.getAttribute('evt-click') == 'dialog-post') {
+    //             document.getElementById('dialog-post').showModal();
+    //         }
+    //     }
+    // });
     if(window.location.pathname.includes('versions')) { 
         loadVersion();
     } else if(window.location.pathname.includes('notes')) {
@@ -1586,7 +1582,7 @@ function loadPage() {
     }else if(window.location.pathname.includes('users')) {
         document.title = "Lillihub: Timeline";
         document.getElementById("titleBar").innerHTML = "Timeline";
-        buildMasonry();
+        //buildMasonry();
     }
 }
 if (document.readyState === "loading") {

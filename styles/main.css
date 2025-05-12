@@ -1,4 +1,4 @@
-/* :root {
+/* /* :root {
   color-scheme: light; 
   --background: #e0e0c5;
   --background-tint-1: #F2F2E7;
@@ -988,7 +988,7 @@ span[data-img-src]::after {
 } */
 
 /*! Spectre.css v0.5.9 | MIT License | github.com/picturepan2/spectre */
-html {
+/* html {
   font-family: sans-serif;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%
@@ -1327,7 +1327,7 @@ dl dt {
 }
 
 dl dd {
-  /* margin: .4rem 0 .8rem 0 */
+
 }
 
 .lang-zh,.lang-zh-hans,html:lang(zh),html:lang(zh-Hans) {
@@ -1990,7 +1990,6 @@ textarea.form-input,textarea.form-input.input-lg,textarea.form-input.input-sm {
 .input-group .form-input,.input-group .form-select {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
-  /* width: 1% */
 }
 
 .input-group .input-group-btn {
@@ -3069,8 +3068,6 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .card {
-  /* background: var(--background-tint-4); */
-  /* border: .05rem solid var(--background-shade-1); */
   background: var(--background-tint-1);
   border-bottom: 1px solid var(--background-tint-4);
   border-radius: .1rem;
@@ -3197,10 +3194,6 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .menu {
-  /* background: var(--background-tint-1); */
-  /* border: 1px solid var(--background-tint-4);
-  border-radius: .1rem;
-  box-shadow: 0 .05rem .2rem rgba(48,55,66,.3); */
   list-style: none;
   margin: 0;
   min-width: 180px;
@@ -3327,7 +3320,6 @@ summary.accordion-header::-webkit-details-marker {
   flex-direction: column;
   max-height: 97.5vh;
   max-width: 640px;
-  /* padding: 0 .8rem; */
   width: 100%
 }
 
@@ -3348,7 +3340,6 @@ summary.accordion-header::-webkit-details-marker {
 
 .modal-container .modal-footer {
   padding: .8rem;
-  /* text-align: right */
 }
 
 .nav {
@@ -3442,7 +3433,6 @@ summary.accordion-header::-webkit-details-marker {
 }
 
 .panel {
-  /* border: .05rem solid #dadee4; */
   border-radius: .1rem;
   display: -ms-flexbox;
   display: flex;
@@ -3640,7 +3630,6 @@ summary.accordion-header::-webkit-details-marker {
   flex: 1 0 0;
   text-align: center;
   font-size: 0.9em;
-  /* color: var(--greenblue); */
 }
 
 .tab.tab-block .tab-item a {
@@ -4059,7 +4048,6 @@ a.text-error:visited {
 
 .divider-vert[data-content]::after,.divider[data-content]::after {
   background: var(--background-tint-2);
-  /* color: var(--background-tint-2); */
   content: attr(data-content);
   display: inline-block;
   font-size: .7rem;
@@ -4451,7 +4439,6 @@ a.text-error:visited {
   word-wrap: break-word
 }
 
-/*! Spectre.css Experimentals v0.5.9 | MIT License | github.com/picturepan2/spectre */
 .form-autocomplete {
   position: relative
 }
@@ -5633,7 +5620,6 @@ a.text-error:visited {
   order: 1
 }
 
-/*! Spectre.css Icons v0.5.9 | MIT License | github.com/picturepan2/spectre */
 .icon {
   box-sizing: border-box;
   display: inline-block;
@@ -5666,10 +5652,6 @@ a.text-error:visited {
 .icon.icon-4x {
   font-size: 3.2rem
 }
-
-/* .accordion .icon,.btn .icon,.menu .icon,.toast .icon {
-  vertical-align: -10%
-} */
 
 .btn-lg .icon {
   vertical-align: -15%
@@ -6204,14 +6186,8 @@ a.text-error:visited {
   width: .5em
 }
 
-/*********************************/
-/*********************************/
-/******* CUSTOM CSS     ********/
-/*********************************/
-/*********************************/
 html {
   line-height: 1.5;
-  /* font-family: system-ui; */
 }
 
 body {
@@ -6261,7 +6237,6 @@ a,pre,code {
 }
 
 .card-header {
-  /* border-bottom: .05rem solid var(--background-tint-4); */
   display: flex;
   align-items: center;
 }
@@ -6276,9 +6251,6 @@ a,pre,code {
   overflow-wrap: anywhere;
 }
 
-.card-buttons {
-  /* min-width: 107px; */
-}
 
 article main {
   padding: 1em;
@@ -6341,10 +6313,6 @@ main p:last-child {
   border-bottom: 0;
 }
 
-/* .tab-item {
-  margin-top: 3em !important;
-} */
-
 .mt-0 {
   margin-top: 0 !important;
 }
@@ -6361,16 +6329,6 @@ main p:last-child {
   z-index: 300;
 }
 
-/* #sidebar-id {
-  width:100%;
-} */
-
-/* @media screen and (min-width: 960px) {
-  #sidebar-id {
-    width:100%;
-  }
-} */
-
 .app-info {
   padding: .4rem;
 }
@@ -6379,17 +6337,6 @@ main p:last-child {
   border: 0;
   box-shadow: none;
 }
-
-/* .off-canvas-content {
-  padding: 0 !important;
-  width: 100%;
-}
-
-@media screen and (min-width: 960px) {
-  .off-canvas .off-canvas-sidebar {
-      z-index: 200;
-  }
-} */
 
 p, dd {
   overflow-wrap: anywhere;
@@ -6491,20 +6438,17 @@ hr {
 }
 
 textarea {
-  /* width: 99% !important; */
   background-color: black;
   resize:vertical;
 }
 
 .textarea {
-  /* width: 95% !important; */
   background-color: black;
 }
 
 .navbar {
   padding: 0.25em;
   padding-bottom: 0em;
-  /* background-color: var(--background-tint-1); */
 }
 
 .navbar .active {
@@ -6610,13 +6554,6 @@ article footer {
 .parent:first {
   margin-top: 0;
 }
-
-/* 
-*   Hide and show via css based on location.hash
-*   Not sure where the original
-*   concept came from, I used it in a project back in
-*   2016 from another project even earlier than that ...
-*/
 .pages > * {
     display: none;
 }
@@ -6703,35 +6640,6 @@ article footer {
   background:linear-gradient(transparent 150px, white);
 }
 
-:root {
-  /* --red: #de324c;
-  --redorange: #E95E56;
-  --orange: #f4895f;
-  --orangeyellow: #F6B567;
-  --yellow: #f8e16f;
-  --yellowgreen: #C7D881;
-  --green: #95cf92;
-  --greenblue: #66B5AF;
-  --blue: #369acc;
-  --bluepurple: #6678B7;
-  --purple: #9656a2;
-  --purplered: #BA4477; */
-  --red: #e78284;
-  --redorange: #EB917D;
-  --orange: #ef9f76;
-  --orangeyellow: #EAB483;
-  --yellow: #e5c890;
-  --yellowgreen: #C6CD8D;
-  --green: #a6d189;
-  --greenblue: #99BEBC;
-  --blue: #8caaee;
-  --bluepurple: #A3B3F0;
-  --purple: #babbf1;
-  --purplered: #D19FBB;
-}
-
-
-
 .text-red {
   color: var(--red);
 }
@@ -6778,21 +6686,6 @@ article footer {
   vertical-align: middle;
 }
 
-/* #post-list {
-  max-width: 70ch;
-  margin: 0px auto;
-} */
-
-/* @media (min-width: 840px) {
-  #pageAction { 
-    padding-left: 110px;
-  }
-} */
-/* #pageAction {
-  z-index: 298;
-  width: 200px;
-  margin: 0px auto;
-} */
 
 #titleBar {
   vertical-align: middle;
@@ -6954,7 +6847,7 @@ article footer {
 
 .mini_thumbnail {
   display: inline-block;
-}
+} */
 
 /* Dracula Theme v1.2.5
  *
@@ -7036,4 +6929,154 @@ article footer {
 
 .hljs-emphasis {
   font-style: italic;
+} 
+
+:root, body.light {
+  --red: #e78284;
+  --redorange: #EB917D;
+  --orange: #ef9f76;
+  --orangeyellow: #EAB483;
+  --yellow: #e5c890;
+  --yellowgreen: #C6CD8D;
+  --green: #a6d189;
+  --greenblue: #99BEBC;
+  --blue: #8caaee;
+  --bluepurple: #A3B3F0;
+  --purple: #babbf1;
+  --purplered: #D19FBB;
+
+  --primary:#006e1c;
+  --on-primary:#ffffff;
+  --primary-container:#48874a;
+  --on-primary-container:#fafbf8;
+  --secondary:#52634f;
+  --on-secondary:#ffffff;
+  --secondary-container:#d5e8cf;
+  --on-secondary-container:#111f0f;
+  --tertiary:#38656a;
+  --on-tertiary:#ffffff;
+  --tertiary-container:#e1e3c7;
+  --on-tertiary-container:#002023;
+  --error:#ba1a1a;
+  --on-error:#ffffff;
+  --error-container:#ffdad6;
+  --on-error-container:#410002;
+  --background:#fcfdf6;
+  --on-background:#1a1c19;
+  --surface:#f2f3e9;
+  --on-surface:#1a1c19;
+  --surface-variant:#fafbf8;
+  --on-surface-variant:#424940;
+  --outline:#72796f;
+  --outline-variant:#c2c9bd;
+  --shadow:#000000;
+  --scrim:#000000;
+  --inverse-surface:#2f312d;
+  --inverse-on-surface:#f0f1eb;
+  --inverse-primary:#78dc77;
+  --surface-dim:#dadad4;
+  --surface-bright:#f9faf4;
+  --surface-container-lowest:#ffffff;
+  --surface-container-low:#f3f4ee;
+  --surface-container:#eeeee8;
+  --surface-container-high:#e8e9e2;
+  --surface-container-highest:#e2e3dd;
+}
+.text-red {
+  color: var(--red);
+}
+.text-orange {
+  color: var(--orange);
+}
+.text-yellow {
+  color: var(--yellow);
+}
+.text-green {
+  color: var(--green);
+}
+.text-blue {
+  color: var(--blue);
+}
+.text-purple {
+  color: var(--purple);
+}
+.bg-red {
+  background-color: var(--red);
+}
+.bg-orange {
+  background-color: var(--orange);
+}
+.bg-yellow {
+  background-color: var(--yellow);
+}
+.bg-green {
+  background-color: var(--green);
+}
+.bg-blue {
+  background-color: var(--blue);
+}
+.bg-purple {
+  background-color: var(--purple);
+}
+iframe {width: 100% !important;height: unset;}
+.hide {display: none !important;}
+.post, .post pre, .post code, .note, .note pre, .note code { overflow-wrap: anywhere; }
+.post a, .note a { text-decoration: underline; display: inline; }
+.post img, .post video, .note img, .note video { max-width: 100%; width: unset; height: unset; }
+.post > img.single, .post > p > img.single  {
+    max-width: calc(100% + (1.2em * 2) - 2px);
+    height: auto;
+    margin-left: -1rem;
+}
+h1, h2, h3 {
+    font-size: 1.5625rem;
+}
+.chip {padding: 0 .5rem;}
+.clear {clear: both;}
+#swap, .convo { max-width: 80ch; }
+.convo { margin: 0px auto; }
+.mini_cover { float: left; padding-right: 1em; }
+textarea { width: 100%; }
+.avatar { height: 48px !important; width: 48px !important;}
+[data-parent-of] button { display: none; }
+@media only screen and (max-width: 600px) {
+    body {
+        --_left: 0rem !important;
+    }
+}
+.grow-wrap {
+    display: grid;
+    margin: var(--space-xs) 0;
+}
+.grow-wrap::after {
+    content: attr(data-replicated-value) " ";
+    white-space: pre-wrap;
+    visibility: hidden;
+}
+.grow-wrap > textarea {
+    resize: none;
+    overflow: hidden;
+    background-color: var(--mantle);
+    color: var(--text);
+    border: .0625rem solid var(--outline);
+    border-top: 0;
+}
+.grow-wrap > textarea,
+.grow-wrap::after {
+    padding: 0.5rem;
+    font: inherit;
+    grid-area: 1 / 1 / 2 / 2;
+}
+#markdownBtns button {
+  padding: 0 1em;
+}
+nav.drawer, [dir=rtl] nav.drawer {
+  inline-size: 15rem; 
+}
+article {
+  border: 1px solid #e1e3c7;
+}
+.no-top {
+  margin-top: 0 !important;
+  border-top: 0;
 }

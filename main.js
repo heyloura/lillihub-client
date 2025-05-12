@@ -165,7 +165,8 @@ Deno.serve(async (req) => {
             user.plan = mbUser.plan;
             user.ai = mbUser.is_using_ai && mbUser.is_premium;
 
-            //const kv = await Deno.openKv();
+            const kv = await Deno.openKv();
+            const userKV = await kv.get([user.username, 'global']);
 
             if(new URLPattern({ pathname: "/offline" }).exec(req.url)) {
                 return new Response(layout.replaceAll('{{nonce}}', nonce),
@@ -505,6 +506,23 @@ Deno.serve(async (req) => {
                 return new Response(JSON.stringify(media.items[0]), JSONHeaders());
             }
 
+            if((new URLPattern({ pathname: "/api/mentions" })).exec(req.url)) {
+                const fetching = await fetch(`https://micro.blog/posts/mentions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const results = await fetching.json();
+                return new Response(JSON.stringify(results), JSONHeaders());
+            }
+
+            if((new URLPattern({ pathname: "/api/replies" })).exec(req.url)) {
+                const fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const results = await fetching.json();
+                return new Response(JSON.stringify(results), JSONHeaders());
+            }
+
+            if((new URLPattern({ pathname: "/api/following/favorites" })).exec(req.url)) {
+                console.log(userKV);
+                return new Response(JSON.stringify(userKV.value && userKV.value.favorites? userKV.value.favorites : []), JSONHeaders());
+            }
+
             const CHECK_ROUTE = new URLPattern({ pathname: "/api/timeline/check/:id" });
             if(CHECK_ROUTE.exec(req.url)) {
                 const id = CHECK_ROUTE.exec(req.url).pathname.groups.id;
@@ -744,7 +762,7 @@ Deno.serve(async (req) => {
                     const post = await fetching.json();
                     const original = post.items.filter(i => i.id == id)[0];
                     // put JSON check here or something.....
-                    content = `${utility.timelineHeader('timeline')}<div id="conversationContent"
+                    content = `<div id="conversation-${id}"
                         data-name="${original &&  original.author && original.author._microblog && original.author._microblog.username ? original.author._microblog.username : ''}"
                         data-id="${id}"
                         data-avatar="${original &&  original.author && original.author.avatar ? original.author.avatar : ''}"
@@ -756,8 +774,17 @@ Deno.serve(async (req) => {
                     id = name;
                     name = "timeline";
                     const posts = await mb.getMicroBlogTimelinePostsChronological(mbToken, id);
-                    content = `${utility.timelineHeader('timeline')}
-                        <div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
+                    content = `<div id="post-list">${utility.timelineHTML(posts.map(n => utility.postHTML(n)).join(''),posts[posts.length -1].id)}</div>`;
+                    return new Response(new TextDecoder().decode(await Deno.readFile("timeline.html")).replaceAll('{{nonce}}', nonce)
+                        .replaceAll('{{pages}}', content)
+                        .replaceAll('{{avatar}}', mbUser.avatar)
+                        .replaceAll('{{username}}', mbUser.username)
+                        .replaceAll('{{pageName}}', 'Timeline')
+                        .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
+                    , HTMLHeaders(nonce, null, false));
+
+
+
                 } else if(req.url.includes("mentions")) {
                     //----------
                     //  Mentions
@@ -992,10 +1019,9 @@ Deno.serve(async (req) => {
                         </div>`;
                 } 
 
-
-                
                 return new Response(layout.replaceAll('{{nonce}}', nonce)
                     .replaceAll('{{pages}}', content)
+                    .replaceAll('{{avatar}}', mbUser.avatar)
                     .replaceAll('{{pageName}}', name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '')
                     .replaceAll('{{scriptLink}}', name == 'settings' ? `<script src="/scripts/settings.js" type="text/javascript"></script>` : '')
                     .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')

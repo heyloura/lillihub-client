@@ -116,27 +116,27 @@ export async function getMicroBlogTimelinePosts(accessToken,lastId) {
 }
 
 
-function flattenedMicroBlogPost(post) {
-    return {
-        id: post && post.id ? post.id : 0,
-        content: post &&  post.content_html ? post.content_html : '',
-        url: post &&  post.url ? post.url : '',
-        published: post &&  post.date_published ? post.date_published : '',
-        name: post &&  post.author && post.author.name ? post.author.name : '',
-        authorUrl: post &&  post.author && post.author.url ? post.author.url : '',
-        avatar: post &&  post.author && post.author.avatar ? post.author.avatar : '',
-        username: post &&  post.author && post.author._microblog && post.author._microblog.username ? post.author._microblog.username : '',
-        relative: post &&  post._microblog && post._microblog.date_relative ? post._microblog.date_relative : '',
-        timestamp: post &&  post._microblog && post._microblog.date_timestamp ? post._microblog.date_timestamp : '',
-        favorite: post &&  post._microblog && post._microblog.is_favorite ? post._microblog.is_favorite : false,
-        bookmark: post &&  post._microblog && post._microblog.is_bookmark ? post._microblog.is_bookmark : false,
-        deletable: post &&  post._microblog && post._microblog.is_deletable ? post._microblog.is_deletable : false,
-        conversation: post &&  post._microblog && post._microblog.is_conversation ? post._microblog.is_conversation : false,
-        linkpost: post && post._microblog && post._microblog.is_linkpost ? post._microblog.is_linkpost : false,
-        mention: post && post._microblog && post._microblog.is_mention ? post._microblog.is_mention : false,
-        bio: post && post._microblog && post._microblog.bio ? post._microblog.bio : ''
-    };
-}
+// function flattenedMicroBlogPost(post) {
+//     return {
+//         id: post && post.id ? post.id : 0,
+//         content: post &&  post.content_html ? post.content_html : '',
+//         url: post &&  post.url ? post.url : '',
+//         published: post &&  post.date_published ? post.date_published : '',
+//         name: post &&  post.author && post.author.name ? post.author.name : '',
+//         authorUrl: post &&  post.author && post.author.url ? post.author.url : '',
+//         avatar: post &&  post.author && post.author.avatar ? post.author.avatar : '',
+//         username: post &&  post.author && post.author._microblog && post.author._microblog.username ? post.author._microblog.username : '',
+//         relative: post &&  post._microblog && post._microblog.date_relative ? post._microblog.date_relative : '',
+//         timestamp: post &&  post._microblog && post._microblog.date_timestamp ? post._microblog.date_timestamp : '',
+//         favorite: post &&  post._microblog && post._microblog.is_favorite ? post._microblog.is_favorite : false,
+//         bookmark: post &&  post._microblog && post._microblog.is_bookmark ? post._microblog.is_bookmark : false,
+//         deletable: post &&  post._microblog && post._microblog.is_deletable ? post._microblog.is_deletable : false,
+//         conversation: post &&  post._microblog && post._microblog.is_conversation ? post._microblog.is_conversation : false,
+//         linkpost: post && post._microblog && post._microblog.is_linkpost ? post._microblog.is_linkpost : false,
+//         mention: post && post._microblog && post._microblog.is_mention ? post._microblog.is_mention : false,
+//         bio: post && post._microblog && post._microblog.bio ? post._microblog.bio : ''
+//     };
+// }
 export async function getMicroBlogTimelinePostsChronological(accessToken, lastId) {
     const fetching = await fetch(`https://micro.blog/posts/check`, { method: "GET", headers: { "Authorization": "Bearer " + accessToken } } );
     const results = await fetching.json(); 
@@ -154,7 +154,7 @@ export async function getMicroBlogTimelinePostsChronological(accessToken, lastId
     let i = 0;
     console.log(marker,!ids.includes(marker.id),lastId)
     if(marker && !ids.includes(marker.id) && lastId == 0) {
-        while(!ids.includes(results.markers.timeline.id) && i < 100)
+        while(!ids.includes(results.markers.timeline.id) && i < 1)
         {
             console.log(posts.length, i)
             items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/timeline', ids[ids.length - 1], 40);
