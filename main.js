@@ -9,7 +9,7 @@ import * as utility from "./scripts/server/utilities.js";
 *      const rawKey = JSON.stringify(await crypto.subtle.exportKey("jwk", key));
 ******************************************************************************************************************/
 const _appSecret = JSON.parse(Deno.env.get("APP_SECRET") ?? "{}");
-const _lillihubToken = Deno.env.get("APP_LILLIHUB_MTOKEN") ?? "";
+const _lillihubToken = Deno.env.get("LILLIHUB_TOKEN") ?? "";
 const _development = true;
 
 Deno.serve(async (req) => { 
@@ -521,7 +521,11 @@ Deno.serve(async (req) => {
             if((new URLPattern({ pathname: "/api/discover/photos" })).exec(req.url)) {
                 const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 const results = await fetching.json();
-                let data = results.items.map(n => {return { content: `<article><div class="post"><img src="${n.content_html.split('src="')[1].split('"')[0]}" class="single" /></div></article>` }});
+                let data = results.items.map(n => {
+                    console.log(n.content_html);
+                    console.log(n.content_html.split('src="')[1]);
+                    console.log(n.content_html.split('src="')[1].split('"')[0]);
+                    return { content: `<article><div class="post"><img src="${n.content_html.split('src="')[1].split('"')[0]}" class="single" /></div></article>` }});
                 return new Response(JSON.stringify(data), JSONHeaders());
             }
 
