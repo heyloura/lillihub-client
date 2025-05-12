@@ -798,7 +798,7 @@ Deno.serve(async (req) => {
                     const post = await fetching.json();
                     const original = post.items.filter(i => i.id == id)[0];
                     // put JSON check here or something.....
-                    content = `<div id="conversation-${id}"
+                    content = `<div class="conversation" id="conversation-${id}"
                         data-name="${original &&  original.author && original.author._microblog && original.author._microblog.username ? original.author._microblog.username : ''}"
                         data-id="${id}"
                         data-avatar="${original &&  original.author && original.author.avatar ? original.author.avatar : ''}"
