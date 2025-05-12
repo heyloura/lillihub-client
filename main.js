@@ -530,7 +530,9 @@ Deno.serve(async (req) => {
                         src = src.split('"')[0];
                     }
                     if(src) {
-                        return { content: `<div class="post"><img src="${src}" class="single" /></div>` };
+                        return { content: `<article class="no-padding">
+                                            <img class="responsive medium" src="src="${src}"">
+                                            </article>` };
                     }
                     return {};
                 });
@@ -539,7 +541,7 @@ Deno.serve(async (req) => {
 
             if((new URLPattern({ pathname: "/api/discover/lillihub" })).exec(req.url)) {
                 console.log(_lillihubToken);
-                const results = await mb.getMicroBlogTimelinePostsChronological(_lillihubToken, id);
+                const results = await mb.getMicroBlogTimelinePostsChronological(_lillihubToken);
                 console.log(results);
                 let data = results.items.map(n => {return { content: utility.postHTML(n) }});
                 return new Response(JSON.stringify(data), JSONHeaders());
