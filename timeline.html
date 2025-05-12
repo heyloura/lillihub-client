@@ -38,7 +38,7 @@
                 <a class="m l button transparent" rel="prefetch" swap-target="#main" swap-history="false" href="/notebooks">Notes</a>
                 <a class="m l active button" rel="prefetch" swap-target="#main" swap-history="false" href="/timeline">Social</a>
                 <!-- <a class="m l" href="/settings">Settings</a> -->
-                <h5 id="titleBar" class="max center-align s">{{pageName}}</h5>
+                <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
                 <span class="max m l"></span>
                 <button class="circle transparent">
                     <img id="myAvatar" class="responsive" src="{{avatar}}">
@@ -440,8 +440,17 @@
                     document.getElementById("following").innerHTML = '<p>Your favorites will show here</p>'
                 } else {
                     var following = [... document.querySelectorAll('#following option')];
-                    console.log(following.filter(f => data.includes(f.value)));
-                    document.getElementById("following").innerHTML = JSON.stringify(following.filter(f => data.includes(f.value)));
+                    document.getElementById("following").innerHTML = `
+                        <ul class="list border">
+                            ${following.filter(f => data.includes(f.value)).map(f => `
+                                <li>
+                                    <img class="round" src="${f.getAttribute('avatar')}">
+                                    <div class="max">
+                                        <h6 class="small">${f.innerHTML}</h6>
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>`;
                 }
                 document.getElementById("following-sidebar").innerHTML = document.getElementById("following").innerHTML;
             });
@@ -504,13 +513,11 @@
                         unloaders[selector] = loaders[selector]();
         }
         loaders['.conversation'] = () => {
-            alert('conversation loaded!')
             document.getElementById('titleBar').innerHTML = `${document.querySelector('.conversation').getAttribute('data-name')}'s Post`;
             document.getElementById('goBack').classList.remove('hide');
             document.getElementById('menu').classList.add('hide');
 
             return () => {  // unloader function
-                alert('conversation unloaded!')
                 document.getElementById('titleBar').innerHTML = `Timeline`;
                 document.getElementById('goBack').classList.add('hide');
                 document.getElementById('menu').classList.remove('hide');
