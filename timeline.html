@@ -20,7 +20,7 @@
         <link rel="stylesheet" href="/styles/main.css">  
     </head>
     <body>
-        <header class="fixed primary-container">
+        <header class="fixed">
             <nav>
                 <button data-ui="#apps-menu-drawer" class="s circle transparent">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
@@ -128,7 +128,10 @@
                         </aside>
                     </div>
                     <div class="s12 m12 l6">
-                        <article class="no-elevate tertiary-container">
+                        <button class="circle left-round bottom-round extra small-elevate s">
+                            <i>add</i>
+                        </button>
+                        <article class="no-elevate tertiary-container m l">
                             <div class="row">
                                 <img class="medium round" src="{{avatar}}">
                                 <div class="max">
@@ -376,7 +379,7 @@
         function update(href, target, pushstate, fallback = null) {
             console.log(href, target, pushstate, fallback);
             if(!href.includes('#')) {
-                document.querySelector(target).innerHTML = '<progress class="circle"></progress>';
+                document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
                 fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
                     var tmp = document.createElement('html');
                     tmp.innerHTML = html;
@@ -385,7 +388,10 @@
                         history.pushState({}, "", href);
                     register_links();  
                 }).finally(() => {
-                    //document.getElementById('loader').remove();
+                    const openDialog = document.querySelector('dialog[open]');
+                    if(openDialog) {
+                        openDialog.close();
+                    }
                 });
             }
         }
