@@ -527,7 +527,7 @@ Deno.serve(async (req) => {
             if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
                 const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 const results = await fetching.json();
-                return new Response(JSON.stringify(results), JSONHeaders());
+                return new Response(JSON.stringify(results.items.map(i => {return { content: utility.postHTML(n) }})), JSONHeaders());
             }
 
             if((new URLPattern({ pathname: "/api/following/favorites" })).exec(req.url)) {
@@ -791,7 +791,7 @@ Deno.serve(async (req) => {
                         .replaceAll('{{pageName}}', 'Timeline')
                         .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
                     , HTMLHeaders(nonce, null, false));
-                    
+
                 } else if(req.url.includes("timeline")) {
                     //----------
                     //  Timeline
