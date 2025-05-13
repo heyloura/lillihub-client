@@ -179,6 +179,118 @@
                 <button data-ui="#dialog-post">Confirm</button>
             </nav>
         </dialog>
+        <script src="/scripts/showdown.js" type="text/javascript"></script>
+        <script src="/scripts/highlight.js" type="text/javascript"></script>
+        <script nonce="{{nonce}}" type="module">
+        function hexStringToArrayBuffer(hexString) {
+            const length = hexString.length / 2;
+            const array_buffer = new ArrayBuffer(length);
+            const uint8_array = new Uint8Array(array_buffer);
+
+            for (let i = 0; i < length; i++) {
+                const byte = parseInt(hexString.substr(i * 2, 2), 16);
+                uint8_array[i] = byte;
+            }
+
+            return array_buffer;
+        }
+
+        async function decryptWithKey(encryptedText, imported_key) {
+            const encrypted_data = new Uint8Array(atob(encryptedText).split('').map(char => char.charCodeAt(0)));
+            const iv = encrypted_data.slice(0, 12);
+            const ciphertext = encrypted_data.slice(12);
+
+            const decrypted_buffer = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv },
+                imported_key,
+                ciphertext
+            );
+
+            const decoder = new TextDecoder();
+            const decrypted_text = decoder.decode(decrypted_buffer);
+            return decrypted_text;
+        }
+
+        async function encryptWithKey(text, imported_key) {
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encoder = new TextEncoder();
+            const plaintext_buffer = encoder.encode(text);
+
+            const ciphertext_buffer = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                imported_key,
+                plaintext_buffer
+            );
+
+            const encrypted_data = new Uint8Array([...iv, ...new Uint8Array(ciphertext_buffer)]);
+            const base64_encoded = btoa(String.fromCharCode(...encrypted_data));
+            return base64_encoded;
+        }
+
+        const converter = new showdown.Converter({	
+            metadata: true,
+            parseImgDimensions: true,
+            strikethrough: true,
+            tables: true,
+            ghCodeBlocks: true,
+            smoothLivePreview: true,
+            simpleLineBreaks: true,
+            emoji: true, 
+        });
+        const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importKey(
+            'raw',
+            hexStringToArrayBuffer(localStorage.getItem("mbKey").substr(4)),
+            { name: 'AES-GCM', length: 256 },
+            true,
+            ['encrypt', 'decrypt']
+        ) : '';
+        if(localStorage.getItem("mbKey")) {
+            document.getElementById("privateKeyWarning").classList.add("hide");
+
+            const decryptMeElements = Array.from(document.querySelectorAll('.decryptMe'));
+            const promises = decryptMeElements.map(async (element) => {
+                const noteId = element.getAttribute('data-id');
+                const markdown = await decryptWithKey(element.innerHTML, imported_key);
+                const html = converter.makeHtml(markdown);
+                const metadata = converter.getMetadata();
+                if(metadata && metadata.background) {
+                    document.querySelector(`article[data-id="${noteId}"]`).style.background = metadata.background;
+                }
+                if(metadata && metadata.color) {
+                    document.querySelector(`article[data-id="${noteId}"] a`).style.setProperty('color', metadata.color, 'important');
+                }
+                document.getElementById(`title-${noteId}`).innerHTML = metadata && metadata.title ? metadata.title : strip(html).substring(0,50) + '...'; 
+                let tags = metadata && metadata.tags ? metadata.tags.replace('[','').replace(']','').split(',') : [];
+                tags.forEach(function(item){
+                    if(!Array.from(document.getElementById('tags').options).map(option => option.value).includes(item)) {
+                        var option = document.createElement('option');
+                        option.value = item;
+                        document.getElementById('tags').appendChild(option);
+                    }
+                });
+                document.getElementById(`tags-${noteId}`).innerHTML = metadata && metadata.tags ? tags.map(t => `<span class="chip">${t}</span>`).join('') : ''; 
+                element.innerHTML = html;
+            });
+        
+            Promise.all(promises)
+                .then(() => {
+                    hljs.highlightAll();
+                })
+                .catch((error) => {
+                    document.querySelectorAll('.decryptMe').forEach(element => {
+                        document.getElementById("privateKeyWarning").classList.remove("hide");
+                        document.getElementById("privateKeyWarning").innerHTML = "We ran into an issue decrypting your notes."
+                        element.parentNode.classList.remove("hide");
+                    });
+                });
+
+        } else {
+            // we don't have a key
+            document.querySelectorAll('.decryptMe').forEach(element => {
+                element.parentNode.classList.remove("hide");
+            });
+        }
+        </script>
         <script nonce="{{nonce}}" type="text/javascript">
         function growTextArea(el) {
             el.parentNode.dataset.replicatedValue = el.value;
