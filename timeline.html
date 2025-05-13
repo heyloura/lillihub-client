@@ -444,9 +444,10 @@
                         <ul class="list border">
                             ${following.filter(f => data.includes(f.value)).map(f => `
                                 <li>
-                                    <img class="round" src="${f.getAttribute('avatar')}">
+                                    <img class="round" src="${f.getAttribute('data-avatar')}">
                                     <div class="max">
-                                        <h6 class="small">${f.innerHTML}</h6>
+                                        <h6 class="small">${f.innerHTML.split('(')[0].trim()}</h6>
+                                        <div>${f.innerHTML.split('(')[1].replace(')','').trim()}</div>
                                     </div>
                                 </li>
                             `).join('')}
