@@ -473,10 +473,9 @@
             if(!href.includes('#') && state && back) {
                 document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
                 document.querySelector(target).innerHTML = state;
-                window.scrollTo(0,document.querySelector(`[href="${state.source}"]`).offsetTop)
+                //window.scrollTo(0,document.querySelector(`[href="${state.source}"]`).offsetTop)
             } else if(!href.includes('#')) {
                 state = document.querySelector(target).innerHTML;
-                window.scrollTo(0,0);
                 document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
                 fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
                     var tmp = document.createElement('html');
@@ -485,6 +484,7 @@
                     if (pushstate)
                         history.pushState({source: href}, "", href);
                     register_links();  
+                    //window.scrollTo(0,document.querySelector(`[data-id="${state.source}"]`).offsetTop);
                 }).finally(() => {
                     const openDialog = document.querySelector('dialog[open]');
                     if(openDialog) {
