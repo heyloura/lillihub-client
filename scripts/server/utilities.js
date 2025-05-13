@@ -1047,7 +1047,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                                         </svg>
                                     </i>
                                     <menu class="top no-wrap left">
-                                        <li data-ui="#dialog-reply-${item.id}">Comment</li>
+                                        <li data-ui="#dialog-reply-${post.id}">Comment</li>
                                     </menu>  
                                 </button>
                                 ${post.conversation && !isConvo ? `<!--<a rel="prefetch" swap-target="#conversation-${post.id}" swap-history="true"  href="/timeline/posts/${post.id}" class="button transparent circle wave m l">
@@ -1087,16 +1087,16 @@ export function postHTML(post, stranger, isConvo, convoId) {
                                         </div>
                                     <div>
                                 </dialog>-->
-                                <dialog id="dialog-reply-${item.id}" class="bottom">
+                                <dialog id="dialog-reply-${post.id}" class="bottom">
                                     <header class="fixed front">
                                         <nav>
                                             <div class="max truncate">
                                                 <h5>Reply</h5>
                                             </div>
-                                            <button evt-click="close" data-id="reply-${item.id}" class="circle transparent"><i evt-click="close" data-id="reply-${item.id}">close</i></button>
+                                            <button evt-click="close" data-id="reply-${post.id}" class="circle transparent"><i evt-click="close" data-id="reply-${post.id}">close</i></button>
                                         </nav>
                                     </header>
-                                    ${replyForm(item.id,`<label class="checkbox large icon"><input type='checkbox' checked="checked" name='replyingTo[]' value='${item.username}'><span><i><img class="round tiny" src="${item.avatar}"></i><i>done</i></span> @${item.username}</label>`, true)}
+                                    ${replyForm(post.id,`<label class="checkbox large icon"><input type='checkbox' checked="checked" name='replyingTo[]' value='${post.username}'><span><i><img class="round tiny" src="${post.avatar}"></i><i>done</i></span> @${post.username}</label>`, true)}
                                 </dialog>
                             </nav>
                         </div>
