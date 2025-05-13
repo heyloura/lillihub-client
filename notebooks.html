@@ -308,8 +308,9 @@
         .then(response => response.json())
         .then(data => {
             let content = `
-                <ul class="list border">${data.map(element => { return 
-                    `<li>
+                <ul class="list border">${data.map(element => {
+                    console.log(element);
+                    return `<li>
                         <a rel="prefetch" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">
                             ${element.title}
                         </a>
