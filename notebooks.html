@@ -300,6 +300,17 @@
                 growTextArea(event.target);
             }
         });
+        fetch("/api/notebooks", { method: "get" })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("mentions").innerHTML = `<ul class="list border">${data.map(i => {return 
+                `<li>
+                    <a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">
+                        ${element.title}</a></li>`
+                    }).join('')}
+                </ul>`
+            register_links();
+        });
         /************************************************************
         ** Swap
         ** Facilitates AJAX-style navigation in web pages 
