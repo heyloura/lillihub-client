@@ -465,23 +465,25 @@
         var loaders = {}, unloaders = {}, state;
         register_links();
         new MutationObserver(dom_changes).observe(document.querySelector("html"), { childList: true, subtree: true });
-        window.addEventListener("popstate", (event) => update(location.href, "[swap-history-restore]", false, "body", true));
+        window.addEventListener("popstate", (event) => update(location.href, "[swap-history-restore]", false, "body", true, event.state));
         window.addEventListener("DOMContentLoaded", dom_load);
-        function update(href, target, pushstate, fallback = null, back = false) {
-            console.log(href, target, pushstate, fallback, state);
+        function update(href, target, pushstate, fallback = null, back = false, popState = null) {
+            console.log(state);
+            console.log(popState);
             if(!href.includes('#') && state && back) {
                 document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
                 document.querySelector(target).innerHTML = state;
-                window.scrollTo(0,document.querySelector(`[href="${href}"]`).offsetTop)
+                window.scrollTo(0,document.querySelector(`[href="${state.source}"]`).offsetTop)
             } else if(!href.includes('#')) {
                 state = document.querySelector(target).innerHTML;
+                window.scrollTo(0,0);
                 document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
                 fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
                     var tmp = document.createElement('html');
                     tmp.innerHTML = html;
                     (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
                     if (pushstate)
-                        history.pushState({}, "", href);
+                        history.pushState({source: href}, "", href);
                     register_links();  
                 }).finally(() => {
                     const openDialog = document.querySelector('dialog[open]');
