@@ -154,7 +154,7 @@ export async function getMicroBlogTimelinePostsChronological(accessToken, lastId
     let i = 0;
     console.log(marker,!ids.includes(marker.id),lastId)
     if(marker && !ids.includes(marker.id) && lastId == 0) {
-        while(!ids.includes(results.markers.timeline.id) && i < 1)
+        while(!ids.includes(results.markers.timeline.id) && i < 0)
         {
             console.log(posts.length, i)
             items = await __getMicroBlogPosts(accessToken, 'https://micro.blog/posts/timeline', ids[ids.length - 1], 40);
