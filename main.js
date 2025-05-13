@@ -783,8 +783,8 @@ Deno.serve(async (req) => {
                         fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const notebooks = await fetching.json();
                         content = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element =>
-                            `<li class="menu-item"><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join('');
-                        content = `<div id="notebook-list" class="menu">${content}</div>`;
+                            `<li><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join('');
+                        content = `<div id="notebook-list"><ul class="list border">${content}</ul></div>`;
                     }
                     name = "notebook";
                     return new Response(new TextDecoder().decode(await Deno.readFile("notebooks.html")).replaceAll('{{nonce}}', nonce)
