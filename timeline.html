@@ -484,7 +484,7 @@
                     if (pushstate)
                         history.pushState({source: href}, "", href);
                     register_links();  
-                    //window.scrollTo(0,document.querySelector(`[data-id="${state.source}"]`).offsetTop);
+                    window.scrollTo(0,0);
                 }).finally(() => {
                     const openDialog = document.querySelector('dialog[open]');
                     if(openDialog) {
