@@ -309,7 +309,7 @@
         .then(data => {
             alert('Hmmmmmmm!');
             console.log(data);
-            document.getElementById("notebooks").innerHTML = `<ul class="list border">${data.map(i => {return 
+            document.getElementById("notebooks").innerHTML = `<ul class="list border">${data.map(element => {return 
                 `<li>
                     <a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">
                         ${element.title}</a></li>`
