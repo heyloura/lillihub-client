@@ -35,7 +35,7 @@
                 <a class="m l button transparent" href="/blog">Blog</a>
                 <a class="m l button transparent" href="/bookmarks">Bookmarks</a>
                 <a class="m l button transparent" href="/bookshelves">Bookshelves</a>
-                <a class="m l button transparent active" href="/notebooks">Notes</a>
+                <a class="m l button active" href="/notebooks">Notes</a>
                 <a class="m l transparent button" href="/timeline">Social</a>
                 <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
                 <span class="max m l"></span>
@@ -307,7 +307,7 @@
         fetch("/api/notebooks", { method: "get" })
         .then(response => response.json())
         .then(data => {
-            document.getElementById("notebooks").innerHTML = `
+            let content = `
                 <ul class="list border">${data.map(element => { return 
                     `<li>
                         <a rel="prefetch" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">
@@ -315,6 +315,8 @@
                         </a>
                     </li>`; }).join('')}
                 </ul>`;
+            console.log(content)
+            document.getElementById("notebooks").innerHTML = content;
             register_links();
         });
         /************************************************************
