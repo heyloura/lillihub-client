@@ -557,8 +557,8 @@ Deno.serve(async (req) => {
             if((new URLPattern({ pathname: "/api/notebooks" })).exec(req.url)) {
                 fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                 const notebooks = await fetching.json();
-                const data = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
-                return new Response(JSON.stringify(data), JSONHeaders());
+                //const data = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
+                return new Response(JSON.stringify(notebooks.items), JSONHeaders());
             }
 
             if((new URLPattern({ pathname: "/api/following/favorites" })).exec(req.url)) {
