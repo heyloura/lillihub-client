@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Lillihub - A delightful Micro.blog client">
+        <meta name="mobile-web-app-capable" content="yes">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="apple-touch-icon" href="/lillihub-512.png">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="theme-color" content="#000000">
+        <meta name="apple-mobile-web-app-title" content="Lillihub">
+        <link rel="manifest" href="/manifest.webmanifest">
+        <title>Lillihub: {{pageName}}</title>
+        <noscript><style nonce="{{nonce}}">.hide-if-user-has-no-javascript{ display: none }</style></noscript>
+        <script nonce="{{nonce}}">if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js', { scope: "/" }) }</script>
+        <script nonce="{{nonce}}">document.write('<style nonce="{{nonce}}">.hide-if-user-has-javascript{display:none}}</style>');</script>
+        <link rel="stylesheet" href="/styles/beer.min.css">  
+        <script type="module" src="/scripts/beer.min.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="/styles/main.css">  
+    </head>
+    <body>
+        <header class="fixed">
+            <nav>
+                <button id="menu" data-ui="#apps-menu-drawer" class="s circle transparent">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                    </svg>
+                </button>
+                <a href="javascript:history.back()" id="goBack" class="s circle transparent hide button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                    </svg>
+                </a>
+                <a class="m l button transparent" rel="prefetch" swap-target="#main" swap-history="false" href="/blog">Blog</a>
+                <a class="m l button transparent" rel="prefetch" swap-target="#main" swap-history="false" href="/bookmarks">Bookmarks</a>
+                <a class="m l button transparent" rel="prefetch" swap-target="#main" swap-history="false" href="/bookshelves">Bookshelves</a>
+                <a class="m l button transparent" rel="prefetch" swap-target="#main" swap-history="false" href="/notebooks">Notes</a>
+                <a class="m l active button" rel="prefetch" swap-target="#main" swap-history="false" href="/timeline">Social</a>
+                <!-- <a class="m l" href="/settings">Settings</a> -->
+                <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
+                <span class="max m l"></span>
+                <button class="circle transparent">
+                    <img id="myAvatar" class="responsive" src="{{avatar}}">
+                </button>
+            </nav>
+            <dialog id="apps-menu-drawer" class="left">
+                <header>
+                    <nav>
+                    <img width="60" src="/logo.png">
+                    <h6 class="max">Lillihub</h6>
+                    <div class="max"></div>
+                    <button data-ui="#apps-menu-drawer" class="circle transparent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                            </svg>
+                    </button>
+                    </nav>
+                </header>
+                <ul class="list">
+                    <li><a class="button" rel="prefetch" swap-target="#main" swap-history="false" href="/blog">Blog</a></li>
+                    <li><a class="button" rel="prefetch" swap-target="#main" swap-history="false" href="/bookmarks">Bookmarks</a></li>
+                    <li><a class="button" rel="prefetch" swap-target="#main" swap-history="false" href="/bookshelves">Bookshelves</a></li>
+                    <li><a class="button active" rel="prefetch" swap-target="#main" swap-history="false" href="/notebooks">Notes</a></li>
+                    <li><a class="button" rel="prefetch" swap-target="#main" swap-history="false" href="/timeline">Social</a></li>
+                </ul>
+            </dialog>
+        </header>
+        <main class="responsive">
+            <div class="page right active">
+                <div class="grid medium-space">
+                    <div class="m l m12 l3">
+                        <div id="notebooks"></div>
+                    </div>
+                    <div class="s12 m12 l9">
+                        <div id="main" swap-history-restore="#main">{{pages}}</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="s fixed">
+            <nav>
+                <div class="max"></div>
+                <button class="square round extra primary">
+                    <i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                    </svg></i>
+                </button>
+            </nav>
+        </footer>
+        <dialog id="dialog-post" class="modal">
+            <button class="right-align transparent circle" type="button" data-ui="#dialog-post">
+                <svg evt-click="apps-menu-close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                </svg>
+            </button>
+            <nav class="wrap">
+                <h6>Create a post on</h6> 
+                <div class="field border label">
+                    <select>
+                        <option>Item 1</option>
+                        <option>Item 2</option>
+                        <option>Item 3</option>
+                    </select>
+                    <label>Selected Blog</label>
+                </div>  
+                <!--<div class="field border label l m">
+                    <input placeholder=" "><label>Community</label>
+                    <i class="tiny">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                        </svg>
+                    </i>
+                    <menu>
+                        {{destinations}}
+                        <li><i class="tiny">people</i><span>r/svelte</span></li>
+                        <li><i class="tiny">people</i><span>r/svelte</span></li>
+                        <li><i class="tiny">people</i><span>r/svelte</span></li>
+                    </menu>
+                </div>-->
+            </nav>
+            <div class="medium-space l m"></div>
+            <div class="field border label">
+                <input placeholder=" ">
+                <label>Title (optional)</label>
+            </div>
+            <nav class="no-space small border tertiary-container" id="markdownBtns">
+                <button id="editor-bold-btn" type="button" class="transparent editor-bold no-round small">
+                    <i class="small editor-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-type-bold" viewBox="0 0 16 16">
+                            <path d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 0 0 1.852-2.14c0-1.51-1.162-2.46-3.014-2.46H3.843V13zM5.908 4.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908V4.673zm0 6.788V8.598h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907z"/>
+                        </svg>
+                    </i>
+                </button>
+                <button id="editor-italic-btn" type="button" class="no-round transparent editor-italic small">
+                    <i class="editor-italic small">
+                        <svg class="editor-italic" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-type-italic" viewBox="0 0 16 16">
+                            <path d="M7.991 11.674 9.53 4.455c.123-.595.246-.71 1.347-.807l.11-.52H7.211l-.11.52c1.06.096 1.128.212 1.005.807L6.57 11.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z"/>
+                        </svg>
+                    </i>
+                </button>
+                <button id="editor-code-btn" type="button" class="no-round transparent editor-code small">
+                    <i class="small editor-code">
+                        <svg class="editor-code" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-code" viewBox="0 0 16 16">
+                        <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8z"/>
+                        </svg>
+                    </i>
+                </button>
+                <button id="editor-upload-btn" type="button" class="no-round transparent editor-upload small">
+                    <i class="tiny editor-upload">
+                        <svg class="editor-upload" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                        <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+                        </svg>
+                    </i>
+                </button>
+                <button type="button" class="no-round transparent small">
+                    <i class="tiny">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
+                        <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9q-.13 0-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                        <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4 4 0 0 1-.82 1H12a3 3 0 1 0 0-6z"/>
+                        </svg>
+                    </i>
+                    <menu>
+                        <li class="editor-image"><a id="editor-image-markdown-btn" class="editor-image" href="#">image</a></li>
+                        <li><a id="editor-link-markdown-btn" class="editor-link" href="#">link</a></li>
+                    </menu>
+                </button>
+            </nav>
+            <div class="border no-round textarea no-top">
+                <div class="grow-wrap">
+                    <textarea class="grow-me" name="content" rows="6" id="content" placeholder="What do you want to write?"></textarea>
+                </div>
+            </div>  
+            <nav class="right-align">
+                <button id="editor-preview-btn" type="button" class="no-round transparent editor-preview">preview</button>
+                <button data-ui="#dialog-post">Confirm</button>
+            </nav>
+        </dialog>
+        <script nonce="{{nonce}}" type="text/javascript">
+        function growTextArea(el) {
+            el.parentNode.dataset.replicatedValue = el.value;
+        }
+        document.addEventListener("input", (event) => {  
+            if(event.target.classList.contains('grow-me')) {
+                growTextArea(event.target);
+            }
+        });
+        /************************************************************
+        ** Swap
+        ** Facilitates AJAX-style navigation in web pages 
+        ** MIT Licence - https://github.com/josephernest/Swap
+        ** UPDATED - https://news.ycombinator.com/item?id=36008516
+        *************************************************************/
+        var loaders = {}, unloaders = {}, state;
+        register_links();
+        new MutationObserver(dom_changes).observe(document.querySelector("html"), { childList: true, subtree: true });
+        window.addEventListener("popstate", (event) => update(location.href, "[swap-history-restore]", false, "body", true, event.state));
+        window.addEventListener("DOMContentLoaded", dom_load);
+        function update(href, target, pushstate, fallback = null, back = false, popState = null) {
+            console.log(state);
+            console.log(popState);
+            if(!href.includes('#') && state && back) {
+                document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
+                document.querySelector(target).innerHTML = state;
+                //window.scrollTo(0,document.querySelector(`[href="${state.source}"]`).offsetTop)
+            } else if(!href.includes('#')) {
+                state = document.querySelector(target).innerHTML;
+                document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
+                fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
+                    var tmp = document.createElement('html');
+                    tmp.innerHTML = html;
+                    (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
+                    if (pushstate)
+                        history.pushState({source: href}, "", href);
+                    register_links();  
+                    window.scrollTo(0,0);
+                }).finally(() => {
+                    const openDialog = document.querySelector('dialog[open]');
+                    if(openDialog) {
+                        openDialog.close();
+                    }
+                });
+            }
+        }
+        function register_links() {
+            for (const elt of document.querySelectorAll('*[swap-target]')) {
+                elt.onclick = e => {
+                    update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
+                    e.preventDefault();
+                }
+            }
+        }
+        function dom_changes(mutations) {
+            for (var selector in unloaders)
+                for (var m of mutations)
+                    for (var n of m.removedNodes)
+                        if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector))) {
+                            unloaders[selector]();
+                            delete unloaders[selector];
+                        }
+            for (var selector in loaders)
+                for (var m of mutations)
+                    for (var n of m.addedNodes) 
+                        if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector)))
+                                unloaders[selector] = loaders[selector]();
+        }
+        function dom_load() {
+            for (var selector in loaders)
+                if (document.querySelector(selector))
+                        unloaders[selector] = loaders[selector]();
+        }
+        // loaders['.conversation'] = () => {
+        //     document.getElementById('titleBar').innerHTML = `${document.querySelector('.conversation').getAttribute('data-name')}'s Post`;
+        //     document.getElementById('goBack').classList.remove('hide');
+        //     document.getElementById('menu').classList.add('hide');
+
+        //     return () => {  // unloader function
+        //         document.getElementById('titleBar').innerHTML = `Timeline`;
+        //         document.getElementById('goBack').classList.add('hide');
+        //         document.getElementById('menu').classList.remove('hide');
+        //     };  
+        // }
+        </script>
+    </body>
+</html>

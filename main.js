@@ -787,7 +787,12 @@ Deno.serve(async (req) => {
                         content = `<div id="notebook-list" class="menu">${content}</div>`;
                     }
                     name = "notebook";
-
+                    return new Response(new TextDecoder().decode(await Deno.readFile("notebooks.html")).replaceAll('{{nonce}}', nonce)
+                        .replaceAll('{{pages}}', content)
+                        .replaceAll('{{avatar}}', mbUser.avatar)
+                        .replaceAll('{{username}}', mbUser.username)
+                        .replaceAll('{{pageName}}', `Notebooks`)
+                    , HTMLHeaders(nonce, null, false));
                 } else if(req.url.includes("posts")) {
                     //------------------------
                     //  Posts / Conversations
@@ -814,7 +819,7 @@ Deno.serve(async (req) => {
                         .replaceAll('{{username}}', mbUser.username)
                         .replaceAll('{{following}}', following.map(f => { return `<option data-avatar="${f.avatar}" value="${f.username}">${f.name} (@${f.username})</option>`}).join(''))
                         .replaceAll('{{pageName}}', `${original &&  original.author && original.author._microblog && original.author._microblog.username ? original.author._microblog.username : ''}'s Post`)
-                        .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
+                        //.replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
                     , HTMLHeaders(nonce, null, false));
 
                 } else if(req.url.includes("timeline")) {
@@ -831,7 +836,7 @@ Deno.serve(async (req) => {
                         .replaceAll('{{username}}', mbUser.username)
                         .replaceAll('{{pageName}}', 'Timeline')
                         .replaceAll('{{following}}', following.map(f => { return `<option data-avatar="${f.avatar}" value="${f.username}">${f.name} (@${f.username})</option>`}).join(''))
-                        .replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
+                        //.replaceAll('{{editor}}', !req.headers.get("swap-target") ? await utility.getEditor(following, mbUser.username, mbToken, destination) : '')
                     , HTMLHeaders(nonce, null, false));
 
 
