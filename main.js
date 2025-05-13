@@ -554,6 +554,13 @@ Deno.serve(async (req) => {
                 return new Response(JSON.stringify(data), JSONHeaders());
             }
 
+            if((new URLPattern({ pathname: "/api/notebooks" })).exec(req.url)) {
+                fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                const notebooks = await fetching.json();
+                const data = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
+                return new Response(JSON.stringify(data), JSONHeaders());
+            }
+
             if((new URLPattern({ pathname: "/api/following/favorites" })).exec(req.url)) {
                 console.log(userKV);
                 return new Response(JSON.stringify(userKV.value && userKV.value.favorites? userKV.value.favorites : []), JSONHeaders());
@@ -778,13 +785,17 @@ Deno.serve(async (req) => {
                         fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const notes = await fetching.json();
                         // put JSON check here or something.....
-                        content = `<div id="note-list" class="mt-2">${utility.getNotebookHTML(notes.items,id)}</div>`;
+                        content = `<div id="note-list">${utility.getNotebookHTML(notes.items,id)}</div>`;
                     } else {
                         fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const notebooks = await fetching.json();
-                        content = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element =>
-                            `<li><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join('');
-                        content = `<div id="notebook-list"><ul class="list border">${content}</ul></div>`;
+                        fetching = await fetch(`https://micro.blog/notes/notebooks/${notebooks.items[0].id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+                        const notes = await fetching.json();
+                        content = `<div id="note-list">${utility.getNotebookHTML(notes.items,id)}</div>`;
+
+                        // content = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element =>
+                        //     `<li><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join('');
+                        // content = `<div id="notebook-list"><ul class="list border">${content}</ul></div>`;
                     }
                     name = "notebook";
                     return new Response(new TextDecoder().decode(await Deno.readFile("notebooks.html")).replaceAll('{{nonce}}', nonce)
