@@ -1047,7 +1047,7 @@ export function postHTML(post, stranger, isConvo, convoId) {
                                         </svg>
                                     </i>
                                     <menu class="top no-wrap left">
-                                        <li data-ui="#dialog-reply">Comment</li>
+                                        <li data-ui="#dialog-reply-${item.id}">Comment</li>
                                     </menu>  
                                 </button>
                                 ${post.conversation && !isConvo ? `<!--<a rel="prefetch" swap-target="#conversation-${post.id}" swap-history="true"  href="/timeline/posts/${post.id}" class="button transparent circle wave m l">
@@ -1087,6 +1087,17 @@ export function postHTML(post, stranger, isConvo, convoId) {
                                         </div>
                                     <div>
                                 </dialog>-->
+                                <dialog id="dialog-reply-${item.id}" class="bottom">
+                                    <header class="fixed front">
+                                        <nav>
+                                            <div class="max truncate">
+                                                <h5>Reply</h5>
+                                            </div>
+                                            <button evt-click="close" data-id="reply-${item.id}" class="circle transparent"><i evt-click="close" data-id="reply-${item.id}">close</i></button>
+                                        </nav>
+                                    </header>
+                                    ${replyForm(item.id,`<label class="checkbox large icon"><input type='checkbox' checked="checked" name='replyingTo[]' value='${item.username}'><span><i><img class="round tiny" src="${item.avatar}"></i><i>done</i></span> @${item.username}</label>`, true)}
+                                </dialog>
                             </nav>
                         </div>
                     
@@ -1173,6 +1184,29 @@ export function postHTML(post, stranger, isConvo, convoId) {
         </article>
         ${isConvo ? `</div>` : '' }
     `;
+}
+
+function replyForm(id, checkboxes, reload = false) {
+    return `
+    <a id="reply-${id}" href="/conversation/${id}" class="hide"></a>
+    <form action='/reply' method='POST' data-id="reply-${id}" data-action="${reload}">
+        <fieldset>
+            <legend>Join the conversation</legend>
+            <nav class="vertical">
+                ${checkboxes}
+                <input type='hidden' value='${id}' name='id' />
+            </nav>
+            <div class="field border textarea" style="height:100%">
+                <div class="grow-wrap">
+                    <textarea id="content"
+                        name='content'
+                        required
+                        onInput="this.parentNode.dataset.replicatedValue = this.value"></textarea>
+                </div>
+            </div>
+            <button class="border" type='submit'>Submit reply</button>
+        </fieldset>
+    </form>`;
 }
 
 function getReplyBox(repliers) {  
