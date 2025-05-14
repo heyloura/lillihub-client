@@ -2283,6 +2283,8 @@ function HTML(content, title, redirect, footer, header) {
             <link href="https://cdn.jsdelivr.net/npm/beercss@3.10.7/dist/cdn/beer.min.css" rel="stylesheet">
             <script type="module" src="/scripts/beer.min.js" type="text/javascript"></script>
             <link rel="stylesheet" href="/styles/main.css">  
+            <script src="/scripts/showdown.js" type="text/javascript"></script>
+            <script src="/scripts/highlight.js" type="text/javascript"></script>
             <!--<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.10.7/dist/cdn/beer.min.js"></script>-->
         </head>
         <body>
@@ -2311,8 +2313,6 @@ function HTML(content, title, redirect, footer, header) {
             </main>
             ${footer ? footer : ''}
         </body>
-        <script nonce="{{nonce}}" src="/scripts/showdown.js" type="text/javascript"></script>
-        <script nonce="{{nonce}}" src="/scripts/highlight.js" type="text/javascript"></script>
         <script>
             function searchTag(tag) {
                 document.getElementById('search').value = tag;
