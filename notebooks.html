@@ -359,7 +359,7 @@
         fetch("/api/notebooks", { method: "get" })
         .then(response => response.json())
         .then(data => {
-            let selected = document.querySelector('note').getAttribute('data-notebookid');
+            let selected = document.querySelector('.note').getAttribute('data-notebookid');
             let content = `
                 <ul class="list">${data.map(element => {
                     return `<li class="${selected == element.id ? "primary-container" : ""}">
