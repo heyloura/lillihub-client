@@ -1090,13 +1090,17 @@ export function postHTML(post, stranger, isConvo, convoId) {
                                         </div>
                                     <div>
                                 </dialog>-->
-                                <dialog id="dialog-reply-${post.id}" class="bottom">
+                                <dialog id="dialog-reply-${post.id}" class="modal">
                                     <header class="fixed front">
                                         <nav>
                                             <div class="max truncate">
                                                 <h5>Reply</h5>
                                             </div>
-                                            <button evt-click="close" data-id="reply-${post.id}" class="circle transparent"><i evt-click="close" data-id="reply-${post.id}">close</i></button>
+                                            <button data-ui="#dialog-reply-${post.id}" class="circle transparent">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                                </svg>
+                                            </button>
                                         </nav>
                                     </header>
                                     ${replyForm(post.id,`<label class="checkbox large icon"><input type='checkbox' checked="checked" name='replyingTo[]' value='${post.username}'><span><i><img class="round tiny" src="${post.avatar}"></i><i>done</i></span> @${post.username}</label>`, true)}
