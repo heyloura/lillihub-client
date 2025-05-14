@@ -732,7 +732,7 @@ export function getNotebookHTML(notes, notebookId) {
             <input data-element="article" list="tags" id="search" type="text" class="form-input search" placeholder="...">
             <datalist id="tags"></datalist>
         </div>
-        ${notes.map((n,i) => `${notesHTML(n,notebookId)}`).join('')}
+        <ul class="border list">${notes.map((n,i) => `${notesHTML(n,notebookId)}`).join('')}</ul>
     </div>
     `;
 }
@@ -740,13 +740,14 @@ export function getNotebookHTML(notes, notebookId) {
 function notesHTML(note, notebookId) {
     const n = flattenedNote(note);
     return `
-            <article class="note bordered p-2" 
+            <li class="note" 
                 data-id="${n.id}" 
-                data-url="${n.url}" 
+                data-url="${n.url}"
+                data-notebookId="${notebookId}" 
                 data-published="${n.published}" 
                 data-modified="${n.modified}"
                 data-shared="${n.shared}" >               
-                <a id="title-${n.id}" class="fakeAnchor d-block" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">
+                <a id="title-${n.id}" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">
                     ${n.shared ? n.content_text.substring(0,50) : ''}
                 </a> 
                 <div class="card-subtitle">
@@ -756,7 +757,7 @@ function notesHTML(note, notebookId) {
                 <main class="hide">
                     <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>
                 </main>
-            </article>
+            </li>
     `;
 }
 
