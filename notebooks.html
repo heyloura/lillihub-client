@@ -76,12 +76,12 @@
                     <div class="m l m12 l3">
                         <h6>Notes</h6>
                         <div class="medium-space l m"></div>
-                        <div id="main" class="noteList">{{pages}}</div>
+                        <div id="main" swap-history-restore="#main" class="noteList">{{pages}}</div>
                     </div>
                     <div class="s12 m12 l6">
                         <h6 id="title"></h6>
                         <div class="medium-space l m"></div>
-                        <div id="note" swap-history-restore="#main">
+                        <div id="note">
                             <article class="medium middle-align center-align">
                                 <div>
                                     <i class="extra">
@@ -328,7 +328,7 @@
         .then(response => response.json())
         .then(data => {
             let content = `
-                <ul class="list border">${data.map(element => {
+                <ul class="list">${data.map(element => {
                     console.log(element);
                     return `<li>
                         <a rel="prefetch" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">
