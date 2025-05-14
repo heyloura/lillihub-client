@@ -746,13 +746,15 @@ function notesHTML(note, notebookId) {
                 data-notebookId="${notebookId}" 
                 data-published="${n.published}" 
                 data-modified="${n.modified}"
-                data-shared="${n.shared}" >               
-                <a id="title-${n.id}" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">
+                data-shared="${n.shared}" >      
+                <div class="max">         
+                <h6 class="small"><a id="title-${n.id}" rel="prefetch" href="/notebooks/${notebookId}/notes/${n.id}" swap-target="#main" swap-history="true">
                     ${n.shared ? n.content_text.substring(0,50) : ''}
-                </a> 
+                </a></h6> 
                 <div class="card-subtitle">
                     ${n.shared ? `<a target="_blank" class="text-gray" href="${n.shared_url}">${n.shared_url}</a>` : ''}
                     <div class="d-inline" id="tags-${n.id}"></div>
+                </div>
                 </div> 
                 <main class="hide">
                     <div data-id="${n.id}" class="${n.shared ? '' : 'decryptMe'}">${n.shared ? n.content_html : n.content_text}</div>

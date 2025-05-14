@@ -7059,7 +7059,7 @@ body.dark {
 iframe {width: 100% !important;height: unset;}
 .hide {display: none !important;}
 .post, .post pre, .post code, .note, .note pre, .note code { overflow-wrap: anywhere; }
-.post a, .note a { text-decoration: underline; display: inline; }
+.post a { text-decoration: underline; display: inline; }
 .post img, .post video, .note img, .note video { max-width: 100%; width: unset; height: unset; }
 .post > img.single, .post > p > img.single  {
     max-width: calc(100% + (1.2em * 2) - 2px);
@@ -7117,4 +7117,7 @@ article {
 .no-top {
   margin-top: 0 !important;
   border-top: 0;
+}
+.noteList, #note-list {
+  overflow: hidden;
 }
