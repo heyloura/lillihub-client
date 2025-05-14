@@ -360,9 +360,10 @@
         .then(response => response.json())
         .then(data => {
             let selected = document.querySelector('.note').getAttribute('data-notebookid');
+            console.log(selected);
             let content = `
                 <ul class="list">${data.map(element => {
-                    return `<li class="${selected == element.id ? "primary-container" : ""}">
+                    return `<li ${selected == element.id ? 'class="primary-container"' : ""}>
                         <a id=${element.id} rel="prefetch" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">
                             ${element.title}
                         </a>
