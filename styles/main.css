@@ -7118,6 +7118,6 @@ article {
   margin-top: 0 !important;
   border-top: 0;
 }
-.noteList, #note-list {
+.noteList, #notebooks-list, #notes-list {
   overflow: hidden;
 }

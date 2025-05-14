@@ -791,13 +791,13 @@ Deno.serve(async (req) => {
                         fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const notes = await fetching.json();
                         // put JSON check here or something.....
-                        content = `<div id="note-list">${utility.getNotebookHTML(notes.items,id)}</div>`;
+                        content = `<div id="notes-list">${utility.getNotebookHTML(notes.items,id)}</div>`;
                     } else {
                         fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const notebooks = await fetching.json();
                         fetching = await fetch(`https://micro.blog/notes/notebooks/${notebooks.items[0].id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
                         const notes = await fetching.json();
-                        content = `<div id="note-list">${utility.getNotebookHTML(notes.items,id)}</div>`;
+                        content = `<div id="notebook-list">${utility.getNotebookHTML(notes.items,notebooks.items[0].id)}</div>`;
 
                         // content = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)).map(element =>
                         //     `<li><a rel="prefetch" class="notebook-${element.id}" href="/notebooks/${element.id}" swap-target="#main" swap-history="true">${element.title}</a></li>`).join('');
