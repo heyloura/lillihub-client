@@ -359,8 +359,9 @@
         fetch("/api/notebooks", { method: "get" })
         .then(response => response.json())
         .then(data => {
+            let selectedEl = document.querySelector('.note');
             let selected = document.querySelector('.note').getAttribute('data-notebookid');
-            console.log(selected);
+            console.log(selectedEl, selected);
             let content = `
                 <ul class="list">${data.map(element => {
                     return `<li ${selected == element.id ? 'class="primary-container"' : ""}>
@@ -369,7 +370,6 @@
                         </a>
                     </li>`; }).join('')}
                 </ul>`;
-            console.log(content)
             document.getElementById("notebooks").innerHTML = content;
             register_links();
         });

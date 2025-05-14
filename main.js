@@ -776,6 +776,12 @@ Deno.serve(async (req) => {
                     const versions = await fetching.json();
                     // put JSON check here or something.....
                     content = `<div id="note" class="mt-2">${await utility.noteHTML(note,parts[parts.length - 3],versions.items)}</div>`;
+                    return new Response(new TextDecoder().decode(await Deno.readFile("notebooks.html")).replaceAll('{{nonce}}', nonce)
+                        .replaceAll('{{pages}}', content)
+                        .replaceAll('{{avatar}}', mbUser.avatar)
+                        .replaceAll('{{username}}', mbUser.username)
+                        .replaceAll('{{pageName}}', `Notebooks`)
+                    , HTMLHeaders(nonce, null, false));
                 } else if(req.url.includes("notebooks")) {
                     //-----------
                     //  Notebooks
