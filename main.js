@@ -275,7 +275,84 @@ Deno.serve(async (req) => {
             <div class="medium-space"></div>
             </div>`;
 
-            return new Response(HTML(page, 'Timeline', undefined), {status: 200, headers: {"content-type": "text/html" } });
+            return new Response(HTML(page, 'Timeline', undefined, null, `
+            <header class="fixed">
+                <nav>
+                    <button id="menu" data-ui="#apps-menu-drawer" class="s circle transparent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                        </svg>
+                    </button>
+                    <a href="javascript:history.back()" id="goBack" class="s circle transparent hide button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                        </svg>
+                    </a>
+                    <a class="m l button transparent" href="/blog">Blog</a>
+                    <a class="m l button transparent" href="/bookmarks">Bookmarks</a>
+                    <a class="m l button transparent" href="/bookshelves">Bookshelves</a>
+                    <a class="m l button transparent" href="/notebooks">Notes</a>
+                    <a class="m l active button" href="/timeline">Social</a>
+                    <!-- <a class="m l" href="/settings">Settings</a> -->
+                    <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
+                    <span class="max m l"></span>
+                    <button class="circle transparent">
+                        <img id="myAvatar" class="responsive" src="{{avatar}}">
+                    </button>
+                </nav>
+                <dialog id="apps-menu-drawer" class="left">
+                    <header>
+                        <nav>
+                        <img width="60" src="/logo.png">
+                        <h6 class="max">Lillihub</h6>
+                        <div class="max"></div>
+                        <button data-ui="#apps-menu-drawer" class="circle transparent">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                </svg>
+                        </button>
+                        </nav>
+                    </header>
+                    <ul class="list">
+                        <li><a class="button" href="/blog">Blog</a></li>
+                        <li><a class="button" href="/bookmarks">Bookmarks</a></li>
+                        <li><a class="button" href="/bookshelves">Bookshelves</a></li>
+                        <li><a class="button" href="/notebooks">Notes</a></li>
+                        <li><a class="button primary" href="/timeline">Social</a></li>
+                    </ul>
+                    <aside>
+                        <h6>Recent Mentions</h6>
+                        <div class="medium-space s"></div>
+                        <div id="mentions-sidebar">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                    </aside>
+                    <aside>
+                        <h6>Recent Replies</h6>
+                        <div class="medium-space s"></div>
+                        <div id="replies-sidebar">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                    </aside>
+                    <aside>
+                        <h6>Following</h6>
+                        <div class="medium-space s"></div>
+                        <div id="following-sidebar">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                    </aside>
+                </dialog>
+            </header>
+                `), {status: 200, headers: {"content-type": "text/html" } });
         }
 
         //---------------------------------
