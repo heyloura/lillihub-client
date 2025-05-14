@@ -7111,13 +7111,7 @@ textarea { width: 100%; }
 nav.drawer, [dir=rtl] nav.drawer {
   inline-size: 15rem; 
 }
-article {
-  /* border: 1px solid #e1e3c7; */
-}
 .no-top {
   margin-top: 0 !important;
   border-top: 0;
-}
-.noteList, #notebooks-list, #notes-list {
-  overflow: hidden;
 }

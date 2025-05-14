@@ -274,53 +274,7 @@ Deno.serve(async (req) => {
             <div class="medium-space"></div>
             </div>`;
 
-            return new Response(HTML(page, 'Timeline', undefined, null, `
-            <header class="fixed">
-                <nav>
-                    <button id="menu" data-ui="#apps-menu-drawer" class="s circle transparent">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-                        </svg>
-                    </button>
-                    <a href="javascript:history.back()" id="goBack" class="s circle transparent hide button">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                        </svg>
-                    </a>
-                    <a class="m l button transparent" href="/blog">Blog</a>
-                    <a class="m l button transparent" href="/bookmarks">Bookmarks</a>
-                    <a class="m l button transparent" href="/bookshelves">Bookshelves</a>
-                    <a class="m l button transparent" href="/notebooks">Notes</a>
-                    <a class="m l active button" href="/timeline">Social</a>
-                    <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
-                    <span class="max m l"></span>
-                    <button class="circle transparent">
-                        <img id="myAvatar" class="responsive" src="{{avatar}}">
-                    </button>
-                </nav>
-                <dialog id="apps-menu-drawer" class="left">
-                    <header>
-                        <nav>
-                        <img width="60" src="/logo.png">
-                        <h6 class="max">Lillihub</h6>
-                        <div class="max"></div>
-                        <button data-ui="#apps-menu-drawer" class="circle transparent">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                                </svg>
-                        </button>
-                        </nav>
-                    </header>
-                    <ul class="list">
-                        <li><a class="button" href="/blog">Blog</a></li>
-                        <li><a class="button" href="/bookmarks">Bookmarks</a></li>
-                        <li><a class="button" href="/bookshelves">Bookshelves</a></li>
-                        <li><a class="button" href="/notebooks">Notes</a></li>
-                        <li><a class="button primary" href="/timeline">Social</a></li>
-                    </ul>
-                </dialog>
-            </header>
-                `), {status: 200, headers: {"content-type": "text/html" } });
+            return new Response(TimelineHTML(page, 'Timeline'), {status: 200, headers: {"content-type": "text/html" } });
         }
 
         //---------------------------------
@@ -973,9 +927,9 @@ Deno.serve(async (req) => {
                     return array_buffer;
                 }
                 async function decryptWithKey(encryptedText) {
-                    const imported_key = localStorage.getItem("key") ? await crypto.subtle.importKey(
+                    const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importKey(
                         'raw',
-                        hexStringToArrayBuffer(localStorage.getItem("key").substr(4)),
+                        hexStringToArrayBuffer(localStorage.getItem("mbKey").substr(4)),
                         { name: 'AES-GCM', length: 256 },
                         true,
                         ['encrypt', 'decrypt']
@@ -995,9 +949,9 @@ Deno.serve(async (req) => {
                     return decrypted_text;
                 }
                 window.encryptWithKey = async function(text) {
-                    const imported_key = localStorage.getItem("key") ? await crypto.subtle.importKey(
+                    const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importKey(
                         'raw',
-                        hexStringToArrayBuffer(localStorage.getItem("key").substr(4)),
+                        hexStringToArrayBuffer(localStorage.getItem("mbKey").substr(4)),
                         { name: 'AES-GCM', length: 256 },
                         true,
                         ['encrypt', 'decrypt']
@@ -1122,7 +1076,7 @@ Deno.serve(async (req) => {
                     </button>
                 </article>
                 <script>
-                    if(!localStorage.getItem("key")) {
+                    if(!localStorage.getItem("mbKey")) {
                         document.getElementById('keyPompt').classList.remove('hide');
                     }
                     document.addEventListener("click", async (event) => {
@@ -2330,60 +2284,6 @@ function HTML(content, title, redirect, footer, header) {
             <script type="module" src="/scripts/beer.min.js" type="text/javascript"></script>
             <link rel="stylesheet" href="/styles/main.css">  
             <!--<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.10.7/dist/cdn/beer.min.js"></script>-->
-            <style>
-                iframe {width: 100% !important;height: unset;}
-                .hide {display: none !important;}
-                .post, .post pre, .post code, .note, .note pre, .note code { overflow-wrap: anywhere; }
-                .post a, .note a { text-decoration: underline; display: inline; }
-                .post img, .post video, .note img, .note video { max-width: 100%; width: unset; height: unset; }
-                .post > img.single  {
-                    max-width: calc(100% + (1.2em * 2));
-                    height: auto;
-                    margin-left: -1rem;
-                }
-                h1, h2, h3 {
-                    font-size: 1.5625rem;
-                }
-                .chip {padding: 0 .5rem;}
-                .clear {clear: both;}
-                #swap, .convo { max-width: 80ch; }
-                .convo { margin: 0px auto; }
-                .mini_cover { float: left; padding-right: 1em; }
-                textarea { width: 100%; }
-                .avatar { height: 48px !important; width: 48px !important;}
-                [data-parent-of] button { display: none; }
-                @media only screen and (max-width: 600px) {
-                    body {
-                        --_left: 0rem !important;
-                    }
-                }
-                .grow-wrap {
-                    display: grid;
-                    margin: var(--space-xs) 0;
-                }
-                .grow-wrap::after {
-                    content: attr(data-replicated-value) " ";
-                    white-space: pre-wrap;
-                    visibility: hidden;
-                }
-                .grow-wrap > textarea {
-                    resize: none;
-                    overflow: hidden;
-                    background-color: var(--mantle);
-                    color: var(--text);
-                }
-                .grow-wrap > textarea,
-                .grow-wrap::after {
-                    padding: 0.5rem;
-                    font: inherit;
-                    grid-area: 1 / 1 / 2 / 2;
-                }
-                main {
-                    width: min(100%, 80ch);
-                    max-width: 80ch;
-                    margin: 0 auto;
-                }
-            </style>
         </head>
         <body>
             <nav class="left l">
@@ -2457,6 +2357,57 @@ function HTML(content, title, redirect, footer, header) {
         </script>
     </html>    
     `;
+}
+function TimelineHTML(content, title, redirect) {
+    return HTML(content, title, redirect, undefined, 
+        `
+        <header class="fixed">
+            <nav>
+                <button id="menu" data-ui="#apps-menu-drawer" class="s circle transparent">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                    </svg>
+                </button>
+                <a href="javascript:history.back()" id="goBack" class="s circle transparent hide button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                    </svg>
+                </a>
+                <a class="m l button transparent" href="/blog">Blog</a>
+                <a class="m l button transparent" href="/bookmarks">Bookmarks</a>
+                <a class="m l button transparent" href="/bookshelves">Bookshelves</a>
+                <a class="m l button transparent" href="/notebooks">Notes</a>
+                <a class="m l active button" href="/timeline">Social</a>
+                <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
+                <span class="max m l"></span>
+                <button class="circle transparent">
+                    <img id="myAvatar" class="responsive" src="{{avatar}}">
+                </button>
+            </nav>
+            <dialog id="apps-menu-drawer" class="left">
+                <header>
+                    <nav>
+                    <img width="60" src="/logo.png">
+                    <h6 class="max">Lillihub</h6>
+                    <div class="max"></div>
+                    <button data-ui="#apps-menu-drawer" class="circle transparent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                            </svg>
+                    </button>
+                    </nav>
+                </header>
+                <ul class="list">
+                    <li><a class="button" href="/blog">Blog</a></li>
+                    <li><a class="button" href="/bookmarks">Bookmarks</a></li>
+                    <li><a class="button" href="/bookshelves">Bookshelves</a></li>
+                    <li><a class="button" href="/notebooks">Notes</a></li>
+                    <li><a class="button primary" href="/timeline">Social</a></li>
+                </ul>
+            </dialog>
+        </header>
+        `
+    );
 }
 function flattenPost(post) {
     let regex = /(height|width)=".*?";/gi;
@@ -2609,7 +2560,7 @@ async function getConversationHTML(id, token, nonce, csp) {
         }).join('')}
         ${replyForm(id, replyCheckboxes)}</div>`;
 
-    return new Response(HTML(page, 'Conversation'), {
+    return new Response(TimelineHTML(page, 'Timeline')(page, 'Conversation'), {
         status: 200,
         headers: {
             "content-type": "text/html",
