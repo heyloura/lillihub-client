@@ -250,7 +250,6 @@ Deno.serve(async (req) => {
                                                 </dialog>
                                             </nav>
                                         </div>
-                                    
                                 </div>
                             </div>
                         </div>
@@ -293,7 +292,6 @@ Deno.serve(async (req) => {
                     <a class="m l button transparent" href="/bookshelves">Bookshelves</a>
                     <a class="m l button transparent" href="/notebooks">Notes</a>
                     <a class="m l active button" href="/timeline">Social</a>
-                    <!-- <a class="m l" href="/settings">Settings</a> -->
                     <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
                     <span class="max m l"></span>
                     <button class="circle transparent">
@@ -320,36 +318,6 @@ Deno.serve(async (req) => {
                         <li><a class="button" href="/notebooks">Notes</a></li>
                         <li><a class="button primary" href="/timeline">Social</a></li>
                     </ul>
-                    <aside>
-                        <h6>Recent Mentions</h6>
-                        <div class="medium-space s"></div>
-                        <div id="mentions-sidebar">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                    </aside>
-                    <aside>
-                        <h6>Recent Replies</h6>
-                        <div class="medium-space s"></div>
-                        <div id="replies-sidebar">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                    </aside>
-                    <aside>
-                        <h6>Following</h6>
-                        <div class="medium-space s"></div>
-                        <div id="following-sidebar">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                    </aside>
                 </dialog>
             </header>
                 `), {status: 200, headers: {"content-type": "text/html" } });
@@ -478,7 +446,7 @@ Deno.serve(async (req) => {
         //---------------------------
         // This is a note editor
         //---------------------------
-        if(new URLPattern({ pathname: "/zzuh/:parent/:id" }).exec(req.url) || new URLPattern({ pathname: "/zzuh/:parent" }).exec(req.url)) {
+        if(new URLPattern({ pathname: "/note/edit/:parent/:id" }).exec(req.url) || new URLPattern({ pathname: "/note/edit/:parent" }).exec(req.url)) {
             let id = 0;
             let results = {};
             let versions = {};
@@ -486,9 +454,9 @@ Deno.serve(async (req) => {
             const searchParams = new URLSearchParams(req.url.split('?')[1]);
             const vid = searchParams.get('vid');
 
-            if(new URLPattern({ pathname: "/zzuh/:parent/:id" }).exec(req.url)) {
-                parent = new URLPattern({ pathname: "/zzuh/:parent/:id" }).exec(req.url).pathname.groups.parent;
-                id = new URLPattern({ pathname: "/zzuh/:parent/:id" }).exec(req.url).pathname.groups.id;
+            if(new URLPattern({ pathname: "/note/edit/:parent/:id" }).exec(req.url)) {
+                parent = new URLPattern({ pathname: "/note/edit/:parent/:id" }).exec(req.url).pathname.groups.parent;
+                id = new URLPattern({ pathname: "/note/edit/:parent/:id" }).exec(req.url).pathname.groups.id;
                 let fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
                 versions = await fetching.json();
                 
@@ -499,7 +467,7 @@ Deno.serve(async (req) => {
                     results = versions.items.filter(v => v.id == vid)[0];        
                 }
             } else {
-                parent = new URLPattern({ pathname: "/zzuh/:parent" }).exec(req.url).pathname.groups.parent;
+                parent = new URLPattern({ pathname: "/note/edit/:parent" }).exec(req.url).pathname.groups.parent;
             }
 
             return new Response(HTML(`
@@ -524,7 +492,7 @@ Deno.serve(async (req) => {
                     <table class="table table-striped p-2">
                         ${versions.items.reverse().map((v, i) => `<tr>
                             <td>${(new Date(v.date_published).toLocaleString('en-US', { timeZoneName: 'short' })).replace(' UTC','')}</td>
-                            <td><a href="/zzuh/${parent}/${id}?vid=${v.id}">${v.id}</a>${i == 0 ? ' (current)' : ''}</td>
+                            <td><a href="/note/edit/${parent}/${id}?vid=${v.id}">${v.id}</a>${i == 0 ? ' (current)' : ''}</td>
                         </tr>`).join('')}
                     </table>
                 </dialog>` : '' }
@@ -588,7 +556,7 @@ Deno.serve(async (req) => {
                                     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
                                 }
                             });
-                            window.location = '/hoxtc/${parent}';
+                            window.location = '/notebook/${parent}';
                         });
                     }
                 </script>
@@ -620,9 +588,9 @@ Deno.serve(async (req) => {
         //---------------------------
         // This is a note viewer
         //---------------------------
-        if(new URLPattern({ pathname: "/wpii/:parent/:id" }).exec(req.url)) {
-            const id = new URLPattern({ pathname: "/wpii/:parent/:id" }).exec(req.url).pathname.groups.id;
-            const parent = new URLPattern({ pathname: "/wpii/:parent/:id" }).exec(req.url).pathname.groups.parent;
+        if(new URLPattern({ pathname: "/note/view/:parent/:id" }).exec(req.url)) {
+            const id = new URLPattern({ pathname: "/note/view/:parent/:id" }).exec(req.url).pathname.groups.id;
+            const parent = new URLPattern({ pathname: "/note/view/:parent/:id" }).exec(req.url).pathname.groups.parent;
             const fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
             const fetchingNotebooks = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
@@ -634,7 +602,7 @@ Deno.serve(async (req) => {
                         </label>`;
             }).join('');
             return new Response(HTML(`
-                <a id="editLink" href="/zzuh/${parent}/${id}" style="display:none;"></a>
+                <a id="editLink" href="/note/edit/${parent}/${id}" style="display:none;"></a>
                 <div class="note small-padding" 
                     data-parent="${id}"
                     data-id="${results.id}" 
@@ -675,7 +643,7 @@ Deno.serve(async (req) => {
                             method:'post', 
                             body: new FormData(document.getElementById('moveNotebookForms'))})
                                 .then(r => {
-                                    window.location = '/hoxtc/${parent}';
+                                    window.location = '/notebook/${parent}';
                                 });
                     }
                     function editNote() {
@@ -695,7 +663,7 @@ Deno.serve(async (req) => {
                                 headers: {
                                     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
                                 }
-                            }).then(async result => {  window.location = '/hoxtc/${parent}'; });
+                            }).then(async result => {  window.location = '/notebook/${parent}'; });
                         }
                     }
                 </script>
@@ -1055,14 +1023,14 @@ Deno.serve(async (req) => {
         //--------------------------------------
         // This is the notes list in a notebook
         //--------------------------------------
-        if(new URLPattern({ pathname: "/hoxtc/:id" }).exec(req.url)) {
-            const id = new URLPattern({ pathname: "/hoxtc/:id" }).exec(req.url).pathname.groups.id;
+        if(new URLPattern({ pathname: "/notebook/:id" }).exec(req.url)) {
+            const id = new URLPattern({ pathname: "/notebook/:id" }).exec(req.url).pathname.groups.id;
             console.log(`/notebooks/${id}`);
             const fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
             return new Response(HTML(`
                 <style>a{width:100%;justify-content:left;}.chip{width: auto;overflow: hidden;text-decoration: none;margin: 0 0.5em 0 0;font-size: smaller;}</style>
-                <a id="addLink" href="/zzuh/${id}" style="display:none;"></a>
+                <a id="addLink" href="/note/edit/${id}" style="display:none;"></a>
                 <div class="field large prefix round fill active">
                     <i class="front">search</i>
                     <input id="search" onInput="liveSearch('li','search')">
@@ -1119,7 +1087,7 @@ Deno.serve(async (req) => {
                         if(item.type == 'todo.txt') {
                             element.innerHTML = '<h6><a style="text-decoration:none;" href="/todo/${id}/'+item.id+'">'+item.title+'</a></h6><hr/><div class="small-space"></div><div>'+(item.tags ? item.tags.replaceAll('[','').replaceAll(']','').split(',').map(t => { return '<button onClick="searchTag(\\'#'+t+'\\')" class="chip fill tiny">#'+t+'</button>' }).join('') : '')+'</div><div class="small-space"></div><div>'+item.content_html+'</div>';
                         } else {
-                            element.innerHTML = '<h6><a style="text-decoration:none;" href="/wpii/${id}/'+item.id+'">'+item.title+'</a></h6><hr/><div class="small-space"></div><div>'+(item.tags ? item.tags.replaceAll('[','').replaceAll(']','').split(',').map(t => { return '<button onClick="searchTag(\\'#'+t+'\\')" class="chip fill tiny">#'+t+'</button>' }).join('') : '')+'</div><div class="small-space"></div><div>'+item.content_html+'</div>';
+                            element.innerHTML = '<h6><a style="text-decoration:none;" href="/note/view/${id}/'+item.id+'">'+item.title+'</a></h6><hr/><div class="small-space"></div><div>'+(item.tags ? item.tags.replaceAll('[','').replaceAll(']','').split(',').map(t => { return '<button onClick="searchTag(\\'#'+t+'\\')" class="chip fill tiny">#'+t+'</button>' }).join('') : '')+'</div><div class="small-space"></div><div>'+item.content_html+'</div>';
                         }
                     }
                 `)}
@@ -1138,7 +1106,7 @@ Deno.serve(async (req) => {
         //---------------------------
         // This is the notebook list
         //---------------------------
-        if(new URLPattern({ pathname: "/evko" }).exec(req.url)) {
+        if(new URLPattern({ pathname: "/notebooks" }).exec(req.url)) {
             const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
             return new Response(HTML(`
@@ -1171,7 +1139,7 @@ Deno.serve(async (req) => {
                         return `
                             <li>
                                 <div class="max">
-                                    <h6 class="small"><a href="/hoxtc/${n.id}">${n.title}</a></h6>
+                                    <h6 class="small"><a href="/notebook/${n.id}">${n.title}</a></h6>
                                 </div>
                             </li>
                         `;
@@ -2428,7 +2396,7 @@ function HTML(content, title, redirect, footer, header) {
                     <i>house</i>
                     <div>Dashboard</div>
                 </a>
-                <a href="/evko">
+                <a href="/notebooks">
                     <i>description</i>
                     <div>Notebooks</div>
                 </a>
