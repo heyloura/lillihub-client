@@ -2417,7 +2417,7 @@ function TimelineHTML(content, title, redirect) {
                     </aside>
                 </div>
                 <div class="s12 m12 l6">
-                    <article class="no-elevate tertiary-container m l">
+                    <article id="quickPost" class="no-elevate tertiary-container m l">
                         <div class="row">
                             <img class="medium round" src="{{avatar}}">
                             <div class="max">
@@ -2733,9 +2733,21 @@ async function getConversationHTML(id, token, nonce, csp) {
     let replyCheckboxes = uniqueRepliers.map(function (person, i) {
         return `<label class="checkbox large icon"><input ${i == 0 ? `checked="checked"` : ''} type='checkbox' name='replyingTo[]' value='${person}'><span><i><img class="round tiny" src="${results.items.filter(i => i.author._microblog.username == person)[0].author.avatar}"></i><i>done</i></span> @${person}</label>`
     }).join(' ');
-    let page = `<div id="conversation-${id}">${results.items.reverse().map((item,i) => {
-            let heading = "<h6>Post</h6>";
-            let subHeading = "<h6>COnversation</h6>";
+    let page = `<div id="conversation-${id}">
+        <header id="goBackHeader" class="fixed surface-container-low m l">
+            <nav>
+                <a href="javascript:history.back()" class="circle transparent button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                    </svg>
+                </a>
+                <h5 class="max center-align s truncate">Conversation</h5>
+                <span class="max m l"></span>
+            </nav>
+        </header>
+        ${results.items.reverse().map((item,i) => {
+            let heading = "<h6 class='center-align'>Post</h6>";
+            let subHeading = "<h6 class='center-align'>Replies</h6>";
             return `${i == 0 ? heading : ""}${i == 1 ? subHeading : ''}${postHTML(item,false,true)}`;
         }).join('')}
         ${replyForm(id, replyCheckboxes)}</div>`;

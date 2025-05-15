@@ -626,10 +626,14 @@ loaders['.conversation'] = () => {
     document.getElementById('titleBar').innerHTML = `${document.querySelector('.conversation').getAttribute('data-name')}'s Post`;
     document.getElementById('goBack').classList.remove('hide');
     document.getElementById('menu').classList.add('hide');
+    document.getElementById('quickPost').classList.add('hide');
+    document.getElementById('goBackHeader').classList.remove('hide');
 
     return () => {  // unloader function
         document.getElementById('titleBar').innerHTML = `Timeline`;
         document.getElementById('goBack').classList.add('hide');
         document.getElementById('menu').classList.remove('hide');
+        document.getElementById('quickPost').classList.remove('hide');
+        document.getElementById('goBackHeader').classList.add('hide');
     };  
 }
