@@ -195,7 +195,7 @@ Deno.serve(async (req) => {
 
         if((new URLPattern({ pathname: "/api/discover/lillihub" })).exec(req.url)) {
             const fetching = await fetch(`https://micro.blog/posts/timeline?count=40`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
-            const results = fetching.json();
+            const results = await fetching.json();
             console.log(results);
             if(results) {
                 let data = results.items.map(n => {return { content: postHTML(n, false) }});
