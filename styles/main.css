@@ -7135,7 +7135,6 @@ textarea { width: 100%; }
     background-color: var(--mantle);
     color: var(--text);
     border: .0625rem solid var(--outline);
-    border-top: 0;
 }
 .grow-wrap > textarea,
 .grow-wrap::after {
