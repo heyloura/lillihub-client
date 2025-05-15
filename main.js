@@ -2291,7 +2291,7 @@ function HTML(content, title, redirect, footer, header) {
             <nav class="left l">
                 <header>
                     <nav>
-                        <img src="/lillihub-512.png" class="avatar">
+                        <img src="/logo.png" class="avatar">
                     </nav>
                 </header>
                 <a href="/">
@@ -2359,7 +2359,109 @@ function HTML(content, title, redirect, footer, header) {
     `;
 }
 function TimelineHTML(content, title, redirect) {
-    return HTML(content, title, redirect, undefined, 
+    return HTML(`
+        <div class="page right active">
+            <div class="grid medium-space">
+                <div class="m l m12 l3">
+                    <aside>
+                        <h6>Recent Mentions</h6>
+                        <div class="medium-space l m"></div>
+                        <div id="mentions">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                    </aside>
+                    <aside>
+                        <h6>Recent Replies</h6>
+                        <div class="medium-space l m"></div>
+                        <div id="replies">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                    </aside>
+                    <aside>
+                        <h6>Following</h6>
+                        <div class="medium-space l m"></div>
+                        <div id="following">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                    </aside>
+                </div>
+                <div class="s12 m12 l6">
+                    <article class="no-elevate tertiary-container m l">
+                        <div class="row">
+                            <img class="medium round" src="{{avatar}}">
+                            <div class="max">
+                                <div class="field fill round no-elevate">
+                                    <input data-ui="#dialog-post" placeholder="Create Post">
+                                </div>
+                            </div>
+                            <button class="transparent circle">
+                                <i>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
+                                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                        <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54L1 12.5v-9a.5.5 0 0 1 .5-.5z"/>
+                                    </svg>
+                                </i>
+                                <div class="tooltip bottom">Create Media Post</div>
+                            </button>
+                            <button class="transparent circle">
+                                <i>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
+                                        <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9q-.13 0-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                                        <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4 4 0 0 1-.82 1H12a3 3 0 1 0 0-6z"/>
+                                    </svg>
+                                </i>
+                                <div class="tooltip bottom">Create Link Post</div>
+                            </button>
+                        </div>
+                    </article>
+                    <div class="medium-space l m"></div>
+                    <div id="newPost"></div>
+                    <div id="main" swap-history-restore="#main">${content}</div>
+                </div>
+                <div class="m12 l3 m l">
+                    <aside>
+                        <h6>New on Micro.blog</h6>
+                        <div class="medium-space l m"></div>
+                        <div id="new">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                    </aside>
+                    <aside>
+                        <h6>Discover photos</h6>
+                        <div class="medium-space l m"></div>
+                        <div id="photos">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                    </aside>
+                    <aside>
+                        <h6>Curated Discover</h6>
+                        <div class="medium-space l m"></div>
+                        <div id="discover">
+                            <div class="center-align middle-align"> 
+                                <progress class="circle"></progress>
+                            </div>
+                        </div>
+                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                    </aside>
+                    <div id="feeds"></div>
+                </div>
+            </div>
+        </div>
+        `, title, redirect, undefined, 
         `
         <header class="fixed">
             <nav>
