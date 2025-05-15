@@ -156,6 +156,66 @@ Deno.serve(async (req) => {
             });
         }
 
+        if((new URLPattern({ pathname: "/api/mentions" })).exec(req.url)) {
+            const fetching = await fetch(`https://micro.blog/posts/mentions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const results = await fetching.json();
+            return new Response(JSON.stringify(results), JSONHeaders());
+        }
+
+        if((new URLPattern({ pathname: "/api/replies" })).exec(req.url)) {
+            const fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const results = await fetching.json();
+            return new Response(JSON.stringify(results), JSONHeaders());
+        }
+
+        if((new URLPattern({ pathname: "/api/discover/photos" })).exec(req.url)) {
+            const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const results = await fetching.json();
+            let data = results.items.map(n => {
+                let src = n.content_html;
+                if(src) {
+                    src = src.split('src="')[1];
+                }
+                if(src) {
+                    src = src.split('"')[0];
+                }
+                if(src) {
+                    return { content: `<article class="no-padding">
+                                        <img class="responsive medium" src="${src}">
+                                        </article>` };
+                }
+                return {};
+            });
+            return new Response(JSON.stringify(data), JSONHeaders());
+        }
+
+        if((new URLPattern({ pathname: "/api/discover/lillihub" })).exec(req.url)) {
+            console.log(_lillihubToken);
+            const results = await mb.getMicroBlogTimelinePostsChronological(_lillihubToken);
+            console.log(results);
+            let data = results.map(n => {return { content: utility.postHTML(n) }});
+            return new Response(JSON.stringify(data), JSONHeaders());
+        }
+        
+        if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
+            const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const results = await fetching.json();
+            let data = results.items.map(n => {return { content: utility.postHTML(n) }});
+            return new Response(JSON.stringify(data), JSONHeaders());
+        }
+
+        if((new URLPattern({ pathname: "/api/notebooks" })).exec(req.url)) {
+            const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const notebooks = await fetching.json();
+            const data = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
+            return new Response(JSON.stringify(data), JSONHeaders());
+        }
+
+        if((new URLPattern({ pathname: "/api/following/favorites" })).exec(req.url)) {
+            console.log(userKV);
+            return new Response(JSON.stringify(userKV.value && userKV.value.favorites? userKV.value.favorites : []), JSONHeaders());
+        }
+
         if(new URLPattern({ pathname: "/timeline" }).exec(req.url)) {
             const searchParams = new URLSearchParams(req.url.split('?')[1]);
             const before = searchParams.get('before');
@@ -253,7 +313,7 @@ Deno.serve(async (req) => {
                                                             <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
                                                         </svg>
                                                     </i></a>
-                                                    <a data-ui="dialog-${item.id}" href="/conversation/${item.id}" class="button transparent circle wave s"><i>
+                                                    <a data-ui="dialog-${item.id}" rel="prefetch" swap-target="#conversation-${item.id}" swap-history="true" href="/conversation/${item.id}" class="button transparent circle wave m l"><i>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
                                                             <path d="M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"/>
                                                             <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
@@ -261,7 +321,7 @@ Deno.serve(async (req) => {
                                                     </i></a>` : 
                                                     ``
                                                 }
-                                                <dialog id="dialog-${item.id}" class="max">
+                                                <dialog id="dialog-${item.id}" class="modal">
                                                     <header class="fixed front">
                                                         <nav>
                                                             <div class="max truncate">
