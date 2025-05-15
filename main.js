@@ -2658,8 +2658,7 @@ function formatHTML (str) {
                 const dialog = html.createElement('dialog');
                 dialog.classList.add('modal');
                 dialog.setAttribute('id', image.getAttribute('src'));
-                html.appendChild(dialog);
-                dialog.insertAdjacentHTML('beforeend', `<header class="fixed front">
+                dialog.innerHTML = `<header class="fixed front">
                     <nav>
                         <div class="max ">
                         </div>
@@ -2669,7 +2668,8 @@ function formatHTML (str) {
                             </svg>
                         </i></button>
                     </nav>
-                </header><img loading="lazy" src="${image.getAttribute('src')}"/>`)
+                </header><img loading="lazy" src="${image.getAttribute('src')}"/>`;
+                html.appendChild(dialog);
             } else {
                 image.classList.add('single');
             }
