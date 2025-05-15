@@ -194,10 +194,14 @@ Deno.serve(async (req) => {
         }
 
         if((new URLPattern({ pathname: "/api/discover/lillihub" })).exec(req.url)) {
-            const fetching = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+            const fetching = await fetch(`https://micro.blog/posts/timeline?count=40`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
             const results = fetching.json();
-            let data = results.items.map(n => {return { content: postHTML(n, false) }});
-            return new Response(JSON.stringify(data), JSONHeaders());
+            console.log(results);
+            if(results) {
+                let data = results.items.map(n => {return { content: postHTML(n, false) }});
+                return new Response(JSON.stringify(data), JSONHeaders());
+            }
+            return new Response([], JSONHeaders());
         }
         
         if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
