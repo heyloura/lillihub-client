@@ -197,14 +197,14 @@ Deno.serve(async (req) => {
             console.log(_lillihubToken);
             const results = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
             console.log(results);
-            let data = results.map(n => {return { content: postHTML(n) }});
+            let data = results.map(n => {return { content: postHTML(n, 0) }});
             return new Response(JSON.stringify(data), JSONHeaders());
         }
         
         if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
             const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
-            let data = results.items.map(n => {return { content: postHTML(n) }});
+            let data = results.items.map(n => {return { content: postHTML(n, 0) }});
             return new Response(JSON.stringify(data), JSONHeaders());
         }
 
@@ -269,7 +269,7 @@ Deno.serve(async (req) => {
             let page = `<div class="screen">
             ${before ? `<a class="button wave border" href="/timeline?after=${items[0].id}">Previous</a>` : ''}
             ${items.map((item,i) => {
-                return postHTML(item);
+                return postHTML(item, i);
             }).join('')}          
             <div class="medium-space"></div>  
             <nav class="no-space">
@@ -2742,7 +2742,7 @@ async function getMicroBlogUser(accessToken) {
     return result;
 }
 
-function postHTML(item) {
+function postHTML(item, i) {
     item = flattenPost(item);
     return `
         <article class="no-elevate round ${i == index ? 'secondary-container' : ''}" data-id="${item.id}">
