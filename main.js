@@ -157,19 +157,19 @@ Deno.serve(async (req) => {
         }
 
         if((new URLPattern({ pathname: "/api/mentions" })).exec(req.url)) {
-            const fetching = await fetch(`https://micro.blog/posts/mentions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const fetching = await fetch(`https://micro.blog/posts/mentions`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
             return new Response(JSON.stringify(results), JSONHeaders());
         }
 
         if((new URLPattern({ pathname: "/api/replies" })).exec(req.url)) {
-            const fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
             return new Response(JSON.stringify(results), JSONHeaders());
         }
 
         if((new URLPattern({ pathname: "/api/discover/photos" })).exec(req.url)) {
-            const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
             let data = results.items.map(n => {
                 let src = n.content_html;
@@ -198,14 +198,14 @@ Deno.serve(async (req) => {
         }
         
         if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
-            const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
             let data = results.items.map(n => {return { content: utility.postHTML(n) }});
             return new Response(JSON.stringify(data), JSONHeaders());
         }
 
         if((new URLPattern({ pathname: "/api/notebooks" })).exec(req.url)) {
-            const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+            const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const notebooks = await fetching.json();
             const data = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
             return new Response(JSON.stringify(data), JSONHeaders());
@@ -1297,7 +1297,7 @@ Deno.serve(async (req) => {
     //                 const replies = replyingTo.map(function (reply, i) { return '@' + reply }).join(' ');
     //                 content = replies + ' ' + content;
         
-    //                 const posting = await fetch(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+    //                 const posting = await fetch(`https://micro.blog/posts/reply?id=${id}&content=${encodeURIComponent(content)}`, { method: "POST", headers: { "Authorization": "Bearer " + token } });
     //                 if (!posting.ok) {
     //                     console.log(`${user.username} tried to add a reply and ${await posting.text()}`);
     //                 }
@@ -1392,7 +1392,7 @@ Deno.serve(async (req) => {
     //                     formBody.append("mp-syndicate-to[]", "");
     //                 }
                     
-    //                 const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
+    //                 const posting = await fetch(`https://micro.blog/micropub`, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + token, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
     //                 if (!posting.ok) {
     //                    console.log(`${user.username} tried to add a post and ${await posting.text()}`);
     //                 }
@@ -1438,11 +1438,11 @@ Deno.serve(async (req) => {
     //                 }
     //             }
         
-    //             let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const config = await fetching.json();
     //             const mediaEndpoint = config["media-endpoint"];
         
-    //             fetching = await fetch(mediaEndpoint, { method: "POST", headers: { "Authorization": "Bearer " + mbToken }, body: formData } );
+    //             fetching = await fetch(mediaEndpoint, { method: "POST", headers: { "Authorization": "Bearer " + token }, body: formData } );
     //             const uploaded = await fetching.json();
     //             const result = {};
     //             result.url = uploaded.url,
@@ -1464,11 +1464,11 @@ Deno.serve(async (req) => {
     //             formBody.append('action', 'delete');
     //             formBody.append('url', url);
         
-    //             const fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             const fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const config = await fetching.json();
     //             const mediaEndpoint = config["media-endpoint"];
         
-    //             const posting = await fetch(mediaEndpoint, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + mbToken, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
+    //             const posting = await fetch(mediaEndpoint, { method: "POST", body: formBody.toString(), headers: { "Authorization": "Bearer " + token, "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" } });
     //             if (!posting.ok) {
     //                 console.log(`${user.username} tried to delete a media item and ${await posting.text()}`);
     //             }
@@ -1499,7 +1499,7 @@ Deno.serve(async (req) => {
     //                 body: form.toString(),
     //                 headers: {
     //                     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-    //                     "Authorization": "Bearer " + mbToken
+    //                     "Authorization": "Bearer " + token
     //                 }
     //             });
 
@@ -1529,7 +1529,7 @@ Deno.serve(async (req) => {
     //             const posting = await fetch(`https://micro.blog/notes/${id}`, {
     //                 method: "DELETE",
     //                 headers: {
-    //                     "Authorization": "Bearer " + mbToken
+    //                     "Authorization": "Bearer " + token
     //                 }
     //             });
 
@@ -1554,7 +1554,7 @@ Deno.serve(async (req) => {
     //             let unfollow = value.get('unfollow');
     //             unfollow = unfollow == 'true';
         
-    //             const posting = await fetch(`https://micro.blog/users/${unfollow ? 'unfollow' : 'follow'}?username=${username}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+    //             const posting = await fetch(`https://micro.blog/users/${unfollow ? 'unfollow' : 'follow'}?username=${username}`, { method: "POST", headers: { "Authorization": "Bearer " + token } });
     //             const result = `User was ${unfollow ? 'unfollowed' : 'followed'}.`;
     //             if (!posting.ok) {
     //                 let error = await posting.text();
@@ -1584,7 +1584,7 @@ Deno.serve(async (req) => {
     //             const posting = await fetch(`https://micro.blog/micropub`, {
     //                 method: "POST",
     //                 body: formBody.toString(),
-    //                 headers: {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8","Authorization": "Bearer " + mbToken}
+    //                 headers: {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8","Authorization": "Bearer " + token}
     //             });
     //             let message = 'bookmark added';
     //             if (!posting.ok) {
@@ -1603,29 +1603,29 @@ Deno.serve(async (req) => {
     //         // API endpoints
     //         // -----------------------------------------------------
     //         if((new URLPattern({ pathname: "/api/media/latest" })).exec(req.url)) {
-    //             let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const config = await fetching.json();
     //             const mediaEndpoint = config["media-endpoint"];
                 
-    //             fetching = await fetch(`${mediaEndpoint}?q=source`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             fetching = await fetch(`${mediaEndpoint}?q=source`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const media = await fetching.json();
     //             return new Response(JSON.stringify(media.items[0]), JSONHeaders());
     //         }
 
     //         if((new URLPattern({ pathname: "/api/mentions" })).exec(req.url)) {
-    //             const fetching = await fetch(`https://micro.blog/posts/mentions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             const fetching = await fetch(`https://micro.blog/posts/mentions`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const results = await fetching.json();
     //             return new Response(JSON.stringify(results), JSONHeaders());
     //         }
 
     //         if((new URLPattern({ pathname: "/api/replies" })).exec(req.url)) {
-    //             const fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             const fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const results = await fetching.json();
     //             return new Response(JSON.stringify(results), JSONHeaders());
     //         }
 
     //         if((new URLPattern({ pathname: "/api/discover/photos" })).exec(req.url)) {
-    //             const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             const fetching = await fetch(`https://micro.blog/posts/discover/photos`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const results = await fetching.json();
     //             let data = results.items.map(n => {
     //                 let src = n.content_html;
@@ -1654,14 +1654,14 @@ Deno.serve(async (req) => {
     //         }
             
     //         if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
-    //             const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const results = await fetching.json();
     //             let data = results.items.map(n => {return { content: utility.postHTML(n) }});
     //             return new Response(JSON.stringify(data), JSONHeaders());
     //         }
 
     //         if((new URLPattern({ pathname: "/api/notebooks" })).exec(req.url)) {
-    //             const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             const fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const notebooks = await fetching.json();
     //             const data = notebooks.items.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
     //             return new Response(JSON.stringify(data), JSONHeaders());
@@ -1675,7 +1675,7 @@ Deno.serve(async (req) => {
     //         const CHECK_ROUTE = new URLPattern({ pathname: "/api/timeline/check/:id" });
     //         if(CHECK_ROUTE.exec(req.url)) {
     //             const id = CHECK_ROUTE.exec(req.url).pathname.groups.id;
-    //             const fetching = await fetch(`https://micro.blog/posts/check?since_id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             const fetching = await fetch(`https://micro.blog/posts/check?since_id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const results = await fetching.json(); 
     //             return new Response(JSON.stringify(results),JSONHeaders());
     //         }
@@ -1683,7 +1683,7 @@ Deno.serve(async (req) => {
     //         const MARK_TIMELINE_ROUTE = new URLPattern({ pathname: "/api/timeline/mark/:id" });
     //         if(MARK_TIMELINE_ROUTE.exec(req.url)) {
     //             const id = MARK_TIMELINE_ROUTE.exec(req.url).pathname.groups.id;
-    //             const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + mbToken } });
+    //             const _posting = await fetch(`https://micro.blog/posts/markers?id=${id}&channel=timeline&date_marked=${new Date()}`, { method: "POST", headers: { "Authorization": "Bearer " + token } });
     //             return new Response('Timeline marked', {
     //                 status: 200,
     //                 headers: {
@@ -1695,7 +1695,7 @@ Deno.serve(async (req) => {
     //         const GET_PARENT_ROUTE = new URLPattern({ pathname: "/api/timeline/parent/:id" });
     //         if(GET_PARENT_ROUTE.exec(req.url)) {
     //             const id = GET_PARENT_ROUTE.exec(req.url).pathname.groups.id;
-    //             const fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             const fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             const post = await fetching.json();
     //             return new Response(post.items.slice(0).reverse().map(n => utility.postHTML(n, null, true, id)).join(''), HTMLHeaders());
     //         }
@@ -1715,7 +1715,7 @@ Deno.serve(async (req) => {
     //             const destination = searchParams.get('destination');
 
     //             // following
-    //             let fetching = await fetch(`https://micro.blog/users/following/${mbUser.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //             let fetching = await fetch(`https://micro.blog/users/following/${mbUser.username}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //             let following = await fetching.json();
 
     //             // check for notebooks route
@@ -1733,7 +1733,7 @@ Deno.serve(async (req) => {
 
     //                 let reader = '';
     //                 if(rid) {
-    //                     let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${rid}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     let fetching = await fetch(`https://micro.blog/hybrid/bookmarks/${rid}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                     const results = await fetching.text(); 
                 
     //                     const page = results;                            
@@ -1756,7 +1756,7 @@ Deno.serve(async (req) => {
     //                 }
     //                 const bookmark = (await mb.getAllFromMicroBlog(mbToken, `https://micro.blog/posts/bookmarks`)).filter(b => b.id == bid)[0];
 
-    //                 fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const tags = (await fetching.json())
 
     //                 content = `<div id="reader" class="mt-2">${utility.bookmarkReaderHTML(reader, bookmark, tags)}</div>`;
@@ -1769,10 +1769,10 @@ Deno.serve(async (req) => {
     //                 id = name;
     //                 name = tag ? "bookmarks: " + tag : "bookmarks";
 
-    //                 fetching = await fetch(`https://micro.blog/posts/bookmarks${tag ? `?tag=${tag}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/posts/bookmarks${tag ? `?tag=${tag}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const items = (await fetching.json()).items;
     //                 const allHighlights = await mb.getAllFromMicroBlog(mbToken,'https://micro.blog/posts/bookmarks/highlights');
-    //                 fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const tags = (await fetching.json())
     
     //                 for(let i=0; i< items.length; i++) {
@@ -1796,11 +1796,11 @@ Deno.serve(async (req) => {
     //                 //----------
     //                 id = name;
     //                 name = "discover";
-    //                 fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 let tagmoji = await fetching.json();
     //                 // put JSON check here or something.....
     //                 if(id != 'discover') {
-    //                     fetching = await fetch(`https://micro.blog/posts/discover${id != "original" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     fetching = await fetch(`https://micro.blog/posts/discover${id != "original" ? `/${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                     const posts = await fetching.json();
     //                     content = `${utility.timelineHeader('discover')}<div id="discover" class="mt-2">${utility.discoverHTML(posts, tagmoji._microblog.tagmoji)}</div>`;
     //                 } else {
@@ -1816,7 +1816,7 @@ Deno.serve(async (req) => {
     //                 //-------
     //                 id = name;
     //                 name = "users";
-    //                 fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/posts/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const posts = await fetching.json();
     //                 const friend = following.filter(f => f.username == id)[0] ?? null;
 
@@ -1854,7 +1854,7 @@ Deno.serve(async (req) => {
     //                 //--------------
     //                 id = name;
     //                 name = "version";
-    //                 fetching = await fetch(`https://micro.blog/notes/${parts[parts.length - 3]}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/notes/${parts[parts.length - 3]}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const versions = await fetching.json();
     //                 const version = versions.items.filter(v => v.id == id)[0];
     //                 // put JSON check here or something.....
@@ -1876,9 +1876,9 @@ Deno.serve(async (req) => {
     //                 //-------
     //                 id = name;
     //                 name = "note";
-    //                 fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/notes/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const note = await fetching.json();
-    //                 fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/notes/${id}/versions`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const versions = await fetching.json();
     //                 // put JSON check here or something.....
     //                 content = `<div id="note" class="mt-2">${await utility.noteHTML(note,parts[parts.length - 3],versions.items)}</div>`;
@@ -1894,14 +1894,14 @@ Deno.serve(async (req) => {
     //                 //-----------
     //                 id = name;  
     //                 if(id != 'notebooks') {
-    //                     fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     fetching = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                     const notes = await fetching.json();
     //                     // put JSON check here or something.....
     //                     content = `<div id="notes-list">${utility.getNotebookHTML(notes.items,id)}</div>`;
     //                 } else {
-    //                     fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     fetching = await fetch(`https://micro.blog/notes/notebooks`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                     const notebooks = await fetching.json();
-    //                     fetching = await fetch(`https://micro.blog/notes/notebooks/${notebooks.items[0].id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     fetching = await fetch(`https://micro.blog/notes/notebooks/${notebooks.items[0].id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                     const notes = await fetching.json();
     //                     content = `<div id="notebook-list">${utility.getNotebookHTML(notes.items,notebooks.items[0].id)}</div>`;
 
@@ -1922,7 +1922,7 @@ Deno.serve(async (req) => {
     //                 //------------------------
     //                 id = name;
     //                 name = "timeline";
-    //                 fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/posts/conversation?id=${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const post = await fetching.json();
     //                 const original = post.items.filter(i => i.id == id)[0];
     //                 // put JSON check here or something.....
@@ -1970,7 +1970,7 @@ Deno.serve(async (req) => {
     //                 //----------
     //                 id = name;
     //                 name = "mentions";
-    //                 fetching = await fetch(`https://micro.blog/posts/mentions${id != "mentions" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/posts/mentions${id != "mentions" ? `?before_id=${id}` : ''}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
 
     //                 const posts = await fetching.json();
     //                 content = `${utility.timelineHeader('mentions')}
@@ -1987,7 +1987,7 @@ Deno.serve(async (req) => {
     //                 // Using ?before_id= does not work on the replies endpoint
     //                 id = name;
     //                 name = "replies";
-    //                 fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/posts/replies`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const posts = await fetching.json();
     //                 content = `${utility.timelineHeader('replies')}
     //                     <div id="replies" class="mt-2">
@@ -2002,7 +2002,7 @@ Deno.serve(async (req) => {
     //                 //----------
     //                 id = name;
     //                 name = "following";
-    //                 fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/users/following/${user.username}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const results = await fetching.json();
             
     //                 const users = results.sort((a,b) => (a.username > b.username) ? 1 : ((b.username > a.username) ? -1 : 0)).map((item) =>
@@ -2035,13 +2035,13 @@ Deno.serve(async (req) => {
     //                 id = name;
     //                 name = "blog";
 
-    //                 fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const config = await fetching.json();
                 
     //                 const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
     //                 const mpDestination = destination ? destination : defaultDestination;
 
-    //                 fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${id}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${id}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const post = await fetching.json();
 
     //                 content = `${utility.blogHeader('blog')}
@@ -2062,13 +2062,13 @@ Deno.serve(async (req) => {
     //                 const q = searchParams.get('q');
     //                 const offset = searchParams.get('offset');
 
-    //                 fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const config = await fetching.json();
                 
     //                 const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
     //                 const mpDestination = destination ? destination : defaultDestination;
 
-    //                 fetching = await fetch(`${config["media-endpoint"]}?q=source${offset ? `&offset=${offset}` : ''}&limit=50000&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`${config["media-endpoint"]}?q=source${offset ? `&offset=${offset}` : ''}&limit=50000&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const results = await fetching.json();
 
     //                 let nextPage = false;
@@ -2077,7 +2077,7 @@ Deno.serve(async (req) => {
     //                     .filter(p => q ? p.alt ? p.alt.includes(q) : false : true);
 
     //                 if(collection) {
-    //                     fetching = await fetch(`${config["media-endpoint"]}?q=source&microblog-collection=https://example.org/collections/${collection}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     fetching = await fetch(`${config["media-endpoint"]}?q=source&microblog-collection=https://example.org/collections/${collection}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                     const collectionUploads = await fetching.json();
     //                     items = collectionUploads.items;
     //                 }
@@ -2093,7 +2093,7 @@ Deno.serve(async (req) => {
     //                 });
     //                 const uniqueExtensions = new Set(fileExtensions);
 
-    //                 fetching = await fetch(`https://micro.blog/micropub?q=source&mp-destination=${encodeURIComponent(mpDestination)}&mp-channel=collections`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/micropub?q=source&mp-destination=${encodeURIComponent(mpDestination)}&mp-channel=collections`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const collections = await fetching.json();
 
     //                 content = `${utility.blogHeader('uploads')}
@@ -2115,7 +2115,7 @@ Deno.serve(async (req) => {
     //                         </p>
     //                     </div>`;
 
-    //                     // fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     // fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                     // const categories = await fetching.json();
     //                     // let nextPage = false;
     //                     // const items = results.items
@@ -2148,18 +2148,18 @@ Deno.serve(async (req) => {
     //                 const q = searchParams.get('q');
     //                 const offset = searchParams.get('offset');
 
-    //                 fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const config = await fetching.json();
                 
     //                 const defaultDestination = config.destination.filter(d => d["microblog-default"])[0] ? config.destination.filter(d => d["microblog-default"])[0].uid : config.destination[0].uid;
     //                 const mpDestination = destination ? destination : defaultDestination;
 
     //                     //https://micro.blog/micropub?q=source&filter=daughter&limit=3&offset=2
-    //                     fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=50000${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     fetching = await fetch(`https://micro.blog/micropub?q=source${offset ? `&offset=${offset}` : ''}&limit=50000${q ? `&filter=${encodeURIComponent(q)}` : ''}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
 
     //                     const results = await fetching.json();
 
-    //                     fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                     fetching = await fetch(`https://micro.blog/micropub?q=category&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                     const categories = await fetching.json();
     //                     let nextPage = false;
     //                     const items = results.items
@@ -2187,7 +2187,7 @@ Deno.serve(async (req) => {
     //                 id = name;
     //                 name = "pages";
 
-    //                 fetching = await fetch(`https://${user.username}.micro.blog/rsd.xml`, { method: "GET", headers: { "Authorization": "Bearer " + mbToken } } );
+    //                 fetching = await fetch(`https://${user.username}.micro.blog/rsd.xml`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
     //                 const result = await fetching.text();
 
     //                 console.log(result);
