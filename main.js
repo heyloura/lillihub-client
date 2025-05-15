@@ -146,12 +146,16 @@ Deno.serve(async (req) => {
     let csp = `default-src 'nonce-${nonce}';frame-src 'self';img-src * data:;media-src *;`;
 
     if(token) {
+        const user = await getMicroBlogUser(token);
+        const kv = await Deno.openKv();
+        const userKV = await kv.get([user.username, 'global']);
+
         if(new URLPattern({ pathname: "/logout" }).exec(req.url)) {
             console.log("/logout");
             return new Response(HTML(`<p>Thanks for visiting. Redirecting now.</p>`, ' ', '/'), { status: 200,
                 headers: {
                     "content-type": "text/html",
-                    "set-cookie": `token=undefined;SameSite=Lax;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+                    "set-cookie": `atoken=undefined;SameSite=Lax;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT`
                 },
             });
         }
@@ -191,16 +195,16 @@ Deno.serve(async (req) => {
 
         if((new URLPattern({ pathname: "/api/discover/lillihub" })).exec(req.url)) {
             console.log(_lillihubToken);
-            const results = await mb.getMicroBlogTimelinePostsChronological(_lillihubToken);
+            const results = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
             console.log(results);
-            let data = results.map(n => {return { content: utility.postHTML(n) }});
+            let data = results.map(n => {return { content: postHTML(n) }});
             return new Response(JSON.stringify(data), JSONHeaders());
         }
         
         if((new URLPattern({ pathname: "/api/discover" })).exec(req.url)) {
             const fetching = await fetch(`https://micro.blog/posts/discover`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
             const results = await fetching.json();
-            let data = results.items.map(n => {return { content: utility.postHTML(n) }});
+            let data = results.items.map(n => {return { content: postHTML(n) }});
             return new Response(JSON.stringify(data), JSONHeaders());
         }
 
@@ -265,97 +269,7 @@ Deno.serve(async (req) => {
             let page = `<div class="screen">
             ${before ? `<a class="button wave border" href="/timeline?after=${items[0].id}">Previous</a>` : ''}
             ${items.map((item,i) => {
-                item = flattenPost(item);
-                return `
-                    <article class="no-elevate round ${i == index ? 'secondary-container' : ''}" data-id="${item.id}">
-                        <div class="row top-align">
-                            <div class="max">
-                                <div>
-                                    <div class="row">
-                                        <img class="round" src="${item.avatar}">
-                                        <div class="max">
-                                            <h6 class="no-margin">${item.name}</h6>
-                                            <label class="grey-text">${item.username ? ` <a href="${item.author_url}">@${item.username}</a>` : ''}</label>
-                                        </div>
-                                    </div>
-                                        <div class="medium-space"></div>
-                                        <div class="post">
-                                            ${item.is_conversation ? `<!--<article data-parent-of="${item.id}" data-processed="false" class="border round surface-variant"><progress class="circle center"></progress></article>-->` : ''}
-                                            ${item.content_html}${item.summary}
-                                        </div>
-                                        <div class="medium-space"></div>
-                                        <div class="clear">
-                                            <nav class="no-space grey-text">
-                                                <div class="max">
-                                                    <a class="grey-text" href="${item.url}">${item.date_relative}&nbsp;
-                                                        <i class="tiny">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
-                                                                <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
-                                                                <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                </div>
-                                                <button class="transparent circle wave">
-                                                    <i>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
-                                                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
-                                                        </svg>
-                                                    </i>
-                                                    <menu class="top no-wrap left">
-                                                        <li data-ui="#dialog-reply-${item.id}">Add Comment</li>
-                                                    </menu>  
-                                                </button>
-                                                ${item.is_conversation ? 
-                                                    `<a href="/conversation/${item.id}" class="button transparent circle wave s"><i>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
-                                                            <path d="M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"/>
-                                                            <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
-                                                        </svg>
-                                                    </i></a>
-                                                    <a data-ui="dialog-${item.id}" rel="prefetch" swap-target="#conversation-${item.id}" swap-history="true" href="/conversation/${item.id}" class="button transparent circle wave m l"><i>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
-                                                            <path d="M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"/>
-                                                            <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
-                                                        </svg>
-                                                    </i></a>` : 
-                                                    ``
-                                                }
-                                                <dialog id="dialog-${item.id}" class="modal">
-                                                    <header class="fixed front">
-                                                        <nav>
-                                                            <div class="max truncate">
-                                                                <h5>Conversation</h5>
-                                                            </div>
-                                                            <button evt-click="close" data-id="${item.id}" class="circle transparent"><i evt-click="close" data-id="${item.id}">close</i></button>
-                                                        </nav>
-                                                    </header>
-                                                    <div class="convo"><div id="conversation-${item.id}">
-                                                        <progress class="circle center"></progress>
-                                                    </div></div>
-                                                </dialog>
-                                            </nav>
-                                        </div>
-                                </div>
-                            </div>
-                        </div>
-                        ${!item.is_conversation ? `<dialog id="dialog-reply-${item.id}" class="modal">
-                            <header class="fixed front">
-                                <nav>
-                                    <div class="max truncate">
-                                        <h5>Reply</h5>
-                                    </div>
-                                    <button data-ui="#dialog-reply-${item.id}" class="circle transparent"><i>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                                        </svg>
-                                    </i></button>
-                                </nav>
-                            </header>
-                            ${replyForm(item.id,`<label class="checkbox large icon"><input type='checkbox' checked="checked" name='replyingTo[]' value='${item.username}'><span><i><img class="round tiny" src="${item.avatar}"></i><i>done</i></span> @${item.username}</label>`, true)}
-                        </dialog>` : '' }
-                    </article>
-                    `;
+                return postHTML(item);
             }).join('')}          
             <div class="medium-space"></div>  
             <nav class="no-space">
@@ -2800,14 +2714,127 @@ async function getConversationHTML(id, token, nonce, csp) {
 //     };
 // }
 
-// function JSONHeaders() {
-//     return {
-//         headers: {
-//             "content-type": "text/json",
-//             status: 200,
-//         },
-//     };
-// }
+function JSONHeaders() {
+    return {
+        headers: {
+            "content-type": "text/json",
+            status: 200,
+        },
+    };
+}
+
+async function getMicroBlogUser(accessToken) {
+    const formBody = new URLSearchParams();
+    formBody.append("token", accessToken);
+
+    const fetching = await fetch('https://micro.blog/account/verify', {
+        method: "POST",
+        body: formBody.toString(),
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+            "Accept": "application/json"
+        }
+    });
+    const result = await fetching.json();
+    if(result.error) {
+      return undefined;
+    }
+    return result;
+}
+
+function postHTML(item) {
+    item = flattenPost(item);
+    return `
+        <article class="no-elevate round ${i == index ? 'secondary-container' : ''}" data-id="${item.id}">
+            <div class="row top-align">
+                <div class="max">
+                    <div>
+                        <div class="row">
+                            <img class="round" src="${item.avatar}">
+                            <div class="max">
+                                <h6 class="no-margin">${item.name}</h6>
+                                <label class="grey-text">${item.username ? ` <a href="${item.author_url}">@${item.username}</a>` : ''}</label>
+                            </div>
+                        </div>
+                            <div class="medium-space"></div>
+                            <div class="post">
+                                ${item.is_conversation ? `<!--<article data-parent-of="${item.id}" data-processed="false" class="border round surface-variant"><progress class="circle center"></progress></article>-->` : ''}
+                                ${item.content_html}${item.summary}
+                            </div>
+                            <div class="medium-space"></div>
+                            <div class="clear">
+                                <nav class="no-space grey-text">
+                                    <div class="max">
+                                        <a class="grey-text" href="${item.url}">${item.date_relative}&nbsp;
+                                            <i class="tiny">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+                                                    <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                                    <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                                </svg>
+                                            </i>
+                                        </a>
+                                    </div>
+                                    <button class="transparent circle wave">
+                                        <i>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+                                            </svg>
+                                        </i>
+                                        <menu class="top no-wrap left">
+                                            <li data-ui="#dialog-reply-${item.id}">Add Comment</li>
+                                        </menu>  
+                                    </button>
+                                    ${item.is_conversation ? 
+                                        `<a href="/conversation/${item.id}" class="button transparent circle wave s"><i>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
+                                                <path d="M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"/>
+                                                <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
+                                            </svg>
+                                        </i></a>
+                                        <a data-ui="dialog-${item.id}" rel="prefetch" swap-target="#conversation-${item.id}" swap-history="true" href="/conversation/${item.id}" class="button transparent circle wave m l"><i>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
+                                                <path d="M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"/>
+                                                <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
+                                            </svg>
+                                        </i></a>` : 
+                                        ``
+                                    }
+                                    <dialog id="dialog-${item.id}" class="modal">
+                                        <header class="fixed front">
+                                            <nav>
+                                                <div class="max truncate">
+                                                    <h5>Conversation</h5>
+                                                </div>
+                                                <button evt-click="close" data-id="${item.id}" class="circle transparent"><i evt-click="close" data-id="${item.id}">close</i></button>
+                                            </nav>
+                                        </header>
+                                        <div class="convo"><div id="conversation-${item.id}">
+                                            <progress class="circle center"></progress>
+                                        </div></div>
+                                    </dialog>
+                                </nav>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            ${!item.is_conversation ? `<dialog id="dialog-reply-${item.id}" class="modal">
+                <header class="fixed front">
+                    <nav>
+                        <div class="max truncate">
+                            <h5>Reply</h5>
+                        </div>
+                        <button data-ui="#dialog-reply-${item.id}" class="circle transparent"><i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                            </svg>
+                        </i></button>
+                    </nav>
+                </header>
+                ${replyForm(item.id,`<label class="checkbox large icon"><input type='checkbox' checked="checked" name='replyingTo[]' value='${item.username}'><span><i><img class="round tiny" src="${item.avatar}"></i><i>done</i></span> @${item.username}</label>`, true)}
+            </dialog>` : '' }
+        </article>
+    `;
+}
 
 // Helper method to return a bad gateway and the reason.
 // function returnBadGateway(reason) {
