@@ -196,8 +196,7 @@ Deno.serve(async (req) => {
         if((new URLPattern({ pathname: "/api/discover/lillihub" })).exec(req.url)) {
             console.log(_lillihubToken);
             const results = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
-            console.log(results);
-            let data = results.map(n => {return { content: postHTML(n, false) }});
+            let data = results.items.map(n => {return { content: postHTML(n, false) }});
             return new Response(JSON.stringify(data), JSONHeaders());
         }
         
@@ -2466,6 +2465,9 @@ function TimelineHTML(content, title, redirect) {
             </div>
         </div>
         `, title, redirect, `
+            <datalist id="following">
+                {{following}}
+            </datalist>
             <script nonce="{{nonce}}" src="/scripts/timeline.js" type="text/javascript"></script>
         `, 
         `
