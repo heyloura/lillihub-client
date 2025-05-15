@@ -194,8 +194,8 @@ Deno.serve(async (req) => {
         }
 
         if((new URLPattern({ pathname: "/api/discover/lillihub" })).exec(req.url)) {
-            console.log(_lillihubToken);
-            const results = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+            const fetching = await fetch(`https://micro.blog/posts/timeline`, { method: "GET", headers: { "Authorization": "Bearer " + _lillihubToken } } );
+            const results = fetching.json();
             let data = results.items.map(n => {return { content: postHTML(n, false) }});
             return new Response(JSON.stringify(data), JSONHeaders());
         }
@@ -2465,6 +2465,81 @@ function TimelineHTML(content, title, redirect) {
             </div>
         </div>
         `, title, redirect, `
+            <dialog id="dialog-more" class="left">
+                <header class="fixed front">
+                    <nav>
+                        <div class="max truncate">
+                        </div>
+                        <button data-ui="#dialog-more" class="circle transparent">
+                            <i>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                </svg>
+                            </i>
+                        </button>
+                    </nav>
+                </header>
+                <aside>
+                    <h6>New on Micro.blog</h6>
+                    <div class="medium-space"></div>
+                    <div id="new-sidebar">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                </aside>
+                <aside>
+                    <h6>Discover photos</h6>
+                    <div class="medium-space"></div>
+                    <div id="photos-sidebar">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                </aside>
+                <aside>
+                    <h6>Curated Discover</h6>
+                    <div class="medium-space"></div>
+                    <div id="discover-sidebar">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                </aside>
+                <aside>
+                    <h6>Recent Mentions</h6>
+                    <div class="medium-space s"></div>
+                    <div id="mentions-sidebar">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                </aside>
+                <aside>
+                    <h6>Recent Replies</h6>
+                    <div class="medium-space s"></div>
+                    <div id="replies-sidebar">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                </aside>
+                <aside>
+                    <h6>Following</h6>
+                    <div class="medium-space s"></div>
+                    <div id="following-sidebar">
+                        <div class="center-align middle-align"> 
+                            <progress class="circle"></progress>
+                        </div>
+                    </div>
+                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+                </aside>
+                <div id="feeds"></div>
+            </dialog>
             <datalist id="following">
                 {{following}}
             </datalist>
