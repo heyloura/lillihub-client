@@ -2658,6 +2658,7 @@ function formatHTML (str) {
                 const dialog = html.createElement('dialog');
                 dialog.classList.add('modal');
                 dialog.setAttribute('id', image.getAttribute('src'));
+                html.appendChild(dialog);
                 dialog.insertAdjacentHTML('beforeend', `<header class="fixed front">
                     <nav>
                         <div class="max ">
