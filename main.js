@@ -2550,7 +2550,7 @@ function TimelineHTML(content, title, redirect) {
             <script nonce="{{nonce}}" src="/scripts/timeline.js" type="text/javascript"></script>
         `, 
         `
-        <header class="fixed">
+        <header class="fixed surface-container-low">
             <nav>
                 <button id="menu" data-ui="#apps-menu-drawer" class="s circle transparent">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
