@@ -226,15 +226,41 @@ Deno.serve(async (req) => {
                                         <div class="medium-space"></div>
                                         <div class="clear">
                                             <nav class="no-space grey-text">
-                                                <div class="max"><a class="grey-text" href="${item.url}">${item.date_relative} <i class="tiny">open_in_new</i></a></div>
+                                                <div class="max">
+                                                    <a class="grey-text" href="${item.url}">${item.date_relative}&nbsp;
+                                                        <i class="tiny">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+                                                                <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                                                <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                                            </svg>
+                                                        </i>
+                                                    </a>
+                                                </div>
                                                 <button class="transparent circle wave">
-                                                    <i evt-click="show" data-id="reply-${item.id}">edit</i>
+                                                    <i>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+                                                        </svg>
+                                                    </i>
                                                     <menu class="top no-wrap left">
-                                                        <li evt-click="show" data-id="reply-${item.id}">Comment <i evt-click="show" data-id="reply-${item.id}">add_comment</i></li>
+                                                        <li data-ui="#dialog-reply-${item.id}">Add Comment</li>
                                                     </menu>  
                                                 </button>
-                                                ${item.is_conversation ? `<a href="/conversation/${item.id}" class="button transparent circle wave"><i>forum</i><div class="badge min"></div></a>` : 
-                                                    `<button evt-click="show" data-id="reply-${item.id}" class="transparent circle wave hide"><i evt-click="show" data-id="reply-${item.id}">pencil</i></button>`}
+                                                ${item.is_conversation ? 
+                                                    `<a href="/conversation/${item.id}" class="button transparent circle wave s"><i>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
+                                                            <path d="M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"/>
+                                                            <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
+                                                        </svg>
+                                                    </i></a>
+                                                    <a data-ui="dialog-${item.id}" href="/conversation/${item.id}" class="button transparent circle wave s"><i>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
+                                                            <path d="M2.678 11.894a1 1 0 0 1 .287.801 11 11 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8 8 0 0 0 8 14c3.996 0 7-2.807 7-6s-3.004-6-7-6-7 2.808-7 6c0 1.468.617 2.83 1.678 3.894m-.493 3.905a22 22 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a10 10 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105"/>
+                                                            <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8m0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5"/>
+                                                        </svg>
+                                                    </i></a>` : 
+                                                    ``
+                                                }
                                                 <dialog id="dialog-${item.id}" class="max">
                                                     <header class="fixed front">
                                                         <nav>
@@ -253,13 +279,17 @@ Deno.serve(async (req) => {
                                 </div>
                             </div>
                         </div>
-                        ${!item.is_conversation ? `<dialog id="dialog-reply-${item.id}" class="bottom">
+                        ${!item.is_conversation ? `<dialog id="dialog-reply-${item.id}" class="modal">
                             <header class="fixed front">
                                 <nav>
                                     <div class="max truncate">
                                         <h5>Reply</h5>
                                     </div>
-                                    <button evt-click="close" data-id="reply-${item.id}" class="circle transparent"><i evt-click="close" data-id="reply-${item.id}">close</i></button>
+                                    <button data-ui="#dialog-reply-${item.id}" class="circle transparent"><i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                        </svg>
+                                    </i></button>
                                 </nav>
                             </header>
                             ${replyForm(item.id,`<label class="checkbox large icon"><input type='checkbox' checked="checked" name='replyingTo[]' value='${item.username}'><span><i><img class="round tiny" src="${item.avatar}"></i><i>done</i></span> @${item.username}</label>`, true)}
@@ -2288,7 +2318,7 @@ function HTML(content, title, redirect, footer, header) {
             <!--<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.10.7/dist/cdn/beer.min.js"></script>-->
         </head>
         <body>
-            <nav class="left l">
+            <!--<nav class="left l">
                 <header>
                     <nav>
                         <img src="/logo.png" class="avatar">
@@ -2306,7 +2336,7 @@ function HTML(content, title, redirect, footer, header) {
                     <i>view_timeline</i>
                     <div>Timeline</div>
                 </a>
-            </nav>
+            </nav>-->
             ${header ? header : ''}
             <main>
                 ${content}
@@ -2342,18 +2372,18 @@ function HTML(content, title, redirect, footer, header) {
                             }
                         });
             });
-            document.addEventListener("click", async (event) => {
-                if(!event.target.getAttribute('evt-click')) {
-                    return;
-                } else {
-                    if(event.target.getAttribute('evt-click') == 'show') {
-                        document.getElementById('dialog-' + event.target.getAttribute('data-id')).showModal();
-                    }
-                    if(event.target.getAttribute('evt-click') == 'close') {
-                        document.getElementById('dialog-' + event.target.getAttribute('data-id')).close();
-                    }
-                }
-            });
+            // document.addEventListener("click", async (event) => {
+            //     if(!event.target.getAttribute('evt-click')) {
+            //         return;
+            //     } else {
+            //         if(event.target.getAttribute('evt-click') == 'show') {
+            //             document.getElementById('dialog-' + event.target.getAttribute('data-id')).showModal();
+            //         }
+            //         if(event.target.getAttribute('evt-click') == 'close') {
+            //             document.getElementById('dialog-' + event.target.getAttribute('data-id')).close();
+            //         }
+            //     }
+            // });
         </script>
     </html>    
     `;
@@ -2461,7 +2491,9 @@ function TimelineHTML(content, title, redirect) {
                 </div>
             </div>
         </div>
-        `, title, redirect, undefined, 
+        `, title, redirect, `
+            <script nonce="{{nonce}}" src="/scripts/timeline.js" type="text/javascript"></script>
+        `, 
         `
         <header class="fixed">
             <nav>
@@ -2662,7 +2694,7 @@ async function getConversationHTML(id, token, nonce, csp) {
         }).join('')}
         ${replyForm(id, replyCheckboxes)}</div>`;
 
-    return new Response(TimelineHTML(page, 'Timeline')(page, 'Conversation'), {
+    return new Response(TimelineHTML(page, 'Conversation'), {
         status: 200,
         headers: {
             "content-type": "text/html",

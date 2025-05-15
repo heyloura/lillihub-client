@@ -1,465 +1,635 @@
-// function liveSearch(selector, searchboxId) {
-//     let cards = document.querySelectorAll(selector)
-//     let search_query = document.getElementById(searchboxId).value;
-//     let re = new RegExp(search_query,"g");
-//     for (var i = 0; i < cards.length; i++) {
-//         if(cards[i].textContent.toLowerCase().includes(search_query.toLowerCase())) {
-//             cards[i].classList.remove("hide");
+// // function liveSearch(selector, searchboxId) {
+// //     let cards = document.querySelectorAll(selector)
+// //     let search_query = document.getElementById(searchboxId).value;
+// //     let re = new RegExp(search_query,"g");
+// //     for (var i = 0; i < cards.length; i++) {
+// //         if(cards[i].textContent.toLowerCase().includes(search_query.toLowerCase())) {
+// //             cards[i].classList.remove("hide");
+// //         } else {
+// //             cards[i].classList.add("hide");
+// //         }
+// //     }
+// // }
+// // function countChecked(name, id) {
+// //     var checkedBoxes = document.querySelectorAll('input[name="' + name + '"]:checked').length; 
+// //     var element = document.getElementById(id);
+
+// //     if(checkedBoxes == 0) {
+// //         element.removeAttribute('data-badge');
+// //         element.classList.remove('badge');
+// //     } else {
+// //         element.setAttribute('data-badge', checkedBoxes);
+// //         element.classList.add('badge');
+// //     }
+// // }
+
+
+// // set up gesture navigation
+// let touchstartX = 0
+// let touchendX = 0
+    
+// function checkDirection() {
+//   if (touchendX < touchstartX - 50) {
+//     history.back();
+//     // document.getElementById('goBackBtn').classList.toggle('hide');
+//   }
+//   if (touchendX > touchstartX) return;
+// }
+
+// document.getElementById('conversation').addEventListener('touchstart', e => {
+//   touchstartX = e.changedTouches[0].screenX
+// })
+
+// document.getElementById('conversation').addEventListener('touchend', e => {
+//   touchendX = e.changedTouches[0].screenX
+//   checkDirection()
+// })
+
+
+// if(window.location.hash) {
+//     removeHash();
+// }
+
+// // function loadConversations() {
+// //     if(localStorage.getItem("lillihub_display_mode") == 'conversation') {
+// //         var promises = [];
+// //         var children = document.querySelectorAll('[data-mention="true"][data-conversation="true"][data-processed="false"]');
+// //         children = [...children];
+// //         children.forEach((child) => {
+// //             let id = child.getAttribute('data-id');
+// //             child.classList.remove('parent');
+// //             child.classList.add('child');
+// //             child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
+// //             child.setAttribute('data-processed', 'true');
+
+// //             var promise = fetch("/timeline/conversation/" + id, { method: "get" })
+// //                 .then(response => response.json())
+// //                 .then(data => {
+// //                     var doc = new DOMParser().parseFromString(data.conversation, "text/html");
+// //                     var parent = child.parentNode;
+// //                     var parentArticle = doc.querySelector('article');
+// //                     if(parentArticle.children.length == 3) {
+// //                         //clean up for gallery
+// //                         var galleryImgs = doc.querySelectorAll('article:first-child img');
+// //                         galleryImgs.forEach((img) => {
+// //                             img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
+// //                         });
+// //                         parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
+// //                     }
+// //                     if(parent && parentArticle && child) {
+// //                         parent.insertBefore(parentArticle, child);
+// //                     }
+// //                     document.getElementById('content-' + id).innerHTML = data.conversation.replaceAll('convoBtns', 'convoBtns hide');
+// //                     document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
+
+// //                     let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
+// //                     if(visibleParent) {
+// //                         visibleParent.remove();
+// //                     }
+
+// //                     document.getElementById('loading-' + id).remove();
+// //                 });
+
+// //                 promises.push(promise);
+// //         });
+
+// //         Promise.all(promises).then(results => {
+// //             var parents = document.querySelectorAll('.parent');
+// //             parents = [...parents];
+// //             let singles = new Set();
+// //             parents.forEach((parent) => {
+// //                 let id = parent.getAttribute('data-id');
+// //                 if(!parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
+// //                     parent.children[0].style.borderBottom = 0;
+// //                     if(parent.children.length > 1 && parent.children[1].nodeName == 'MAIN') {
+// //                         parent.children[1].remove();
+// //                     }
+// //                     if(parent.children.length > 2 && parent.children[1].nodeName == 'DIV') {
+// //                         parent.children[2].remove();
+// //                     }                                
+// //                 }
+// //                 singles.add(id);
+// //             });
+// //             buildCarousels();
+// //         });
+
+// //     }
+// // }
+// function load() {
+//     if(localStorage.getItem('post_setting'))
+//     {
+//         if(localStorage.getItem('post_setting') === 'none') {
+//             document.getElementById('mainPost').classList.add('hide');
 //         } else {
-//             cards[i].classList.add("hide");
+//             if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
+//             {
+//                 document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
+//                 document.getElementById('postingType').value = localStorage.getItem('post_setting');
+//                 document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
+//                 document.getElementById('omgApi').value = localStorage.getItem('omg_api');
+//             } else if(localStorage.getItem('post_setting') === 'micropub') {
+//                 document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
+//                 document.getElementById('postingType').value = 'micropub';
+//                 document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
+//                 document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
+//             } else {
+//                 document.getElementById('postingType').value = 'mb';
+//             }
 //         }
 //     }
-// }
-// function countChecked(name, id) {
-//     var checkedBoxes = document.querySelectorAll('input[name="' + name + '"]:checked').length; 
-//     var element = document.getElementById(id);
 
-//     if(checkedBoxes == 0) {
-//         element.removeAttribute('data-badge');
-//         element.classList.remove('badge');
-//     } else {
-//         element.setAttribute('data-badge', checkedBoxes);
-//         element.classList.add('badge');
-//     }
-// }
-
-
-// set up gesture navigation
-let touchstartX = 0
-let touchendX = 0
-    
-function checkDirection() {
-  if (touchendX < touchstartX - 50) {
-    history.back();
-    // document.getElementById('goBackBtn').classList.toggle('hide');
-  }
-  if (touchendX > touchstartX) return;
-}
-
-document.getElementById('conversation').addEventListener('touchstart', e => {
-  touchstartX = e.changedTouches[0].screenX
-})
-
-document.getElementById('conversation').addEventListener('touchend', e => {
-  touchendX = e.changedTouches[0].screenX
-  checkDirection()
-})
-
-
-if(window.location.hash) {
-    removeHash();
-}
-
-// function loadConversations() {
-//     if(localStorage.getItem("lillihub_display_mode") == 'conversation') {
-//         var promises = [];
-//         var children = document.querySelectorAll('[data-mention="true"][data-conversation="true"][data-processed="false"]');
-//         children = [...children];
-//         children.forEach((child) => {
-//             let id = child.getAttribute('data-id');
-//             child.classList.remove('parent');
-//             child.classList.add('child');
-//             child.insertAdjacentHTML( 'beforebegin', '<article id="loading-'+id+'" class="card parent" data-child="'+id+'"><main class="loading"></main></article>');
-//             child.setAttribute('data-processed', 'true');
-
-//             var promise = fetch("/timeline/conversation/" + id, { method: "get" })
-//                 .then(response => response.json())
-//                 .then(data => {
-//                     var doc = new DOMParser().parseFromString(data.conversation, "text/html");
-//                     var parent = child.parentNode;
-//                     var parentArticle = doc.querySelector('article');
-//                     if(parentArticle.children.length == 3) {
-//                         //clean up for gallery
-//                         var galleryImgs = doc.querySelectorAll('article:first-child img');
-//                         galleryImgs.forEach((img) => {
-//                             img.setAttribute('data-gallery', img.getAttribute('data-gallery') + '-moved');
-//                         });
-//                         parentArticle.children[2].setAttribute('data-id', parentArticle.children[2].getAttribute('data-id') + '-moved');
-//                     }
-//                     if(parent && parentArticle && child) {
-//                         parent.insertBefore(parentArticle, child);
-//                     }
-//                     document.getElementById('content-' + id).innerHTML = data.conversation.replaceAll('convoBtns', 'convoBtns hide');
-//                     document.getElementById('modal-' + id).setAttribute('data-loaded', 'true');
-
-//                     let visibleParent = document.getElementById(parentArticle.getAttribute('data-id')); 
-//                     if(visibleParent) {
-//                         visibleParent.remove();
-//                     }
-
-//                     document.getElementById('loading-' + id).remove();
-//                 });
-
-//                 promises.push(promise);
-//         });
-
-//         Promise.all(promises).then(results => {
-//             var parents = document.querySelectorAll('.parent');
-//             parents = [...parents];
-//             let singles = new Set();
-//             parents.forEach((parent) => {
-//                 let id = parent.getAttribute('data-id');
-//                 if(!parent.parentNode.getAttribute('id').includes('content') && singles.has(id)) {
-//                     parent.children[0].style.borderBottom = 0;
-//                     if(parent.children.length > 1 && parent.children[1].nodeName == 'MAIN') {
-//                         parent.children[1].remove();
-//                     }
-//                     if(parent.children.length > 2 && parent.children[1].nodeName == 'DIV') {
-//                         parent.children[2].remove();
-//                     }                                
+//     //grab the timeline posts
+//     fetch("/timeline/0", { method: "get" })
+//         .then(response => response.text())
+//         .then(data => {
+//             document.getElementById('add-0').innerHTML = data;
+//             const article = document.querySelector('article:first-child');
+//             const id = article.getAttribute('id');
+//             let checks = 0;
+//             const timerID = setInterval(function() {
+//                 fetch("/timeline/check/" + id, { method: "get" })
+//                     .then(response => response.json())
+//                     .then(data => {
+//                         if(data.count > 0) {
+//                             document.getElementById('morePostsToast').classList.remove('hide');
+//                             document.getElementById('showPostCount').innerHTML = data.count;
+//                             console.log(data);
+//                             document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
+//                         }     
+//                     });
+//                 checks++;
+//                 if(checks > 10) {
+//                     clearInterval(timerID);
 //                 }
-//                 singles.add(id);
-//             });
-//             buildCarousels();
+//             }, 60 * 1000); 
+//             fetch("/timeline/mark/" + id, { method: "get" })
+//                 .then(response => response.text())
+//                 .then(_data => {});
+
+//             buildMasonry();
 //         });
-
-//     }
 // }
-function load() {
-    if(localStorage.getItem('post_setting'))
-    {
-        if(localStorage.getItem('post_setting') === 'none') {
-            document.getElementById('mainPost').classList.add('hide');
-        } else {
-            if(localStorage.getItem('post_setting') === 'statuslog' || localStorage.getItem('post_setting') === 'weblog')
-            {
-                document.getElementById('postingName').innerHTML = `${localStorage.getItem('omg_address')} (${localStorage.getItem('post_setting')})`;
-                document.getElementById('postingType').value = localStorage.getItem('post_setting');
-                document.getElementById('omgAddess').value = localStorage.getItem('omg_address');
-                document.getElementById('omgApi').value = localStorage.getItem('omg_api');
-            } else if(localStorage.getItem('post_setting') === 'micropub') {
-                document.getElementById('postingName').innerHTML = `${localStorage.getItem('indieweb_nickname')} (${localStorage.getItem('post_setting')})`;
-                document.getElementById('postingType').value = 'micropub';
-                document.getElementById('indieToken').value = localStorage.getItem('indieauth_endpoint');
-                document.getElementById('microPub').value = localStorage.getItem('micropub_endpoint');
-            } else {
-                document.getElementById('postingType').value = 'mb';
-            }
-        }
-    }
 
-    //grab the timeline posts
-    fetch("/timeline/0", { method: "get" })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('add-0').innerHTML = data;
-            const article = document.querySelector('article:first-child');
-            const id = article.getAttribute('id');
-            let checks = 0;
-            const timerID = setInterval(function() {
-                fetch("/timeline/check/" + id, { method: "get" })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.count > 0) {
-                            document.getElementById('morePostsToast').classList.remove('hide');
-                            document.getElementById('showPostCount').innerHTML = data.count;
-                            console.log(data);
-                            document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
-                        }     
-                    });
-                checks++;
-                if(checks > 10) {
-                    clearInterval(timerID);
-                }
-            }, 60 * 1000); 
-            fetch("/timeline/mark/" + id, { method: "get" })
-                .then(response => response.text())
-                .then(_data => {});
+// function offline() {
+//     document.getElementById('mainPost').classList.add('hide');
+//     document.getElementById('add-0').innerHTML = `
+//         <div class="empty">
+//             <div class="empty-icon">
+//                 <img src="/logo.png" width="100px">
+//             </div>
+//             <p class="empty-title h5">Looks like you're offline</p>
+//             <p class="empty-subtitle">You could</p>
+//             <ul>
+//                 <li>Manage your <a href="/blog">blog</a>.</li>
+//                 <li>Take a look at your <a href="/bookmarks">bookmarks</a>.</li>
+//                 <li>Peruse your <a href="/bookshelves">bookshelves</a>.</li>
+//                 <li>Start jotting down <a href="/notebooks">notes</a>.</li>
+//             </ul>
+//         </div>
+//     `;
+// }
 
-            buildMasonry();
-        });
-}
-
-function offline() {
-    document.getElementById('mainPost').classList.add('hide');
-    document.getElementById('add-0').innerHTML = `
-        <div class="empty">
-            <div class="empty-icon">
-                <img src="/logo.png" width="100px">
-            </div>
-            <p class="empty-title h5">Looks like you're offline</p>
-            <p class="empty-subtitle">You could</p>
-            <ul>
-                <li>Manage your <a href="/blog">blog</a>.</li>
-                <li>Take a look at your <a href="/bookmarks">bookmarks</a>.</li>
-                <li>Peruse your <a href="/bookshelves">bookshelves</a>.</li>
-                <li>Start jotting down <a href="/notebooks">notes</a>.</li>
-            </ul>
-        </div>
-    `;
-}
-
-document.addEventListener("DOMContentLoaded", async (event) => {
-    document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
-    handleConnection(load,offline);
-});
-
-
-
-// document.addEventListener("change", (event) => {
-//     if(event.target.classList.contains('countCheckedCategory')) {
-//         countChecked('category[]', 'categoriesDropdown');
-//     }
-//     if(event.target.classList.contains('countCheckedSyndicates')) {
-//         countChecked('syndicate[]', 'syndicatesDropdown');
-//     }
+// document.addEventListener("DOMContentLoaded", async (event) => {
+//     document.querySelectorAll("p").forEach(el => el.textContent.trim() === "" && el.parentNode.removeChild(el));
+//     handleConnection(load,offline);
 // });
-// document.addEventListener("focusin", (event) => {
-//     if(event.target.classList.contains('updateTags')){
-//         event.target.setAttribute('type', 'email');
-//     }
-// });
-// document.addEventListener("focusout", (event) => {
-//     if(event.target.classList.contains('updateTags')){
-//         event.target.setAttribute('type', 'text');
-//     }
-// });
-document.addEventListener("input", (event) => {
+
+
+
+// // document.addEventListener("change", (event) => {
+// //     if(event.target.classList.contains('countCheckedCategory')) {
+// //         countChecked('category[]', 'categoriesDropdown');
+// //     }
+// //     if(event.target.classList.contains('countCheckedSyndicates')) {
+// //         countChecked('syndicate[]', 'syndicatesDropdown');
+// //     }
+// // });
+// // document.addEventListener("focusin", (event) => {
+// //     if(event.target.classList.contains('updateTags')){
+// //         event.target.setAttribute('type', 'email');
+// //     }
+// // });
+// // document.addEventListener("focusout", (event) => {
+// //     if(event.target.classList.contains('updateTags')){
+// //         event.target.setAttribute('type', 'text');
+// //     }
+// // });
+// document.addEventListener("input", (event) => {
     
-    // if(event.target.classList.contains('search')){
-    //     liveSearch('article', 'search');
-    // }
-    // if(event.target.classList.contains('searchFollowing')){
-    //     liveSearch('tr', 'search');
-    // }
+//     // if(event.target.classList.contains('search')){
+//     //     liveSearch('article', 'search');
+//     // }
+//     // if(event.target.classList.contains('searchFollowing')){
+//     //     liveSearch('tr', 'search');
+//     // }
+//     if(event.target.classList.contains('grow-me')) {
+//         growTextArea(event.target);
+//     }
+//     if(event.target.classList.contains('replierInput')){
+//         let id = event.target.getAttribute('data-id');
+//         let menu = document.getElementById('replybox-menu-' + id); 
+//         menu.classList.remove('hide');
+//         var menuItems = menu.children;
+//         if(!event.target.value)
+//         {
+//             menu.classList.add('hide');
+//         }
+//         for (var i = 0; i < menuItems.length; i++) {
+//             var item = menuItems[i];
+//             if(event.target.value && ('@' + item.getAttribute('data-name')).toLowerCase().includes(event.target.value.toLowerCase())) {
+//                 item.classList.remove('hide');
+//                 item.innerHTML = '<a data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="addUserToReplyBox" href="#"><div data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="tile tile-centered addUserToReplyBox">' +
+//                     '<div data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="tile-icon addUserToReplyBox"><img data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="avatar avatar-sm addUserToReplyBox" src="'+item.getAttribute('data-avatar')+'"></div>' +
+//                     '<div data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="tile-content addUserToReplyBox">@'+item.getAttribute('data-name').replaceAll(event.target.value, '<mark>' + event.target.value + '</mark>')+'</div></div></a>';
+//             } else {
+//                 item.classList.add('hide');
+//             }
+//         }
+//     }
+// });
+// function submitReply(formData, id) {
+//     fetch("/timeline/reply", { body: formData, method: "post" })
+//         .then(response => response.text())
+//         .then(data => {
+//             if(id && document.getElementById('toast-' + id)) {
+//                 document.getElementById('toast-content-' + id).innerHTML = data;
+//                 document.getElementById('toast-' + id).classList.remove('hide');
+//             }
+//         });
+// }
+// function submitPost(formData) {
+//     fetch("/post/add", { body: formData, method: "post" })
+//         .then(response => response.json())
+//         .then(data => {
+//             document.getElementById('postToastMessage').innerHTML = data.response.message;
+//             document.getElementById('postToast').classList.remove("hide");
+//         });
+// }
+// document.addEventListener("submit", (item) => {
+//     item.preventDefault();
+// });
+// document.addEventListener("click", (item) => {
+//     var parentHasClassOpenConversationId = findParentHasClassReturnId(item.target, 'openConversationBtn')
+
+
+
+
+//     // if(item.target.classList.contains('noteTag')) {
+//     //     document.getElementById('search').value = item.target.getAttribute('data-id');
+//     //     document.getElementById('search').dispatchEvent(new Event('input', {bubbles: true,cancelable: true}));
+//     // }
+//     // if(item.target.classList.contains('searchUser')) {
+//     //     var term = document.getElementById('searchUser').value;
+//     //     window.location.href = '/users/search?q=' + encodeURIComponent(term);
+//     // }
+//     // if(item.target.classList.contains('searchPost')) {
+//     //     var term = document.getElementById('searchPost').value;
+//     //     window.location.href = '/posts/search?q=' + encodeURIComponent(term);
+//     // }
+//     // if(item.target.classList.contains('addBookmark')){
+//     //     let url = item.target.getAttribute('data-url');
+//     //     let formData = new FormData();
+//     //     formData.append("url", url);
+//     //     fetch("/bookmarks/new", { body: formData, method: "post" })
+//     //     .then(response => response.text())
+//     //     .then(data => {
+//     //         alert(data);
+//     //     });
+//     // }
+//     // if(item.target.classList.contains('followUser') || item.target.classList.contains('unfollow')){
+//     //     let username = item.target.getAttribute('data-username');
+//     //     let formData = new FormData();
+//     //     let tag = item.target.classList.contains('unfollow') ? '-unfollow' : '-follow';
+//     //     formData.append("username", username);
+//     //     formData.append("unfollow", item.target.classList.contains('unfollow'));
+//     //     fetch("/users/follow", { body: formData, method: "post" })
+//     //     .then(response => response.text())
+//     //     .then(data => {
+//     //         if(username && document.getElementById('toast-' + username + tag)) {
+//     //             document.getElementById('toast-username-' + username + tag).innerHTML = data;
+//     //             document.getElementById('toast-' + username + tag).classList.remove('hide');
+//     //             item.target.classList.add('hide');
+//     //         }
+//     //     });
+//     // }
+//     // if(item.target.classList.contains('deleteNote')){
+//     //     if(confirm('Are you sure you want to delete this note? This action cannot be undone.')){
+//     //         let id = item.target.getAttribute('data-id');
+//     //         let notebookid = item.target.getAttribute('data-notebookid');
+//     //         fetch("/notebooks/delete/" + id, { method: "get" })
+//     //         .then(response => response.text())
+//     //         .then(data => {
+//     //             window.location.href = '/notebooks/' + notebookid;
+//     //         });
+//     //     }
+//     // }
+//     // if(item.target.classList.contains('saveNotesKey')){
+//     //     let noteKey = document.getElementById('notes_key');
+//     //     localStorage.setItem('notes_key', noteKey.value);
+//     //     document.getElementById('enter_notes_key').style.display = 'none';
+//     //     window.location.reload();
+//     // }
+//     // if(item.target.classList.contains('saveDisplayMode')){
+//     //     let value = document.querySelector('input[name="display"]:checked').value;
+//     //     localStorage.setItem('lillihub_display_mode', value);
+//     //     window.location.reload();
+//     // }
+//     if(item.target.classList.contains('addUserToReplyBox')){
+//         item.preventDefault();
+//         let id = item.target.getAttribute('data-id');
+//         let name = item.target.getAttribute('data-name');
+//         let avatar = item.target.getAttribute('data-avatar');
+//         let chips = document.getElementById('replybox-chips-'+ id); 
+//         chips.innerHTML = chips.innerHTML + '<span id="chip-'+id+'-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" data-id="'+id+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
+//         document.getElementById('replybox-input-'+ id).value = '';
+//         document.getElementById('replybox-input-'+ id).focus();
+//         document.getElementById('replybox-menu-' + id).classList.add('hide');
+//         document.getElementById('replybox-checkbox-' + id + '-' + name).checked = true; 
+//     }
+//     if(item.target.classList.contains('replierRemoveChip')){
+//         let id = item.target.getAttribute('data-id');
+//         let name = item.target.getAttribute('data-name');
+//         document.getElementById('chip-'+ id + '-' + name).remove(); 
+//         document.getElementById('replybox-input-'+ id).focus();
+//         document.getElementById('replybox-menu-' + id).classList.add('hide');
+//         document.getElementById('replybox-checkbox-' + id + '-' + name).checked = false; 
+//     }
+//     if(item.target.classList.contains('loadTimeline')){
+//         let id = item.target.getAttribute('data-id');
+//         item.target.classList.add('loading');
+//         fetch("/timeline/" + id, { method: "get" })
+//             .then(response => response.text())
+//             .then(data => {
+//                 document.getElementById('add-' + id).innerHTML = data;
+//                 buildMasonry();
+//                 item.target.style.display = 'none';
+//                 //loadConversations();
+//             });
+//     }
+//     if(item.target.classList.contains('replyBtn')){
+//         let id = item.target.getAttribute('data-id');
+//         let form = document.getElementById('replybox-form-' + id); 
+//         submitReply(new FormData(form), id);
+//         form.reset();
+//     }
+//     if(parentHasClassOpenConversationId != 0 || item.target.classList.contains('openConversationBtn')) {
+//         //check if item is an anchor... if yes, bail...
+//         console.log(item.target.tagName);
+//         if(item.target.tagName.toLowerCase() == "a"){
+//             return;
+//         }
+//         const id = parentHasClassOpenConversationId != 0 ?  parentHasClassOpenConversationId : item.target.getAttribute('data-id');
+//         document.getElementById('conversation-thread').innerHTML = `<span class="loading d-block"></span>`;
+//         fetch("/timeline/conversation/" + id, { method: "get" })
+//             .then(response => response.json())
+//             .then(data => {
+//                 document.getElementById('conversation-thread').innerHTML = `<div class="card">${data.conversation}</div>`;
+//                 buildMasonry();
+//             });
+//         redirectToAnchor('#conversation');
+//     }
+//     // if(item.target.classList.contains('closeConversationBtn')) {
+//     //     let id = item.target.getAttribute('data-id');
+//     //     document.getElementById('modal-' + id).classList.remove("active");
+//     // }
+//     // if(item.target.classList.contains('openDetailsBtn')) {
+//     //     let id = item.target.getAttribute('data-id');
+//     //     document.getElementById('details-' + id).classList.add("active");
+//     // }
+//     // if(item.target.classList.contains('closeDetailsBtn')) {
+//     //     let id = item.target.getAttribute('data-id');
+//     //     document.getElementById('details-' + id).classList.remove("active");
+//     // }
+//     if(item.target.classList.contains('clearToast')) {
+//         let id = item.target.getAttribute('data-id');
+//         document.getElementById('toast-' + id).classList.add("hide");
+//     }
+//     if(item.target.classList.contains('toggleMainReplyBox')) {
+//         // need to clear values if toggled
+//         document.getElementById('mainReplyBox').classList.toggle('hide');
+//         document.getElementById('mainReplyBox').classList.add('mb-2');
+//     }
+//     if(item.target.classList.contains('sendPost')) {
+//         item.preventDefault();
+//         const form = document.getElementById('mainPost'); 
+//         submitPost(new FormData(form));
+//         document.getElementById('post').value = '';
+//         document.getElementById('replybox-input-main').value = ''; 
+//     }
+//     if(item.target.classList.contains('dismissPostToast')) {
+//         document.getElementById('postToast').classList.add("hide");
+//     }
+//     if(item.target.classList.contains('dismissMorePostsToast')) {
+//         document.getElementById('morePostsToast').classList.add("hide");
+//     }
+//     if(item.target.classList.contains('getNewPosts')) {
+//         document.getElementById('add-0').innerHTML = '<div class="mt-2" id="add-0"><span class="loading d-block"></span></div>';
+//         document.getElementById('morePostsToast').classList.add('hide');
+//         fetch("/timeline/0", { method: "get" })
+//             .then(response => response.text())
+//             .then(data => {
+//                 document.getElementById('add-0').innerHTML = data;
+//                 const article = document.querySelector('article:first-child');
+//                 const id = article.getAttribute('id');
+//                 let checks = 0;
+//                 const timerID = setInterval(function() {
+//                     fetch("/timeline/check/" + id, { method: "get" })
+//                         .then(response => response.json())
+//                         .then(data => {
+//                             if(data.count > 0) {
+//                                 document.getElementById('morePostsToast').classList.remove('hide');
+//                                 document.getElementById('showPostCount').innerHTML = data.count;
+//                                 console.log(data);
+//                                 document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
+//                             }     
+//                         });
+//                     checks++;
+//                     if(checks > 10) {
+//                         clearInterval(timerID);
+//                     }
+//                 }, 60 * 1000); 
+//                 fetch("/timeline/mark/" + id, { method: "get" })
+//                     .then(response => response.text())
+//                     .then(_data => {});
+
+//                 buildMasonry();
+//             });
+//     }
+//     if(item.target.classList.contains('addToReply')) {
+//         const username = item.target.getAttribute('data-id');
+//         const target = item.target.getAttribute('data-target');
+//         console.log(username, target);
+//         document.getElementById(target).value = document.getElementById(target).value + '@' + username + ' ';
+//     }
+
+// });
+function growTextArea(el) {
+    el.parentNode.dataset.replicatedValue = el.value;
+}
+document.addEventListener("input", (event) => {  
     if(event.target.classList.contains('grow-me')) {
         growTextArea(event.target);
     }
-    if(event.target.classList.contains('replierInput')){
-        let id = event.target.getAttribute('data-id');
-        let menu = document.getElementById('replybox-menu-' + id); 
-        menu.classList.remove('hide');
-        var menuItems = menu.children;
-        if(!event.target.value)
-        {
-            menu.classList.add('hide');
-        }
-        for (var i = 0; i < menuItems.length; i++) {
-            var item = menuItems[i];
-            if(event.target.value && ('@' + item.getAttribute('data-name')).toLowerCase().includes(event.target.value.toLowerCase())) {
-                item.classList.remove('hide');
-                item.innerHTML = '<a data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="addUserToReplyBox" href="#"><div data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="tile tile-centered addUserToReplyBox">' +
-                    '<div data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="tile-icon addUserToReplyBox"><img data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="avatar avatar-sm addUserToReplyBox" src="'+item.getAttribute('data-avatar')+'"></div>' +
-                    '<div data-avatar="'+item.getAttribute('data-avatar')+'" data-name="'+item.getAttribute('data-name')+'" data-id="' + id + '" class="tile-content addUserToReplyBox">@'+item.getAttribute('data-name').replaceAll(event.target.value, '<mark>' + event.target.value + '</mark>')+'</div></div></a>';
-            } else {
-                item.classList.add('hide');
-            }
-        }
-    }
 });
-function submitReply(formData, id) {
-    fetch("/timeline/reply", { body: formData, method: "post" })
-        .then(response => response.text())
-        .then(data => {
-            if(id && document.getElementById('toast-' + id)) {
-                document.getElementById('toast-content-' + id).innerHTML = data;
-                document.getElementById('toast-' + id).classList.remove('hide');
+document.addEventListener("DOMContentLoaded", async (event) => {
+    fetch("/api/mentions", { method: "get" })
+    .then(response => response.json())
+    .then(data => {
+        let items = data.items.slice(0, 3);
+        document.getElementById("mentions").innerHTML = items.map(i => {return `<article class="no-elevate">
+            <p>
+                ${i.author && i.author._microblog && i.author._microblog.username ? `<a rel="prefetch" swap-target="#main" swap-history="true" href="/timeline/users/${i.author._microblog.username}" class="grey-text">@${i.author._microblog.username}</a>` : i.author.name}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right" viewBox="0 0 16 16">
+                    <path d="M6 12.796V3.204L11.481 8zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753"/>
+                </svg>
+                ${i.content_html.replace('<p>','').replace('</p>', '').replace('</a> ', '</a>').replaceAll('@{{username}}','')}
+                <a class="grey-text" rel="prefetch" swap-target="#main" swap-history="true"  href="/timeline/posts/${i.id}">
+                ${i._microblog.date_relative}&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
+                        </svg>
+                </a>
+            </p>
+            </article>` }).join('');
+        document.getElementById("mentions-sidebar").innerHTML = document.getElementById("mentions").innerHTML;
+        register_links();
+    });
+    fetch("/api/replies", { method: "get" })
+    .then(response => response.json())
+    .then(data => {
+        let items = data.items.slice(0, 3);
+        document.getElementById("replies").innerHTML = items.map(i => {return `<article class="no-elevate">
+            <p>
+                ${i.content_html.replace('<p>','').replace('</p>', '').replaceAll('@{{username}}','')}
+                <a class="grey-text" rel="prefetch" swap-target="#main" swap-history="true"  href="/timeline/posts/${i.id}">
+                ${i._microblog.date_relative}&nbsp;&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
+                        </svg>
+                </a>
+            </p>
+            </article>` }).join('');
+        document.getElementById("replies-sidebar").innerHTML = document.getElementById("replies").innerHTML;
+        register_links();
+    });
+    fetch("/api/discover/lillihub", { method: "get" })
+    .then(response => response.json())
+    .then(data => {
+        let items = data.slice(0, 5);
+        document.getElementById("new").innerHTML = items.map(i => {return i.content }).join('');
+        document.getElementById("new-sidebar").innerHTML = document.getElementById("new").innerHTML;
+        register_links();
+    });
+    fetch("/api/discover/photos", { method: "get" })
+    .then(response => response.json())
+    .then(data => {
+        let items = data.slice(0, 5);
+        document.getElementById("photos").innerHTML = items.map(i => {return i.content }).join('');
+        document.getElementById("photos-sidebar").innerHTML = document.getElementById("photos").innerHTML;
+        register_links();
+    });
+    fetch("/api/discover", { method: "get" })
+    .then(response => response.json())
+    .then(data => {
+        let items = data.slice(0, 5);
+        document.getElementById("discover").innerHTML = items.map(i => {return i.content }).join('');
+        document.getElementById("discover-sidebar").innerHTML = document.getElementById("discover").innerHTML;
+        register_links();
+    });
+    fetch("/api/following/favorites", { method: "get" })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if(data.length <= 0) {
+            document.getElementById("following").innerHTML = '<p>Your favorites will show here</p>'
+        } else {
+            var following = [... document.querySelectorAll('#following option')];
+            document.getElementById("following").innerHTML = `
+                <ul class="list border">
+                    ${following.filter(f => data.includes(f.value)).map(f => `
+                        <li>
+                            <img class="round" src="${f.getAttribute('data-avatar')}">
+                            <div class="max">
+                                <h6 class="small">${f.innerHTML.split('(')[0].trim()}</h6>
+                                <div>${f.innerHTML.split('(')[1].replace(')','').trim()}</div>
+                            </div>
+                        </li>
+                    `).join('')}
+                </ul>`;
+        }
+        document.getElementById("following-sidebar").innerHTML = document.getElementById("following").innerHTML;
+    });
+});
+/************************************************************
+** Swap
+** Facilitates AJAX-style navigation in web pages 
+** MIT Licence - https://github.com/josephernest/Swap
+** UPDATED - https://news.ycombinator.com/item?id=36008516
+*************************************************************/
+var loaders = {}, unloaders = {}, state;
+register_links();
+new MutationObserver(dom_changes).observe(document.querySelector("html"), { childList: true, subtree: true });
+window.addEventListener("popstate", (event) => update(location.href, "[swap-history-restore]", false, "body", true, event.state));
+window.addEventListener("DOMContentLoaded", dom_load);
+function update(href, target, pushstate, fallback = null, back = false, popState = null) {
+    console.log(state);
+    console.log(popState);
+    if(!href.includes('#') && state && back) {
+        document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
+        document.querySelector(target).innerHTML = state;
+        //window.scrollTo(0,document.querySelector(`[href="${state.source}"]`).offsetTop)
+    } else if(!href.includes('#')) {
+        state = document.querySelector(target).innerHTML;
+        document.querySelector(target).innerHTML = '<div class="center-align middle-align"><progress class="circle"></progress></div>';
+        fetch(href, { headers: new Headers({"swap-target": target}) }).then(r => r.text()).then(html => {
+            var tmp = document.createElement('html');
+            tmp.innerHTML = html;
+            (document.querySelector(target) ?? document.querySelector(fallback)).outerHTML = (tmp.querySelector(target) ?? tmp.querySelector(fallback)).outerHTML;
+            if (pushstate)
+                history.pushState({source: href}, "", href);
+            register_links();  
+            window.scrollTo(0,0);
+        }).finally(() => {
+            const openDialog = document.querySelector('dialog[open]');
+            if(openDialog) {
+                openDialog.close();
             }
         });
+    }
 }
-function submitPost(formData) {
-    fetch("/post/add", { body: formData, method: "post" })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('postToastMessage').innerHTML = data.response.message;
-            document.getElementById('postToast').classList.remove("hide");
-        });
-}
-document.addEventListener("submit", (item) => {
-    item.preventDefault();
-});
-document.addEventListener("click", (item) => {
-    var parentHasClassOpenConversationId = findParentHasClassReturnId(item.target, 'openConversationBtn')
-
-
-
-
-    // if(item.target.classList.contains('noteTag')) {
-    //     document.getElementById('search').value = item.target.getAttribute('data-id');
-    //     document.getElementById('search').dispatchEvent(new Event('input', {bubbles: true,cancelable: true}));
-    // }
-    // if(item.target.classList.contains('searchUser')) {
-    //     var term = document.getElementById('searchUser').value;
-    //     window.location.href = '/users/search?q=' + encodeURIComponent(term);
-    // }
-    // if(item.target.classList.contains('searchPost')) {
-    //     var term = document.getElementById('searchPost').value;
-    //     window.location.href = '/posts/search?q=' + encodeURIComponent(term);
-    // }
-    // if(item.target.classList.contains('addBookmark')){
-    //     let url = item.target.getAttribute('data-url');
-    //     let formData = new FormData();
-    //     formData.append("url", url);
-    //     fetch("/bookmarks/new", { body: formData, method: "post" })
-    //     .then(response => response.text())
-    //     .then(data => {
-    //         alert(data);
-    //     });
-    // }
-    // if(item.target.classList.contains('followUser') || item.target.classList.contains('unfollow')){
-    //     let username = item.target.getAttribute('data-username');
-    //     let formData = new FormData();
-    //     let tag = item.target.classList.contains('unfollow') ? '-unfollow' : '-follow';
-    //     formData.append("username", username);
-    //     formData.append("unfollow", item.target.classList.contains('unfollow'));
-    //     fetch("/users/follow", { body: formData, method: "post" })
-    //     .then(response => response.text())
-    //     .then(data => {
-    //         if(username && document.getElementById('toast-' + username + tag)) {
-    //             document.getElementById('toast-username-' + username + tag).innerHTML = data;
-    //             document.getElementById('toast-' + username + tag).classList.remove('hide');
-    //             item.target.classList.add('hide');
-    //         }
-    //     });
-    // }
-    // if(item.target.classList.contains('deleteNote')){
-    //     if(confirm('Are you sure you want to delete this note? This action cannot be undone.')){
-    //         let id = item.target.getAttribute('data-id');
-    //         let notebookid = item.target.getAttribute('data-notebookid');
-    //         fetch("/notebooks/delete/" + id, { method: "get" })
-    //         .then(response => response.text())
-    //         .then(data => {
-    //             window.location.href = '/notebooks/' + notebookid;
-    //         });
-    //     }
-    // }
-    // if(item.target.classList.contains('saveNotesKey')){
-    //     let noteKey = document.getElementById('notes_key');
-    //     localStorage.setItem('notes_key', noteKey.value);
-    //     document.getElementById('enter_notes_key').style.display = 'none';
-    //     window.location.reload();
-    // }
-    // if(item.target.classList.contains('saveDisplayMode')){
-    //     let value = document.querySelector('input[name="display"]:checked').value;
-    //     localStorage.setItem('lillihub_display_mode', value);
-    //     window.location.reload();
-    // }
-    if(item.target.classList.contains('addUserToReplyBox')){
-        item.preventDefault();
-        let id = item.target.getAttribute('data-id');
-        let name = item.target.getAttribute('data-name');
-        let avatar = item.target.getAttribute('data-avatar');
-        let chips = document.getElementById('replybox-chips-'+ id); 
-        chips.innerHTML = chips.innerHTML + '<span id="chip-'+id+'-'+name+'" class="chip"><img class="avatar avatar-sm" src="'+avatar+'" />@'+name+'<a data-name="'+name+'" data-id="'+id+'" class="btn btn-clear replierRemoveChip" href="#" aria-label="Close" role="button"></a></span>';                    
-        document.getElementById('replybox-input-'+ id).value = '';
-        document.getElementById('replybox-input-'+ id).focus();
-        document.getElementById('replybox-menu-' + id).classList.add('hide');
-        document.getElementById('replybox-checkbox-' + id + '-' + name).checked = true; 
-    }
-    if(item.target.classList.contains('replierRemoveChip')){
-        let id = item.target.getAttribute('data-id');
-        let name = item.target.getAttribute('data-name');
-        document.getElementById('chip-'+ id + '-' + name).remove(); 
-        document.getElementById('replybox-input-'+ id).focus();
-        document.getElementById('replybox-menu-' + id).classList.add('hide');
-        document.getElementById('replybox-checkbox-' + id + '-' + name).checked = false; 
-    }
-    if(item.target.classList.contains('loadTimeline')){
-        let id = item.target.getAttribute('data-id');
-        item.target.classList.add('loading');
-        fetch("/timeline/" + id, { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('add-' + id).innerHTML = data;
-                buildMasonry();
-                item.target.style.display = 'none';
-                //loadConversations();
-            });
-    }
-    if(item.target.classList.contains('replyBtn')){
-        let id = item.target.getAttribute('data-id');
-        let form = document.getElementById('replybox-form-' + id); 
-        submitReply(new FormData(form), id);
-        form.reset();
-    }
-    if(parentHasClassOpenConversationId != 0 || item.target.classList.contains('openConversationBtn')) {
-        //check if item is an anchor... if yes, bail...
-        console.log(item.target.tagName);
-        if(item.target.tagName.toLowerCase() == "a"){
-            return;
+function register_links() {
+    for (const elt of document.querySelectorAll('*[swap-target]')) {
+        elt.onclick = e => {
+            update(elt.getAttribute('href'), elt.getAttribute('swap-target'), elt.getAttribute('swap-history'));
+            e.preventDefault();
         }
-        const id = parentHasClassOpenConversationId != 0 ?  parentHasClassOpenConversationId : item.target.getAttribute('data-id');
-        document.getElementById('conversation-thread').innerHTML = `<span class="loading d-block"></span>`;
-        fetch("/timeline/conversation/" + id, { method: "get" })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('conversation-thread').innerHTML = `<div class="card">${data.conversation}</div>`;
-                buildMasonry();
-            });
-        redirectToAnchor('#conversation');
     }
-    // if(item.target.classList.contains('closeConversationBtn')) {
-    //     let id = item.target.getAttribute('data-id');
-    //     document.getElementById('modal-' + id).classList.remove("active");
-    // }
-    // if(item.target.classList.contains('openDetailsBtn')) {
-    //     let id = item.target.getAttribute('data-id');
-    //     document.getElementById('details-' + id).classList.add("active");
-    // }
-    // if(item.target.classList.contains('closeDetailsBtn')) {
-    //     let id = item.target.getAttribute('data-id');
-    //     document.getElementById('details-' + id).classList.remove("active");
-    // }
-    if(item.target.classList.contains('clearToast')) {
-        let id = item.target.getAttribute('data-id');
-        document.getElementById('toast-' + id).classList.add("hide");
-    }
-    if(item.target.classList.contains('toggleMainReplyBox')) {
-        // need to clear values if toggled
-        document.getElementById('mainReplyBox').classList.toggle('hide');
-        document.getElementById('mainReplyBox').classList.add('mb-2');
-    }
-    if(item.target.classList.contains('sendPost')) {
-        item.preventDefault();
-        const form = document.getElementById('mainPost'); 
-        submitPost(new FormData(form));
-        document.getElementById('post').value = '';
-        document.getElementById('replybox-input-main').value = ''; 
-    }
-    if(item.target.classList.contains('dismissPostToast')) {
-        document.getElementById('postToast').classList.add("hide");
-    }
-    if(item.target.classList.contains('dismissMorePostsToast')) {
-        document.getElementById('morePostsToast').classList.add("hide");
-    }
-    if(item.target.classList.contains('getNewPosts')) {
-        document.getElementById('add-0').innerHTML = '<div class="mt-2" id="add-0"><span class="loading d-block"></span></div>';
-        document.getElementById('morePostsToast').classList.add('hide');
-        fetch("/timeline/0", { method: "get" })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('add-0').innerHTML = data;
-                const article = document.querySelector('article:first-child');
-                const id = article.getAttribute('id');
-                let checks = 0;
-                const timerID = setInterval(function() {
-                    fetch("/timeline/check/" + id, { method: "get" })
-                        .then(response => response.json())
-                        .then(data => {
-                            if(data.count > 0) {
-                                document.getElementById('morePostsToast').classList.remove('hide');
-                                document.getElementById('showPostCount').innerHTML = data.count;
-                                console.log(data);
-                                document.getElementById('showPostCount').setAttribute('marker', data.markers.timeline.id);
-                            }     
-                        });
-                    checks++;
-                    if(checks > 10) {
-                        clearInterval(timerID);
-                    }
-                }, 60 * 1000); 
-                fetch("/timeline/mark/" + id, { method: "get" })
-                    .then(response => response.text())
-                    .then(_data => {});
+}
+function dom_changes(mutations) {
+    for (var selector in unloaders)
+        for (var m of mutations)
+            for (var n of m.removedNodes)
+                if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector))) {
+                    unloaders[selector]();
+                    delete unloaders[selector];
+                }
+    for (var selector in loaders)
+        for (var m of mutations)
+            for (var n of m.addedNodes) 
+                if (n.matches && n.querySelector && (n.matches(selector) || n.querySelector(selector)))
+                        unloaders[selector] = loaders[selector]();
+}
+function dom_load() {
+    for (var selector in loaders)
+        if (document.querySelector(selector))
+                unloaders[selector] = loaders[selector]();
+}
+loaders['.conversation'] = () => {
+    document.getElementById('titleBar').innerHTML = `${document.querySelector('.conversation').getAttribute('data-name')}'s Post`;
+    document.getElementById('goBack').classList.remove('hide');
+    document.getElementById('menu').classList.add('hide');
 
-                buildMasonry();
-            });
-    }
-    if(item.target.classList.contains('addToReply')) {
-        const username = item.target.getAttribute('data-id');
-        const target = item.target.getAttribute('data-target');
-        console.log(username, target);
-        document.getElementById(target).value = document.getElementById(target).value + '@' + username + ' ';
-    }
-
-});
+    return () => {  // unloader function
+        document.getElementById('titleBar').innerHTML = `Timeline`;
+        document.getElementById('goBack').classList.add('hide');
+        document.getElementById('menu').classList.remove('hide');
+    };  
+}
