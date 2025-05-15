@@ -2295,26 +2295,53 @@ function HTML(content, title, redirect, footer, header) {
             <!--<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.10.7/dist/cdn/beer.min.js"></script>-->
         </head>
         <body>
-            <!--<nav class="left l">
-                <header>
-                    <nav>
-                        <img src="/logo.png" class="avatar">
-                    </nav>
-                </header>
-                <a href="/">
-                    <i>house</i>
-                    <div>Dashboard</div>
-                </a>
-                <a href="/notebooks">
-                    <i>description</i>
-                    <div>Notebooks</div>
-                </a>
-                <a href="/timeline">
-                    <i>view_timeline</i>
-                    <div>Timeline</div>
-                </a>
-            </nav>-->
-            ${header ? header : ''}
+            ${header ? header : `
+            <header class="fixed surface-container-low">
+                <nav>
+                    <button id="menu" data-ui="#apps-menu-drawer" class="s circle transparent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                        </svg>
+                    </button>
+                    <a href="javascript:history.back()" id="goBack" class="s circle transparent hide button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                        </svg>
+                    </a>
+                    <a class="m l button transparent" href="/blog">Blog</a>
+                    <a class="m l button transparent" href="/bookmarks">Bookmarks</a>
+                    <a class="m l button transparent" href="/bookshelves">Bookshelves</a>
+                    <a class="m l button transparent" href="/notebooks">Notes</a>
+                    <a class="m l ${title == 'Timeline' ? "active button" : "button transparent"}" href="/timeline">Social</a>
+                    <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
+                    <span class="max m l"></span>
+                    <button class="circle transparent">
+                        <img id="myAvatar" class="responsive" src="{{avatar}}">
+                    </button>
+                </nav>
+                <dialog id="apps-menu-drawer" class="left">
+                    <header>
+                        <nav>
+                        <img width="60" src="/logo.png">
+                        <h6 class="max">Lillihub</h6>
+                        <div class="max"></div>
+                        <button data-ui="#apps-menu-drawer" class="circle transparent">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                </svg>
+                        </button>
+                        </nav>
+                    </header>
+                    <ul class="list">
+                        <li><a class="button" href="/blog">Blog</a></li>
+                        <li><a class="button" href="/bookmarks">Bookmarks</a></li>
+                        <li><a class="button" href="/bookshelves">Bookshelves</a></li>
+                        <li><a class="button" href="/notebooks">Notes</a></li>
+                        <li><a class="button ${title == 'Timeline' ? "primary" : ""}" href="/timeline">Social</a></li>
+                    </ul>
+                </dialog>
+            </header>
+                `}
             <main>
                 ${content}
             </main>
@@ -2349,18 +2376,6 @@ function HTML(content, title, redirect, footer, header) {
                             }
                         });
             });
-            // document.addEventListener("click", async (event) => {
-            //     if(!event.target.getAttribute('evt-click')) {
-            //         return;
-            //     } else {
-            //         if(event.target.getAttribute('evt-click') == 'show') {
-            //             document.getElementById('dialog-' + event.target.getAttribute('data-id')).showModal();
-            //         }
-            //         if(event.target.getAttribute('evt-click') == 'close') {
-            //             document.getElementById('dialog-' + event.target.getAttribute('data-id')).close();
-            //         }
-            //     }
-            // });
         </script>
     </html>    
     `;
