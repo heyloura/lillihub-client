@@ -1131,16 +1131,16 @@ Deno.serve(async (req) => {
     } // end authenticated routes...
 
     if(new URLPattern({ pathname: "/login" }).exec(req.url)) {
-        console.log('/login')
         const value = await req.formData();
         const token = value.get('token');
         const expiresOn = new Date();
         expiresOn.setDate(expiresOn.getDate() + 399); //chrome limits to 400 days
+        const accessToken = await encryptMe(token)
         return new Response(HTML(`Thanks for signing in. Redirecting now.`, ' ', '/'), {
             status: 200,
             headers: {
                 "content-type": "text/html",
-                "set-cookie": `token=${token};SameSite=Lax;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`
+                "set-cookie": `atoken=${accessToken};SameSite=Lax;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`
             },
         });
     }
@@ -2584,9 +2584,9 @@ function TimelineHTML(content, title, redirect) {
                 <a class="m l active button" href="/timeline">Social</a>
                 <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
                 <span class="max m l"></span>
-                <button class="circle transparent">
+                <!--<button class="circle transparent">
                     <img id="myAvatar" class="responsive" src="{{avatar}}">
-                </button>
+                </button>-->
             </nav>
             <dialog id="apps-menu-drawer" class="left">
                 <header>
