@@ -1082,7 +1082,7 @@ Deno.serve(async (req) => {
                             return;
                         } else {
                             document.getElementById('keyPompt').classList.add('hide');
-                            localStorage.setItem("key", document.getElementById('key').value);
+                            localStorage.setItem("mbKey", document.getElementById('key').value);
                         }
                     });
                 </script>
@@ -2398,7 +2398,7 @@ function HTML(content, title, redirect, footer, header) {
         </body>
         <script>
             function removeKey() {
-                localStorage.setItem("key", '');
+                localStorage.setItem("mbKey", '');
             }
             function searchTag(tag) {
                 document.getElementById('search').value = tag;
