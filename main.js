@@ -1105,19 +1105,9 @@ Deno.serve(async (req) => {
                             </li>
                         `;
                     }).join('')}
-                </ul>`, 'Notebooks', undefined, undefined, `
-                <header class="l">
-                    <nav>
-                        <h5 class="max center-align">Notebooks</h5>
-                        <button class="circle transparent">
-                            <i>settings</i>
-                        </button>
-                    </nav>
-                </header>
-                `), {status: 200, headers: {"content-type": "text/html"} });
+                </ul>`, 'Notebooks', undefined, undefined), {status: 200, headers: {"content-type": "text/html"} });
         }
 
-        console.log("dashboard...");
         return new Response(HTML(`
             <aside>
                 <h6>Recent Mentions</h6>
@@ -2372,7 +2362,7 @@ function HTML(content, title, redirect, footer, header) {
                     <a class="l button transparent" href="/bookshelves">Bookshelves</a>
                     <a class="l button transparent" href="/notebooks">Notes</a>
                     <a class="l ${title == 'Timeline' ? "active button" : "button transparent"}" href="/timeline">Social</a>
-                    <h5 id="titleBar" class="max center-align s truncate">${title}</h5>
+                    <h5 id="titleBar" class="max center-align s m truncate">${title}</h5>
                     <span class="max l"></span>
                 </nav>
                 <dialog id="apps-menu-drawer" class="left">
@@ -2606,14 +2596,14 @@ async function getConversationHTML(id, token, nonce, csp) {
         return `<label class="checkbox large icon"><input ${i == 0 ? `checked="checked"` : ''} type='checkbox' name='replyingTo[]' value='${person}'><span><i><img class="round tiny" src="${results.items.filter(i => i.author._microblog.username == person)[0].author.avatar}"></i><i>done</i></span> @${person}</label>`
     }).join(' ');
     let page = `<div id="conversation-${id}">
-        <header id="goBackHeader" class="fixed surface-container-low m l">
+        <header id="goBackHeader" class="fixed surface-container-low l">
             <nav>
                 <a href="javascript:history.back()" class="circle transparent button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
                     </svg>
                 </a>
-                <h5 class="max center-align s truncate">Conversation</h5>
+                <h5 class="max center-align s m truncate">Conversation</h5>
                 <span class="max m l"></span>
             </nav>
         </header>
