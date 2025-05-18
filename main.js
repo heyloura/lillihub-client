@@ -1119,15 +1119,71 @@ Deno.serve(async (req) => {
 
         console.log("dashboard...");
         return new Response(HTML(`
-            <header class="l">
-                <nav>
-                    <button class="circle transparent">
-                    <i>menu</i>
-                    </button>
-                    <h5 class="max center-align">Dashboard</h5>
-                </nav>
-            </header>
-            <p>To do...</p>`, 'Dashboard'), {status: 200, headers: {"content-type": "text/html"} });
+            <aside>
+                <h6>Recent Mentions</h6>
+                <div class="medium-space l m"></div>
+                <div id="mentions">
+                    <div class="center-align middle-align"> 
+                        <progress class="circle"></progress>
+                    </div>
+                </div>
+                <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+            </aside>
+            <aside>
+                <h6>Following</h6>
+                <div class="medium-space l m"></div>
+                <div id="following">
+                    <div class="center-align middle-align"> 
+                        <progress class="circle"></progress>
+                    </div>
+                </div>
+                <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+            </aside>
+            <aside>
+                <h6>Recent Replies</h6>
+                <div class="medium-space l m"></div>
+                <div id="replies">
+                    <div class="center-align middle-align"> 
+                        <progress class="circle"></progress>
+                    </div>
+                </div>
+                <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+            </aside>
+            <aside>
+                <h6>New on Micro.blog</h6>
+                <div class="medium-space l m"></div>
+                <div id="new">
+                    <div class="center-align middle-align"> 
+                        <progress class="circle"></progress>
+                    </div>
+                </div>
+            </aside>
+            <aside>
+                <h6>Discover photos</h6>
+                <div class="medium-space l m"></div>
+                <div id="photos">
+                    <div class="center-align middle-align"> 
+                        <progress class="circle"></progress>
+                    </div>
+                </div>
+                <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+            </aside>
+            <aside>
+                <h6>Curated Discover</h6>
+                <div class="medium-space l m"></div>
+                <div id="discover">
+                    <div class="center-align middle-align"> 
+                        <progress class="circle"></progress>
+                    </div>
+                </div>
+                <p class="right-align"><a href="#" class="primary-text">View All</a></p>
+            </aside>
+            <div id="feeds"></div>
+            `, 'Dashboard', null, `         
+            <datalist id="following">
+                {{following}}
+            </datalist>
+            <script nonce="{{nonce}}" src="/scripts/dashboard.js" type="text/javascript"></script>`), {status: 200, headers: {"content-type": "text/html"} });
     } // end authenticated routes...
 
     if(new URLPattern({ pathname: "/login" }).exec(req.url)) {
@@ -2308,6 +2364,9 @@ function HTML(content, title, redirect, footer, header) {
                             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
                         </svg>
                     </a>
+                    <a class="l button transparent" href="/"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+                        <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+                        </svg></a>
                     <a class="l button transparent" href="/blog">Blog</a>
                     <a class="l button transparent" href="/bookmarks">Bookmarks</a>
                     <a class="l button transparent" href="/bookshelves">Bookshelves</a>
@@ -2330,6 +2389,9 @@ function HTML(content, title, redirect, footer, header) {
                         </nav>
                     </header>
                     <ul class="list">
+                        <li><a class="button" href="/"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+  <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+</svg> Dashboard</a></li>
                         <li><a class="button" href="/blog">Blog</a></li>
                         <li><a class="button" href="/bookmarks">Bookmarks</a></li>
                         <li><a class="button" href="/bookshelves">Bookshelves</a></li>
@@ -2381,38 +2443,7 @@ function TimelineHTML(content, title, redirect) {
     return HTML(`
         <div class="page right active">
             <div class="grid medium-space">
-                <div class="m l m12 l3">
-                    <aside>
-                        <h6>Recent Mentions</h6>
-                        <div class="medium-space l m"></div>
-                        <div id="mentions">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                    </aside>
-                    <aside>
-                        <h6>Recent Replies</h6>
-                        <div class="medium-space l m"></div>
-                        <div id="replies">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                    </aside>
-                    <aside>
-                        <h6>Following</h6>
-                        <div class="medium-space l m"></div>
-                        <div id="following">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                    </aside>
-                </div>
+                <div class="m l m12 l3"></div>
                 <div class="s12 m12 l6">
                     <article id="quickPost" class="no-elevate tertiary-container m l">
                         <div class="row">
@@ -2446,167 +2477,11 @@ function TimelineHTML(content, title, redirect) {
                     <div id="newPost"></div>
                     <div id="main" swap-history-restore="#main">${content}</div>
                 </div>
-                <div class="m12 l3 m l">
-                    <aside>
-                        <h6>New on Micro.blog</h6>
-                        <div class="medium-space l m"></div>
-                        <div id="new">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                    </aside>
-                    <aside>
-                        <h6>Discover photos</h6>
-                        <div class="medium-space l m"></div>
-                        <div id="photos">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                    </aside>
-                    <aside>
-                        <h6>Curated Discover</h6>
-                        <div class="medium-space l m"></div>
-                        <div id="discover">
-                            <div class="center-align middle-align"> 
-                                <progress class="circle"></progress>
-                            </div>
-                        </div>
-                        <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                    </aside>
-                    <div id="feeds"></div>
-                </div>
+                <div class="m12 l3 m l"></div>
             </div>
         </div>
         `, title, redirect, `
-            <dialog id="dialog-more" class="left">
-                <header class="fixed front">
-                    <nav>
-                        <div class="max truncate">
-                        </div>
-                        <button data-ui="#dialog-more" class="circle transparent">
-                            <i>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                                </svg>
-                            </i>
-                        </button>
-                    </nav>
-                </header>
-                <aside>
-                    <h6>New on Micro.blog</h6>
-                    <div class="medium-space"></div>
-                    <div id="new-sidebar">
-                        <div class="center-align middle-align"> 
-                            <progress class="circle"></progress>
-                        </div>
-                    </div>
-                </aside>
-                <aside>
-                    <h6>Discover photos</h6>
-                    <div class="medium-space"></div>
-                    <div id="photos-sidebar">
-                        <div class="center-align middle-align"> 
-                            <progress class="circle"></progress>
-                        </div>
-                    </div>
-                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                </aside>
-                <aside>
-                    <h6>Curated Discover</h6>
-                    <div class="medium-space"></div>
-                    <div id="discover-sidebar">
-                        <div class="center-align middle-align"> 
-                            <progress class="circle"></progress>
-                        </div>
-                    </div>
-                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                </aside>
-                <aside>
-                    <h6>Recent Mentions</h6>
-                    <div class="medium-space s"></div>
-                    <div id="mentions-sidebar">
-                        <div class="center-align middle-align"> 
-                            <progress class="circle"></progress>
-                        </div>
-                    </div>
-                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                </aside>
-                <aside>
-                    <h6>Recent Replies</h6>
-                    <div class="medium-space s"></div>
-                    <div id="replies-sidebar">
-                        <div class="center-align middle-align"> 
-                            <progress class="circle"></progress>
-                        </div>
-                    </div>
-                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                </aside>
-                <aside>
-                    <h6>Following</h6>
-                    <div class="medium-space s"></div>
-                    <div id="following-sidebar">
-                        <div class="center-align middle-align"> 
-                            <progress class="circle"></progress>
-                        </div>
-                    </div>
-                    <p class="right-align"><a href="#" class="primary-text">View All</a></p>
-                </aside>
-                <div id="feeds"></div>
-            </dialog>
-            <datalist id="following">
-                {{following}}
-            </datalist>
             <script nonce="{{nonce}}" src="/scripts/timeline.js" type="text/javascript"></script>
-        `, 
-        `
-        <header class="fixed surface-container-low">
-            <nav>
-                <button id="menu" data-ui="#apps-menu-drawer" class="s circle transparent">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-                    </svg>
-                </button>
-                <a href="javascript:history.back()" id="goBack" class="s circle transparent hide button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-                    </svg>
-                </a>
-                <a class="m l button transparent" href="/blog">Blog</a>
-                <a class="m l button transparent" href="/bookmarks">Bookmarks</a>
-                <a class="m l button transparent" href="/bookshelves">Bookshelves</a>
-                <a class="m l button transparent" href="/notebooks">Notes</a>
-                <a class="m l active button" href="/timeline">Social</a>
-                <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
-                <span class="max m l"></span>
-                <!--<button class="circle transparent">
-                    <img id="myAvatar" class="responsive" src="{{avatar}}">
-                </button>-->
-            </nav>
-            <dialog id="apps-menu-drawer" class="left">
-                <header>
-                    <nav>
-                    <img width="60" src="/logo.png">
-                    <h6 class="max">Lillihub</h6>
-                    <div class="max"></div>
-                    <button data-ui="#apps-menu-drawer" class="circle transparent">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                            </svg>
-                    </button>
-                    </nav>
-                </header>
-                <ul class="list">
-                    <li><a class="button" href="/blog">Blog</a></li>
-                    <li><a class="button" href="/bookmarks">Bookmarks</a></li>
-                    <li><a class="button" href="/bookshelves">Bookshelves</a></li>
-                    <li><a class="button" href="/notebooks">Notes</a></li>
-                    <li><a class="button primary" href="/timeline">Social</a></li>
-                </ul>
-            </dialog>
-        </header>
         `
     );
 }
