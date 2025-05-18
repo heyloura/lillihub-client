@@ -688,15 +688,21 @@ Deno.serve(async (req) => {
                             <div class="max truncate">
                                 <h5>Manage Todo</h5>
                             </div>
-                            <button evt-click="close" data-id="edit" class="circle transparent"><i evt-click="close" data-id="edit">close</i></button>
+                            <button data-ui="#dialog-edit" class="circle transparent">
+                                <i>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                    </svg>
+                                </i>
+                            </button>
                         </nav>
                     </header>
                     <div class="field textarea">
                         <input id="lineId" type="hidden" />
                         <textarea style="height:70vh;" id="content"></textarea>
                         <div class="medium-space"></div>
-                        <button id="deleteMe" evt-click='delete' class="error-text border"><i>delete</i> Delete</button>
-                        <button evt-click='save'><i>save</i> Save</button>
+                        <button id="deleteMe" evt-click='delete' class="error-text border">Delete</button>
+                        <button evt-click='save'>Save</button>
                     </div>
                 </dialog>
                 <style>
@@ -841,16 +847,7 @@ Deno.serve(async (req) => {
                     document.getElementById('tasks').innerHTML = item.content_html;
                     window.createTaskList();
                 `)}
-            `, `todo.txt`, undefined, undefined, `
-                <header class="l">
-                    <nav>
-                        <h5 class="max center-align">todo.txt</h5>
-                        <button onclick="addTodo()" class="circle transparent">
-                            <i>add</i>
-                        </button>
-                    </nav>
-                </header>
-            `), {status: 200, headers: {"content-type": "text/html"} });
+            `, `todo.txt`, undefined, undefined,), {status: 200, headers: {"content-type": "text/html"} });
         }
 
         //----------------------------------------------
@@ -1052,7 +1049,7 @@ Deno.serve(async (req) => {
                         }
                     }
                 `)}
-                `, `Notebooks ${id}`, undefined, undefined,), {status: 200, headers: {"content-type": "text/html"} });
+                `, `View Notes`, undefined, undefined,), {status: 200, headers: {"content-type": "text/html"} });
         }
 
         //---------------------------
@@ -2357,9 +2354,20 @@ function HTML(content, title, redirect, footer, header) {
                     <span class="max l"></span>
                     ${title.includes('View Notes') ? `
                         <button onclick="addNote()" class="circle transparent">
-                                <i>add</i>
+                            <i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                            </svg></i>
                         </button>
                     ` : ""}
+                    ${title.includes('todo.txt') ? `
+                        <button onclick="addTodo()" class="circle transparent">
+                            <i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                            </svg></i>
+                        </button>
+                    ` : ""}
+
+                                            
                 </nav>
                 <dialog id="apps-menu-drawer" class="left">
                     <header>
