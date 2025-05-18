@@ -716,14 +716,13 @@ Deno.serve(async (req) => {
                         document.getElementById('dialog-edit').showModal();
                     }
                     function saveTodos() {
-                        let tasks = document.querySelectorAll('h6');
+                        let tasks = document.querySelectorAll('[data-task]');
                         var note = '---\\ntype: todo.txt\\ntitle: todo.txt\\n---\\n';
                         for (var i = 0; i < tasks.length; i++) {
                             note += tasks[i].getAttribute('data-task') + '\\n\\n';
                         }
 
                         window.encryptWithKey(note).then(async result => {
-                            console.log("Result:", result); // Output: Result: Async result
                             const form = new URLSearchParams();
                             form.append("text", result);
                             form.append("notebook_id", ${parent});
@@ -781,8 +780,6 @@ Deno.serve(async (req) => {
                                 var line = document.getElementById('lineId').value;
 
                                 var tasks = text.split('\\n');
-
-                                console.log(tasks);
 
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
                                 if(task) {
