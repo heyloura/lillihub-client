@@ -1052,16 +1052,7 @@ Deno.serve(async (req) => {
                         }
                     }
                 `)}
-                `, `Notebooks ${id}`, undefined, undefined, `
-                    <header class="l">
-                        <nav>
-                            <h5 class="max center-align">Notes</h5>
-                            <button onclick="addNote()" class="circle transparent">
-                                <i>add</i>
-                            </button>
-                        </nav>
-                    </header>
-                `), {status: 200, headers: {"content-type": "text/html"} });
+                `, `Notebooks ${id}`, undefined, undefined,), {status: 200, headers: {"content-type": "text/html"} });
         }
 
         //---------------------------
@@ -2364,6 +2355,11 @@ function HTML(content, title, redirect, footer, header) {
                     <a class="l ${title == 'Timeline' ? "active button" : "button transparent"}" href="/timeline">Social</a>
                     <h5 id="titleBar" class="max center-align s m truncate">${title}</h5>
                     <span class="max l"></span>
+                    ${title.includes('View Notes') ? `
+                        <button onclick="addNote()" class="circle transparent">
+                                <i>add</i>
+                        </button>
+                    ` : ""}
                 </nav>
                 <dialog id="apps-menu-drawer" class="left">
                     <header>
@@ -2380,14 +2376,18 @@ function HTML(content, title, redirect, footer, header) {
                     </header>
                     <ul class="list">
                         <li><a class="button" href="/"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
-  <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
-</svg> Dashboard</a></li>
+                            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+                            </svg> Dashboard</a></li>
                         <li><a class="button" href="/blog">Blog</a></li>
                         <li><a class="button" href="/bookmarks">Bookmarks</a></li>
                         <li><a class="button" href="/bookshelves">Bookshelves</a></li>
                         <li><a class="button" href="/notebooks">Notes</a></li>
                         <li><a class="button ${title == 'Timeline' ? "primary" : ""}" href="/timeline">Social</a></li>
                     </ul>
+                    <hr/>
+                    <button onclick="removeKey()" class="circle transparent">
+                            <i>add</i>
+                    </button>
                 </dialog>
             </header>
                 `}
@@ -2397,6 +2397,9 @@ function HTML(content, title, redirect, footer, header) {
             ${footer ? footer : ''}
         </body>
         <script>
+            function removeKey() {
+                localStorage.setItem("key", '');
+            }
             function searchTag(tag) {
                 document.getElementById('search').value = tag;
                 document.getElementById('search').dispatchEvent(new Event("input"))
