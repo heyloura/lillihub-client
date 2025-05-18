@@ -2298,26 +2298,23 @@ function HTML(content, title, redirect, footer, header) {
             ${header ? header : `
             <header class="fixed surface-container-low">
                 <nav>
-                    <button id="menu" data-ui="#apps-menu-drawer" class="s circle transparent">
+                    <button id="menu" data-ui="#apps-menu-drawer" class="s m circle transparent">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
                         </svg>
                     </button>
-                    <a href="javascript:history.back()" id="goBack" class="s circle transparent hide button">
+                    <a href="javascript:history.back()" id="goBack" class="s m circle transparent hide button">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
                         </svg>
                     </a>
-                    <a class="m l button transparent" href="/blog">Blog</a>
-                    <a class="m l button transparent" href="/bookmarks">Bookmarks</a>
-                    <a class="m l button transparent" href="/bookshelves">Bookshelves</a>
-                    <a class="m l button transparent" href="/notebooks">Notes</a>
-                    <a class="m l ${title == 'Timeline' ? "active button" : "button transparent"}" href="/timeline">Social</a>
-                    <h5 id="titleBar" class="max center-align s truncate">{{pageName}}</h5>
-                    <span class="max m l"></span>
-                    <button class="circle transparent">
-                        <img id="myAvatar" class="responsive" src="{{avatar}}">
-                    </button>
+                    <a class="l button transparent" href="/blog">Blog</a>
+                    <a class="l button transparent" href="/bookmarks">Bookmarks</a>
+                    <a class="l button transparent" href="/bookshelves">Bookshelves</a>
+                    <a class="l button transparent" href="/notebooks">Notes</a>
+                    <a class="l ${title == 'Timeline' ? "active button" : "button transparent"}" href="/timeline">Social</a>
+                    <h5 id="titleBar" class="max center-align s truncate">${title}</h5>
+                    <span class="max l"></span>
                 </nav>
                 <dialog id="apps-menu-drawer" class="left">
                     <header>
