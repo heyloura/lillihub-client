@@ -715,7 +715,7 @@ Deno.serve(async (req) => {
                 </dialog>
                 <style>
                 .list li {overflow:auto;}
-                .done {display: none;}
+                .done {display: none !important;}
                 </style>
                 <script>
                     function addTodo() {
