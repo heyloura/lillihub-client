@@ -674,10 +674,17 @@ Deno.serve(async (req) => {
                     data-id="${results.id}" 
                     data-encypted="${results._microblog.is_encrypted}" 
                     data-content="${results.content_text ?results.content_text : results.content_html}">
-                    <div class="field large prefix round fill active">
-                        <i class="front">search</i>
-                        <input id="search" onInput="liveSearch('li','search')">
+                    <div class="">
+                        <div class="field large prefix round fill active max">
+                            <i class="front">search</i>
+                            <input id="search" onInput="liveSearch('li','search')">
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span>hi</span>
+                        </label>
                     </div>
+
                     <ul class="list border" id="tasks">
                         <li class="list border"><progress class="circle small"></progress></li>
                     </ul>
@@ -914,7 +921,7 @@ Deno.serve(async (req) => {
                     document.getElementById('tasks').innerHTML = item.content_html;
                     window.createTaskList();
                 `)}
-            `, `todo.txt`, undefined, `<footer>
+            `, `todo.txt`, undefined, `<footer class="fixed surface-container-low">
                 <nav>
                     <button id="checkboxMode" class="circle primary">
                         <i>check_box</i>
