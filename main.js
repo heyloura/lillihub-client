@@ -770,6 +770,11 @@ Deno.serve(async (req) => {
                         console.log(str)
                         return /^\d{14}$/.test(str);
                     }
+                    function find14DigitNumbers(text) {
+                        const regex = /\b\d{14}\b/g;
+                        const matches = text.match(regex);
+                        return matches || [];
+                    }
                     document.addEventListener("click", async (event) => {
                         if(!event.target.getAttribute('evt-click')) {
                             return;
@@ -881,11 +886,9 @@ Deno.serve(async (req) => {
                                     markup = markup.replaceAll(words[j],'<span onClick="searchTag(\\''+words[j]+'\\')" class="primary-text">' + words[j] + '</span>')
                                 }
                             }
-                            if(markup.charAt(0) == 'x') {
-                            
-                            }
-                            if(markup.charAt(0) == '(') {
-                            
+                            var ids = find14DigitNumbers(markup);
+                            if(ids.length > 0) {
+                                markup.replace(ids[0], '<span class="chip no-elevate">'+ids[0]+'</span>')
                             }
                             li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
                             
