@@ -789,9 +789,9 @@ Deno.serve(async (req) => {
                                         // task has priority
                                         var priority = tasks[0].substring(0,2);
                                         console.log(priority);
-                                        task[0] = new Date().toISOString().split('T')[0] + ' ' + priority + ' ' + task[0].slice(2);
+                                        tasks[0] = new Date().toISOString().split('T')[0] + ' ' + priority + ' ' + tasks[0].slice(2);
                                     } else {
-                                        task[0] = new Date().toISOString().split('T')[0] + ' ' + task[0];
+                                        tasks[0] = new Date().toISOString().split('T')[0] + ' ' + tasks[0];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replaceAll('"','”')+'">new</h6></li>')
                                 }
@@ -801,9 +801,9 @@ Deno.serve(async (req) => {
                                     // task has priority
                                         var priority = tasks[i].substring(0,2);
                                         console.log(priority);
-                                        task[i] = new Date().toISOString().split('T')[i] + ' ' + priority + ' ' + task[i].slice(2);
+                                        tasks[i] = new Date().toISOString().split('T')[i] + ' ' + priority + ' ' + tasks[i].slice(2);
                                     } else {
-                                        task[i] = new Date().toISOString().split('T')[i] + ' ' + task[i];
+                                        tasks[i] = new Date().toISOString().split('T')[i] + ' ' + tasks[i];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replaceAll('"','”')+'">new</h6></li>')
                                 }
