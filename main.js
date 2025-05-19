@@ -793,7 +793,7 @@ Deno.serve(async (req) => {
                                     } else {
                                         tasks[0] = new Date().toISOString().split('T')[0] + ' ' + tasks[0];
                                     }
-                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replaceAll('"','”')+'">new</h6></li>')
+                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
 
                                 for(var i = 1; i < tasks.length; i++) {
@@ -805,7 +805,7 @@ Deno.serve(async (req) => {
                                     } else {
                                         tasks[i] = new Date().toISOString().split('T')[i] + ' ' + tasks[i];
                                     }
-                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replaceAll('"','”')+'">new</h6></li>')
+                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
                                 
                                 saveTodos();
