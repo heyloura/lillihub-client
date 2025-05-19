@@ -865,14 +865,16 @@ Deno.serve(async (req) => {
                             var li = document.createElement('li');
                             var markup = task.innerHTML;
 
-                            //markup = markup.replace(/(\d{14})/g, '<span class="chip no-elevate">$1</span>');
+                            var taskId;
                             if(markup[0] == '(') {
                                 if(is14DigitNumber(markup.substring(4,18))) {
-                                    markup = markup.substring(0,3) + '<span class="chip no-elevate">' + markup.substring(4,18) + '</span>' + ' ' + markup.slice(18);
+                                    taskId = markup.substring(4,18);
+                                    markup = markup.substring(0,3) + '<span class="chip no-elevate m l">' + markup.substring(4,18) + '</span>' + ' ' + markup.slice(18);
                                 } 
                             } else {
                                 if(is14DigitNumber(markup.substring(0,14))) {
-                                    markup = '<span class="chip no-elevate">' + markup.substring(0,14) + '</span>' + ' ' + markup.slice(15);
+                                    taskId = markup.substring(0,14);
+                                    markup = '<span class="chip no-elevate m l">' + markup.substring(0,14) + '</span>' + ' ' + markup.slice(15);
                                 } 
                             }
                             markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
@@ -891,7 +893,7 @@ Deno.serve(async (req) => {
                                     markup = markup.replaceAll(words[j],'<span onClick="searchTag(\\''+words[j]+'\\')" class="primary-text">' + words[j] + '</span>')
                                 }
                             }
-                            li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
+                            li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 '+(taskId ? 'data-task-id="'+taskId+'"' : '')+' evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
                             
                             task.parentNode.replaceChild(li, task);
                         }
