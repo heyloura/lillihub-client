@@ -789,9 +789,9 @@ Deno.serve(async (req) => {
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[0].substring(0,2);
                                         console.log(priority);
-                                        tasks[0] = new Date().toISOString().split('T')[0] + '.' + tasksLen.padStart(3, '0') + ' ' + priority + ' ' + tasks[0].slice(2);
+                                        tasks[0] = new Date().toISOString().split('T')[0] + '.' + String(tasksLen).padStart(3, '0') + ' ' + priority + ' ' + tasks[0].slice(2);
                                     } else {
-                                        tasks[0] = new Date().toISOString().split('T')[0] + '.' + tasksLen.padStart(3, '0') + ' ' + tasks[0];
+                                        tasks[0] = new Date().toISOString().split('T')[0] + '.' + String(tasksLen).padStart(3, '0') + ' ' + tasks[0];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
@@ -800,9 +800,9 @@ Deno.serve(async (req) => {
                                     tasksLen++;
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[i].substring(0,2);
-                                        tasks[i] = new Date().toISOString().split('T')[0] + '.' + tasksLen.padStart(3, '0') + ' ' + priority + ' ' + tasks[i].slice(2);
+                                        tasks[i] = new Date().toISOString().split('T')[0] + '.' + String(tasksLen).padStart(3, '0') + ' ' + priority + ' ' + tasks[i].slice(2);
                                     } else {
-                                        tasks[i] = new Date().toISOString().split('T')[0] + '.' + tasksLen.padStart(3, '0') + ' ' + tasks[i];
+                                        tasks[i] = new Date().toISOString().split('T')[0] + '.' + String(tasksLen).padStart(3, '0') + ' ' + tasks[i];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
