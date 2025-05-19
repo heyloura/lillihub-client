@@ -768,6 +768,7 @@ Deno.serve(async (req) => {
                     }
                     function is14DigitNumber(str) {
                         console.log(str)
+                        console.log(/^\d{14}$/.test(str));
                         return /^\d{14}$/.test(str);
                     }
                     document.addEventListener("click", async (event) => {
@@ -868,7 +869,7 @@ Deno.serve(async (req) => {
 
                             //markup = markup.replace(/(\d{14})/g, '<span class="chip no-elevate">$1</span>');
                             if(markup[0] == '(') {
-                                if(is14DigitNumber(markup.substring(3,17))) {
+                                if(is14DigitNumber(markup.substring(4,18))) {
                                     markup = markup.substring(0,3) + '<span class="chip no-elevate">' + markup.substring(4,18) + '</span>' + ' ' + text.slice(18);
                                 } 
                             } else {
