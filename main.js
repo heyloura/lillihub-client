@@ -779,8 +779,8 @@ Deno.serve(async (req) => {
                                 document.getElementById('dialog-edit').showModal();
                             }
                             if(event.target.getAttribute('evt-click') == 'moveDown') {
-                                id = event.target.getAttribute('data-id');
-                                var task = document.querySelector('[data-line-id="'+id+'"]');
+                                var line = document.getElementById('lineId').value;
+                                var task = document.querySelector('[data-line-id="'+line+'"]');
                                 var text = task.getAttribute('data-task');
 
                                 if(text[0] == '(') {
@@ -822,9 +822,9 @@ Deno.serve(async (req) => {
                                     let now = new Date();
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[0].substring(0,2);
-                                        tasks[0] = formatDateToYYMMDD(now) + '.' + now.getUTCMilliseconds() + ' ' + priority + ' ' + tasks[0].slice(2);
+                                        tasks[0] = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + ' ' + priority + ' ' + tasks[0].slice(2);
                                     } else {
-                                        tasks[0] = formatDateToYYMMDD(now) + '.' + now.getUTCMilliseconds() + ' ' + tasks[0];
+                                        tasks[0] = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + ' ' + tasks[0];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
@@ -833,9 +833,9 @@ Deno.serve(async (req) => {
                                     let now = new Date();
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[i].substring(0,2);
-                                        tasks[i] = formatDateToYYMMDD(now) + '.' + now.getUTCMilliseconds() + ' ' + priority + ' ' + tasks[i].slice(2);
+                                        tasks[i] = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + ' ' + priority + ' ' + tasks[i].slice(2);
                                     } else {
-                                        tasks[i] = formatDateToYYMMDD(now) + '.' + now.getUTCMilliseconds() + ' ' + tasks[i];
+                                        tasks[i] = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + ' ' + tasks[i];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
