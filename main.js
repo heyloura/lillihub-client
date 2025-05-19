@@ -786,7 +786,7 @@ Deno.serve(async (req) => {
                                 if(text[0] == '(') {
                                     var priority = text.substring(0,3);
                                     console.log(text.slice(3,9));
-                                    text = priority + ' ' + getTimebasedId() + text.slice(9);
+                                    text = priority + ' ' + getTimebasedId() + text.slice(11);
                                 } else {
                                     console.log(text.slice(9));
                                     text = getTimebasedId() + text.slice(9);
@@ -823,7 +823,7 @@ Deno.serve(async (req) => {
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[0].substring(0,3);
                                         console.log(priority)
-                                        tasks[0] = priority + ' ' + getTimebasedId() + ' ' + tasks[0].slice(2);
+                                        tasks[0] = priority + ' ' + getTimebasedId() + ' ' + tasks[0].slice(4);
                                     } else {
                                         tasks[0] = getTimebasedId() + ' ' + tasks[0];
                                     }
@@ -833,7 +833,7 @@ Deno.serve(async (req) => {
                                 for(var i = 1; i < tasks.length; i++) {
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[i].substring(0,3);
-                                        tasks[i] =  priority + ' ' + getTimebasedId() + ' ' + tasks[i].slice(2);
+                                        tasks[i] =  priority + ' ' + getTimebasedId() + ' ' + tasks[i].slice(4);
                                     } else {
                                         tasks[i] = getTimebasedId() + ' ' + tasks[i];
                                     }
