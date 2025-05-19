@@ -768,8 +768,8 @@ Deno.serve(async (req) => {
                     }
                     function is14DigitNumber(str) {
                         console.log(str)
-                        console.log(/^\d{14}$/.test(str));
-                        return /^\d{14}$/.test(str);
+                        console.log(parseInt(str) && str.length == 14);
+                        return parseInt(str) && str.length == 14;
                     }
                     document.addEventListener("click", async (event) => {
                         if(!event.target.getAttribute('evt-click')) {
