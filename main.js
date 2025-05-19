@@ -866,7 +866,16 @@ Deno.serve(async (req) => {
                             var li = document.createElement('li');
                             var markup = task.innerHTML;
 
-                            markup = markup.replace(/(\d{14})/g, '<span class="chip no-elevate">$1</span>');
+                            //markup = markup.replace(/(\d{14})/g, '<span class="chip no-elevate">$1</span>');
+                            if(markup[0] == '(') {
+                                if(is14DigitNumber(markup.substring(3,17))) {
+                                    markup = markup.substring(0,3) + '<span class="chip no-elevate">' + markup.substring(4,18) + '</span>' + ' ' + text.slice(18);
+                                } 
+                            } else {
+                                if(is14DigitNumber(markup.substring(0,14))) {
+                                    markup = '<span class="chip no-elevate">' + markup.substring(0,14) + '</span>' + ' ' + text.slice(15);
+                                } 
+                            }
                             markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
                                 .replaceAll('(B)','<span onClick="searchTag(\\'(B)\\')" class="tertiary-text">(B)</span>')
                                 .replaceAll('(C)','<span onClick="searchTag(\\'(C)\\')" class="secondary-text">(C)</span>');
