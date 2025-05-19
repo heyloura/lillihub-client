@@ -767,8 +767,6 @@ Deno.serve(async (req) => {
                         return formatDateToYYMMDD(now) + String(currentMillisecondsPassedToday(now)).padStart(8, '0');
                     }
                     function is14DigitNumber(str) {
-                        console.log(str)
-                        console.log(parseInt(str) && str.length == 14);
                         return parseInt(str) && str.length == 14;
                     }
                     document.addEventListener("click", async (event) => {
@@ -870,11 +868,11 @@ Deno.serve(async (req) => {
                             //markup = markup.replace(/(\d{14})/g, '<span class="chip no-elevate">$1</span>');
                             if(markup[0] == '(') {
                                 if(is14DigitNumber(markup.substring(4,18))) {
-                                    markup = markup.substring(0,3) + '<span class="chip no-elevate">' + markup.substring(4,18) + '</span>' + ' ' + text.slice(18);
+                                    markup = markup.substring(0,3) + '<span class="chip no-elevate">' + markup.substring(4,18) + '</span>' + ' ' + markup.slice(18);
                                 } 
                             } else {
                                 if(is14DigitNumber(markup.substring(0,14))) {
-                                    markup = '<span class="chip no-elevate">' + markup.substring(0,14) + '</span>' + ' ' + text.slice(15);
+                                    markup = '<span class="chip no-elevate">' + markup.substring(0,14) + '</span>' + ' ' + markup.slice(15);
                                 } 
                             }
                             markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
