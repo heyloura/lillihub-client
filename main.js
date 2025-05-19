@@ -789,7 +789,7 @@ Deno.serve(async (req) => {
                                     text = priority + ' ' + formatDateToYYMMDD(new Date()) + text.slice(9);
                                 } else {
                                     console.log(text.slice(6));
-                                    text = formatDateToYYMMDD(new Date()) text.slice(6);
+                                    text = formatDateToYYMMDD(new Date()) + text.slice(6);
                                 }
 
                                 task.setAttribute('data-task', text);
