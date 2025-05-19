@@ -782,14 +782,14 @@ Deno.serve(async (req) => {
                                 var line = document.getElementById('lineId').value;
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
                                 var text = task.getAttribute('data-task');
-
+                                var now = new Date();
                                 if(text[0] == '(') {
                                     var priority = text.substring(0,2);
                                     console.log(text.slice(3,9));
-                                    text = priority + ' ' + formatDateToYYMMDD(new Date()) + text.slice(9);
+                                    text = priority + ' ' + formatDateToYYMMDD(now) + now.getUTCMilliseconds() + text.slice(9);
                                 } else {
                                     console.log(text.slice(9));
-                                    text = formatDateToYYMMDD(new Date()) + text.slice(9);
+                                    text = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + text.slice(9);
                                 }
 
                                 task.setAttribute('data-task', text);
