@@ -778,7 +778,7 @@ Deno.serve(async (req) => {
                             if(event.target.getAttribute('evt-click') == 'save') {
                                 var text = document.getElementById('content').value;
                                 var line = document.getElementById('lineId').value;
-                                let tasksLen = document.querySelectorAll('p').length;
+                                let tasksLen = document.querySelectorAll('[data-task]').length;
                                 var tasks = text.split('\\n');
 
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
