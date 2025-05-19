@@ -874,6 +874,7 @@ Deno.serve(async (req) => {
 
                             var ids = find14DigitNumbers(markup);
                             if(ids.length > 0) {
+                                console.log(ids[0]);
                                 markup = markup.replace(ids[0], '<span class="chip no-elevate">'+ids[0]+'</span>')
                             }
                             markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
