@@ -766,6 +766,10 @@ Deno.serve(async (req) => {
                         var now = new Date();
                         return formatDateToYYMMDD(now) + String(currentMillisecondsPassedToday(now)).padStart(8, '0');
                     }
+                    function is14DigitNumber(str) {
+                        console.log(str)
+                        return /^\d{14}$/.test(str);
+                    }
                     document.addEventListener("click", async (event) => {
                         if(!event.target.getAttribute('evt-click')) {
                             return;
@@ -783,10 +787,19 @@ Deno.serve(async (req) => {
                                 var line = document.getElementById('lineId').value;
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
                                 var text = task.getAttribute('data-task');
+
                                 if(text[0] == '(') {
-                                    text = getTimebasedId() + ' ' + text.slice(18);
+                                    if(is14DigitNumber(text.substring(3,17))) {
+                                        text = getTimebasedId() + ' ' + text.slice(18);
+                                    } else {
+                                        text = getTimebasedId() + ' ' + text.slice(3);
+                                    }
                                 } else {
-                                    text = getTimebasedId() + ' ' + text.slice(15);
+                                    if(is14DigitNumber(text.substring(0,14))) {
+                                        text = getTimebasedId() + ' ' + text.slice(15);
+                                    } else {
+                                        text = getTimebasedId() + ' ' + text;
+                                    }
                                 }
 
                                 task.setAttribute('data-task', text);
