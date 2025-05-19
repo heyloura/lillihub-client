@@ -770,13 +770,6 @@ Deno.serve(async (req) => {
                         console.log(str)
                         return /^\d{14}$/.test(str);
                     }
-                    function find14DigitNumbers(text) {
-                        console.log(text);
-                        const regex = /^\b\d{14}\b/g;
-                        const matches = text.match(regex);
-                        console.log(matches);
-                        return matches || [];
-                    }
                     document.addEventListener("click", async (event) => {
                         if(!event.target.getAttribute('evt-click')) {
                             return;
@@ -873,13 +866,7 @@ Deno.serve(async (req) => {
                             var li = document.createElement('li');
                             var markup = task.innerHTML;
 
-                            var ids = find14DigitNumbers(markup);
-                            console.log(ids)
-                            console.log(ids.length)
-                            if(ids.length > 0) {
-                                console.log(ids[0]);
-                                markup = markup.replace(ids[0].toString(), '<span class="chip no-elevate">'+ids[0]+'</span>')
-                            }
+                            markup = markup.replace(/(\d{14})/g, '<span class="chip no-elevate">$1</span>');
                             markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
                                 .replaceAll('(B)','<span onClick="searchTag(\\'(B)\\')" class="tertiary-text">(B)</span>')
                                 .replaceAll('(C)','<span onClick="searchTag(\\'(C)\\')" class="secondary-text">(C)</span>');
