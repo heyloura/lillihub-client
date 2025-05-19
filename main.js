@@ -870,8 +870,12 @@ Deno.serve(async (req) => {
                         for (var i = 0; i < tasks.length; i++) {
                             var task = tasks[i];
                             var li = document.createElement('li');
-                            
-                            var markup = task.innerHTML.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
+                            var ids = find14DigitNumbers(markup);
+                            var markup = task.innerHTML;
+                            if(ids.length > 0) {
+                                markup = markup.replace(ids[0], '<span class="chip no-elevate">'+ids[0]+'</span>')
+                            }
+                            markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
                                 .replaceAll('(B)','<span onClick="searchTag(\\'(B)\\')" class="tertiary-text">(B)</span>')
                                 .replaceAll('(C)','<span onClick="searchTag(\\'(C)\\')" class="secondary-text">(C)</span>');
                             var words = task.innerHTML.split(' ');
@@ -886,11 +890,6 @@ Deno.serve(async (req) => {
                                     projects.push(words[j]);
                                     markup = markup.replaceAll(words[j],'<span onClick="searchTag(\\''+words[j]+'\\')" class="primary-text">' + words[j] + '</span>')
                                 }
-                            }
-                            var ids = find14DigitNumbers(markup);
-                            console.log(ids);
-                            if(ids.length > 0) {
-                                markup = markup.replace(ids[0], '<span class="chip no-elevate">'+ids[0]+'</span>')
                             }
                             li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
                             
