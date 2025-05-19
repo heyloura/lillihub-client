@@ -870,8 +870,9 @@ Deno.serve(async (req) => {
                         for (var i = 0; i < tasks.length; i++) {
                             var task = tasks[i];
                             var li = document.createElement('li');
-                            var ids = find14DigitNumbers(markup);
                             var markup = task.innerHTML;
+
+                            var ids = find14DigitNumbers(markup);
                             if(ids.length > 0) {
                                 markup = markup.replace(ids[0], '<span class="chip no-elevate">'+ids[0]+'</span>')
                             }
