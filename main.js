@@ -786,10 +786,9 @@ Deno.serve(async (req) => {
                                 if(text[0] == '(') {
                                     var priority = text.substring(0,3);
                                     console.log(text.slice(3,15));
-                                    text = priority + ' ' + getTimebasedId() + text.slice(18);
+                                    text = priority + ' ' + getTimebasedId() + ' ' + text.slice(18);
                                 } else {
-                                    console.log(text.slice(15));
-                                    text = getTimebasedId() + text.slice(15);
+                                    text = getTimebasedId() + ' ' + text.slice(15);
                                 }
 
                                 task.setAttribute('data-task', text);
