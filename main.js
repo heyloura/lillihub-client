@@ -674,7 +674,7 @@ Deno.serve(async (req) => {
                     data-id="${results.id}" 
                     data-encypted="${results._microblog.is_encrypted}" 
                     data-content="${results.content_text ?results.content_text : results.content_html}">
-                    <div class="">
+                    <nav>
                         <div class="field large prefix round fill active max">
                             <i class="front">search</i>
                             <input id="search" onInput="liveSearch('li','search')">
@@ -683,7 +683,7 @@ Deno.serve(async (req) => {
                             <input id="showCompleted" type="checkbox">
                             <span>&nbsp;&nbsp;Show completed</span>
                         </label>
-                    </div>
+                    </nav>
 
                     <ul class="list border" id="tasks">
                         <li class="list border"><progress class="circle small"></progress></li>
