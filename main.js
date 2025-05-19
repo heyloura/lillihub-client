@@ -800,7 +800,6 @@ Deno.serve(async (req) => {
                                 if(tasks[0][0] == '(') {
                                     // task has priority
                                         var priority = tasks[i].substring(0,2);
-                                        console.log(priority);
                                         tasks[i] = new Date().toISOString().split('T')[i] + ' ' + priority + ' ' + tasks[i].slice(2);
                                     } else {
                                         tasks[i] = new Date().toISOString().split('T')[i] + ' ' + tasks[i];
@@ -845,7 +844,8 @@ Deno.serve(async (req) => {
                         }
                         const ul = document.getElementById("tasks");
                         const list = ul.querySelectorAll("li");
-                        ul.append(...sortList(list));
+                        //ul.append(...sortList(list));
+                        ul.append(list);
                         document.getElementById('search').dispatchEvent(new Event("input"));
                     }
                 </script>
