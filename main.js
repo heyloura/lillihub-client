@@ -772,7 +772,7 @@ Deno.serve(async (req) => {
                     }
                     function find14DigitNumbers(text) {
                         console.log(text);
-                        const regex = /\b\d{14}\b/g;
+                        const regex = /^\b\d{14}\b/g;
                         const matches = text.match(regex);
                         console.log(matches);
                         return matches || [];
