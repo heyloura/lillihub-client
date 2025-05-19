@@ -680,8 +680,8 @@ Deno.serve(async (req) => {
                             <input id="search" onInput="liveSearch('li','search')">
                         </div>
                         <label class="switch">
-                            <input type="checkbox">
-                            <span>hi</span>
+                            <input id="showCompleted" type="checkbox">
+                            <span>&nbsp;&nbsp;Show completed</span>
                         </label>
                     </div>
 
@@ -715,6 +715,7 @@ Deno.serve(async (req) => {
                 </dialog>
                 <style>
                 .list li {overflow:auto;}
+                .done {display: none;}
                 </style>
                 <script>
                     function addTodo() {
@@ -876,12 +877,12 @@ Deno.serve(async (req) => {
                             if(markup[0] == '(') {
                                 if(is14DigitNumber(markup.substring(4,18))) {
                                     taskId = markup.substring(4,18);
-                                    markup = markup.substring(0,3) + '<span class="chip no-elevate m l">' + markup.substring(4,18) + '</span>' + ' ' + markup.slice(18);
+                                    markup = markup.substring(0,3) + '<span class="chip no-elevate hide">' + markup.substring(4,18) + '</span>' + ' ' + markup.slice(18);
                                 } 
                             } else {
                                 if(is14DigitNumber(markup.substring(0,14))) {
                                     taskId = markup.substring(0,14);
-                                    markup = '<span class="chip no-elevate m l">' + markup.substring(0,14) + '</span>' + ' ' + markup.slice(15);
+                                    markup = '<span class="chip no-elevate hide">' + markup.substring(0,14) + '</span>' + ' ' + markup.slice(15);
                                 } 
                             }
                             markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
@@ -901,7 +902,9 @@ Deno.serve(async (req) => {
                                 }
                             }
                             li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 '+(taskId ? 'data-task-id="'+taskId+'"' : '')+' evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
-                            
+                            if(task.innerHTML.charAt(0) == 'x') {
+                                li.classList.add('done');
+                            }
                             task.parentNode.replaceChild(li, task);
                         }
                         const ul = document.getElementById("tasks");
