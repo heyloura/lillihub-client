@@ -784,9 +784,7 @@ Deno.serve(async (req) => {
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
                                 var text = task.getAttribute('data-task');
                                 if(text[0] == '(') {
-                                    var priority = text.substring(0,3);
-                                    console.log(text.slice(3,15));
-                                    text = priority + ' ' + getTimebasedId() + ' ' + text.slice(18);
+                                    text = getTimebasedId() + ' ' + text.slice(18);
                                 } else {
                                     text = getTimebasedId() + ' ' + text.slice(15);
                                 }
