@@ -702,6 +702,7 @@ Deno.serve(async (req) => {
                         <textarea style="height:70vh;" id="content"></textarea>
                         <div class="medium-space"></div>
                         <button id="deleteMe" evt-click='delete' class="error-text border">Delete</button>
+                        <button id="moveBottom" evt-click='moveDown' class="border">Move to bottom of list</button>
                         <button evt-click='save'>Save</button>
                     </div>
                 </dialog>
@@ -711,6 +712,7 @@ Deno.serve(async (req) => {
                 <script>
                     function addTodo() {
                         document.getElementById('deleteMe').classList.add('hide');
+                        document.getElementById('moveBottom').classList.add('hide');
                         document.getElementById('content').value = '';
                         document.getElementById('lineId').value = '-1';
                         document.getElementById('dialog-edit').showModal();
@@ -748,17 +750,50 @@ Deno.serve(async (req) => {
                                 simpleLineBreaks: true,
                                 emoji: true, 
                             });
+                            
+                    function formatDateToYYMMDD(date) {
+                        const year = String(date.getFullYear()).substring(2); // Get last two digits of year
+                        const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+                        const day = String(date.getDate()).padStart(2, '0');
+
+                        return year + month + day;
+                    }             
+                    function convertYYMMDD(dateString) {
+                        const year = parseInt("20" + dateString.substring(0, 2)); // Assuming YY is in the 21st century
+                        const month = parseInt(dateString.substring(2, 4)) - 1; // Month is 0-indexed
+                        const day = parseInt(dateString.substring(4, 6));
+
+                        return new Date(year, month, day);
+                    }
                     document.addEventListener("click", async (event) => {
                         if(!event.target.getAttribute('evt-click')) {
                             return;
                         } else {
                             if(event.target.getAttribute('evt-click') == 'edit') {
                                 document.getElementById('deleteMe').classList.remove('hide');
+                                document.getElementById('moveBottom').classList.remove('hide');
                                 id = event.target.getAttribute('data-line-id');
                                 text = event.target.textContent;
                                 document.getElementById('content').value = text;
                                 document.getElementById('lineId').value = id;
                                 document.getElementById('dialog-edit').showModal();
+                            }
+                            if(event.target.getAttribute('evt-click') == 'moveDown') {
+                                id = event.target.getAttribute('data-id');
+                                var task = document.querySelector('[data-line-id="'+id+'"]');
+                                var text = task.getAttribute('data-task');
+
+                                if(text[0] == '(') {
+                                    var priority = text.substring(0,2);
+                                    console.log(text.slice(3,9));
+                                    text = priority + ' ' + formatDateToYYMMDD(new Date()) +  ' ' + text.slice(9);
+                                } else {
+                                    console.log(text.slice(6));
+                                    text = formatDateToYYMMDD(new Date()) +  ' ' + text.slice(6);
+                                }
+
+                                task.setAttribute('data-task', text);
+                                saveTodos();
                             }
                             if(event.target.getAttribute('evt-click') == 'check') {
                                 id = event.target.getAttribute('data-id');
@@ -778,31 +813,29 @@ Deno.serve(async (req) => {
                             if(event.target.getAttribute('evt-click') == 'save') {
                                 var text = document.getElementById('content').value;
                                 var line = document.getElementById('lineId').value;
-                                let tasksLen = document.querySelectorAll('[data-task]').length;
                                 var tasks = text.split('\\n');
 
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
                                 if(task) {
                                     task.setAttribute('data-task',tasks[0]);
                                 } else {
-                                    tasksLen++;
+                                    let now = new Date();
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[0].substring(0,2);
-                                        console.log(priority);
-                                        tasks[0] = new Date().toISOString().split('T')[0] + '.' + String(tasksLen).padStart(3, '0') + ' ' + priority + ' ' + tasks[0].slice(2);
+                                        tasks[0] = formatDateToYYMMDD(now) + '.' + now.getUTCMilliseconds() + ' ' + priority + ' ' + tasks[0].slice(2);
                                     } else {
-                                        tasks[0] = new Date().toISOString().split('T')[0] + '.' + String(tasksLen).padStart(3, '0') + ' ' + tasks[0];
+                                        tasks[0] = formatDateToYYMMDD(now) + '.' + now.getUTCMilliseconds() + ' ' + tasks[0];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
 
                                 for(var i = 1; i < tasks.length; i++) {
-                                    tasksLen++;
+                                    let now = new Date();
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[i].substring(0,2);
-                                        tasks[i] = new Date().toISOString().split('T')[0] + '.' + String(tasksLen).padStart(3, '0') + ' ' + priority + ' ' + tasks[i].slice(2);
+                                        tasks[i] = formatDateToYYMMDD(now) + '.' + now.getUTCMilliseconds() + ' ' + priority + ' ' + tasks[i].slice(2);
                                     } else {
-                                        tasks[i] = new Date().toISOString().split('T')[0] + '.' + String(tasksLen).padStart(3, '0') + ' ' + tasks[i];
+                                        tasks[i] = formatDateToYYMMDD(now) + '.' + now.getUTCMilliseconds() + ' ' + tasks[i];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
