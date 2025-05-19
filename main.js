@@ -786,14 +786,15 @@ Deno.serve(async (req) => {
                                 if(text[0] == '(') {
                                     var priority = text.substring(0,2);
                                     console.log(text.slice(3,9));
-                                    text = priority + ' ' + formatDateToYYMMDD(new Date()) +  ' ' + text.slice(9);
+                                    text = priority + ' ' + formatDateToYYMMDD(new Date()) + text.slice(9);
                                 } else {
                                     console.log(text.slice(6));
-                                    text = formatDateToYYMMDD(new Date()) +  ' ' + text.slice(6);
+                                    text = formatDateToYYMMDD(new Date()) text.slice(6);
                                 }
 
                                 task.setAttribute('data-task', text);
                                 saveTodos();
+                                document.getElementById('dialog-edit').close();
                             }
                             if(event.target.getAttribute('evt-click') == 'check') {
                                 id = event.target.getAttribute('data-id');
