@@ -681,20 +681,6 @@ Deno.serve(async (req) => {
                     <ul class="list border" id="tasks">
                         <li class="list border"><progress class="circle small"></progress></li>
                     </ul>
-                    <nav class="toolbar small-elevate tertiary-container">
-                        <a>
-                            <i>videocam_off</i>
-                        </a>
-                        <a>
-                            <i>mic</i>
-                        </a>
-                        <a class="active">
-                            <i>front_hand</i>
-                        </a>
-                        <a>
-                            <i>more_vert</i>
-                        </a>
-                    </nav>
                 </div>
                 <dialog id="dialog-edit" class="max">
                     <header class="fixed front">
@@ -928,7 +914,18 @@ Deno.serve(async (req) => {
                     document.getElementById('tasks').innerHTML = item.content_html;
                     window.createTaskList();
                 `)}
-            `, `todo.txt`, undefined, undefined), {status: 200, headers: {"content-type": "text/html"} });
+            `, `todo.txt`, undefined, `<footer>
+                <nav>
+                    <button id="checkboxMode" class="circle primary">
+                        <i>check_box</i>
+                    </button>
+                    <button id="dotMode" class="circle transparent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                        </svg>
+                    </button>
+                </nav>
+                </footer>`), {status: 200, headers: {"content-type": "text/html"} });
         }
 
         //----------------------------------------------
