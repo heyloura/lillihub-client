@@ -758,12 +758,13 @@ Deno.serve(async (req) => {
 
                         return year + month + day;
                     }             
-                    function convertYYMMDD(dateString) {
-                        const year = parseInt("20" + dateString.substring(0, 2)); // Assuming YY is in the 21st century
-                        const month = parseInt(dateString.substring(2, 4)) - 1; // Month is 0-indexed
-                        const day = parseInt(dateString.substring(4, 6));
-
-                        return new Date(year, month, day);
+                    function currentMillisecondsPassedToday(now) {
+                        const midnight = new Date(now).setHours(0, 0, 0, 0);
+                        return now.getTime() - midnight;
+                    }
+                    function getTimebasedId() {
+                        var now = new Date();
+                        return formatDateToYYMMDD(now) + String(currentMillisecondsPassedToday(now)).padStart(8, '0');
                     }
                     document.addEventListener("click", async (event) => {
                         if(!event.target.getAttribute('evt-click')) {
@@ -782,14 +783,13 @@ Deno.serve(async (req) => {
                                 var line = document.getElementById('lineId').value;
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
                                 var text = task.getAttribute('data-task');
-                                var now = new Date();
                                 if(text[0] == '(') {
                                     var priority = text.substring(0,2);
                                     console.log(text.slice(3,9));
-                                    text = priority + ' ' + formatDateToYYMMDD(now) + now.getUTCMilliseconds() + text.slice(9);
+                                    text = priority + ' ' + getTimebasedId() + text.slice(9);
                                 } else {
                                     console.log(text.slice(9));
-                                    text = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + text.slice(9);
+                                    text = getTimebasedId() + text.slice(9);
                                 }
 
                                 task.setAttribute('data-task', text);
@@ -820,23 +820,21 @@ Deno.serve(async (req) => {
                                 if(task) {
                                     task.setAttribute('data-task',tasks[0]);
                                 } else {
-                                    let now = new Date();
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[0].substring(0,2);
-                                        tasks[0] = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + ' ' + priority + ' ' + tasks[0].slice(2);
+                                        tasks[0] = priority + ' ' + getTimebasedId() + ' ' + tasks[0].slice(2);
                                     } else {
-                                        tasks[0] = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + ' ' + tasks[0];
+                                        tasks[0] = getTimebasedId() + ' ' + tasks[0];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
 
                                 for(var i = 1; i < tasks.length; i++) {
-                                    let now = new Date();
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[i].substring(0,2);
-                                        tasks[i] = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + ' ' + priority + ' ' + tasks[i].slice(2);
+                                        tasks[i] =  priority + ' ' + getTimebasedId() + ' ' + tasks[i].slice(2);
                                     } else {
-                                        tasks[i] = formatDateToYYMMDD(now) + now.getUTCMilliseconds() + ' ' + tasks[i];
+                                        tasks[i] = getTimebasedId() + ' ' + tasks[i];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replace('"','“').replace('"','”')+'">new</h6></li>')
                                 }
