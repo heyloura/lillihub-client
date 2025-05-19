@@ -888,7 +888,7 @@ Deno.serve(async (req) => {
                             }
                             var ids = find14DigitNumbers(markup);
                             if(ids.length > 0) {
-                                markup.replace(ids[0], '<span class="chip no-elevate">'+ids[0]+'</span>')
+                                markup = markup.replace(ids[0], '<span class="chip no-elevate">'+ids[0]+'</span>')
                             }
                             li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
                             
