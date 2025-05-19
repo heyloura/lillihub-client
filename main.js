@@ -872,6 +872,7 @@ Deno.serve(async (req) => {
                             var markup = task.innerHTML;
 
                             var ids = find14DigitNumbers(markup);
+                            console.log(ids)
                             console.log(ids.length)
                             if(ids.length > 0) {
                                 console.log(ids[0]);
