@@ -681,6 +681,20 @@ Deno.serve(async (req) => {
                     <ul class="list border" id="tasks">
                         <li class="list border"><progress class="circle small"></progress></li>
                     </ul>
+                    <nav class="toolbar small-elevate tertiary-container">
+                        <a>
+                            <i>videocam_off</i>
+                        </a>
+                        <a>
+                            <i>mic</i>
+                        </a>
+                        <a class="active">
+                            <i>front_hand</i>
+                        </a>
+                        <a>
+                            <i>more_vert</i>
+                        </a>
+                    </nav>
                 </div>
                 <dialog id="dialog-edit" class="max">
                     <header class="fixed front">
