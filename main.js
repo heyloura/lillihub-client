@@ -784,7 +784,7 @@ Deno.serve(async (req) => {
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
                                 var text = task.getAttribute('data-task');
                                 if(text[0] == '(') {
-                                    var priority = text.substring(0,2);
+                                    var priority = text.substring(0,3);
                                     console.log(text.slice(3,9));
                                     text = priority + ' ' + getTimebasedId() + text.slice(9);
                                 } else {
@@ -821,7 +821,8 @@ Deno.serve(async (req) => {
                                     task.setAttribute('data-task',tasks[0]);
                                 } else {
                                     if(tasks[0][0] == '(') {
-                                        var priority = tasks[0].substring(0,2);
+                                        var priority = tasks[0].substring(0,3);
+                                        console.log(priority)
                                         tasks[0] = priority + ' ' + getTimebasedId() + ' ' + tasks[0].slice(2);
                                     } else {
                                         tasks[0] = getTimebasedId() + ' ' + tasks[0];
@@ -831,7 +832,7 @@ Deno.serve(async (req) => {
 
                                 for(var i = 1; i < tasks.length; i++) {
                                     if(tasks[0][0] == '(') {
-                                        var priority = tasks[i].substring(0,2);
+                                        var priority = tasks[i].substring(0,3);
                                         tasks[i] =  priority + ' ' + getTimebasedId() + ' ' + tasks[i].slice(2);
                                     } else {
                                         tasks[i] = getTimebasedId() + ' ' + tasks[i];
@@ -869,6 +870,12 @@ Deno.serve(async (req) => {
                                     projects.push(words[j]);
                                     markup = markup.replaceAll(words[j],'<span onClick="searchTag(\\''+words[j]+'\\')" class="primary-text">' + words[j] + '</span>')
                                 }
+                            }
+                            if(markup.charAt(0) == 'x') {
+                            
+                            }
+                            if(markup.charAt(0) == '(') {
+                            
                             }
                             li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
                             
