@@ -785,11 +785,27 @@ Deno.serve(async (req) => {
                                 if(task) {
                                     task.setAttribute('data-task',tasks[0]);
                                 } else {
-                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0]+'">new</h6></li>')
+                                    if(tasks[0][0] == '(') {
+                                        // task has priority
+                                        var priority = tasks[0].substring(0,2);
+                                        console.log(priority);
+                                        task[0] = new Date().toISOString().split('T')[0] + ' ' + priority + ' ' + task[0].slice(2);
+                                    } else {
+                                        task[0] = new Date().toISOString().split('T')[0] + ' ' + task[0];
+                                    }
+                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replaceAll('"','”')+'">new</h6></li>')
                                 }
 
                                 for(var i = 1; i < tasks.length; i++) {
-                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i]+'">new</h6></li>')
+                                if(tasks[0][0] == '(') {
+                                    // task has priority
+                                        var priority = tasks[i].substring(0,2);
+                                        console.log(priority);
+                                        task[i] = new Date().toISOString().split('T')[i] + ' ' + priority + ' ' + task[i].slice(2);
+                                    } else {
+                                        task[i] = new Date().toISOString().split('T')[i] + ' ' + task[i];
+                                    }
+                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replaceAll('"','”')+'">new</h6></li>')
                                 }
                                 
                                 saveTodos();
@@ -823,7 +839,7 @@ Deno.serve(async (req) => {
                                     markup = markup.replaceAll(words[j],'<span onClick="searchTag(\\''+words[j]+'\\')" class="primary-text">' + words[j] + '</span>')
                                 }
                             }
-                            li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del>' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
+                            li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
                             
                             task.parentNode.replaceChild(li, task);
                         }
@@ -844,7 +860,7 @@ Deno.serve(async (req) => {
                     document.getElementById('tasks').innerHTML = item.content_html;
                     window.createTaskList();
                 `)}
-            `, `todo.txt`, undefined, undefined,), {status: 200, headers: {"content-type": "text/html"} });
+            `, `todo.txt`, undefined, undefined), {status: 200, headers: {"content-type": "text/html"} });
         }
 
         //----------------------------------------------

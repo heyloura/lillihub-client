@@ -7155,4 +7155,5 @@ nav.drawer, [dir=rtl] nav.drawer {
 main {
   max-width: 1425px;
   margin: 0px auto;
+  width: 100%;
 }
