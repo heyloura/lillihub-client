@@ -729,7 +729,7 @@ Deno.serve(async (req) => {
                         let tasks = document.querySelectorAll('[data-task]');
                         var note = '---\\ntype: todo.txt\\ntitle: todo.txt\\n---\\n';
                         for (var i = 0; i < tasks.length; i++) {
-                            note += tasks[i].getAttribute('data-task') + '\\n\\n';
+                            note += decodeURIComponent(tasks[i].getAttribute('data-task')) + '\\n\\n';
                         }
 
                         window.encryptWithKey(note).then(async result => {
@@ -793,7 +793,7 @@ Deno.serve(async (req) => {
                             if(event.target.getAttribute('evt-click') == 'moveDown') {
                                 var line = document.getElementById('lineId').value;
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
-                                var text = task.getAttribute('data-task');
+                                var text = decodeURIComponent(task.getAttribute('data-task'));
 
                                 if(text[0] == '(') {
                                     if(is14DigitNumber(text.substring(3,17))) {
@@ -809,14 +809,22 @@ Deno.serve(async (req) => {
                                     }
                                 }
 
-                                task.setAttribute('data-task', text);
+                                task.setAttribute('data-task', encodeURIComponent(text));
                                 saveTodos();
                                 document.getElementById('dialog-edit').close();
                             }
                             if(event.target.getAttribute('evt-click') == 'check') {
                                 id = event.target.getAttribute('data-id');
                                 var task = document.querySelector('[data-line-id="'+id+'"]');
-                                task.setAttribute('data-task','x ' + new Date().toISOString().split('T')[0] + ' ' + task.getAttribute('data-task'));
+                                var text = decodeURIComponent(task.getAttribute('data-task'));
+                                if(text[0] == '(') {
+                                    var priority = text.substring(0,3);
+                                    console.log(priority)
+                                    text = 'x ' + priority + ' ' + new Date().toISOString().split('T')[0] + ' ' + text.slice(4);
+                                } else {
+                                    text = 'x ' + ' ' + new Date().toISOString().split('T')[0] + ' ' + text;
+                                }
+                                task.setAttribute('data-task', encodeURIComponent(text));
                                 saveTodos();
                             }
                             if(event.target.getAttribute('evt-click') == 'delete') {
@@ -835,7 +843,7 @@ Deno.serve(async (req) => {
 
                                 var task = document.querySelector('[data-line-id="'+line+'"]');
                                 if(task) {
-                                    task.setAttribute('data-task',tasks[0]);
+                                    task.setAttribute('data-task',encodeURIComponent(tasks[0]));
                                 } else {
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[0].substring(0,3);
@@ -844,7 +852,7 @@ Deno.serve(async (req) => {
                                     } else {
                                         tasks[0] = getTimebasedId() + ' ' + tasks[0];
                                     }
-                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[0].replace('"','“').replace('"','”')+'">new</h6></li>')
+                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+encodeURIComponent(tasks[0])+'">new</h6></li>')
                                 }
 
                                 for(var i = 1; i < tasks.length; i++) {
@@ -854,7 +862,7 @@ Deno.serve(async (req) => {
                                     } else {
                                         tasks[i] = getTimebasedId() + ' ' + tasks[i];
                                     }
-                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+tasks[i].replace('"','“').replace('"','”')+'">new</h6></li>')
+                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+encodeURIComponent(tasks[i])+'">new</h6></li>')
                                 }
                                 
                                 saveTodos();
@@ -901,9 +909,14 @@ Deno.serve(async (req) => {
                                     markup = markup.replaceAll(words[j],'<span onClick="searchTag(\\''+words[j]+'\\')" class="primary-text">' + words[j] + '</span>')
                                 }
                             }
-                            li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" '+(task.innerHTML.charAt(0) == 'x' ? 'checked' : '')+'><span></span></label><div class="max"><h6 '+(taskId ? 'data-task-id="'+taskId+'"' : '')+' evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + (task.innerHTML.charAt(0) == 'x' ? '<del evt-click="edit" data-line-id="'+i+'">' : '') + markup + (task.innerHTML.charAt(0) == 'x' ? '</del>' : '') + '</h6>';
-                            if(task.innerHTML.charAt(0) == 'x') {
+                            if(task.innerHTML.charAt(0) == 'x') 
+                            {
+                                li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" checked disabled><span></span></label><div class="max"><h6 '+(taskId ? 'data-task-id="'+taskId+'"' : '')+' evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small"><del evt-click="edit" data-line-id="'+i+'">' + markup + '</del></h6>';
                                 li.classList.add('done');
+                            }
+                            else
+                            {
+                                li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox"><span></span></label><div class="max"><h6 '+(taskId ? 'data-task-id="'+taskId+'"' : '')+' evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + markup + '</h6>';
                             }
                             task.parentNode.replaceChild(li, task);
                         }
