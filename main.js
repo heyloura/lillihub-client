@@ -769,7 +769,7 @@ Deno.serve(async (req) => {
                         const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
 
                         console.log(year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds)
-                        return year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds' + '.' + milliseconds;
+                        return year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds;
                     }
                     function isDateTimeId(str) {
                         console.log(str,str.includes('-') && str.includeds(':') && str.includes('.') && str.includes(' ') && str.length == 21)
