@@ -773,7 +773,7 @@ Deno.serve(async (req) => {
                     }
                     function isDateTimeId(str) {
                         console.log(str,str.includes('-') && str.includeds(':') && str.includes('.') && str.includes(' ') && str.length == 21)
-                        return str.includes('-') && str.includeds(':') && str.includes('.') && str.includes(' ') && str.length == 21;
+                        return str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 21;
                     }
                     let timeIdLen = 21;
                     document.addEventListener("click", async (event) => {
