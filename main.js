@@ -772,10 +772,10 @@ Deno.serve(async (req) => {
                         return year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds;
                     }
                     function isDateTimeId(str) {
-                        console.log(str,str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 21)
-                        return str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 21;
+                        console.log(str,str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 23)
+                        return str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 23;
                     }
-                    let timeIdLen = 21;
+                    let timeIdLen = 23;
                     document.addEventListener("click", async (event) => {
                         if(!event.target.getAttribute('evt-click')) {
                             return;
