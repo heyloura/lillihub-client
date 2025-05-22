@@ -881,6 +881,8 @@ Deno.serve(async (req) => {
 
                             var taskId;
                             if(markup[0] == '(') {
+                                console.log('has priority')
+                                console.log(markup.substring(4,timeIdLen))
                                 if(isDateTimeId(markup.substring(4,timeIdLen))) {
                                     taskId = markup.substring(4,timeIdLen);
                                     markup = markup.substring(0,3) + '<span class="chip no-elevate hide">' + markup.substring(4,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 4);
