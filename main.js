@@ -768,7 +768,7 @@ Deno.serve(async (req) => {
                         const seconds = String(date.getSeconds()).padStart(2, '0');
                         const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
 
-                        console.log(year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds' + '.' + milliseconds)
+                        console.log(year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds)
                         return year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds' + '.' + milliseconds;
                     }
                     function isDateTimeId(str) {
