@@ -681,7 +681,7 @@ Deno.serve(async (req) => {
                         </div>
                         <label class="switch">
                             <input id="showCompleted" type="checkbox">
-                            <span>&nbsp;&nbsp;Show completed</span>
+                            <span>&nbsp;&nbsp;Show done</span>
                         </label>
                     </nav>
 
