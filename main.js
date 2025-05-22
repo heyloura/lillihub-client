@@ -768,11 +768,11 @@ Deno.serve(async (req) => {
                         const seconds = String(date.getSeconds()).padStart(2, '0');
                         const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
 
-                        console.log(year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds)
+                        //console.log(year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds)
                         return year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds;
                     }
                     function isDateTimeId(str) {
-                        console.log(str,str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 23)
+                        //console.log(str,str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 23)
                         return str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 23;
                     }
                     let timeIdLen = 23;
@@ -882,9 +882,10 @@ Deno.serve(async (req) => {
                             var taskId;
                             if(markup[0] == '(') {
                                 console.log('has priority')
-                                console.log(markup.substring(4,timeIdLen))
-                                if(isDateTimeId(markup.substring(4,timeIdLen))) {
-                                    taskId = markup.substring(4,timeIdLen);
+                                console.log(markup.substring(4,timeIdLen + 4))
+                                console.log(isDateTimeId(markup.substring(4,timeIdLen + 4)))
+                                if(isDateTimeId(markup.substring(4,timeIdLen + 4))) {
+                                    taskId = markup.substring(4,timeIdLen + 4);
                                     markup = markup.substring(0,3) + '<span class="chip no-elevate hide">' + markup.substring(4,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 4);
                                 } 
                             } else {
