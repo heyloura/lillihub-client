@@ -757,26 +757,25 @@ Deno.serve(async (req) => {
                                 ghCodeBlocks: true,
                                 simpleLineBreaks: true,
                                 emoji: true, 
-                            });
-                            
-                    function formatDateToYYMMDD(date) {
-                        const year = String(date.getFullYear()).substring(2); // Get last two digits of year
-                        const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+                            });         
+                    function getDateTimeId() {
+                        var date = new Date();
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
                         const day = String(date.getDate()).padStart(2, '0');
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        const seconds = String(date.getSeconds()).padStart(2, '0');
+                        const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
 
-                        return year + month + day;
-                    }             
-                    function currentMillisecondsPassedToday(now) {
-                        const midnight = new Date(now).setHours(0, 0, 0, 0);
-                        return now.getTime() - midnight;
+                        console.log(year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds' + '.' + milliseconds)
+                        return year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds' + '.' + milliseconds;
                     }
-                    function getTimebasedId() {
-                        var now = new Date();
-                        return formatDateToYYMMDD(now) + String(currentMillisecondsPassedToday(now)).padStart(8, '0');
+                    function isDateTimeId(str) {
+                        console.log(str,str.includes('-') && str.includeds(':') && str.includes('.') && str.includes(' ') && str.length == 21)
+                        return str.includes('-') && str.includeds(':') && str.includes('.') && str.includes(' ') && str.length == 21;
                     }
-                    function is14DigitNumber(str) {
-                        return parseInt(str) && str.length == 14;
-                    }
+                    let timeIdLen = 21;
                     document.addEventListener("click", async (event) => {
                         if(!event.target.getAttribute('evt-click')) {
                             return;
@@ -796,16 +795,16 @@ Deno.serve(async (req) => {
                                 var text = decodeURIComponent(task.getAttribute('data-task'));
 
                                 if(text[0] == '(') {
-                                    if(is14DigitNumber(text.substring(3,17))) {
-                                        text = getTimebasedId() + ' ' + text.slice(18);
+                                    if(isDateTimeId(text.substring(4,timeIdLen))) {
+                                        text = getDateTimeId() + ' ' + text.slice(timeIdLen + 4);
                                     } else {
-                                        text = getTimebasedId() + ' ' + text.slice(3);
+                                        text = getDateTimeId() + ' ' + text.slice(4);
                                     }
                                 } else {
-                                    if(is14DigitNumber(text.substring(0,14))) {
-                                        text = getTimebasedId() + ' ' + text.slice(15);
+                                    if(isDateTimeId(text.substring(0,timeIdLen))) {
+                                        text = getDateTimeId() + ' ' + text.slice(timeIdLen + 1);
                                     } else {
-                                        text = getTimebasedId() + ' ' + text;
+                                        text = getDateTimeId() + ' ' + text;
                                     }
                                 }
 
@@ -847,10 +846,9 @@ Deno.serve(async (req) => {
                                 } else {
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[0].substring(0,3);
-                                        console.log(priority)
-                                        tasks[0] = priority + ' ' + getTimebasedId() + ' ' + tasks[0].slice(4);
+                                        tasks[0] = priority + ' ' + getDateTimeId() + ' ' + tasks[0].slice(4);
                                     } else {
-                                        tasks[0] = getTimebasedId() + ' ' + tasks[0];
+                                        tasks[0] = getDateTimeId() + ' ' + tasks[0];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+encodeURIComponent(tasks[0])+'">new</h6></li>')
                                 }
@@ -858,9 +856,9 @@ Deno.serve(async (req) => {
                                 for(var i = 1; i < tasks.length; i++) {
                                     if(tasks[0][0] == '(') {
                                         var priority = tasks[i].substring(0,3);
-                                        tasks[i] =  priority + ' ' + getTimebasedId() + ' ' + tasks[i].slice(4);
+                                        tasks[i] =  priority + ' ' + getDateTimeId() + ' ' + tasks[i].slice(4);
                                     } else {
-                                        tasks[i] = getTimebasedId() + ' ' + tasks[i];
+                                        tasks[i] = getDateTimeId() + ' ' + tasks[i];
                                     }
                                     document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+encodeURIComponent(tasks[i])+'">new</h6></li>')
                                 }
@@ -883,14 +881,14 @@ Deno.serve(async (req) => {
 
                             var taskId;
                             if(markup[0] == '(') {
-                                if(is14DigitNumber(markup.substring(4,18))) {
-                                    taskId = markup.substring(4,18);
-                                    markup = markup.substring(0,3) + '<span class="chip no-elevate hide">' + markup.substring(4,18) + '</span>' + ' ' + markup.slice(18);
+                                if(isDateTimeId(markup.substring(4,timeIdLen))) {
+                                    taskId = markup.substring(4,timeIdLen);
+                                    markup = markup.substring(0,3) + '<span class="chip no-elevate hide">' + markup.substring(4,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 4);
                                 } 
                             } else {
-                                if(is14DigitNumber(markup.substring(0,14))) {
-                                    taskId = markup.substring(0,14);
-                                    markup = '<span class="chip no-elevate hide">' + markup.substring(0,14) + '</span>' + ' ' + markup.slice(15);
+                                if(isDateTimeId(markup.substring(0,timeIdLen))) {
+                                    taskId = markup.substring(0,timeIdLen);
+                                    markup = '<span class="chip no-elevate hide">' + markup.substring(0,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 1);
                                 } 
                             }
                             markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
