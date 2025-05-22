@@ -881,17 +881,17 @@ Deno.serve(async (req) => {
 
                             var taskId;
                             if(markup[0] == '(') {
-                                console.log('has priority')
-                                console.log(markup.substring(4,timeIdLen + 4))
-                                console.log(isDateTimeId(markup.substring(4,timeIdLen + 4)))
+                                //console.log('has priority')
+                                //console.log(markup.substring(4,timeIdLen + 4))
+                                //console.log(isDateTimeId(markup.substring(4,timeIdLen + 4)))
                                 if(isDateTimeId(markup.substring(4,timeIdLen + 4))) {
                                     taskId = markup.substring(4,timeIdLen + 4);
-                                    markup = markup.substring(0,3) + '<span class="chip no-elevate hide">' + markup.substring(4,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 4);
+                                    markup = markup.substring(0,3) + '<span class="chip no-elevate">' + markup.substring(4,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 4);
                                 } 
                             } else {
                                 if(isDateTimeId(markup.substring(0,timeIdLen))) {
                                     taskId = markup.substring(0,timeIdLen);
-                                    markup = '<span class="chip no-elevate hide">' + markup.substring(0,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 1);
+                                    markup = '<span class="chip no-elevate">' + markup.substring(0,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 1);
                                 } 
                             }
                             markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
