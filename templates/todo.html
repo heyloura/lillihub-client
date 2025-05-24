@@ -1,270 +1,269 @@
-<style>{{easyMDECSS}}</style>
-<script>{{easyMDEJS}}</script>
-<script>{{compressor}}</script>
+<div class="note small-padding" 
+                    data-parent="${id}"
+                    data-id="${results.id}" 
+                    data-encypted="${results._microblog.is_encrypted}" 
+                    data-content="${results.content_text ?results.content_text : results.content_html}">
+                    <nav>
+                        <div class="field large prefix round fill active max">
+                            <i class="front">search</i>
+                            <input id="search" onInput="liveSearch('li','search')">
+                        </div>
+                        <label class="switch">
+                            <input id="showCompleted" type="checkbox">
+                            <span>&nbsp;&nbsp;Show done</span>
+                        </label>
+                    </nav>
 
-<ul class="breadcrumb pl-2">
-    <li class="breadcrumb-item">
-        <a onclick="addLoading(this)" href="/notes/{{id}}">{{name}}</a>
-    </li>
-    <li class="breadcrumb-item">
-        <a href="#">{{breadcrumb}}</a>
-    </li>
-</ul>
-{{viewVersion}}
-<!-- form switch control -->
-<div class="form-group">
-    <label class="form-switch">
-        <input id="autosave" type="checkbox">
-        <i class="form-icon"></i> Enable autosave (Note: this saves the unencrypted value in your localStorage)
-    </label>
-</div>
-<div class="box">
-    <input type="hidden" id="original" value="{{originalValue}}" />
-    <textarea id="content"></textarea>
-</div>
-<button onclick="addLoading(this)" class="btn btn-primary m-2 float-right" id="saveNoteBtn">Save Note</button>
-<p><mark>Note:</mark> Images that are dragged/dropped or copied in are saved to your default Micro.blog media upload and are <b>not</b> encrypted.</p>
-{{versions}}
-{{editDelete}}
-<div style="clear:both"></div>
-<script type="module">
-    var options = {
-        element: document.getElementById('content'),
-        uploadImage: true,
-        minHeight: '50vh',
-        showIcons: ["code"],
-        nativeSpellcheck: true,
-        inputStyle: 'contenteditable',
-        status: ["upload-image", "autosave", "lines", "words", "cursor"],
-        imageUploadFunction: async (image, onSuccess, onError) => {
-            let formData = new FormData();
-            formData.append("destination", "{{mpDestination}}"); 
-            new Compressor(image, {
-                quality: 0.95,
-                maxHeight: 1920,
-                maxWidth: 1920,
-                success(result) {
-                    console.log('new size: ' + result.size /1024 /1024 + ' MB');
-                    if(result.size /1024 /1024 > 3) {
-                        new Compressor(result, {
-                            quality: 0.85,
-                            maxHeight: 1920,
-                            maxWidth: 1920,
-                            success(result) {
-                                console.log('another compress size: ' + result.size /1024 /1024 + ' MB');
-                                formData.append("media", result, result.name);
-                                fetch('/media/upload', { method: "POST", body: formData })
-                                    .then(response => console.log(response.status) || response)
-                                    .then(response => response.text())
-                                    .then(body => onSuccess(body));
-                            },
+                    <ul class="list border" id="tasks">
+                        <li class="list border"><progress class="circle small"></progress></li>
+                    </ul>
+                </div>
+                <dialog id="dialog-edit" class="max">
+                    <header class="fixed front">
+                        <nav>
+                            <div class="max truncate">
+                                <h5>Manage Todo</h5>
+                            </div>
+                            <button data-ui="#dialog-edit" class="circle transparent">
+                                <i>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                                    </svg>
+                                </i>
+                            </button>
+                        </nav>
+                    </header>
+                    <div class="field textarea">
+                        <input id="lineId" type="hidden" />
+                        <textarea style="height:70vh;" id="content"></textarea>
+                        <div class="medium-space"></div>
+                        <button id="deleteMe" evt-click='delete' class="error-text border">Delete</button>
+                        <button id="moveBottom" evt-click='moveDown' class="border">Move to bottom of list</button>
+                        <button evt-click='save'>Save</button>
+                    </div>
+                </dialog>
+                <style>
+                .list li {overflow:auto;}
+                /*.done {display: none !important;}*/
+                </style>
+                <script>
+                    function addTodo() {
+                        document.getElementById('deleteMe').classList.add('hide');
+                        document.getElementById('moveBottom').classList.add('hide');
+                        document.getElementById('content').value = '';
+                        document.getElementById('lineId').value = '-1';
+                        document.getElementById('dialog-edit').showModal();
+                    }
+                    function saveTodos() {
+                        let tasks = document.querySelectorAll('[data-task]');
+                        var note = '---\\ntype: todo.txt\\ntitle: todo.txt\\n---\\n';
+                        for (var i = 0; i < tasks.length; i++) {
+                            note += decodeURIComponent(tasks[i].getAttribute('data-task')) + '\\n\\n';
+                        }
+
+                        window.encryptWithKey(note).then(async result => {
+                            const form = new URLSearchParams();
+                            form.append("text", result);
+                            form.append("notebook_id", ${parent});
+                            ${id != 0 ? `form.append("id", ${id});` : ''}
+                            const posting = await fetch('/note/update', {
+                                method: "POST",
+                                body: form.toString(),
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                                }
+                            });
                         });
-                    } else {
-                        formData.append("media", result, result.name);
-                        fetch('/media/upload', { method: "POST", body: formData })
-                            .then(response => console.log(response.status) || response)
-                            .then(response => response.text())
-                            .then(body => onSuccess(body));
+
+                        document.getElementById('tasks').innerHTML = converter.makeHtml(note);
+                        window.createTaskList();
                     }
-                },
-            });
-        },
-        autosave: {
-            enabled: localStorage.getItem('autosave-note-{{id}}-{{vid}}') ? true : false,
-            uniqueId: "note-{{id}}-{{vid}}",
-            delay: 1000,
-            submit_delay: 5000,
-            timeFormat: {
-                locale: 'en-US',
-                format: {
-                    year: 'numeric',
-                    month: 'long',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                },
-            },
-            text: "Autosaved: "
-        },
-    };
+                    const converter = new showdown.Converter({	
+                                metadata: true,
+                                parseImgDimensions: true,
+                                strikethrough: true,
+                                tables: true,
+                                ghCodeBlocks: true,
+                                simpleLineBreaks: true,
+                                emoji: true, 
+                            });         
+                    function getDateTimeId() {
+                        var date = new Date();
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        const seconds = String(date.getSeconds()).padStart(2, '0');
+                        const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
 
-    let easymde = new EasyMDE(options);
-
-    function autoSaveToggled(evt) {
-        if(document.getElementById('autosave').checked) {
-            localStorage.setItem('autosave-note-{{id}}-{{vid}}','true');
-            options.autosave.enabled = true;
-            easymde.toTextArea();
-            easymde = new EasyMDE(options);
-        } else {
-            localStorage.setItem('autosave-note-{{id}}-{{vid}}','');
-            options.autosave.enabled = false;
-            localStorage.setItem('smde_note-{{id}}-{{vid}}','');
-            easymde.toTextArea();
-            easymde = new EasyMDE(options);
-        }
-    }
-
-    const imported_key = localStorage.getItem("notes_key") ? await crypto.subtle.importKey(
-        'raw',
-        hexStringToArrayBuffer(localStorage.getItem("notes_key").substr(4)),
-        { name: 'AES-GCM', length: 256 },
-        true,
-        ['encrypt', 'decrypt']
-    ) : '';
-
-    function hexStringToArrayBuffer(hexString) {
-        const length = hexString.length / 2;
-        const array_buffer = new ArrayBuffer(length);
-        const uint8_array = new Uint8Array(array_buffer);
-       
-        for (let i = 0; i < length; i++) {
-            const byte = parseInt(hexString.substr(i * 2, 2), 16);
-            uint8_array[i] = byte;
-        }
-       
-        return array_buffer;
-    }
-
-    async function decryptWithKey(encryptedText) {
-        const encrypted_data = new Uint8Array(atob(encryptedText).split('').map(char => char.charCodeAt(0)));
-        const iv = encrypted_data.slice(0, 12);
-        const ciphertext = encrypted_data.slice(12);
-
-        const decrypted_buffer = await crypto.subtle.decrypt(
-            { name: 'AES-GCM', iv },
-            imported_key,
-            ciphertext
-        );
-       
-        const decoder = new TextDecoder();
-        const decrypted_text = decoder.decode(decrypted_buffer);
-        return decrypted_text;
-    }
-
-    async function decryptNotes() {
-        if(localStorage.getItem("notes_key"))
-        {
-            const converter = new showdown.Converter();
-            const cards = document.querySelectorAll('.decryptMe');
-            for (var i = 0; i < cards.length; i++) {
-                cards[i].innerHTML = converter.makeHtml(await decryptWithKey(cards[i].innerHTML));
-            }
-        }
-    }
-
-    async function encryptWithKey(text) {
-        const iv = crypto.getRandomValues(new Uint8Array(12));
-        const encoder = new TextEncoder();
-        const plaintext_buffer = encoder.encode(text);
-       
-        const ciphertext_buffer = await crypto.subtle.encrypt(
-            { name: 'AES-GCM', iv },
-            imported_key,
-            plaintext_buffer
-        );
-       
-        const encrypted_data = new Uint8Array([...iv, ...new Uint8Array(ciphertext_buffer)]);
-        const base64_encoded = btoa(String.fromCharCode(...encrypted_data));
-        return base64_encoded;
-    }
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", async function(event) {
-            if(localStorage.getItem('autosave-note-{{id}}-{{vid}}')) {
-                if(!localStorage.getItem('smde_note-{{id}}-{{vid}}')) {
-                    if({{is_shared}}) {
-                        easymde.value(document.getElementById("original").value);
-                    } else {
-                        easymde.value(await decryptWithKey(document.getElementById("original").value));
+                        //console.log(year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds)
+                        return year +'-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + milliseconds;
                     }
-                }
-            }
-            else {
-                if({{is_shared}}) {
-                    easymde.value(document.getElementById("original").value);
-                } else {
-                    easymde.value(await decryptWithKey(document.getElementById("original").value));
-                }
-            }
-            document.getElementById("saveNoteBtn").onclick = registerClick;
-            document.getElementById("autosave").addEventListener('change', autoSaveToggled);
-            document.getElementById("autosave").checked = localStorage.getItem('autosave-note-{{id}}-{{vid}}') ? true : false;
-        });
-    }
-    else
-    {
-        if(document.getElementById("original").value) {
-            if(localStorage.getItem('autosave-note-{{id}}-{{vid}}')) {
-                if(!localStorage.getItem('smde_note-{{id}}-{{vid}}')) {
-                    if({{is_shared}}) {
-                        easymde.value(document.getElementById("original").value);
-                    } else {
-                        easymde.value(await decryptWithKey(document.getElementById("original").value));
+                    function isDateTimeId(str) {
+                        //console.log(str,str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 23)
+                        return str.includes('-') && str.includes(':') && str.includes('.') && str.includes(' ') && str.length == 23;
                     }
-                }
-            }
-            else {
-                if({{is_shared}}) {
-                    easymde.value(document.getElementById("original").value);
-                } else {
-                    easymde.value(await decryptWithKey(document.getElementById("original").value));
-                }
-            }
-        }
-        document.getElementById("saveNoteBtn").onclick = registerClick;
-        document.getElementById("autosave").addEventListener('change', autoSaveToggled);
-        document.getElementById("autosave").checked = localStorage.getItem('autosave-note-{{id}}-{{vid}}') ? true : false;
-    }
+                    let timeIdLen = 23;
+                    document.addEventListener("click", async (event) => {
+                        if(!event.target.getAttribute('evt-click')) {
+                            return;
+                        } else {
+                            if(event.target.getAttribute('evt-click') == 'edit') {
+                                document.getElementById('deleteMe').classList.remove('hide');
+                                document.getElementById('moveBottom').classList.remove('hide');
+                                id = event.target.getAttribute('data-line-id');
+                                text = event.target.textContent;
+                                document.getElementById('content').value = text;
+                                document.getElementById('lineId').value = id;
+                                document.getElementById('dialog-edit').showModal();
+                            }
+                            if(event.target.getAttribute('evt-click') == 'moveDown') {
+                                var line = document.getElementById('lineId').value;
+                                var task = document.querySelector('[data-line-id="'+line+'"]');
+                                var text = decodeURIComponent(task.getAttribute('data-task'));
 
-    async function registerClick() {
-        let note = easymde.value();
-        let eNote = '';
-        if(note) {
-            if({{is_shared}}) {
-                eNote = note;
-            } else {
-                eNote = await encryptWithKey(note);
-            }      
-            const form = new URLSearchParams();
-            form.append("text", eNote);
-            form.append("notebook_id", {{id}});
-            {{editAppend}}
-                
-            const posting = await fetch('/note/update', {
-                method: "POST",
-                body: form.toString(),
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-                }
-            });
-            localStorage.setItem('smde_note-{{id}}-{{vid}}','')
-            window.location.href = '/notes/{{id}}';
-        }
-    }
+                                if(text[0] == '(') {
+                                    if(isDateTimeId(text.substring(4,timeIdLen))) {
+                                        text = getDateTimeId() + ' ' + text.slice(timeIdLen + 4);
+                                    } else {
+                                        text = getDateTimeId() + ' ' + text.slice(4);
+                                    }
+                                } else {
+                                    if(isDateTimeId(text.substring(0,timeIdLen))) {
+                                        text = getDateTimeId() + ' ' + text.slice(timeIdLen + 1);
+                                    } else {
+                                        text = getDateTimeId() + ' ' + text;
+                                    }
+                                }
 
-    function downloadHTML() {
-        let id =  document.getElementById('noteId').value;
-        var html = document.getElementById(id).innerHTML;
-        var title = document.getElementById(id).getAttribute('data-title') + '.html';
-        download(title, html);
-    }
-    function downloadMarkdown() {
-        let id =  document.getElementById('noteId').value;
-        var markdown = document.getElementById(id).getAttribute('data-markdown');
-        var title = document.getElementById(id).getAttribute('data-title') + '.md';
-        download(title, markdown);
-    }
-    function download(filename, text) {
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
+                                task.setAttribute('data-task', encodeURIComponent(text));
+                                saveTodos();
+                                document.getElementById('dialog-edit').close();
+                            }
+                            if(event.target.getAttribute('evt-click') == 'check') {
+                                id = event.target.getAttribute('data-id');
+                                var task = document.querySelector('[data-line-id="'+id+'"]');
+                                var text = decodeURIComponent(task.getAttribute('data-task'));
+                                if(text[0] == '(') {
+                                    var priority = text.substring(0,3);
+                                    console.log(priority)
+                                    text = 'x ' + priority + ' ' + new Date().toISOString().split('T')[0] + ' ' + text.slice(4);
+                                } else {
+                                    text = 'x ' + ' ' + new Date().toISOString().split('T')[0] + ' ' + text;
+                                }
+                                task.setAttribute('data-task', encodeURIComponent(text));
+                                saveTodos();
+                            }
+                            if(event.target.getAttribute('evt-click') == 'delete') {
+                                if(confirm('Are you sure you want to delete this?')) {
+                                    var line = document.getElementById('lineId').value;
+                                    var task = document.querySelector('[data-line-id="'+line+'"]');
+                                    task.remove();
+                                    saveTodos();
+                                    document.getElementById('dialog-edit').close();
+                                }
+                            }
+                            if(event.target.getAttribute('evt-click') == 'save') {
+                                var text = document.getElementById('content').value;
+                                var line = document.getElementById('lineId').value;
+                                var tasks = text.split('\\n');
 
-        element.style.display = 'none';
-        document.body.appendChild(element);
+                                var task = document.querySelector('[data-line-id="'+line+'"]');
+                                if(task) {
+                                    task.setAttribute('data-task',encodeURIComponent(tasks[0]));
+                                } else {
+                                    if(tasks[0][0] == '(') {
+                                        var priority = tasks[0].substring(0,3);
+                                        tasks[0] = priority + ' ' + getDateTimeId() + ' ' + tasks[0].slice(4);
+                                    } else {
+                                        tasks[0] = getDateTimeId() + ' ' + tasks[0];
+                                    }
+                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+encodeURIComponent(tasks[0])+'">new</h6></li>')
+                                }
 
-        element.click();
+                                for(var i = 1; i < tasks.length; i++) {
+                                    if(tasks[0][0] == '(') {
+                                        var priority = tasks[i].substring(0,3);
+                                        tasks[i] =  priority + ' ' + getDateTimeId() + ' ' + tasks[i].slice(4);
+                                    } else {
+                                        tasks[i] = getDateTimeId() + ' ' + tasks[i];
+                                    }
+                                    document.getElementById('tasks').insertAdjacentHTML('beforeend', '<li><h6 data-task="'+encodeURIComponent(tasks[i])+'">new</h6></li>')
+                                }
+                                
+                                saveTodos();
+                                document.getElementById('dialog-edit').close();
+                            }
+                        }
+                    });
+                    window.createTaskList = function() {
+                        const sortList = list => [...list].sort((a, b) => {
+                            const A = a.textContent, B = b.textContent;
+                            return (A < B) ? -1 : (A > B) ? 1 : 0;
+                        });
+                        let tasks = document.querySelectorAll('p');
+                        for (var i = 0; i < tasks.length; i++) {
+                            var task = tasks[i];
+                            var li = document.createElement('li');
+                            var markup = task.innerHTML;
 
-        document.body.removeChild(element);
-    }
-</script>
+                            var taskId;
+                            if(markup[0] == '(') {
+                                //console.log('has priority')
+                                //console.log(markup.substring(4,timeIdLen + 4))
+                                //console.log(isDateTimeId(markup.substring(4,timeIdLen + 4)))
+                                if(isDateTimeId(markup.substring(4,timeIdLen + 4))) {
+                                    taskId = markup.substring(4,timeIdLen + 4);
+                                    markup = markup.substring(0,3) + '<span class="chip no-elevate hide">' + markup.substring(4,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 4);
+                                } 
+                            } else {
+                                if(isDateTimeId(markup.substring(0,timeIdLen))) {
+                                    taskId = markup.substring(0,timeIdLen);
+                                    markup = '<span class="chip no-elevate hide">' + markup.substring(0,timeIdLen) + '</span>' + ' ' + markup.slice(timeIdLen + 1);
+                                } 
+                            }
+                            markup = markup.replaceAll('(A)','<span onClick="searchTag(\\'(A)\\')" class="error-text">(A)</span>')
+                                .replaceAll('(B)','<span onClick="searchTag(\\'(B)\\')" class="tertiary-text">(B)</span>')
+                                .replaceAll('(C)','<span onClick="searchTag(\\'(C)\\')" class="secondary-text">(C)</span>');
+                            var words = task.innerHTML.split(' ');
+                            var contexts = [];
+                            var projects = [];
+                            for(var j=0; j < words.length; j++) {
+                                if(words[j].charAt(0) == '@') {
+                                    contexts.push(words[j]);
+                                    markup = markup.replaceAll(words[j],'<span onClick="searchTag(\\''+words[j]+'\\')" class="primary-text">' + words[j] + '</span>')
+                                }
+                                if(words[j].charAt(0) == '+') {
+                                    projects.push(words[j]);
+                                    markup = markup.replaceAll(words[j],'<span onClick="searchTag(\\''+words[j]+'\\')" class="primary-text">' + words[j] + '</span>')
+                                }
+                            }
+                            if(task.innerHTML.charAt(0) == 'x') 
+                            {
+                                li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox" checked disabled><span></span></label><div class="max"><h6 '+(taskId ? 'data-task-id="'+taskId+'"' : '')+' evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small"><del evt-click="edit" data-line-id="'+i+'">' + markup + '</del></h6>';
+                                li.classList.add('done');
+                            }
+                            else
+                            {
+                                li.innerHTML = '<label class="checkbox"><input evt-click="check" data-id="'+i+'" type="checkbox"><span></span></label><div class="max"><h6 '+(taskId ? 'data-task-id="'+taskId+'"' : '')+' evt-click="edit" data-line-id="'+i+'" data-task="'+task.innerHTML+'" class="small">' + markup + '</h6>';
+                            }
+                            task.parentNode.replaceChild(li, task);
+                        }
+                        const ul = document.getElementById("tasks");
+                        const list = ul.querySelectorAll("li");
+                        ul.append(...sortList(list));
+                        document.getElementById('search').dispatchEvent(new Event("input"));
+                    }
+                </script>
+                ${decryptNotes(`
+                    let element = document.querySelector('.note');
+                    var item = {};
+                    item.content_text = element.getAttribute('data-content');
+                    item.encrypted = element.getAttribute('data-encypted') == 'true' ? true : false;
+                    item.content_html = element.getAttribute('data-content');
+                    item.id = element.getAttribute('data-id');
+                    var result = await note(item,converter);
+                    document.getElementById('tasks').innerHTML = item.content_html;
+                    window.createTaskList();
+                `)}

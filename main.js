@@ -64,6 +64,7 @@ const BOOK_ROUTE = new URLPattern({ pathname: "/bookshelves/shelf/:shelfid/book/
 const NOTEBOOKS_ROUTE = new URLPattern({ pathname: "/notes" });
 const NOTES_ROUTE = new URLPattern({ pathname: "/notes/:id" });
 const UPDATE_NOTES_ROUTE = new URLPattern({ pathname: "/notes/:id/update" });
+const TODO_NOTES_ROUTE = new URLPattern({ pathname: "/notes/:id/todo" });
 const SETTINGS_ROUTE = new URLPattern({ pathname: "/settings" });
 const POST_ROUTE = new URLPattern({ pathname: "/post" });
 const TIMELINE_POST_ROUTE = new URLPattern({ pathname: "/timeline/:id" });
@@ -440,6 +441,17 @@ async function handler(req) {
         const id = UPDATE_NOTES_ROUTE.exec(req.url).pathname.groups.id;
 
         return new Response(await NoteTemplate(user, accessTokenValue, id, req), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+            },
+        });
+    }
+
+    if(TODO_NOTES_ROUTE.exec(req.url) && user) {
+        const id = TODO_NOTES_ROUTE.exec(req.url).pathname.groups.id;
+
+        return new Response(await TodoTemplate(user, accessTokenValue, id, req), {
             status: 200,
             headers: {
                 "content-type": "text/html",
