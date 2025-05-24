@@ -7,9 +7,9 @@ const _shoelacejs = await Deno.readTextFile("scripts/client/shoelace.js");
 const _dropdownTemplate = new TextDecoder().decode(await Deno.readFile("templates/_dropdown.html"));
 
 
-function NavBarContent(user, area, title, navContent) {
+function NavBarContent(user, area, title, navContent, scroll) {
     if(area == "blog" || title == 'Post') {
-        return `<section class="mt-1 mb-2 scroll-container">
+        return `<section class="mt-1 mb-2 ${scroll? 'scroll-container': ''}">
             <ul class="pl-0 horizontal-list" style="list-style:none">
                 ${title == 'Post' || title == 'Media' ? '' : `<li class="menuAction"><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>`}
                 <li><a onclick="addLoading(this)" href="/posts" class="btn ${title == "Posts" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-window-stack green-text"></i> Posts</a></li>
@@ -30,14 +30,14 @@ function NavBarContent(user, area, title, navContent) {
         //         </div>
         //     </section>`;
         // }
-        return `<section class="mt-1 mb-2 scroll-container">
+        return `<section class="mt-1 mb-2 ${scroll? 'scroll-container': ''}">
             <ul class="pl-0 horizontal-list" style="list-style:none">
                 ${navContent}
             </ul>
         </section>`;
     }
     if(area == "bookshelves") {
-        return `<section class="mt-1 mb-2 scroll-container" >
+        return `<section class="mt-1 mb-2 ${scroll? 'scroll-container': ''}" >
             <ul class="pl-0 horizontal-list" style="list-style:none">
                 <li><a onclick="addLoading(this)" href="/books" class="btn ${title == "Books" ? 'bg-light greenblue-border' : 'btn-link'} greenblue-text"><i class="bi bi-search-heart greenblue-text"></i> Books</a></li>
                 ${navContent}            
@@ -45,7 +45,7 @@ function NavBarContent(user, area, title, navContent) {
         </section>`;
     }
     if(area == "notes") {
-        return `<section class="mt-1 mb-2 scroll-container">
+        return `<section class="mt-1 mb-2 ${scroll? 'scroll-container': ''}">
             <ul class="pl-0 horizontal-list" style="list-style:none">
                 ${navContent}
                 <li class="divider"></li>
@@ -57,7 +57,7 @@ function NavBarContent(user, area, title, navContent) {
     if(parseInt(title) || title.includes('User')) {
         discoverTitle = false;
     }
-    return `<section class="mt-1 mb-2 scroll-container">
+    return `<section class="mt-1 mb-2 ${scroll? 'scroll-container': ''}">
         <ul class="pl-0 horizontal-list" style="list-style:none">
             ${title == 'Editor' ? '' : `<li class="menuAction"><a href="/post" class="btn btn-primary dropdown-toggle" tabindex="0"><i class="bi bi-pencil-square"></i> New Post</a></li>`}
             <li><a onclick="addLoading(this)" href="/" class="btn ${title == "Timeline" ? 'bg-light green-border' : 'btn-link'} green-text"><i class="bi bi-card-list green-text"></i> Timeline</a></li>
@@ -295,7 +295,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                     : '' }
                         <div class="columns">
                             <div id="app-sidebar" class="column col-3 hide-sm">
-                                <div class="p-fixed sidenav">
+                                <div class="">
                                     ${NavBarContent(user, area, title, navContent)}
                                 </div>
                             </div>
@@ -304,7 +304,7 @@ export async function HTMLPage(token, title, contentHTML, user, redirect = '', n
                     </div>
                     <footer class="p-1 bg-light show-sm app-footer">
                         <div class="bottomNav">
-                            ${NavBarContent(user, area, title, navContent)}
+                            ${NavBarContent(user, area, title, navContent, true)}
                         </div>
                     </footer>
 
