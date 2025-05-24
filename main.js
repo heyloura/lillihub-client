@@ -71,6 +71,7 @@ const FAVORITES_ROUTE = new URLPattern({ pathname: "/favorites" });
 const POSTS_ROUTE = new URLPattern({ pathname: "/posts" });
 const MEDIA_ROUTE = new URLPattern({ pathname: "/media" });
 const LOGOUT_ROUTE = new URLPattern({ pathname: "/logout" });
+const LOGIN_ROUTE = new URLPattern({ pathname: "/login" });
 const AUTH_ROUTE = new URLPattern({ pathname: "/auth" });
 const ROBOT_ROUTE = new URLPattern({pathname: "/robots.txt"});
 const LILLIHUB_ROUTE = new URLPattern({pathname: "/lillihub"});
@@ -1344,6 +1345,43 @@ async function handler(req) {
                 "content-type": "text/html",
             },
         });
+    }
+
+    if(LOGIN_ROUTE.exec(req.url)) {
+        const value = await req.formData();
+        const token = value.get('token');
+        const accessToken = await encryptMe(token);
+        const mbUser = await getMicroBlogLoggedInUser(token);
+        const user = {};
+        user.username = mbUser.username;
+        user.name = mbUser.name;
+        user.avatar = mbUser.avatar;
+        user.plan = mbUser.plan;
+
+        const kv = await Deno.openKv();
+        
+        if(user.username) {
+            const userKV = await kv.get([user.username, 'global']);
+            if(userKV && !userKV.value) {
+                const starterFavs = { favorites: ['news', 'help', 'lillihub'], feeds: [], display: 'classic' };
+                await kv.set([user.username, 'global'], starterFavs);
+                user.lillihub = starterFavs;
+            } else {   
+                user.lillihub = userKV.value;
+            }
+        }
+
+        SESSION[user.username] = user;
+        const expiresOn = new Date();
+        expiresOn.setDate( expiresOn.getDate() + 399); //chrome limits to 400 days
+        const page =  new Response(await HTMLPage(accessTokenValue, `Redirect`, `<h3 style="text-align:center;" class="container mt-2">You have been logged in. Redirecting to your timeline</h3>`, user, req.url.split('?')[0].replaceAll('/auth','')), {
+            status: 200,
+            headers: {
+                "content-type": "text/html",
+                "set-cookie": `atoken=${accessToken};SameSite=Lax;Secure;HttpOnly;Expires=${expiresOn.toUTCString()}`
+            },
+        });
+        return page;
     }
 
     if(LOGOUT_ROUTE.exec(req.url)) {
