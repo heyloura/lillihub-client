@@ -220,6 +220,12 @@
                                 datalist.add(t);
                                 return `<span class="chip">#${t}</span>`;}).join(''); 
                         }
+                        if(metadata && metadata.type) {
+                            if(metadata.type == 'todo.txt') {
+                                var currentLink = card.querySelector('.noteLink').setAttribute();
+                                card.querySelector('.noteLink').setAttribute('href', currentLink.replace('update','todo'));
+                            }
+                        }
                         cards[i].innerHTML = html;
                     }
 
