@@ -1224,6 +1224,10 @@ async function handler(req) {
         }); 
     }
 
+    if(LOGIN_ROUTE.exec(req.url)  && user) {
+        return Response.redirect(req.url.replaceAll('/login', '/'));
+    }
+
  
     /********************************************************
      * Unauthenticated Routes
@@ -1350,6 +1354,7 @@ async function handler(req) {
     if(LOGIN_ROUTE.exec(req.url)) {
         const value = await req.formData();
         const token = value.get('token');
+
         const accessToken = await encryptMe(token);
         const mbUser = await getMicroBlogLoggedInUser(token);
         const user = {};
