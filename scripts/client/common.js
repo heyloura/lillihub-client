@@ -89,3 +89,15 @@ const eventLogger = (event) => {
 };
 
 events.forEach((eventName) => window.addEventListener(eventName, eventLogger));
+
+document.addEventListener("click", async (event) => {
+    if(!event.target.getAttribute('evt-click')) {
+        return;
+    } else {
+        if(event.target.getAttribute('evt-click') == 'show-menu') {
+            document.getElementById('sidebar-menu').classList.toggle('hide-sm');
+            document.getElementById('main-content').classList.toggle('hide-sm');
+            document.getElementById('show-menu-button').classList.toggle('btn-link');
+        }
+    }
+});

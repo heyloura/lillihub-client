@@ -27,6 +27,7 @@ import { MediaTemplate } from "./layouts/media.js";
 import { NotebooksTemplate } from "./layouts/notebooks.js";
 import { NotesTemplate } from "./layouts/notes.js";
 import { NoteTemplate } from "./layouts/note.js";
+import { TodoTemplate } from "./layouts/todo.js";
 import { TimelineTemplate } from "./layouts/timeline.js";
 import { LillihubTemplate } from "./layouts/lillihub.js";
 import { DiscoverTemplate } from "./layouts/discover.js";
@@ -182,6 +183,79 @@ async function handler(req) {
             },
         });
     }
+
+    //********************************************************
+    // Now let's give them any common files that the mobile
+    // or browser will need for our HTML page
+    // - the icon
+    // - the webmanifest
+    // - the service worker
+    // - JS libraries, CSS and font resources
+    //********************************************************
+    // if((new URLPattern({ pathname: "/lillihub-512.png" })).exec(req.url)){
+    //     return new Response(new Uint8Array(await Deno.readFile("static/lillihub-512.png")), {
+    //         status: 200,
+    //         headers: {
+    //             "content-type": "image/png",
+    //         },
+    //     });
+    // }
+
+    // if((new URLPattern({ pathname: "/logo.png" })).exec(req.url)){
+    //     return new Response(new Uint8Array(await Deno.readFile("static/logo-ai-lillihub-xs.png")), {
+    //         status: 200,
+    //         headers: {
+    //             "content-type": "image/png",
+    //         },
+    //     });
+    // }
+
+    // if((new URLPattern({ pathname: "/manifest.webmanifest" })).exec(req.url))
+    // {
+    //     return new Response(await Deno.readFile("static/manifest.webmanifest"), {
+    //         status: 200,
+    //         headers: {
+    //             "content-type": "text/json",
+    //         },
+    //     });
+    // }
+
+    // if(new URLPattern({ pathname: "/sw.js" }).exec(req.url))
+    // {
+    //     return new Response(await Deno.readFile("scripts/client/sw.js"), {
+    //         status: 200,
+    //         headers: {
+    //             "content-type": "text/javascript",
+    //         },
+    //     });
+    // }
+
+    const CHECK_SCRIPT_ROUTE = new URLPattern({ pathname: "/scripts/:id" });
+    if(CHECK_SCRIPT_ROUTE.exec(req.url))
+    {
+        const id = CHECK_SCRIPT_ROUTE.exec(req.url).pathname.groups.id;
+        return new Response(await Deno.readFile("scripts/client/" + id), {
+            status: 200,
+            headers: {
+                "content-type": "text/javascript",
+            },
+        });
+    }
+
+    const CHECK_CSS_ROUTE = new URLPattern({ pathname: "/styles/:id" });
+    if(CHECK_CSS_ROUTE.exec(req.url))
+    {
+        const id = CHECK_CSS_ROUTE.exec(req.url).pathname.groups.id;
+        return new Response(await Deno.readFile("styles/" + id), {
+            status: 200,
+            headers: {
+                "content-type": "text/css",
+            },
+        });
+    }
+
+    const nonce = crypto.randomUUID(); // this is to protect us from scripts and css
+    let csp = `default-src 'self' micro.blog *.micro.blog *.gravatar.com 'nonce-${nonce}';media-src *;img-src *`;
 
     /********************************************************
      * Check if request comes from an authenticated user
@@ -439,6 +513,20 @@ async function handler(req) {
 
     if(UPDATE_NOTES_ROUTE.exec(req.url) && user) {
         const id = UPDATE_NOTES_ROUTE.exec(req.url).pathname.groups.id;
+        const searchParams = new URLSearchParams(req.url.split('?')[1]);
+        const editId = searchParams.get('id');
+        const vid = searchParams.get('vid');
+
+        if(req.headers.get("swap-target")) {
+            //can return empty response because page
+            //already has all the notes on it.
+            return new Response(`<div id="main-content" data-type="note" data-parent="${id}" data-id="${editId}" class="m-2 p-2"></div>`, {
+                status: 200,
+                headers: {
+                    "content-type": "text/html",
+                },
+            });
+        }
 
         return new Response(await NoteTemplate(user, accessTokenValue, id, req), {
             status: 200,
@@ -450,11 +538,12 @@ async function handler(req) {
 
     if(TODO_NOTES_ROUTE.exec(req.url) && user) {
         const id = TODO_NOTES_ROUTE.exec(req.url).pathname.groups.id;
-
-        return new Response(await TodoTemplate(user, accessTokenValue, id, req), {
+        //console.log(user)
+        return new Response(await TodoTemplate(user, accessTokenValue, id, req, nonce), {
             status: 200,
             headers: {
                 "content-type": "text/html",
+                "Content-Security-Policy": csp
             },
         });
     }
@@ -1079,6 +1168,13 @@ async function handler(req) {
                 "Authorization": "Bearer " + accessTokenValue
             }
         });
+
+        return new Response(JSON.stringify(await posting.text()), {
+            status: 200,
+            headers: {
+                "content-type": "text/plain",
+            },
+        }); 
     }
 
     if(DELETE_NOTE.exec(req.url) && user) {
