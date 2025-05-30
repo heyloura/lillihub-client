@@ -243,9 +243,9 @@ function decryptNotes(custom,nonce) {
             return array_buffer;
         }
         async function decryptWithKey(encryptedText) {
-            const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importKey(
+            const imported_key = localStorage.getItem("notes_key") ? await crypto.subtle.importKey(
                 'raw',
-                hexStringToArrayBuffer(localStorage.getItem("mbKey").substr(4)),
+                hexStringToArrayBuffer(localStorage.getItem("notes_key").substr(4)),
                 { name: 'AES-GCM', length: 256 },
                 true,
                 ['encrypt', 'decrypt']
@@ -265,9 +265,9 @@ function decryptNotes(custom,nonce) {
             return decrypted_text;
         }
         window.encryptWithKey = async function(text) {
-            const imported_key = localStorage.getItem("mbKey") ? await crypto.subtle.importKey(
+            const imported_key = localStorage.getItem("notes_key") ? await crypto.subtle.importKey(
                 'raw',
-                hexStringToArrayBuffer(localStorage.getItem("mbKey").substr(4)),
+                hexStringToArrayBuffer(localStorage.getItem("notes_key").substr(4)),
                 { name: 'AES-GCM', length: 256 },
                 true,
                 ['encrypt', 'decrypt']
