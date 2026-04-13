@@ -1,0 +1,135 @@
+<div class="container">
+    <div id="enter_notes_key" class="mt-2 mb-2" style="display:none;">
+        <p>Enter your secret key to access your notes.</p>
+        <div class="input-group">
+            <input id="notes_key" type="text" class="form-input" placeholder="Micro.blog Key">
+            <button class="btn btn-glossy-orange" id="saveKeyBtn"><i class="bi bi-save"></i></button>
+        </div>
+    </div>
+    <div id="note_editor" style="display:none;">
+        {{viewVersion}}
+        <input class="form-input mt-2" id="note-title" type="text" placeholder="Title (optional)">
+        <input class="form-input mt-2" id="note-tags" type="text" placeholder="Tags (comma separated, optional)">
+        <input type="hidden" id="note-type" value="{{noteType}}">
+        <input type="hidden" id="original" value="{{originalValue}}">
+
+        <textarea id="note-content" class="form-input mt-2" placeholder="Write here..." style="min-height:200px;"></textarea>
+
+        <div class="mt-2" style="display:flex;justify-content:flex-end;">
+            <button class="btn btn-glossy-orange" id="saveNoteBtn">Save Note</button>
+        </div>
+    </div>
+</div>
+<script type="module">
+    import { importNotesKey, decryptWithKey, encryptWithKey } from '/scripts/crypto.js';
+
+    const key = await importNotesKey();
+    const isShared = {{is_shared}};
+
+    if (key || isShared) {
+        document.getElementById('note_editor').style.display = 'block';
+    } else {
+        document.getElementById('enter_notes_key').style.display = 'block';
+    }
+
+    document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
+        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        window.location.reload();
+    });
+
+    // Load existing note content if editing
+    const original = document.getElementById('original').value;
+    if (original) {
+        let markdown;
+        if (isShared) {
+            markdown = original;
+        } else if (key) {
+            markdown = await decryptWithKey(key, original);
+        }
+
+        if (markdown) {
+            // Parse YAML frontmatter
+            const fmMatch = markdown.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+            if (fmMatch) {
+                const frontmatter = fmMatch[1];
+                const body = fmMatch[2];
+
+                const titleMatch = frontmatter.match(/^title:\s*(.+)$/m);
+                const tagsMatch = frontmatter.match(/^tags:\s*\[?(.*?)\]?\s*$/m);
+                const typeMatch = frontmatter.match(/^type:\s*(.+)$/m);
+
+                if (titleMatch) document.getElementById('note-title').value = titleMatch[1].trim();
+                if (tagsMatch) document.getElementById('note-tags').value = tagsMatch[1].trim();
+                if (typeMatch) document.getElementById('note-type').value = typeMatch[1].trim();
+
+                document.getElementById('note-content').value = body;
+            } else {
+                document.getElementById('note-content').value = markdown;
+            }
+        }
+    }
+
+    // Auto-grow textarea
+    const ta = document.getElementById('note-content');
+    function autoGrow() {
+        ta.style.height = 'auto';
+        ta.style.height = Math.max(ta.scrollHeight, 200) + 'px';
+    }
+    ta.addEventListener('input', autoGrow);
+    autoGrow();
+
+    // Keyboard shortcuts: Ctrl+B = bold, Ctrl+I = italic, Ctrl+K = link
+    ta.addEventListener('keydown', function(e) {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        const start = ta.selectionStart, end = ta.selectionEnd;
+        function wrap(before, after) {
+            ta.value = ta.value.slice(0, start) + before + ta.value.slice(start, end) + after + ta.value.slice(end);
+            ta.selectionStart = start + before.length;
+            ta.selectionEnd = end + before.length;
+            ta.focus();
+        }
+        if (e.key === 'b') { e.preventDefault(); wrap('**', '**'); }
+        if (e.key === 'i') { e.preventDefault(); wrap('_', '_'); }
+        if (e.key === 'k') { e.preventDefault(); wrap('[', '](url)'); }
+    });
+
+    document.getElementById('saveNoteBtn').onclick = async function() {
+        const content = ta.value;
+        if (!content) return;
+
+        const title = document.getElementById('note-title').value.trim();
+        const tags = document.getElementById('note-tags').value.trim();
+        const type = document.getElementById('note-type').value;
+
+        // Build YAML frontmatter
+        let yaml = '';
+        if (title || tags || type) {
+            yaml = '---\n';
+            if (title) yaml += `title: ${title}\n`;
+            if (tags) yaml += `tags: [${tags}]\n`;
+            if (type) yaml += `type: ${type}\n`;
+            yaml += '---\n';
+        }
+
+        const fullNote = yaml + content;
+
+        let encrypted;
+        if (isShared) {
+            encrypted = fullNote;
+        } else {
+            encrypted = await encryptWithKey(key, fullNote);
+        }
+
+        const form = new URLSearchParams();
+        form.append('text', encrypted);
+        form.append('notebook_id', '{{notebookId}}');
+        {{editAppend}}
+
+        await fetch('/note/update', {
+            method: 'POST',
+            body: form.toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+        });
+        window.location.href = '/notes/{{notebookId}}';
+    };
+</script>

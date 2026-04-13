@@ -1,0 +1,35 @@
+<div class="card mt-2" id="post-{{id}}">
+    <div class="card-header">
+        <div class="card-header-scroll">
+            <div class="card-header-main">
+                <div class="tile">
+                    <div class="tile-icon">
+                        <figure class="avatar avatar-lg {{new}}"><img src="{{avatar}}" alt="Avatar" loading="lazy" height="48" width="48"></figure>
+                    </div>
+                    <div class="tile-content">
+                        <p class="tile-title">
+                            {{name}}<br/><small class="tile-subtitle"><a href="/user/{{username}}">@{{username}}</a>{{followMarker}}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-header-actions btn-group">
+                {{tags}}
+                {{actions}}
+            </div>
+        </div>
+    </div>
+    <div class="card-body">{{content}}{{summary}}</div>
+    <div class="card-footer">
+        <small>
+            <a href="{{url}}">
+{{formattedDate}}
+            </a> {{single}}
+        </small>
+        <br/>
+        <div id="{{id}}" class="comments">
+            {{comments}}
+            {{reply}}
+        </div>
+    </div>
+</div>

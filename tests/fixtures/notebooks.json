@@ -1,0 +1,6 @@
+{
+    "items": [
+        { "id": 1, "title": "Personal" },
+        { "id": 2, "title": "Work" }
+    ]
+}

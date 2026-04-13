@@ -1,0 +1,32 @@
+<div class="card mt-2">
+    <div class="card-header">
+        <div class="card-header-scroll">
+            <div class="card-header-main">
+                <div class="tile">
+                    <div class="tile-icon">
+                        <figure class="avatar avatar-lg"><img loading="lazy" src="{{avatar}}" alt="Avatar" height="48" width="48"></figure>
+                    </div>
+                    <div class="tile-content">
+                        <p class="tile-title">{{name}}</p>
+                        <small class="tile-subtitle">Bookmarked {{formattedDate}}</small>
+                        {{tags}}
+                    </div>
+                </div>
+            </div>
+            <div class="card-header-actions btn-group">
+                {{tagDropdown}}
+                <details>
+                    <summary class="btn btn-glossy-purple btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
+                    <form action="/bookmarks/unbookmark" method="POST" style="position:absolute;right:0;background:var(--crust);padding:0.5rem;border-radius:0.25rem;z-index:10;">
+                        <input type="hidden" name="id" value="{{id}}" />
+                        <button type="submit" class="btn btn-glossy-purple btn-sm">Confirm</button>
+                    </form>
+                </details>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        {{summary}}
+        {{highlightCount}}
+    </div>
+</div>

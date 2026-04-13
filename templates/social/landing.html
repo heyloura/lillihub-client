@@ -1,0 +1,40 @@
+<div class="landing">
+    <div class="landing-inner">
+        <img class="landing-logo" width="150" height="150" src="/lillihub-512.png" alt="Lillihub">
+        <h1 class="landing-title">Lillihub</h1>
+        <p class="landing-blurb">
+            A delightful <a href="https://micro.blog">Micro.blog</a> client that
+            celebrates server-rendered HTML and conversation-centric reading.
+            Fun, nostalgic, mobile-friendly, and built with as little JavaScript
+            as possible.
+        </p>
+
+        <form action="https://micro.blog/indieauth/auth" method="get" class="landing-form">
+            <label class="landing-label" for="loginMe">Sign in with your Micro.blog URL</label>
+            <div class="landing-input-row">
+                <input id="loginMe" class="form-input" type="url" placeholder="https://username.micro.blog" name="me" required>
+                <button onclick="addLoading(this)" type="submit" class="btn-glossy">Sign In</button>
+            </div>
+            <input type="hidden" name="client_id" value="{{appURL}}"/>
+            <input type="hidden" name="redirect_uri" value="{{appURL}}/auth"/>
+            <input type="hidden" name="state" value="{{uuid}}"/>
+            <input type="hidden" name="scope" value="create"/>
+            <input type="hidden" name="response_type" value="code"/>
+        </form>
+
+        <details class="landing-details">
+            <summary>Use an app token instead</summary>
+            <form action="/login" method="post" class="landing-form landing-form-secondary">
+                <div class="landing-input-row">
+                    <input class="form-input" type="password" placeholder="app token" name="token" required>
+                    <button onclick="addLoading(this)" type="submit" class="btn-glossy">Sign In</button>
+                </div>
+            </form>
+        </details>
+
+        <p class="landing-footer">
+            <a href="https://github.com/heyloura/lillihub-client">Source on GitHub</a>
+            · built with ♥ by <a href="https://heyloura.com">Loura</a>
+        </p>
+    </div>
+</div>

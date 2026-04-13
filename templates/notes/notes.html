@@ -1,0 +1,155 @@
+<script src="https://cdn.jsdelivr.net/npm/showdown@2.0.3/dist/showdown.min.js" defer></script>
+<div class="container">
+    {{errorBanner}}
+    <noscript>
+        <p class="mt-2 mb-2"><mark>Notes require JavaScript for client-side encryption.</mark></p>
+    </noscript>
+    <div id="enter_notes_key" class="mt-2 mb-2" style="display:none;">
+        <p>Enter your secret key to access your notes.</p>
+        <div class="input-group">
+            <input id="notes_key" type="text" class="form-input" placeholder="Micro.blog Key">
+            <button class="btn btn-glossy-orange" id="saveKeyBtn"><i class="bi bi-save"></i></button>
+        </div>
+        <div id="hide_notes_key" style="display:none;">
+            <p class="mt-2"><button class="btn btn-link" id="clearKeyBtn"><i class="bi bi-trash"></i> Clear your secret key</button></p>
+        </div>
+    </div>
+    <div id="notes_content" style="display:none;">
+        <ul class="tab tab-block mt-2 mb-2">
+            <li class="tab-item {{notesActive}}"><a href="/notes/{{notebookId}}"><i class="bi bi-journal-text"></i> Notes</a></li>
+            <li class="tab-item {{todosActive}}"><a href="/notes/{{notebookId}}?tab=todos"><i class="bi bi-check2-square"></i> Todos</a></li>
+        </ul>
+        <div class="blog-toolbar mb-2">
+            <div class="input-group">
+                <input list="noteTags" type="search" id="searchbox" class="form-input" placeholder="Search notes..." />
+                <button type="button" class="btn btn-glossy-orange"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+        <datalist id="noteTags"></datalist>
+        {{notes}}
+    </div>
+
+    <script type="module">
+        import { importNotesKey, decryptWithKey } from '/scripts/crypto.js';
+
+        const key = await importNotesKey();
+        if (key) {
+            document.getElementById('enter_notes_key').style.display = 'none';
+            document.getElementById('hide_notes_key').style.display = 'block';
+            document.getElementById('notes_content').style.display = 'block';
+        } else {
+            document.getElementById('enter_notes_key').style.display = 'block';
+        }
+
+        document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
+            localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+            window.location.reload();
+        });
+        document.getElementById('clearKeyBtn')?.addEventListener('click', () => {
+            localStorage.setItem('notes_key', '');
+            window.location.href = '/notes';
+        });
+
+        // Search
+        document.getElementById('searchbox')?.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.note-card').forEach(card => {
+                if (card.style.display === 'none' && !card.hasAttribute('data-search-hidden')) return;
+                const match = card.innerText.toLowerCase().includes(q);
+                card.style.display = match ? '' : 'none';
+                if (!match) card.setAttribute('data-search-hidden', '');
+                else card.removeAttribute('data-search-hidden');
+            });
+        });
+
+        const activeTab = '{{tab}}';
+
+        // Process notes: decrypt encrypted ones, extract titles for shared ones
+        async function processNotes() {
+            const datalist = new Set();
+            const cards = document.querySelectorAll('.note');
+            for (const el of cards) {
+                const card = el.closest('.note-card');
+                const titleEl = card.querySelector('.note-title-text');
+
+                // Handle shared (unencrypted) notes
+                if (!el.classList.contains('decryptMe')) {
+                    const plainText = (el.textContent || '').trim();
+                    titleEl.textContent = plainText.length > 60
+                        ? plainText.substring(0, 60) + '...'
+                        : plainText;
+                    continue;
+                }
+
+                if (!key) continue;
+
+                const converter = new showdown.Converter({
+                    metadata: true, parseImgDimensions: true, strikethrough: true,
+                    tables: true, ghCodeBlocks: true, smoothLivePreview: true,
+                    simpleLineBreaks: true, emoji: true,
+                });
+                const markdown = await decryptWithKey(key, el.innerHTML);
+                el.setAttribute('data-markdown', markdown);
+                const html = converter.makeHtml(markdown);
+                const metadata = converter.getMetadata();
+                const isTodo = metadata?.type === 'todo.txt';
+
+                // Set title or excerpt
+                if (metadata?.title) {
+                    titleEl.textContent = metadata.title;
+                    el.setAttribute('data-title', metadata.title);
+                } else {
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = html;
+                    const plainText = (tmp.textContent || '').trim();
+                    titleEl.textContent = plainText.length > 60
+                        ? plainText.substring(0, 60) + '...'
+                        : plainText;
+                }
+
+                // Set tags
+                if (metadata?.tags) {
+                    const tags = metadata.tags.replace('[','').replace(']','').split(',');
+                    card.querySelector('.tags').innerHTML = tags.map(t => {
+                        datalist.add(t);
+                        return `<span class="chip">#${t}</span>`;
+                    }).join('');
+                }
+
+                // Mark todo type on the card and update link
+                if (isTodo) {
+                    card.setAttribute('data-type', 'todo');
+                    const link = card.querySelector('.noteLink');
+                    if (link) link.href = link.href + '?type=todo';
+                }
+
+                // Store rendered HTML for the view page (kept hidden for search)
+                el.innerHTML = html;
+            }
+
+            // Filter by active tab
+            document.querySelectorAll('.note-card').forEach(card => {
+                const type = card.getAttribute('data-type');
+                if (activeTab === 'notes' && type === 'todo') {
+                    card.style.display = 'none';
+                } else if (activeTab === 'todos' && type !== 'todo') {
+                    card.style.display = 'none';
+                }
+            });
+
+            datalist.forEach(value => {
+                const option = document.createElement('option');
+                option.value = `#${value}`;
+                document.getElementById('noteTags').appendChild(option);
+            });
+            if (typeof hljs !== 'undefined') hljs.highlightAll();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', processNotes);
+        } else {
+            await processNotes();
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</div>

@@ -1,0 +1,6 @@
+{
+    "tasks": {
+        "dev": "deno run --allow-env --allow-net --allow-read --unstable-kv main.js",
+        "test": "deno test --allow-env --allow-net --allow-read --unstable-kv tests/"
+    }
+}

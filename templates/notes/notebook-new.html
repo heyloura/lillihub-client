@@ -1,0 +1,34 @@
+<div class="container mt-2">
+    <noscript>
+        <p class="mt-2 mb-2"><mark>Notes require JavaScript for client-side encryption.</mark></p>
+    </noscript>
+    <div id="enter_notes_key" class="mt-2 mb-2" style="display:none;">
+        <p>Enter your secret key to access your notes.</p>
+        <div class="input-group">
+            <input id="notes_key" type="text" class="form-input" placeholder="Micro.blog Key">
+            <button class="btn btn-glossy-orange" id="saveKeyBtn"><i class="bi bi-save"></i></button>
+        </div>
+    </div>
+    <div id="notebook_form" style="display:none;">
+        <h5>New Notebook</h5>
+        <form method="POST" action="/notebook/add">
+            <div class="input-group mt-2">
+                <input type="text" name="name" class="form-input" placeholder="Notebook name..." required autofocus>
+                <button type="submit" class="btn btn-glossy-orange"><i class="bi bi-plus"></i> Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="module">
+    import { importNotesKey } from '/scripts/crypto.js';
+    const key = await importNotesKey();
+    if (key) {
+        document.getElementById('notebook_form').style.display = 'block';
+    } else {
+        document.getElementById('enter_notes_key').style.display = 'block';
+    }
+    document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
+        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        window.location.reload();
+    });
+</script>

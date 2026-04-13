@@ -1,0 +1,17 @@
+{
+    "items": [
+        {
+            "id": 1,
+            "content_html": "<p>A test note.</p>",
+            "content_text": "encrypted-text-placeholder",
+            "date_published": "2024-01-01T12:00:00+00:00",
+            "date_modified": "2024-01-01T12:00:00+00:00",
+            "_microblog": {
+                "is_shared": false
+            }
+        }
+    ],
+    "_microblog": {
+        "notebook": { "name": "Personal" }
+    }
+}

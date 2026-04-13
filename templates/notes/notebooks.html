@@ -1,0 +1,39 @@
+<div class="container mt-2">
+    {{errorBanner}}
+    <noscript>
+        <p class="mt-2 mb-2"><mark>Notes require JavaScript for client-side encryption.</mark></p>
+    </noscript>
+    <div id="enter_notes_key" class="mt-2 mb-2" style="display:none;">
+        <p>Notes are encrypted in the browser before sending them to the server, so neither Lillihub nor Micro.blog sees the note text.</p>
+        <p>Enter your secret key to access your notes. The key is saved in your browser's local storage and is never sent to Lillihub.</p>
+        <div class="input-group">
+            <input id="notes_key" type="text" class="form-input" placeholder="Micro.blog Key">
+            <button class="btn btn-glossy-orange" id="saveKeyBtn"><i class="bi bi-save"></i></button>
+        </div>
+        <div id="hide_notes_key" style="display:none;">
+            <p class="mt-2"><button class="btn btn-link" id="clearKeyBtn"><i class="bi bi-trash"></i> Clear your secret key</button></p>
+        </div>
+    </div>
+    <div id="notebooks_content" style="display:none;">
+        {{notebooks}}
+    </div>
+</div>
+<script type="module">
+    import { importNotesKey } from '/scripts/crypto.js';
+    const key = await importNotesKey();
+    if (key) {
+        document.getElementById('enter_notes_key').style.display = 'none';
+        document.getElementById('hide_notes_key').style.display = 'block';
+        document.getElementById('notebooks_content').style.display = 'block';
+    } else {
+        document.getElementById('enter_notes_key').style.display = 'block';
+    }
+    document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
+        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        window.location.href = '/notes';
+    });
+    document.getElementById('clearKeyBtn')?.addEventListener('click', () => {
+        localStorage.setItem('notes_key', '');
+        window.location.href = '/notes';
+    });
+</script>

@@ -1,0 +1,3 @@
+Lillihub is my personal micro.blog client that I share with others. It celebrates server-rendered HTML, progressive enhancement, and conversation-centric reading. It goes beyond what micro.blog offeres with enhanced encrypted notes and tying together micro.blog features in a unified workflow. It does this by using as little client side JavaScript as possible, streaming HTML, and relying on the power of HTML and CSS wherever possible. The UI is fun and nostalgic and since its a PWA it can be used on-the-go on a phone.
+
+No huge frameworks, no bloated libraries, simple templating.

@@ -1,0 +1,135 @@
+<div class="container editor-page">
+    <form class="editor-form" action="/post/{{editOrAdd}}" method="POST" enctype="multipart/form-data">
+        <input name="destination" type="hidden" value="{{mpDestination}}">
+        {{editInput}}
+
+        <div class="editor-toolbar">
+            <div class="editor-toolbar-left">
+                {{destinationDropdown}}
+            </div>
+            <div class="editor-toolbar-right">
+                {{categoriesDropdown}}
+                {{syndicatesDropdown}}
+            </div>
+        </div>
+
+        <input class="form-input editor-title" name="name" type="text" placeholder="Title (optional)" value="{{title}}">
+
+        <label class="editor-upload-label {{btnClass}}" hidden>
+            <i class="bi bi-image"></i> Attach image
+            <input type="file" accept="image/*" class="editor-file-input">
+        </label>
+
+        <textarea id="editor-content" class="form-input editor-textarea" name="content" placeholder="Write here...">{{image}}{{quoteback}}{{content}}{{bookPost}}</textarea>
+
+        <div class="editor-footer">
+            <select class="form-select editor-status" name="status">
+                <option value="publish" {{publishSelected}}>Publish</option>
+                <option value="draft" {{draftSelected}}>Draft</option>
+            </select>
+            <button type="submit" class="btn {{btnClass}}">Save</button>
+        </div>
+    </form>
+</div>
+<script>
+(function() {
+    var ta = document.getElementById('editor-content');
+    if (!ta) return;
+
+    // Show image upload button (hidden without JS)
+    var uploadLabel = document.querySelector('.editor-upload-label');
+    if (uploadLabel) {
+        uploadLabel.removeAttribute('hidden');
+        var fileInput = uploadLabel.querySelector('.editor-file-input');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length > 0) uploadImage(fileInput.files[0]);
+                fileInput.value = '';
+            });
+        }
+    }
+
+    // Auto-grow textarea
+    function autoGrow() {
+        ta.style.height = 'auto';
+        ta.style.height = Math.max(ta.scrollHeight, 200) + 'px';
+    }
+    ta.addEventListener('input', autoGrow);
+    autoGrow();
+
+    // Wrap selection with markdown syntax
+    function wrapSelection(before, after) {
+        var start = ta.selectionStart, end = ta.selectionEnd;
+        var text = ta.value;
+        ta.value = text.slice(0, start) + before + text.slice(start, end) + after + text.slice(end);
+        ta.selectionStart = start + before.length;
+        ta.selectionEnd = end + before.length;
+        ta.focus();
+    }
+
+    // Keyboard shortcuts: Ctrl+B = bold, Ctrl+I = italic, Ctrl+K = link
+    ta.addEventListener('keydown', function(e) {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        if (e.key === 'b') { e.preventDefault(); wrapSelection('**', '**'); }
+        if (e.key === 'i') { e.preventDefault(); wrapSelection('_', '_'); }
+        if (e.key === 'k') { e.preventDefault(); wrapSelection('[', '](url)'); }
+    });
+
+    // Drag-drop image upload
+    ta.addEventListener('dragover', function(e) { e.preventDefault(); ta.classList.add('dragover'); });
+    ta.addEventListener('dragleave', function() { ta.classList.remove('dragover'); });
+    ta.addEventListener('drop', function(e) {
+        e.preventDefault();
+        ta.classList.remove('dragover');
+        var files = e.dataTransfer.files;
+        for (var i = 0; i < files.length; i++) {
+            if (!files[i].type.startsWith('image/')) continue;
+            uploadImage(files[i]);
+        }
+    });
+
+    // Paste image upload
+    ta.addEventListener('paste', function(e) {
+        var items = e.clipboardData && e.clipboardData.items;
+        if (!items) return;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.startsWith('image/')) {
+                e.preventDefault();
+                uploadImage(items[i].getAsFile());
+            }
+        }
+    });
+
+    function uploadImage(file) {
+        var dest = document.querySelector('input[name="destination"]').value;
+        var placeholder = '![Uploading...]()';
+        var pos = ta.selectionStart;
+        ta.value = ta.value.slice(0, pos) + placeholder + ta.value.slice(pos);
+        autoGrow();
+
+        var fd = new FormData();
+        fd.append('destination', dest);
+        fd.append('media', file, file.name);
+        fetch('/media/upload', { method: 'POST', body: fd })
+            .then(function(r) { return r.text(); })
+            .then(function(url) {
+                ta.value = ta.value.replace(placeholder, '![](' + url + ')');
+                autoGrow();
+            })
+            .catch(function() {
+                ta.value = ta.value.replace(placeholder, '');
+                autoGrow();
+            });
+    }
+
+    // Tab key inserts spaces instead of changing focus
+    ta.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            var start = ta.selectionStart;
+            ta.value = ta.value.slice(0, start) + '    ' + ta.value.slice(ta.selectionEnd);
+            ta.selectionStart = ta.selectionEnd = start + 4;
+        }
+    });
+})();
+</script>

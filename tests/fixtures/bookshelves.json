@@ -1,0 +1,7 @@
+{
+    "items": [
+        { "id": 1, "title": "Want to read" },
+        { "id": 2, "title": "Reading now" },
+        { "id": 3, "title": "Finished" }
+    ]
+}

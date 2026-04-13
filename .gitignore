@@ -1,0 +1,13 @@
+# Editor / tool configs
+.vscode/
+.claude/
+
+# Secrets
+.env
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Dependencies (none currently, but just in case)
+node_modules/

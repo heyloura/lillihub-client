@@ -1,0 +1,47 @@
+<div class="container mt-2">
+    <div style="text-align:center;">
+        <img style="max-width:200px;border-radius:8px;" src="{{image}}" alt="{{title}} bookcover">
+        <h5 class="mt-2">{{title}}</h5>
+        <p class="tile-subtitle">{{authors}}</p>
+    </div>
+
+    <div class="mt-2" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <a href="/post?book={{titleEncoded}}&authors={{authorsEncoded}}&shelf={{shelfEncoded}}&link={{linkEncoded}}" class="btn btn-glossy-red btn-sm"><i class="bi bi-pencil-square"></i> Create Post</a>
+    </div>
+
+    <div class="mt-2 pt-2" style="border-top:1px solid var(--border);">
+        <h6>Update cover image</h6>
+        <form method="POST" action="/book/change">
+            <input type="hidden" name="id" value="{{id}}">
+            <input type="hidden" name="shelfId" value="{{shelfId}}">
+            <div class="input-group mt-2">
+                <input name="location" class="form-input" type="url" placeholder="Image URL...">
+                <button type="submit" class="btn btn-glossy-red"><i class="bi bi-image"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mt-2 pt-2" style="border-top:1px solid var(--border);">
+        <h6>Move to shelf</h6>
+        <form method="POST" action="/book/move">
+            <input type="hidden" name="id" value="{{id}}">
+            <input type="hidden" name="shelfId" value="{{shelfId}}">
+            <ul style="list-style:none;padding:0;" class="mt-2">
+                {{shelfList}}
+            </ul>
+            <button type="submit" class="btn btn-glossy-red btn-sm mt-2"><i class="bi bi-arrow-right-circle"></i> Move</button>
+        </form>
+    </div>
+
+    <div class="mt-2 pt-2" style="border-top:1px solid var(--border);">
+        <details>
+            <summary class="btn btn-glossy-red btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Remove from shelf</summary>
+            <form method="POST" action="/book/remove" class="mt-2">
+                <input type="hidden" name="id" value="{{id}}">
+                <input type="hidden" name="shelfId" value="{{shelfId}}">
+                <p style="font-size:0.85rem;color:var(--overlay-1);">This will remove the book from this shelf.</p>
+                <button type="submit" class="btn btn-glossy-red btn-sm">Confirm Remove</button>
+            </form>
+        </details>
+    </div>
+</div>

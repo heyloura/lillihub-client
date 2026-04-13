@@ -1,0 +1,89 @@
+<script src="https://cdn.jsdelivr.net/npm/showdown@2.0.3/dist/showdown.min.js" defer></script>
+<div class="container">
+    <div id="enter_notes_key" class="mt-2 mb-2" style="display:none;">
+        <p>Enter your secret key to access your notes.</p>
+        <div class="input-group">
+            <input id="notes_key" type="text" class="form-input" placeholder="Micro.blog Key">
+            <button class="btn btn-glossy-orange" id="saveKeyBtn"><i class="bi bi-save"></i></button>
+        </div>
+    </div>
+    <div id="note_view" style="display:none;">
+        <div class="mt-2 mb-2" style="display:flex;gap:0.5rem;align-items:center;">
+            <a href="/notes/{{notebookId}}/update?id={{noteId}}" class="btn btn-glossy-orange btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+            {{sharedChip}}
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <p class="tile-title" id="note-title"></p>
+                <small class="tile-subtitle">{{formattedDate}}</small>
+                <span id="note-tags"></span>
+            </div>
+            <div class="card-body">
+                <div id="note-content" class="note {{decryptClass}}">{{content}}</div>
+            </div>
+        </div>
+
+        <div class="mt-2 pt-2" style="border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;">
+            {{versionsButton}}
+            <details style="display:inline;">
+                <summary class="btn btn-glossy-orange btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete</summary>
+                <form method="POST" action="/note/delete" class="mt-2">
+                    <input type="hidden" name="id" value="{{noteId}}" />
+                    <input type="hidden" name="notebookId" value="{{notebookId}}" />
+                    <p style="font-size:0.85rem;color:var(--overlay-1);">This will permanently delete this note.</p>
+                    <button type="submit" class="btn btn-glossy-orange btn-sm">Confirm Delete</button>
+                </form>
+            </details>
+        </div>
+    </div>
+</div>
+<script type="module">
+    import { importNotesKey, decryptWithKey } from '/scripts/crypto.js';
+
+    const key = await importNotesKey();
+    if (key || {{is_shared}}) {
+        document.getElementById('note_view').style.display = 'block';
+    } else {
+        document.getElementById('enter_notes_key').style.display = 'block';
+    }
+
+    document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
+        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        window.location.reload();
+    });
+
+    async function renderNote() {
+        const el = document.getElementById('note-content');
+        if (!el.classList.contains('decryptMe') || !key) return;
+
+        const converter = new showdown.Converter({
+            metadata: true, parseImgDimensions: true, strikethrough: true,
+            tables: true, ghCodeBlocks: true, smoothLivePreview: true,
+            simpleLineBreaks: true, emoji: true,
+        });
+        const markdown = await decryptWithKey(key, el.innerHTML);
+        const html = converter.makeHtml(markdown);
+        const metadata = converter.getMetadata();
+
+        if (metadata?.title) {
+            document.getElementById('note-title').textContent = metadata.title;
+        }
+        if (metadata?.tags) {
+            const tags = metadata.tags.replace('[','').replace(']','').split(',');
+            document.getElementById('note-tags').innerHTML = tags.map(t =>
+                `<span class="chip">#${t}</span>`
+            ).join('');
+        }
+
+        el.innerHTML = html;
+        if (typeof hljs !== 'undefined') hljs.highlightAll();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderNote);
+    } else {
+        await renderNote();
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

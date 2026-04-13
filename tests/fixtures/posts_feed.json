@@ -1,0 +1,53 @@
+{
+    "title": "Test Feed",
+    "items": [
+        {
+            "id": "111",
+            "url": "https://example.com/alice/111",
+            "content_html": "<p>Hello world from Alice. This is a test post with <a href=\"https://example.com\">a link</a>.</p>",
+            "content_text": "Hello world from Alice.",
+            "date_published": "2024-01-01T12:00:00+00:00",
+            "summary": "",
+            "tags": "",
+            "author": {
+                "name": "Alice Example",
+                "avatar": "https://example.com/alice.png",
+                "url": "https://alice.example.com",
+                "_microblog": {
+                    "username": "alice"
+                }
+            },
+            "_microblog": {
+                "date_timestamp": 1704110400,
+                "is_conversation": false,
+                "is_bookmark": false,
+                "is_mention": false,
+                "thumbnail_url": ""
+            }
+        },
+        {
+            "id": "222",
+            "url": "https://example.com/bob/222",
+            "content_html": "<p>Bob's conversational post. <a href=\"https://micro.blog/alice\">@alice</a> what do you think?</p>",
+            "content_text": "Bob's conversational post.",
+            "date_published": "2024-01-02T12:00:00+00:00",
+            "summary": "",
+            "tags": "",
+            "author": {
+                "name": "Bob Example",
+                "avatar": "https://example.com/bob.png",
+                "url": "https://bob.example.com",
+                "_microblog": {
+                    "username": "bob"
+                }
+            },
+            "_microblog": {
+                "date_timestamp": 1704196800,
+                "is_conversation": true,
+                "is_bookmark": false,
+                "is_mention": true,
+                "thumbnail_url": ""
+            }
+        }
+    ]
+}

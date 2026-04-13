@@ -1,0 +1,2566 @@
+/* ==========================================================================
+   Lillihub Base CSS — the app's own design system. Started as a progressive
+   replacement for Spectre.css; Spectre is fully gone now (Phase 4, 2026).
+   Lillihub is dark-mode-only (Phase 6b, 2026 — light mode was removed).
+   ========================================================================== */
+
+/* --- Theme (dark, the only theme) --- */
+:root {
+    color-scheme: dark;
+    --base: #11131a;
+    --on-base: #c6d0f5;
+    --link: #99BEBC;
+    --bg-dark: #08090d;
+    --bg-on-dark: #d1d9f7;
+    --bg-secondary: #0d0f14;
+    --bg-on-secondary: #d1d9f7;
+    --border: #000000;
+    --bg-mantle: #232634;
+
+    --text: #c6d0f5;
+    --subtext-1: #b5bfe2;
+    --overlay-2: #949cbb;
+    --overlay-1: #838ba7;
+
+    --mantle: #292c3c;
+    --crust: #232634;
+
+    --red: #e78284;
+    --redorange: #EB917D;
+    --orange: #ef9f76;
+    --orangeyellow: #EAB483;
+    --yellow: #e5c890;
+    --yellowgreen: #C6CD8D;
+    --green: #a6d189;
+    --greenblue: #99BEBC;
+    --blue: #8caaee;
+    --bluepurple: #A3B3F0;
+    --purple: #babbf1;
+    --purplered: #D19FBB;
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+    scroll-behavior: smooth;
+    scrollbar-color: var(--overlay-1) var(--bg-dark);
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--base);
+}
+img, video { max-width: 100%; height: auto; }
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link); opacity: 0.85; }
+a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
+
+/* --- Landing page (logged-out splash) ---
+   Rendered on / and /discover when there's no user. No sidebar, no nav,
+   just a centered splash with the logo, blurb, and login form. */
+.logged-out .content {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+.landing {
+    width: 100%;
+    max-width: 32rem;
+}
+.landing-inner {
+    background: var(--mantle);
+    border: 1px solid var(--crust);
+    border-radius: 1rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.landing-logo {
+    display: block;
+    margin: 0 auto 0.5rem;
+    width: 120px;
+    height: 120px;
+}
+.landing-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+    color: var(--text);
+}
+.landing-blurb {
+    color: var(--subtext-1);
+    line-height: 1.6;
+    margin: 0 auto 1.75rem;
+    max-width: 26rem;
+}
+.landing-blurb a { color: var(--greenblue); }
+.landing-label {
+    display: block;
+    text-align: left;
+    font-size: 0.85rem;
+    color: var(--overlay-1);
+    margin-bottom: 0.4rem;
+}
+.landing-form {
+    text-align: left;
+}
+.landing-input-row {
+    display: flex;
+    gap: 0.5rem;
+}
+.landing-input-row .form-input {
+    flex: 1;
+    min-width: 0;
+}
+.landing-input-row .btn-glossy {
+    flex-shrink: 0;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--green)),
+        var(--green) 40%,
+        color-mix(in srgb, black 10%, var(--green))) !important;
+    border: 1px solid color-mix(in srgb, black 20%, var(--green)) !important;
+    border-radius: 0.5rem !important;
+    color: var(--crust) !important;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    cursor: pointer;
+    font-weight: 600;
+}
+.landing-input-row .btn-glossy:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--green)),
+        color-mix(in srgb, white 15%, var(--green)) 50%,
+        color-mix(in srgb, white 5%, var(--green))) !important;
+}
+.landing-details {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--overlay-1);
+}
+.landing-details summary {
+    cursor: pointer;
+    padding: 0.25rem 0;
+    list-style: none;
+}
+.landing-details summary::-webkit-details-marker { display: none; }
+.landing-details summary::before {
+    content: "▸ ";
+    font-size: 0.8rem;
+}
+.landing-details[open] summary::before { content: "▾ "; }
+.landing-form-secondary {
+    margin-top: 0.5rem;
+}
+.landing-footer {
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: var(--overlay-1);
+}
+.landing-footer a { color: var(--overlay-2); }
+
+/* --- App Layout --- */
+.app {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    grid-template-rows: 1fr auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    background: var(--base);
+    border-right: 1px solid var(--mantle);
+    overflow-y: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    z-index: 40;
+}
+.sidebar::-webkit-scrollbar { display: none; }
+.sidebar-toggle-checkbox {
+    position: fixed;
+    top: -100px;
+    left: -100px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+.sidebar-action {
+    padding: 0.75rem 0.75rem 0.75rem;
+}
+.sidebar-action a {
+    display: block;
+    text-align: center;
+    padding: 0.45rem 0.75rem;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 10%, var(--purple)));
+    color: var(--base);
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    border: 1px solid color-mix(in srgb, black 20%, var(--purple));
+}
+.sidebar-action a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 5%, var(--purple)));
+    color: var(--base);
+}
+/* Area-colored sidebar action button */
+.area-social .sidebar-action a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--green)),
+        var(--green) 40%,
+        color-mix(in srgb, black 10%, var(--green)));
+    border-color: color-mix(in srgb, black 20%, var(--green));
+}
+.area-social .sidebar-action a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--green)),
+        var(--green) 40%,
+        color-mix(in srgb, black 5%, var(--green)));
+}
+.area-blog .sidebar-action a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--blue)),
+        var(--blue) 40%,
+        color-mix(in srgb, black 10%, var(--blue)));
+    border-color: color-mix(in srgb, black 20%, var(--blue));
+}
+.area-blog .sidebar-action a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--blue)),
+        var(--blue) 40%,
+        color-mix(in srgb, black 5%, var(--blue)));
+}
+.area-notes .sidebar-action a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--orange)),
+        var(--orange) 40%,
+        color-mix(in srgb, black 10%, var(--orange)));
+    border-color: color-mix(in srgb, black 20%, var(--orange));
+}
+.area-notes .sidebar-action a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--orange)),
+        var(--orange) 40%,
+        color-mix(in srgb, black 5%, var(--orange)));
+}
+.area-bookmarks .sidebar-action a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 10%, var(--purple)));
+    border-color: color-mix(in srgb, black 20%, var(--purple));
+}
+.area-bookmarks .sidebar-action a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 5%, var(--purple)));
+}
+.area-bookshelves .sidebar-action a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--red)),
+        var(--red) 40%,
+        color-mix(in srgb, black 10%, var(--red)));
+    border-color: color-mix(in srgb, black 20%, var(--red));
+}
+.area-bookshelves .sidebar-action a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--red)),
+        var(--red) 40%,
+        color-mix(in srgb, black 5%, var(--red)));
+}
+
+/* Sidebar nav — compact list with colored left border accents */
+.sidebar-nav {
+    flex: 1;
+    padding: 0.25rem 0;
+}
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    margin: 0.1rem 0.5rem;
+    border-radius: 0.35rem;
+    border-left: 3px solid transparent;
+    color: var(--overlay-2);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background 0.15s, color 0.15s;
+}
+.sidebar-nav-item:hover {
+    background: rgba(255,255,255,0.06);
+    /* No color override: let the per-area color (.sidebar-nav-green, etc.)
+       show through on hover. Setting `color: var(--text)` here used to wipe
+       the per-area color because :hover is higher specificity than the
+       plain class. */
+}
+.sidebar-nav-item .bi {
+    font-size: 1rem;
+    width: 1.2rem;
+    text-align: center;
+}
+
+/* Color accents — left border + matching text color.
+   The :hover variants are intentionally more specific (.sidebar-nav-item.X:hover)
+   so they beat the global `a:hover` rule on anchor-tag sidebar items. Without
+   the class+class+pseudo specificity, hover would fall through to the global
+   link hover color. */
+.sidebar-nav-green,
+.sidebar-nav-item.sidebar-nav-green:hover { border-left-color: var(--green); color: var(--green); }
+.sidebar-nav-blue,
+.sidebar-nav-item.sidebar-nav-blue:hover { border-left-color: var(--blue); color: var(--blue); }
+.sidebar-nav-purple,
+.sidebar-nav-item.sidebar-nav-purple:hover { border-left-color: var(--purple); color: var(--purple); }
+.sidebar-nav-orange,
+.sidebar-nav-item.sidebar-nav-orange:hover { border-left-color: var(--orange); color: var(--orange); }
+.sidebar-nav-red,
+.sidebar-nav-item.sidebar-nav-red:hover { border-left-color: var(--red); color: var(--red); }
+
+/* Active nav item — colored background glow */
+.sidebar-nav-item.active {
+    font-weight: 600;
+    color: var(--text);
+    background: rgba(255,255,255,0.06);
+}
+.sidebar-nav-green.active {
+    background: color-mix(in srgb, var(--green) 15%, var(--crust));
+    color: var(--green);
+    border-left-width: 3px;
+}
+.sidebar-nav-blue.active {
+    background: color-mix(in srgb, var(--blue) 15%, var(--crust));
+    color: var(--blue);
+}
+.sidebar-nav-purple.active {
+    background: color-mix(in srgb, var(--purple) 15%, var(--crust));
+    color: var(--purple);
+}
+.sidebar-nav-orange.active {
+    background: color-mix(in srgb, var(--orange) 15%, var(--crust));
+    color: var(--orange);
+}
+.sidebar-nav-red.active {
+    background: color-mix(in srgb, var(--red) 15%, var(--crust));
+    color: var(--red);
+}
+
+.sidebar-footer {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--overlay-1);
+    border-top: 1px solid var(--mantle);
+    margin-top: 0.5rem;
+}
+.sidebar-footer a { color: var(--overlay-2); text-decoration: none; }
+.sidebar-footer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 0;
+}
+.sidebar-user span.avatar { flex-shrink: 0; }
+
+/* Overflow menu in the sidebar footer — browser-native <details>/<summary>.
+   The summary is the "⋯" button, the <ul> is the popup. The menu pops UP
+   from the footer (bottom: 100%) so it doesn't get clipped by the viewport
+   edge since the sidebar footer sits at the bottom of the screen. */
+.sidebar-footer-menu {
+    position: relative;
+    flex-shrink: 0;
+}
+.sidebar-footer-menu summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    color: var(--overlay-2);
+    font-size: 1.1rem;
+    line-height: 1;
+}
+.sidebar-footer-menu summary::-webkit-details-marker { display: none; }
+.sidebar-footer-menu summary:hover { background: var(--mantle); }
+.sidebar-footer-menu[open] summary { background: var(--mantle); }
+.sidebar-footer-menu ul {
+    position: absolute;
+    bottom: calc(100% + 0.25rem);
+    right: 0;
+    min-width: 10rem;
+    list-style: none;
+    margin: 0;
+    padding: 0.4rem 0;
+    background: var(--mantle);
+    border: 1px solid var(--crust);
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    z-index: 50;
+}
+.sidebar-footer-menu li { padding: 0.25rem 0.75rem; }
+.sidebar-footer-menu li a { display: block; color: var(--text); }
+.sidebar-footer-menu li a:hover { color: var(--purple); }
+.sidebar-footer-menu li small { color: var(--overlay-1); }
+
+/* --- Main Content Area --- */
+.main {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+}
+
+/* Page nav — spans full width, right-aligned items */
+.page-nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--base);
+    border-bottom: 1px solid var(--mantle);
+    padding: 0.5rem 1.5rem;
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    justify-content: flex-end;
+    overflow-x: auto;
+}
+.page-nav a {
+    white-space: nowrap;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.5rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background 0.15s;
+}
+.page-nav a:hover { background: var(--mantle); }
+.area-social .page-nav a { color: var(--greenblue); }
+.area-social .page-nav a:hover { color: var(--greenblue); }
+.page-nav a.active {
+    font-weight: 600;
+    color: var(--base);
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+/* Area-colored glossy active nav buttons */
+.area-social .page-nav a.active {
+    background: color-mix(in srgb, var(--green) 15%, var(--crust));
+    color: var(--green);
+    border-left-width: 3px;
+}
+.area-blog .page-nav a.active {
+    background: 
+    color-mix(in srgb, var(--blue) 15%, var(--crust));
+        color: var(--blue);
+}
+.area-bookmarks .page-nav a { color: var(--purple); }
+.area-bookmarks .page-nav a:hover { color: var(--purple); }
+.area-bookmarks .page-nav a.active {
+    background: color-mix(in srgb, var(--purple) 15%, var(--crust));
+    color: var(--purple);
+}
+.area-notes .page-nav a { color: var(--orange); }
+.area-notes .page-nav a:hover { color: var(--orange); }
+.area-notes .page-nav a.active {
+    background: color-mix(in srgb, var(--orange) 15%, var(--crust));
+    color: var(--orange);
+}
+.area-bookshelves .page-nav a.active {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--red)),
+        var(--red) 40%,
+        color-mix(in srgb, black 10%, var(--red)));
+}
+.area-bookshelves .card-header-actions .btn-link {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--red)),
+        var(--red) 40%,
+        color-mix(in srgb, black 10%, var(--red))) !important;
+    border-color: color-mix(in srgb, black 20%, var(--red)) !important;
+}
+.area-bookshelves .card-header-actions .btn-link,
+.area-bookshelves .card-header-actions .btn-glossy-red {
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+}
+/* The Add-Book button on discover books is wrapped in a <form>; the form
+   needs matching display, alignment, AND height so its child button lines up
+   with the other .btn-link siblings in the action row. */
+.area-bookshelves .card-header-actions form {
+    display: inline-flex;
+    align-items: center;
+    height: 2rem;
+}
+
+.content {
+    max-width: calc(100vw - 190px - 20em);
+    margin: 0px auto;
+}
+
+/* --- Decorative right area --- */
+.main::after {
+    content: "";
+    display: block;
+}
+/* On wide screens, show decorative gradients */
+@media (min-width: 1060px) {
+    /* .main {
+        background: linear-gradient(
+            to right,
+            var(--base) 0,
+            var(--base) 740px,
+            color-mix(in srgb, var(--purple) 5%, var(--base)) 740px,
+            color-mix(in srgb, var(--purplered) 3%, var(--base)) 100%
+        );
+    } */
+    .sidebar {
+        background: var(--base);
+    }
+}
+
+/* --- Bottom Nav (mobile only) --- */
+.bottom-nav {
+    display: none;
+}
+
+/* --- FAB (mobile primary action) --- */
+.fab {
+    display: none;
+}
+
+/* --- Cards (post cards) --- */
+.card {
+    border: 0;
+    border-bottom: 1px solid var(--mantle);
+    padding: 1rem 0;
+}
+.card:first-child { padding-top: 0.5rem; }
+.card-header {
+    margin-bottom: 0.5rem;
+}
+
+/* Scroll-snap container for header (swipe to reveal actions on mobile) */
+.card-header-scroll {
+    display: flex;
+    align-items: center;
+}
+.card-header-main {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Desktop: actions hidden, revealed on hover */
+.card-header-actions {
+    opacity: 0;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+}
+.card-header-scroll:hover .card-header-actions,
+.card-header-actions:focus-within {
+    opacity: 1;
+}
+/* Glossy green action buttons */
+.card-header-actions.btn-group .btn {
+    border-radius: 0.5rem;
+}
+.btn-glossy,
+.card-header-actions .btn-link {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--green)),
+        var(--green) 40%,
+        color-mix(in srgb, black 10%, var(--green))) !important;
+    border: 1px solid color-mix(in srgb, black 20%, var(--green)) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.35rem 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    color: var(--crust) !important;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+.btn-glossy *,
+.card-header-actions .btn-link * { color: inherit !important; }
+/* Hover state — big bright gradient lift. opacity: 1 is important because
+   the anchor-tag variants (<a class="btn btn-link">) would otherwise pick up
+   `a:hover { opacity: 0.85 }` and end up looking dimmer than their
+   button-tag siblings, breaking visual parity between the two markup forms.
+   Default hover uses green (social area); per-area overrides follow below. */
+.btn-glossy:hover,
+.card-header-actions .btn-link:hover,
+.card-header-actions .inline-action:hover button.btn-link,
+.card-header-actions form:hover button.btn-link {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--green)),
+        color-mix(in srgb, white 15%, var(--green)) 50%,
+        color-mix(in srgb, white 5%, var(--green))) !important;
+    color: var(--crust) !important;
+    opacity: 1 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.5) !important;
+}
+/* Per-area hover overrides — each area's action buttons hover to the area
+   accent color. Defined after the default so they win the cascade. Selectors
+   match the same set (button AND <a> AND form-wrapped button). */
+.area-bookshelves .btn-glossy:hover,
+.area-bookshelves .card-header-actions .btn-link:hover,
+.area-bookshelves .card-header-actions .inline-action:hover button.btn-link,
+.area-bookshelves .card-header-actions form:hover button.btn-glossy-red,
+.area-bookshelves .card-header-actions form:hover button.btn-link {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--red)),
+        color-mix(in srgb, white 15%, var(--red)) 50%,
+        color-mix(in srgb, white 5%, var(--red))) !important;
+}
+.area-bookmarks .btn-glossy:hover,
+.area-bookmarks .card-header-actions .btn-link:hover,
+.area-bookmarks .card-header-actions .inline-action:hover button.btn-link,
+.area-bookmarks .card-header-actions form:hover button.btn-link {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--purple)),
+        color-mix(in srgb, white 15%, var(--purple)) 50%,
+        color-mix(in srgb, white 5%, var(--purple))) !important;
+}
+.area-notes .btn-glossy:hover,
+.area-notes .card-header-actions .btn-link:hover,
+.area-notes .card-header-actions .inline-action:hover button.btn-link,
+.area-notes .card-header-actions form:hover button.btn-link {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--orange)),
+        color-mix(in srgb, white 15%, var(--orange)) 50%,
+        color-mix(in srgb, white 5%, var(--orange))) !important;
+}
+.area-blog .btn-glossy:hover,
+.area-blog .card-header-actions .btn-link:hover,
+.area-blog .card-header-actions .inline-action:hover button.btn-link,
+.area-blog .card-header-actions form:hover button.btn-link {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--blue)),
+        color-mix(in srgb, white 15%, var(--blue)) 50%,
+        color-mix(in srgb, white 5%, var(--blue))) !important;
+}
+.card-body {
+    overflow-wrap: anywhere;
+    display: flow-root;
+}
+
+/* Glossy blue action buttons (blog area) */
+.btn-glossy-blue {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--blue)),
+        var(--blue) 40%,
+        color-mix(in srgb, black 10%, var(--blue))) !important;
+    border: 1px solid color-mix(in srgb, black 20%, var(--blue)) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.35rem 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    color: var(--crust) !important;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: inherit;
+    line-height: 1.4;
+    display: inline-block;
+}
+.btn-glossy-blue * { color: inherit !important; }
+.btn-glossy-blue:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--blue)),
+        var(--blue) 40%,
+        color-mix(in srgb, black 5%, var(--blue))) !important;
+    color: var(--crust) !important;
+}
+.btn-glossy-blue.btn-sm {
+    font-size: 0.85rem;
+    padding: 0.2rem 0.4rem;
+}
+.input-group .btn-glossy-blue {
+    border-radius: 0 0.5rem 0.5rem 0 !important;
+    flex: 0 0 auto;
+}
+
+/* Glossy purple action buttons (bookmarks area) */
+.btn-glossy-purple {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 10%, var(--purple))) !important;
+    border: 1px solid color-mix(in srgb, black 20%, var(--purple)) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.35rem 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    color: var(--crust) !important;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: inherit;
+    line-height: 1.4;
+    display: inline-block;
+}
+.btn-glossy-purple * { color: inherit !important; }
+.btn-glossy-purple:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 5%, var(--purple))) !important;
+    color: var(--crust) !important;
+}
+.btn-glossy-purple.btn-sm {
+    font-size: 0.85rem;
+    padding: 0.2rem 0.4rem;
+}
+.input-group .btn-glossy-purple {
+    border-radius: 0 0.5rem 0.5rem 0 !important;
+    flex: 0 0 auto;
+}
+
+.btn-glossy-red {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--red)),
+        var(--red) 40%,
+        color-mix(in srgb, black 10%, var(--red))) !important;
+    border: 1px solid color-mix(in srgb, black 20%, var(--red)) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.35rem 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    color: var(--crust) !important;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.btn-glossy-red * { color: inherit !important; }
+.btn-glossy-red:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--red)),
+        var(--red) 40%,
+        color-mix(in srgb, black 5%, var(--red))) !important;
+    color: var(--crust) !important;
+}
+.btn-glossy-red.btn-sm {
+    font-size: 0.85rem;
+    padding: 0.2rem 0.4rem;
+}
+.input-group .btn-glossy-red {
+    border-radius: 0 0.5rem 0.5rem 0 !important;
+    flex: 0 0 auto;
+}
+
+/* Bookmark page */
+.bookmark-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+.bookmark-tags .chip { cursor: pointer; }
+.bookmark-tags .chip.active {
+    background: var(--purple);
+    color: var(--base);
+}
+.bookmark-tags .chip.active a { color: var(--base); }
+.bookmark-tag-chip {
+    background: color-mix(in srgb, var(--purple) 20%, var(--mantle));
+    color: var(--purple);
+    font-size: 0.75rem;
+}
+.bookmark-highlight-chip {
+    background: var(--yellow);
+    color: var(--crust);
+}
+
+/* Glossy orange action buttons (notes area) */
+.btn-glossy-orange {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--orange)),
+        var(--orange) 40%,
+        color-mix(in srgb, black 10%, var(--orange))) !important;
+    border: 1px solid color-mix(in srgb, black 20%, var(--orange)) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.35rem 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    color: var(--crust) !important;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: inherit;
+    line-height: 1.4;
+    display: inline-block;
+}
+.btn-glossy-orange * { color: inherit !important; }
+.btn-glossy-orange:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--orange)),
+        var(--orange) 40%,
+        color-mix(in srgb, black 5%, var(--orange))) !important;
+    color: var(--crust) !important;
+}
+.btn-glossy-orange.btn-sm {
+    font-size: 0.85rem;
+    padding: 0.2rem 0.4rem;
+}
+.input-group .btn-glossy-orange {
+    border-radius: 0 0.5rem 0.5rem 0 !important;
+    flex: 0 0 auto;
+}
+
+/* Blog toolbar */
+.blog-toolbar-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+/* --- Media page --- */
+.media-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 0.25rem;
+    display: block;
+}
+.media-thumb.media-file {
+    background: var(--crust);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--overlay-1);
+}
+.media-url {
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+    margin: 0;
+}
+.media-alt {
+    font-size: 0.8rem;
+    color: var(--overlay-1);
+    margin: 0.25rem 0 0;
+    padding: 1em;
+}
+.media-file-input {
+    padding: 0.25rem !important;
+}
+
+/* --- Editor page --- */
+.editor-page { max-width: 720px; }
+.editor-form { display: flex; flex-direction: column; gap: 0.5rem; }
+.editor-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+}
+.editor-toolbar-left { display: flex; align-items: center; gap: 0.5rem; }
+.editor-toolbar-right { display: flex; align-items: center; gap: 0.5rem; }
+.editor-dest-label { font-weight: 600; padding: 0.35rem 0; }
+.editor-title { font-size: 1rem; }
+.editor-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    width: fit-content;
+    padding: 0.25rem 0.5rem;
+}
+.editor-file-input { display: none; }
+.editor-textarea {
+    min-height: 50vh;
+    resize: vertical;
+    font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    overflow: hidden;
+}
+.editor-textarea.dragover {
+    border-color: var(--blue);
+    background: color-mix(in srgb, var(--blue) 5%, var(--mantle));
+}
+.editor-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+.editor-status { width: auto; }
+.editor-checklist {
+    max-height: 300px;
+    overflow-y: auto;
+    min-width: 200px;
+}
+.editor-checklist label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.mini_cover {
+    width: 100px !important;
+    max-width: 100px !important;
+    max-height: none !important;
+    height: auto !important;
+    float: left;
+    margin: 0.5em 1em 0.5em 0 !important;
+    object-fit: contain !important;
+    display: inline !important;
+    padding-left: 0;
+}
+.card-body p { margin: 0.6rem 0; max-width: 60ch; }
+.card-body p:first-child { margin-top: 0; }
+.card-footer {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: var(--overlay-1);
+}
+
+/* --- Tiles (avatar + text + action rows) --- */
+.tile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.tile-icon { flex-shrink: 0; }
+.tile-content {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.tile-title { font-weight: 600; }
+.tile-subtitle {
+    font-size: 1rem;
+    color: var(--overlay-1);
+}
+.tile-action { flex-shrink: 0; }
+
+/* Small visual hint next to usernames we don't follow. Kept subtle and
+   unobtrusive — it's a reminder that the follow action is available, not a
+   call to action. */
+.follow-hint {
+    display: inline-block;
+    margin-left: 0.2rem;
+    padding: 0 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--overlay-1);
+    line-height: 1.2;
+    vertical-align: middle;
+}
+
+/* --- Avatars --- */
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--mantle);
+    flex-shrink: 0;
+}
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.avatar         { width: 2.5rem; height: 2.5rem; }
+.avatar-sm      { width: 1.5rem; height: 1.5rem; }
+.avatar-lg      { width: 3rem;   height: 3rem; }
+.avatar-xl      { width: 4.5rem; height: 4.5rem; }
+/* "new" badge on avatar — green dot upper-right */
+.avatar.badge {
+    position: relative;
+    overflow: visible;
+}
+.avatar.badge img {
+    border-radius: 50%;
+}
+.avatar.badge::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 10px; height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+    border: 2px solid var(--base);
+    z-index: 1;
+}
+
+/* --- Buttons --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--mantle);
+    border-radius: 0.25rem;
+    background: var(--mantle);
+    color: var(--text);
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.4;
+    transition: background 0.15s;
+}
+.btn:hover { background: var(--crust); }
+.btn-primary {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 10%, var(--purple)));
+    border-color: color-mix(in srgb, black 20%, var(--purple));
+    color: var(--base);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.btn-primary:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 5%, var(--purple)));
+    color: var(--base);
+}
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--link);
+    padding: 0.2rem 0.4rem;
+}
+.btn-link:hover { background: var(--mantle); }
+.btn-group {
+    display: inline-flex;
+    gap: 0;
+}
+.inline-action {
+    /* inline-block so the form has its own hover hit area matching the button.
+       Without this, :hover on the form (and on .card-header-actions .btn-link
+       through it) was unreliable on the small action buttons. */
+    display: inline-block;
+}
+.inline-action button {
+    position: relative;
+}
+/* Spinner on submit — :focus persists from click until redirect */
+.inline-action button:focus > * {
+    visibility: hidden;
+}
+.inline-action button:focus::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.5s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-group .btn { border-radius: 0; }
+.btn-group .btn:first-child { border-radius: 0.25rem 0 0 0.25rem; }
+.btn-group .btn:last-child { border-radius: 0 0.25rem 0.25rem 0; }
+.card-header-actions.btn-group .btn,
+.card-header-actions.btn-group .btn:first-child,
+.card-header-actions.btn-group .btn:last-child { border-radius: 0.5rem; }
+
+/* --- Forms --- */
+.form-input, .form-select {
+    display: block;
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--crust);
+    border-radius: 0.25rem;
+    background: var(--mantle);
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.4;
+}
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--purple);
+}
+textarea.form-input {
+    resize: vertical;
+    min-height: 4rem;
+}
+
+/* Placeholder text — use the theme's hint color (overlay-1) instead of the
+   browser default grey, which clashes with the dark theme. Applies to every
+   input, textarea, and search box across the app. */
+input::placeholder,
+textarea::placeholder {
+    color: var(--overlay-1);
+    opacity: 1; /* Firefox dims placeholders by default; normalize. */
+}
+
+/* Input group — flex row with joined input + button */
+.input-group {
+    display: flex;
+}
+.input-group .form-input {
+    flex: 1 1 auto;
+    border-radius: 0.5rem 0 0 0.5rem;
+    border-right: none;
+    padding: 0.35rem 0.5rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    background: var(--mantle) !important;
+    color: var(--text);
+    border: 1px solid var(--crust) !important;
+}
+.input-group .form-input:focus {
+    outline: none;
+    border-color: var(--green);
+    background: var(--surface-2);
+}
+.input-group .btn-glossy {
+    border-radius: 0 0.5rem 0.5rem 0 !important;
+    flex: 0 0 auto;
+}
+
+/* --- Labels, Chips, Badges --- */
+.label {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    background: var(--mantle);
+    color: var(--text);
+    font-size: 0.75rem;
+}
+.label-rounded { border-radius: 1rem; }
+span.badge { position: relative; }
+span.badge::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+}
+.label-success { background: var(--mantle); color: var(--green); }
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 1rem;
+    background: var(--mantle);
+    font-size: 0.75rem;
+    transition: background 0.15s;
+}
+/* Chips with a link inside are clickable (tagmoji chips, bookmark tag chips)
+   — show a hover state so users know they're interactive. */
+.chip:has(a):hover {
+    background: color-mix(in srgb, white 10%, var(--mantle));
+}
+.chip.active {
+    background: var(--green);
+    color: var(--base);
+}
+.chip.active a { color: var(--base); }
+.discover-heading {
+    color: var(--green);
+    font-weight: 700;
+    font-size: 1.25rem !important;
+}
+
+/* --- Dropdowns --- */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+.dropdown .menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 160px;
+    background: var(--crust);
+    border: 1px solid var(--mantle);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.dropdown-right .menu { left: auto; right: 0; }
+.dropdown:hover .menu,
+.dropdown:focus-within .menu {
+    display: block;
+}
+
+/* --- Menu (sidebar nav lists) --- */
+.menu {
+    list-style: none;
+    padding: 0;
+}
+.menu-item a {
+    display: block;
+    padding: 0.3rem 0.6rem;
+    color: var(--text);
+    text-decoration: none;
+}
+.menu-item a:hover { background: var(--mantle); }
+.menu-item a.active { font-weight: bold; background: var(--crust); }
+.menu-item .btn-block {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.3rem 0.6rem;
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+}
+.menu-item .btn-block:hover { background: var(--mantle); }
+
+/* --- Tabs --- */
+.tab {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid var(--mantle);
+    list-style: none;
+}
+.tab-block .tab-item { flex: 1 0 0; text-align: center; }
+.tab-item a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    color: var(--overlay-1);
+    text-decoration: none;
+}
+.tab-item a:hover { color: var(--text); }
+.tab-item.active a {
+    border-bottom-color: var(--green);
+    color: var(--green);
+    font-weight: 600;
+}
+.area-notes .tab-item.active a {
+    border-bottom-color: var(--orange);
+    color: var(--orange);
+}
+
+/* --- Todo List --- */
+.todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.todo-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+}
+.todo-item input[type="checkbox"] {
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+    accent-color: var(--orange);
+}
+.todo-item.done .todo-text {
+    text-decoration: line-through;
+    color: var(--overlay-1);
+}
+.todo-text {
+    cursor: pointer;
+    flex: 1;
+    word-break: break-word;
+}
+.todo-priority-a { color: var(--red); font-weight: 600; }
+.todo-priority-b { color: var(--orange); font-weight: 600; }
+.todo-priority-c { color: var(--yellow); font-weight: 600; }
+.todo-context { color: var(--blue); }
+.todo-project { color: var(--green); }
+.todo-searchable { cursor: pointer; }
+.todo-searchable:hover { text-decoration: underline; }
+.todo-dialog {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--base);
+    color: var(--text);
+    padding: 1.5rem;
+    max-width: 500px;
+    width: 90vw;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+}
+.todo-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+.todo-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- User Profile --- */
+.user-profile {
+    text-align: center;
+    padding: 1rem 0;
+}
+.user-profile .avatar-xl img {
+    border-radius: 50%;
+}
+.user-profile-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+.user-profile-pronouns {
+    color: var(--overlay-1);
+    font-size: 0.85rem;
+}
+.user-profile-bio {
+    margin-top: 0.5rem;
+    max-width: 40ch;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--subtext-1);
+}
+.user-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+/* On the user profile, the follow button and gear dropdown live right under
+   the bio. The glossy button style is too loud for secondary actions on a
+   content-first page — override to a subtle outline look so the user's
+   content leads and actions recede. */
+.user-actions .btn-glossy,
+.user-actions .btn-glossy:hover {
+    background: transparent !important;
+    border: 1px solid var(--mantle) !important;
+    color: var(--overlay-2) !important;
+    box-shadow: none !important;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.9rem;
+}
+.user-actions .btn-glossy:hover {
+    border-color: var(--overlay-1) !important;
+    color: var(--text) !important;
+}
+.user-actions .btn-glossy * { color: inherit !important; }
+
+/* --- Reply form (inline, no iframe) --- */
+.reply-form {
+    margin-top: 0.5rem;
+    width: 100%;
+}
+.reply-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+.reply-checkboxes label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    /* Let ridiculously long usernames (cross-instance mastodon handles, etc.)
+       break mid-word rather than overflowing the reply form on mobile. */
+    overflow-wrap: anywhere;
+}
+.reply-avatar {
+    border-radius: 50%;
+    vertical-align: middle;
+}
+.reply-form textarea {
+    min-height: 5rem;
+    margin-bottom: 0.5rem;
+}
+.reply-form-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+/* Spinner on reply submit */
+.reply-form button[type="submit"] {
+    position: relative;
+}
+.reply-form button[type="submit"]:focus > * {
+    visibility: hidden;
+}
+.reply-form button[type="submit"]:focus::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 2px solid var(--base);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.5s linear infinite;
+}
+
+/* Reply-sent confirmation — green flash via ?replied= query param */
+.card.replied {
+    animation: replySent 2s ease-out;
+}
+@keyframes replySent {
+    0% { background-color: color-mix(in srgb, var(--green) 15%, var(--base)); }
+    100% { background-color: transparent; }
+}
+
+/* --- Conversations --- */
+.comments {
+    margin-top: 1em;
+}
+/* Inline reply cards in a post's comment thread. Uses the full post-card
+   shell (card-header / card-body / card-footer) so the visual rhythm matches
+   top-level posts. Uses a lighter raised surface than the main post so the
+   reply cards pop forward visually; an indent nests them under the parent. */
+.card-reply {
+    background: var(--bg-dark) !important;
+    border: 1px solid var(--crust) !important;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    padding-left: 1em;
+    padding-right: 1em;
+}
+.card-reply .card-header { margin-bottom: 0.4rem; }
+.card-reply .card-footer { margin-top: 0.4rem; }
+.card-reply:last-child { margin-bottom: 0.25rem; }
+
+/* --- Images in posts --- */
+.card-body img, .card-body video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+.card-body img {
+    max-height: 70vh;
+    object-fit: cover;
+    width: auto;
+    max-width: 100%;
+}
+.card-body video {
+    max-height: 70vh;
+    object-fit: contain;
+}
+.small-img {
+    width: unset !important;
+    height: unset !important;
+    margin-left: 0 !important;
+    max-width: 100% !important;
+    max-height: unset !important;
+    object-fit: unset !important;
+}
+.post-img {
+    max-height: 500px;
+    object-fit: cover;
+}
+
+/* Image carousel (scroll-snap) */
+.image-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--overlay-1) var(--bg-dark);
+    max-width: 100%;
+}
+.image-carousel-item {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+}
+.image-carousel-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 70vh;
+    object-fit: cover;
+}
+
+/* --- Pagination --- */
+.paging {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    gap: 0.5rem;
+}
+.paging a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--green)),
+        var(--green) 40%,
+        color-mix(in srgb, black 10%, var(--green)));
+    border: 1px solid color-mix(in srgb, black 20%, var(--green));
+    color: var(--crust);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.paging a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 22%, var(--green)),
+        var(--green) 40%,
+        color-mix(in srgb, black 5%, var(--green)));
+    color: var(--crust);
+    opacity: 1;
+}
+.paging a[disabled] {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* Per-area paging button colors — each area's paging link matches its accent
+   color. Defined after the default so they win the cascade. */
+.area-bookmarks .paging a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--purple)),
+        var(--purple) 40%,
+        color-mix(in srgb, black 10%, var(--purple)));
+    border-color: color-mix(in srgb, black 20%, var(--purple));
+}
+.area-bookmarks .paging a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--purple)),
+        color-mix(in srgb, white 15%, var(--purple)) 50%,
+        color-mix(in srgb, white 5%, var(--purple)));
+}
+.area-blog .paging a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--blue)),
+        var(--blue) 40%,
+        color-mix(in srgb, black 10%, var(--blue)));
+    border-color: color-mix(in srgb, black 20%, var(--blue));
+}
+.area-blog .paging a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--blue)),
+        color-mix(in srgb, white 15%, var(--blue)) 50%,
+        color-mix(in srgb, white 5%, var(--blue)));
+}
+.area-bookshelves .paging a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--red)),
+        var(--red) 40%,
+        color-mix(in srgb, black 10%, var(--red)));
+    border-color: color-mix(in srgb, black 20%, var(--red));
+}
+.area-bookshelves .paging a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--red)),
+        color-mix(in srgb, white 15%, var(--red)) 50%,
+        color-mix(in srgb, white 5%, var(--red)));
+}
+.area-notes .paging a {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 15%, var(--orange)),
+        var(--orange) 40%,
+        color-mix(in srgb, black 10%, var(--orange)));
+    border-color: color-mix(in srgb, black 20%, var(--orange));
+}
+.area-notes .paging a:hover {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 55%, var(--orange)),
+        color-mix(in srgb, white 15%, var(--orange)) 50%,
+        color-mix(in srgb, white 5%, var(--orange)));
+}
+
+/* --- Utilities --- */
+.hide { display: none !important; }
+.clearfix::after { content: ""; display: table; clear: both; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.m-2  { margin: 0.5rem; }
+.p-2  { padding: 0.5rem; }
+.pt-2 { padding-top: 0.5rem; }
+.d-inline { display: inline; }
+.float-left { float: left; }
+.float-right { float: right; }
+
+/* --- Color utilities --- */
+.bg-secondary { background: var(--bg-dark); }
+
+/* --- Back to timeline link on single post page --- */
+.back-to-timeline {
+    font-size: 0.85rem;
+    text-align: center;
+}
+.back-to-timeline a {
+    color: var(--overlay-1);
+    text-decoration: none;
+}
+.back-to-timeline a:hover {
+    color: var(--text);
+}
+
+/* --- Details/Summary animation --- */
+details summary { cursor: pointer; color: var(--overlay-1); }
+details[open] summary ~ * { animation: fadeIn 0.3s; }
+@keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+}
+
+/* --- Comments details --- */
+.comments details > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    list-style: none;
+}
+.comments details > summary::-webkit-details-marker { display: none; }
+.comments details > summary::before {
+    content: "\25B6";
+    font-size: 0.55em;
+    transition: transform 0.2s;
+}
+.comments details[open] > summary::before {
+    transform: rotate(90deg);
+}
+.comments details[open]:not(.reply-details):last-of-type { position: relative; }
+.comments details[open]:not(.reply-details):last-of-type > summary::after {
+    content: "Close comments";
+    position: absolute;
+    bottom: -0.2em;
+    right: 10px;
+    font-size: 0.8em;
+}
+
+/* Glossy green badge on comment avatars */
+.comments .avatar-sm.badge::after {
+    width: 8px; height: 8px;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, white 30%, var(--green)),
+        var(--green) 50%,
+        color-mix(in srgb, black 10%, var(--green)));
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35);
+    top: -2px; right: -2px;
+    border-width: 1.5px;
+}
+
+/* Earlier comments link — styled to match details>summary look */
+.earlier-comments {
+    margin: 0.5rem 0;
+}
+details .earlier-comments {
+    text-align: center;
+}
+.earlier-comments a {
+    color: var(--overlay-1);
+    font-size: 1rem;
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: none;
+    cursor: pointer;
+}
+.earlier-comments a:hover {
+    background: none;
+    text-decoration: underline;
+    opacity: 0.85;
+}
+
+/* --- Misc carried over --- */
+.bi { font-size: 1.25em; }
+hr {
+    border: 0;
+    border-top: 1px solid var(--mantle);
+    margin: 1.4rem 0;
+}
+pre, code {
+    font-size: 0.85rem;
+}
+pre {
+    overflow-x: auto;
+    max-width: 100%;
+}
+blockquote {
+    border-left: 3px solid var(--mantle);
+    padding-left: 1rem;
+    color: var(--overlay-2);
+    margin: 0.5rem 0;
+}
+table, th, td {
+    border: 1px solid var(--crust);
+    overflow-wrap: anywhere;
+}
+table { border-collapse: collapse; }
+td { padding: 0.2rem; }
+h1 { font-size: 1.2rem; font-weight: 700; }
+h2 { font-size: 1rem; font-weight: 600; }
+h3 { font-size: 0.9rem; font-weight: 600; }
+p { margin: 0.6rem 0; }
+
+/* --- Loading overlay --- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 500;
+}
+.overlay > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 501;
+}
+.loading::after {
+    border: 2px solid var(--purple);
+    border-top-color: var(--purplered);
+    border-right-color: var(--purplered);
+}
+
+/* --- Reply iframe --- */
+.replyIframe {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 70%;
+}
+
+/* --- Fadeout mask --- */
+.fadeout {
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+
+/* ==========================================================================
+   Responsive — Mobile
+   ========================================================================== */
+@media (max-width: 768px) {
+    .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+    }
+
+    /* Sidebar: off-screen, toggled by checkbox */
+    .sidebar {
+        position: fixed;
+        left: -240px;
+        top: 0;
+        width: 220px;
+        height: 100vh;
+        height: 100dvh;
+        z-index: 300;
+        transition: left 0.25s ease;
+        padding-top: 0.75rem;
+        background: var(--base);
+    }
+    .sidebar-action {
+        padding-top: 0.5rem;
+    }
+    #sidebar-toggle:checked ~ .sidebar {
+        left: 0;
+    }
+    #sidebar-toggle:checked ~ .sidebar-overlay {
+        display: block;
+    }
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 299;
+        cursor: pointer;
+    }
+
+    .main {
+        grid-column: 1;
+        background: var(--base) !important;
+    }
+    .content {
+        max-width: 100%;
+        padding: 1em;
+        width: 100%;
+    }
+
+    /* Full-bleed images on mobile */
+    .card-body img, .card-body video, .image-carousel {
+        max-width: 100vw;
+        margin-left: calc(-1rem) !important;
+        width: calc(100% + 2rem);
+    }
+    .card {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    .card-body img {
+        width: 100vw;
+        max-width: 100vw;
+    }
+    .paging {
+        padding: 1rem;
+        padding-bottom: 5rem;
+    }
+
+    /* Page nav hidden on mobile (shown in top bar) */
+    .page-nav {
+        display: none;
+        margin-left: 0;
+        padding-left: 1rem;
+        max-width: none;
+    }
+
+    /* Top nav bar on mobile — matches desktop page-nav style */
+    .bottom-nav {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: var(--base);
+        border-bottom: 1px solid var(--mantle);
+        z-index: 100;
+        padding: 0.5rem 0;
+        align-items: center;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+    .bottom-nav::-webkit-scrollbar { display: none; }
+    .bottom-nav-links {
+        display: flex;
+        flex: 1;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.25rem;
+        padding: 0 0.5rem;
+        align-items: center;
+    }
+    .bottom-nav-links::-webkit-scrollbar { display: none; }
+    .bottom-nav a, .bottom-nav label {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.85rem;
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.35rem 0.75rem;
+        cursor: pointer;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: background 0.15s;
+    }
+    .bottom-nav a:hover, .bottom-nav label:hover { background: var(--mantle); }
+    .area-social .bottom-nav a { color: var(--greenblue); }
+    .area-blog .bottom-nav a { color: var(--blue); }
+    .bottom-nav a.active {
+        font-weight: 600;
+        color: var(--base);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .area-social .bottom-nav a.active {
+        background: color-mix(in srgb, var(--green) 15%, var(--crust));
+        color: var(--green);
+        border-left-width: 3px;
+    }
+    .area-blog .bottom-nav a.active {
+        background: 
+            color-mix(in srgb, var(--blue) 15%, var(--crust));
+                color: var(--blue);
+    }
+    .area-bookmarks .bottom-nav a { color: var(--purple); }
+    .area-bookmarks .bottom-nav a.active {
+        background: color-mix(in srgb, var(--purple) 15%, var(--crust));
+        color: var(--purple);
+    }
+    .area-notes .bottom-nav a { color: var(--orange); }
+    .area-notes .bottom-nav a.active {
+        background: color-mix(in srgb, var(--orange) 15%, var(--crust));
+        color: var(--orange);
+    }
+    .area-bookshelves .bottom-nav a.active {
+        background: linear-gradient(180deg, color-mix(in srgb, white 15%, var(--red)), var(--red) 40%, color-mix(in srgb, black 10%, var(--red)));
+    }
+    .bottom-nav .bi { font-size: 1rem; }
+
+    /* Swipe-to-reveal actions on mobile */
+    .card-header-scroll {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .card-header-scroll::-webkit-scrollbar { display: none; }
+    .card-header-scroll:has(.dropdown:focus-within) {
+        overflow: visible;
+    }
+    .card-header-main {
+        flex: 0 0 100%;
+        scroll-snap-align: start;
+    }
+    .card-header-actions {
+        flex: 0 0 auto;
+        scroll-snap-align: end;
+        opacity: 1;
+        padding: 0.25rem 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    /* FAB visible on mobile */
+    .fab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1rem;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        background: var(--purple);
+        color: var(--base);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        z-index: 99;
+        text-decoration: none;
+        font-size: 1.5rem;
+    }
+    .fab:hover { opacity: 0.9; }
+    .area-social .fab {
+        background: linear-gradient(180deg,
+            color-mix(in srgb, white 15%, var(--green)),
+            var(--green) 40%,
+            color-mix(in srgb, black 10%, var(--green)));
+    }
+    .area-blog .fab {
+        background: linear-gradient(180deg,
+            color-mix(in srgb, white 15%, var(--blue)),
+            var(--blue) 40%,
+            color-mix(in srgb, black 10%, var(--blue)));
+    }
+    .area-bookmarks .fab {
+        background: linear-gradient(180deg,
+            color-mix(in srgb, white 15%, var(--purple)),
+            var(--purple) 40%,
+            color-mix(in srgb, black 10%, var(--purple)));
+    }
+    .area-notes .fab {
+        background: linear-gradient(180deg,
+            color-mix(in srgb, white 15%, var(--orange)),
+            var(--orange) 40%,
+            color-mix(in srgb, black 10%, var(--orange)));
+    }
+    .area-bookshelves .fab {
+        background: linear-gradient(180deg,
+            color-mix(in srgb, white 15%, var(--red)),
+            var(--red) 40%,
+            color-mix(in srgb, black 10%, var(--red)));
+    }
+
+    /* Hamburger toggle button */
+    .sidebar-toggle-btn {
+        position: fixed;
+        top: 0.75rem;
+        right: 0.75rem;
+        z-index: 50;
+        background: var(--crust);
+        border: 1px solid var(--mantle);
+        border-radius: 0.25rem;
+        padding: 0.4rem 0.6rem;
+        color: var(--text);
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+
+    /* Add padding at top for top nav bar */
+    .content {
+        padding-top: 4rem;
+    }
+
+    /* Swipe-hint chevron on card headers — aligned with action button centers */
+    .card-header-main {
+        position: relative;
+    }
+    .card-header-main::after {
+        content: "\203A";
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        line-height: 1;
+        color: var(--overlay-1);
+        opacity: 0.35;
+        pointer-events: none;
+        padding-right: 0.25rem;
+    }
+
+    .replyIframe {
+        padding-top: 70%;
+    }
+
+    /* Extra bottom padding so FAB doesn't cover Send Reply */
+    .reply-form-actions {
+        padding-bottom: 4rem;
+    }
+}
+
+/* Desktop: larger screens get wider iframe */
+@media (min-width: 769px) {
+    .sidebar-toggle-btn { display: none; }
+    .sidebar-overlay { display: none !important; }
+
+    .replyIframe { padding-top: 56.25%; }
+
+    /* Keep images/video inline with text on desktop */
+    .card-body img, .card-body video {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: auto;
+        max-width: 100%;
+    }
+
+    .image-gallery {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Image gallery */
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+}
+.image-gallery img, .image-gallery video {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* ==========================================================================
+   Toast banners — used by errorBanner() in scripts/server/utilities.js to
+   surface write failures from note/notebook mutation handlers via the
+   ?error= URL param. Render at the top of the page above the content.
+   ========================================================================== */
+.toast {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--mantle);
+    background: var(--bg-secondary);
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+.toast-warning {
+    background: color-mix(in srgb, var(--yellow) 18%, var(--bg-secondary));
+    border-color: var(--yellow);
+}
+.toast-error {
+    background: color-mix(in srgb, var(--red) 18%, var(--bg-secondary));
+    border-color: var(--red);
+}
+.btn-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-left: 0.5rem;
+    border: 0;
+    border-radius: 0.25rem;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+    line-height: 1;
+}
+.btn-clear::before {
+    content: "×";
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+.btn-clear:hover {
+    background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+/* ==========================================================================
+   FORMERLY style.css
+   --------------------------------------------------------------------------
+   Merged into lillihub.css during Phase 6 of the 2.0 refactor. The two files
+   were loaded as separate <style> blocks (lillihub first, style second), so
+   anything below this header was previously the cascade winner over rules
+   above. ~39 classes are defined in BOTH halves; the rules below override
+   their counterparts above. Sub-task C of Phase 6 (or a future cleanup pass)
+   will dedupe these by component.
+   ========================================================================== */
+
+/* Dracula Theme v1.2.5
+ *
+ * https://github.com/dracula/highlightjs
+ *
+ * Copyright 2016-present, All rights reserved
+ *
+ * Code licensed under the MIT license
+ *
+ * @author Denis Ciccale <dciccale@gmail.com>
+ * @author Zeno Rocha <hi@zenorocha.com>
+ */
+
+ .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0.5em;
+    background: #282a36;
+  }
+
+  .hljs-built_in,
+  .hljs-selector-tag,
+  .hljs-section,
+  .hljs-link {
+    color: #8be9fd;
+  }
+
+  .hljs-keyword {
+    color: #ff79c6;
+  }
+
+  .hljs,
+  .hljs-subst {
+    color: #f8f8f2;
+  }
+
+  .hljs-title,
+  .hljs-attr,
+  .hljs-meta-keyword {
+    font-style: italic;
+    color: #50fa7b;
+  }
+
+  .hljs-string,
+  .hljs-meta,
+  .hljs-name,
+  .hljs-type,
+  .hljs-symbol,
+  .hljs-bullet,
+  .hljs-addition,
+  .hljs-variable,
+  .hljs-template-tag,
+  .hljs-template-variable {
+    color: #f1fa8c;
+  }
+
+  .hljs-comment,
+  .hljs-quote,
+  .hljs-deletion {
+    color: #6272a4;
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-literal,
+  .hljs-title,
+  .hljs-section,
+  .hljs-doctag,
+  .hljs-type,
+  .hljs-name,
+  .hljs-strong {
+    font-weight: bold;
+  }
+
+  .hljs-literal,
+  .hljs-number {
+    color: #bd93f9;
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+.bi {
+    font-size: 1.25em;
+}
+html {
+    scroll-behavior: smooth;
+}
+.card-body img, .card-body video, .image-carousel {
+    max-width: calc(100% + (0.8rem * 2));
+    height: auto;
+    margin-left: -0.8rem;
+}
+.image-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+    scrollbar-width: thin;
+}
+.image-carousel-item {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+}
+.image-carousel-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+hr {
+    border:0;
+    border-top: 0.05rem solid var(--mantle);
+    margin-top: 1.4rem;
+}
+.tile-content img, .tile-content video  {
+    width: 100%;
+    height: auto;
+}
+.body-content {
+    margin: 0px auto;
+}
+.card {
+    border: 0;
+    border-bottom: 0.05rem solid var(--mantle);
+    background: var(--base);
+}
+.card pre {
+    width: 100%;
+    overflow: auto;
+}
+.tile .tile-subtitle, .tile .tile-title {
+margin-top: 0rem;
+}
+@media (min-width:960px) {
+    .posts {
+        /*column-count: 3;*/
+        max-width: 760px;
+    }
+}
+.posts {
+    margin-top: 0.4rem;
+}
+summary {
+    color: var(--subtext);
+}
+.comments details[open]:last-of-type {
+    position:relative
+}
+.comments details[open]:last-of-type > summary::after {
+    content: "Close comments";
+    position: absolute;
+    bottom: -0.2em;
+    right: 10px;
+    font-size: 0.8em;
+}
+@keyframes open {
+    0% { opacity: 0 }
+    100% { opacity: 1 }
+}
+@keyframes close {
+    0% { opacity: 1 }
+    100% { opacity: 0 }
+}
+details[open] summary~* {
+    animation: open .5s
+}
+.tile-content, .card-body {
+    overflow-wrap: anywhere;
+}
+.card {
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+.posts .card:first-of-type {
+    margin-top: 0;
+}
+footer, header {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 101;
+    border-top: 0.05rem solid var(--mantle);
+    border-bottom: 0.05rem solid var(--mantle);
+    max-width: 700px;
+}
+header {
+    top: 0%;
+    bottom: unset;
+}
+.small-img {
+    width: unset !important;
+    height: unset !important;
+    margin-left: 0rem !important;
+    max-width: 100% !important;
+}
+.content-page {
+    margin-top: 2rem;
+    margin-bottom: 3.2rem;
+}
+.paging {
+    margin-bottom: 1rem;
+}
+.label-success {
+    background: var(--green);
+}
+.cta-form {
+    max-width: 90%;
+}
+.following-search {
+    max-width: 90%;
+    margin: 0.4rem auto;
+    padding: 1rem;
+}
+.profile {
+    clear: both;
+}
+.menu-item > button {
+    border-radius: .1rem;
+    color: inherit;
+    display: block;
+    margin: 0 -.4rem;
+    padding: .2rem .4rem;
+    text-decoration: none;
+}
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+    grid-auto-rows: minmax(100px, auto);
+}
+.replyIframe {
+    position: relative;overflow: hidden;width: 100%;padding-top: 70%;
+}
+.bottomNav {
+    height: 43px;
+    overflow: hidden;
+}
+.sidebarMenuAction {
+    margin-bottom: 3em;
+}
+@media screen and (min-width: 650px)
+{
+    .post-img {
+        max-height: 500px;
+        margin: 0px auto;
+    }
+    .menuAction {
+        margin-bottom: 3em;
+    }
+    .replyIframe {
+        position: relative;overflow: hidden;width: 100%;padding-top: 56.25%;
+    }
+}
+@media screen and (min-width: 650px)
+{
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.4rem;
+        grid-auto-rows: minmax(100px, auto);
+    }
+}
+.image-gallery img, .image-gallery video {
+    width: 100% !important;
+    height: auto !important;
+}
+body {
+    background: var(--base);
+    color: var(--text);
+}
+.chip {
+    background: var(--mantle);
+}
+.menu {
+    background: var(--mantle);
+}
+.label {
+    background: var(--mantle) !important;
+    color: var(--text) !important;
+}
+.label-success {
+    color: var(--greenblue) !important;
+}
+.tab-item.active a {
+    border-bottom-color: var(--purple) !important;
+    color: var(--purple) !important;
+}
+.tab-item a:hover {
+    color: var(--purplered) !important;
+}
+.bg-secondary {
+    background: var(--mantle) !important;
+}
+.btn {
+    background: var(--mantle);
+    border: .05rem solid var(--purple);
+    color: var(--purple);
+}
+.btn.btn-primary {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: var(--base);
+}
+.form-input {
+    background: var(--mantle);
+    border: .05rem solid var(--crust);
+    color: var(--text);
+}
+.highlight {
+    background-color: var(--yellow);
+    color: black;
+}
+.details-pop-out-form {
+    margin-left: -250px;
+    max-width: 300px;
+    padding: 1em;
+    margin-top: 5px;
+}
+.tab .tab-item a.active, .tab .tab-item.active a {
+    border-bottom-color: var(--purple);
+    color: var(--purple);
+}
+blockquote footer {
+    position: unset;
+}
+pre, pre code  {
+    display: block;
+    max-width: 502px;
+    overflow: auto;
+    margin: 0px auto;
+}
+p {
+    margin: 0.6rem 0 0.6rem 0;
+}
+h1 {
+    font-size: 1rem;
+}
+h2 {
+    font-size: 0.9rem;
+}
+h3 {
+    font-size: 0.8rem;
+}
+
+.editor-toolbar {
+border-top: 0 !important;
+border-left: 0 !important;
+border-right: 0 !important;
+font-size: 0.6rem !important;
+background-color: var(--base) !important;
+border-top-left-radius: 0px !important;
+border-top-right-radius: 0px !important;
+border-bottom: 0.05rem solid var(--mantle) !important;
+}
+.editor-toolbar i.separator {
+display: none !important;
+}
+.editor-toolbar button {
+color: var(--text) !important;
+}
+.editor-toolbar button.active, .editor-toolbar button:hover {
+background: var(--crust)!important;
+border-color: var(--crust)!important;
+color: var(--text)!important;
+}
+@media (max-height: 500px) {
+.app-footer, .app-header {
+display: none;
+}
+.content-page {
+margin-top: 0rem;
+margin-bottom: 0rem;
+}
+}
+.form-select:not([multiple]):not([size]) {
+    background: var(--mantle) url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='var(--color)'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") no-repeat right .35rem center/.4rem .5rem;
+    padding-right: 1.2rem;
+}
+.form-select {
+    background: var(--mantle);
+    border: .05rem solid var(--crust);
+}
+.menu .menu-item > a {
+    margin: 0;
+}
+.card-body {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+table, th, td {
+    border: .05rem solid var(--crust) !important;
+    overflow-wrap: anywhere;
+  }
+  table {
+    border-collapse: collapse;
+  }
+td {
+    padding: 0.2rem;
+}
+.loading::after {
+    border: .1rem solid var(--purple);
+        border-top-color: var(--purplered);
+        border-right-color: var(--purplered);
+}
+
+.mini_cover {
+    width: 100px !important;
+    float: left;
+    margin: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,.5);
+    z-index: 500;
+}
+
+.overlay > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 501;
+}
+.fadeout {
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+.hide {
+    display: none !important;
+}
+div.tile-action.btn-group > a {
+    margin-top: -2px;
+}
+.menu-item>a:hover{background:var(--crust);color:var(--purplered)}
+previewbox-link {
+    margin-top: 1em;
+    max-width: 445px;
+}

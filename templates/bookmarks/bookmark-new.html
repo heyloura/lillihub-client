@@ -1,0 +1,10 @@
+<div class="container mt-2">
+    <h5>New Bookmark</h5>
+    <form method="POST" action="/bookmarks/new">
+        <input type="hidden" name="redirect" value="true" />
+        <label class="mt-2">URL</label>
+        <input class="form-input mt-2" type="url" name="url" placeholder="https://..." required autofocus />
+        {{tagField}}
+        <button type="submit" class="btn btn-glossy-purple mt-2"><i class="bi bi-bookmark-plus"></i> Add Bookmark</button>
+    </form>
+</div>

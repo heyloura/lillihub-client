@@ -1,0 +1,37 @@
+{
+    "title": "Conversation",
+    "items": [
+        {
+            "id": "222",
+            "url": "https://example.com/bob/222",
+            "content_html": "<p>Bob's original post in the conversation.</p>",
+            "content_text": "Bob's original post.",
+            "date_published": "2024-01-02T12:00:00+00:00",
+            "author": {
+                "name": "Bob Example",
+                "avatar": "https://example.com/bob.png",
+                "_microblog": { "username": "bob" }
+            },
+            "_microblog": {
+                "date_timestamp": 1704196800,
+                "is_conversation": true
+            }
+        },
+        {
+            "id": "223",
+            "url": "https://example.com/alice/223",
+            "content_html": "<p>Alice's thoughtful reply to Bob.</p>",
+            "content_text": "Alice's reply.",
+            "date_published": "2024-01-02T13:00:00+00:00",
+            "author": {
+                "name": "Alice Example",
+                "avatar": "https://example.com/alice.png",
+                "_microblog": { "username": "alice" }
+            },
+            "_microblog": {
+                "date_timestamp": 1704200400,
+                "is_conversation": true
+            }
+        }
+    ]
+}

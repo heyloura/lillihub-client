@@ -1,0 +1,23 @@
+<div class="card card-reply mt-2" id="{{id}}">
+    <div class="card-header">
+        <div class="card-header-scroll">
+            <div class="card-header-main">
+                <div class="tile">
+                    <div class="tile-icon">
+                        <figure class="avatar avatar-lg"><img src="{{avatar}}" alt="Avatar" loading="lazy" height="48" width="48"></figure>
+                    </div>
+                    <div class="tile-content">
+                        <p class="tile-title">
+                            {{name}}<br/><small class="tile-subtitle"><a href="/user/{{username}}">@{{username}}</a>{{followMarker}}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-header-actions">{{newLabel}}</div>
+        </div>
+    </div>
+    <div class="card-body">{{content}}</div>
+    <div class="card-footer">
+        <small>{{formattedDate}}</small>
+    </div>
+</div>

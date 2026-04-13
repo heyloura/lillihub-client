@@ -1,0 +1,20 @@
+<div class="container">
+    <div class="user-profile">
+        <figure class="avatar avatar-xl"><img loading="lazy" src="{{avatar}}" alt="{{name}} Avatar" height="72" width="72"></figure>
+        <div class="user-profile-name">{{name}}</div>
+        <div class="user-profile-pronouns">{{pronouns}}</div>
+        <div class="user-profile-bio">{{bio}}</div>
+        <div class="user-actions mt-2">
+            {{HMTLUserActionDropdown}}
+        </div>
+    </div>
+    <ul class="tab tab-block">
+        <li class="tab-item {{postsActive}}">
+            <a href="/user/{{username}}">Posts</a>
+        </li>
+        <li class="tab-item {{photosActive}}">
+            <a href="/user/photos/{{username}}">Photos</a>
+        </li>
+    </ul>
+</div>
+{{feed}}

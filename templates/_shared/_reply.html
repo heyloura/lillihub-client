@@ -1,0 +1,14 @@
+<details class="tile-subtitle mb-2 mt-2 reply-details" {{open}}>
+    <summary class="c-hand">Reply</summary>
+    <form method="POST" action="/replies/add" class="reply-form inline-action">
+        <input type="hidden" name="id" value="{{id}}" />
+        <input type="hidden" name="redirect" value="{{redirect}}" />
+        <div class="reply-checkboxes">
+            {{checkboxes}}
+        </div>
+        <textarea class="form-input" name="content" placeholder="Write a reply..." rows="3"></textarea>
+        <div class="reply-form-actions">
+            <button type="submit" class="btn btn-primary">Send Reply</button>
+        </div>
+    </form>
+</details>
