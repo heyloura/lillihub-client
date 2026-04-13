@@ -88,5 +88,6 @@ export async function getMicroBlogLoggedInUser(access_token) {
             "Accept": "application/json"
         }
     });
+    if (!fetching.ok) return { error: true };
     return await fetching.json();
 }

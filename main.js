@@ -55,7 +55,14 @@ async function handler(req) {
     // 4) Try each route group in order; first non-null Response wins
     for (const tryRoute of ROUTE_GROUPS) {
         const res = await tryRoute(req, ctx);
-        if (res) return res;
+        if (res) {
+            // If the auth cookie was stale/invalid, expire it so the browser
+            // drops it and the user sees the login page cleanly next request.
+            if (ctx.clearCookie) {
+                res.headers.append('set-cookie', 'atoken=; Max-Age=0; Path=/; SameSite=Lax; Secure; HttpOnly');
+            }
+            return res;
+        }
     }
 
     // 5) Nothing matched
