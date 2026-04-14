@@ -120,10 +120,12 @@ function _pageHead(title, redirect) {
     <link rel="icon" type="image/x-icon" href="https://lillihub.com/favicon.ico">
     <link rel="apple-touch-icon" href="/lillihub-512.png">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="theme-color" content="#11131a">
+    <meta name="theme-color" content="#11131a" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#eff1f5" media="(prefers-color-scheme: light)">
     <meta name="apple-mobile-web-app-title" content="Lillihub">
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="mobile-web-app-capable" content="yes">
+    <script>(function(){try{var t=localStorage.getItem('lh-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]:not([media])')||document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('content',t==='light'?'#eff1f5':'#11131a');if(!m.parentNode)document.head.appendChild(m);}}catch(e){}})();</script>
     <style>${_lillihub}</style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <title>${title}</title>
@@ -205,6 +207,12 @@ ${FabAction(area, title, context)}
                     <ul>
                         <li><a href="/logout">Logout</a></li>
                         <li><a href="https://github.com/heyloura/lillihub-client">Github</a></li>
+                        <li class="theme-picker-label"><small>Theme</small></li>
+                        <li class="theme-picker">
+                            <button type="button" class="theme-picker-btn" data-theme-choice="system"><i class="bi bi-circle-half"></i> System</button>
+                            <button type="button" class="theme-picker-btn" data-theme-choice="light"><i class="bi bi-sun"></i> Light</button>
+                            <button type="button" class="theme-picker-btn" data-theme-choice="dark"><i class="bi bi-moon-stars"></i> Dark</button>
+                        </li>
                         <li><small>v2.0</small></li>
                         <li><small>Built with ♥ by <a href="https://heyloura.com">Loura</a></small></li>
                     </ul>

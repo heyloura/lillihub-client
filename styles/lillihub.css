@@ -1,10 +1,15 @@
 /* ==========================================================================
    Lillihub Base CSS — the app's own design system. Started as a progressive
    replacement for Spectre.css; Spectre is fully gone now (Phase 4, 2026).
-   Lillihub is dark-mode-only (Phase 6b, 2026 — light mode was removed).
+   Light mode returned in 2026-04: follows OS preference by default and can
+   be overridden by the user via [data-theme="light"|"dark"] on <html>.
    ========================================================================== */
 
-/* --- Theme (dark, the only theme) --- */
+/* --- Theme tokens ---
+   Dark is the default (historical look). Light overrides live in the
+   @media (prefers-color-scheme: light) block and the [data-theme="light"]
+   block further down. Shadow/surface tokens are defined alongside the
+   palette so both modes can retune contrast. */
 :root {
     color-scheme: dark;
     --base: #11131a;
@@ -37,6 +42,122 @@
     --bluepurple: #A3B3F0;
     --purple: #babbf1;
     --purplered: #D19FBB;
+
+    --shadow-sm-soft: 0 1px 3px rgba(0,0,0,0.2);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-md-strong: 0 2px 8px rgba(0,0,0,0.5);
+    --shadow-lg-soft: 0 4px 12px rgba(0,0,0,0.15);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-xl: 0 4px 20px rgba(0,0,0,0.4);
+    --inset-highlight: inset 0 1px 0 rgba(255,255,255,0.2);
+    --inset-highlight-md: inset 0 1px 0 rgba(255,255,255,0.35);
+    --inset-highlight-strong: inset 0 1px 0 rgba(255,255,255,0.5);
+    --surface-subtle: rgba(255,255,255,0.06);
+    --scrim: rgba(0,0,0,0.5);
+    --scrim-soft: rgba(0,0,0,0.4);
+    --on-scrim: #fff;
+}
+
+/* Light-mode palette (Catppuccin Latte-ish). Applied via OS preference
+   unless the user has explicitly chosen dark, OR when [data-theme="light"]
+   is set on <html>. */
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --base: #eff1f5;
+        --on-base: #4c4f69;
+        --link: #179299;
+        --bg-dark: #e6e9ef;
+        --bg-on-dark: #4c4f69;
+        --bg-secondary: #e6e9ef;
+        --bg-on-secondary: #4c4f69;
+        --border: #bcc0cc;
+        --bg-mantle: #e6e9ef;
+
+        --text: #4c4f69;
+        --subtext-1: #5c5f77;
+        --overlay-2: #6c6f85;
+        --overlay-1: #7c7f93;
+
+        --mantle: #e6e9ef;
+        --crust: #dce0e8;
+
+        --red: #d20f39;
+        --redorange: #e64553;
+        --orange: #fe640b;
+        --orangeyellow: #e88339;
+        --yellow: #df8e1d;
+        --yellowgreen: #a0a73c;
+        --green: #40a02b;
+        --greenblue: #179299;
+        --blue: #1e66f5;
+        --bluepurple: #7287fd;
+        --purple: #8839ef;
+        --purplered: #ea76cb;
+
+        --shadow-sm-soft: 0 1px 3px rgba(0,0,0,0.08);
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+        --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+        --shadow-md-strong: 0 2px 8px rgba(0,0,0,0.2);
+        --shadow-lg-soft: 0 4px 12px rgba(0,0,0,0.08);
+        --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+        --shadow-xl: 0 4px 20px rgba(0,0,0,0.12);
+        --inset-highlight: inset 0 1px 0 rgba(255,255,255,0.5);
+        --inset-highlight-md: inset 0 1px 0 rgba(255,255,255,0.6);
+        --inset-highlight-strong: inset 0 1px 0 rgba(255,255,255,0.7);
+        --surface-subtle: rgba(0,0,0,0.04);
+        --scrim: rgba(0,0,0,0.4);
+        --scrim-soft: rgba(0,0,0,0.3);
+    }
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+    --base: #eff1f5;
+    --on-base: #4c4f69;
+    --link: #179299;
+    --bg-dark: #e6e9ef;
+    --bg-on-dark: #4c4f69;
+    --bg-secondary: #e6e9ef;
+    --bg-on-secondary: #4c4f69;
+    --border: #bcc0cc;
+    --bg-mantle: #e6e9ef;
+
+    --text: #4c4f69;
+    --subtext-1: #5c5f77;
+    --overlay-2: #6c6f85;
+    --overlay-1: #7c7f93;
+
+    --mantle: #e6e9ef;
+    --crust: #dce0e8;
+
+    --red: #d20f39;
+    --redorange: #e64553;
+    --orange: #fe640b;
+    --orangeyellow: #e88339;
+    --yellow: #df8e1d;
+    --yellowgreen: #a0a73c;
+    --green: #40a02b;
+    --greenblue: #179299;
+    --blue: #1e66f5;
+    --bluepurple: #7287fd;
+    --purple: #8839ef;
+    --purplered: #ea76cb;
+
+    --shadow-sm-soft: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+    --shadow-md-strong: 0 2px 8px rgba(0,0,0,0.2);
+    --shadow-lg-soft: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+    --shadow-xl: 0 4px 20px rgba(0,0,0,0.12);
+    --inset-highlight: inset 0 1px 0 rgba(255,255,255,0.5);
+    --inset-highlight-md: inset 0 1px 0 rgba(255,255,255,0.6);
+    --inset-highlight-strong: inset 0 1px 0 rgba(255,255,255,0.7);
+    --surface-subtle: rgba(0,0,0,0.04);
+    --scrim: rgba(0,0,0,0.4);
+    --scrim-soft: rgba(0,0,0,0.3);
 }
 
 /* --- Reset & Base --- */
@@ -78,7 +199,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     border-radius: 1rem;
     padding: 2.5rem 2rem;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    box-shadow: var(--shadow-xl);
 }
 .landing-logo {
     display: block;
@@ -127,7 +248,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     border-radius: 0.5rem !important;
     color: var(--crust) !important;
     padding: 0.5rem 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm), var(--inset-highlight);
     cursor: pointer;
     font-weight: 600;
 }
@@ -213,7 +334,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     font-weight: 600;
     font-size: 1rem;
     text-decoration: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm), var(--inset-highlight);
     border: 1px solid color-mix(in srgb, black 20%, var(--purple));
 }
 .sidebar-action a:hover {
@@ -309,7 +430,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     transition: background 0.15s, color 0.15s;
 }
 .sidebar-nav-item:hover {
-    background: rgba(255,255,255,0.06);
+    background: var(--surface-subtle);
     /* No color override: let the per-area color (.sidebar-nav-green, etc.)
        show through on hover. Setting `color: var(--text)` here used to wipe
        the per-area color because :hover is higher specificity than the
@@ -341,7 +462,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 .sidebar-nav-item.active {
     font-weight: 600;
     color: var(--text);
-    background: rgba(255,255,255,0.06);
+    background: var(--surface-subtle);
 }
 .sidebar-nav-green.active {
     background: color-mix(in srgb, var(--green) 15%, var(--crust));
@@ -412,19 +533,51 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     bottom: calc(100% + 0.25rem);
     right: 0;
     min-width: 10rem;
+    max-width: 180px;
     list-style: none;
     margin: 0;
     padding: 0.4rem 0;
     background: var(--mantle);
     border: 1px solid var(--crust);
     border-radius: 0.25rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    box-shadow: var(--shadow-lg);
     z-index: 50;
 }
 .sidebar-footer-menu li { padding: 0.25rem 0.75rem; }
 .sidebar-footer-menu li a { display: block; color: var(--text); }
 .sidebar-footer-menu li a:hover { color: var(--purple); }
 .sidebar-footer-menu li small { color: var(--overlay-1); }
+
+/* Theme picker (three-way: System / Light / Dark). The active choice gets
+   a subtle colored background via [aria-pressed="true"], set client-side
+   from the persisted preference. */
+.theme-picker { display: flex; gap: 0.2rem; }
+.theme-picker-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    background: none;
+    border: 1px solid var(--crust);
+    border-radius: 0.25rem;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.3rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.theme-picker-btn .bi { font-size: 0.8rem; }
+.theme-picker-btn:hover { color: var(--purple); border-color: var(--purple); }
+.theme-picker-btn[aria-pressed="true"] {
+    background: color-mix(in srgb, var(--purple) 20%, var(--mantle));
+    border-color: var(--purple);
+    color: var(--purple);
+}
 
 /* --- Main Content Area --- */
 .main {
@@ -463,7 +616,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     font-weight: 600;
     color: var(--base);
     border: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm-soft), var(--inset-highlight);
 }
 /* Area-colored glossy active nav buttons */
 .area-social .page-nav a.active {
@@ -596,7 +749,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     border: 1px solid color-mix(in srgb, black 20%, var(--green)) !important;
     border-radius: 0.5rem !important;
     padding: 0.35rem 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm), var(--inset-highlight);
     color: var(--crust) !important;
     transition: background 0.15s, box-shadow 0.15s;
 }
@@ -617,7 +770,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
         color-mix(in srgb, white 5%, var(--green))) !important;
     color: var(--crust) !important;
     opacity: 1 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.5) !important;
+    box-shadow: var(--shadow-md-strong), var(--inset-highlight-strong) !important;
 }
 /* Per-area hover overrides — each area's action buttons hover to the area
    accent color. Defined after the default so they win the cascade. Selectors
@@ -673,7 +826,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     border: 1px solid color-mix(in srgb, black 20%, var(--blue)) !important;
     border-radius: 0.5rem !important;
     padding: 0.35rem 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm), var(--inset-highlight);
     color: var(--crust) !important;
     text-decoration: none;
     cursor: pointer;
@@ -707,7 +860,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     border: 1px solid color-mix(in srgb, black 20%, var(--purple)) !important;
     border-radius: 0.5rem !important;
     padding: 0.35rem 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm), var(--inset-highlight);
     color: var(--crust) !important;
     text-decoration: none;
     cursor: pointer;
@@ -740,7 +893,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     border: 1px solid color-mix(in srgb, black 20%, var(--red)) !important;
     border-radius: 0.5rem !important;
     padding: 0.35rem 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm), var(--inset-highlight);
     color: var(--crust) !important;
     text-decoration: none;
     cursor: pointer;
@@ -796,7 +949,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     border: 1px solid color-mix(in srgb, black 20%, var(--orange)) !important;
     border-radius: 0.5rem !important;
     padding: 0.35rem 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm), var(--inset-highlight);
     color: var(--crust) !important;
     text-decoration: none;
     cursor: pointer;
@@ -1033,7 +1186,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     border-color: color-mix(in srgb, black 20%, var(--purple));
     color: var(--base);
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm-soft), var(--inset-highlight);
 }
 .btn-primary:hover {
     background: linear-gradient(180deg,
@@ -1073,7 +1226,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     margin: auto;
     width: 0.9rem;
     height: 0.9rem;
-    border: 2px solid #fff;
+    border: 2px solid var(--on-scrim);
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 0.5s linear infinite;
@@ -1205,7 +1358,7 @@ span.badge::after {
     border-radius: 0.25rem;
     padding: 0.25rem 0;
     z-index: 100;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-lg-soft);
 }
 .dropdown-right .menu { left: auto; right: 0; }
 .dropdown:hover .menu,
@@ -1314,7 +1467,7 @@ span.badge::after {
     margin: 0;
 }
 .todo-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--scrim);
 }
 .todo-dialog-header {
     display: flex;
@@ -1447,7 +1600,7 @@ span.badge::after {
     background: var(--bg-dark) !important;
     border: 1px solid var(--crust) !important;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    box-shadow: var(--shadow-sm);
     padding-left: 1em;
     padding-right: 1em;
 }
@@ -1528,7 +1681,7 @@ span.badge::after {
         color-mix(in srgb, black 10%, var(--green)));
     border: 1px solid color-mix(in srgb, black 20%, var(--green));
     color: var(--crust);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-sm), var(--inset-highlight);
 }
 .paging a:hover {
     background: linear-gradient(180deg,
@@ -1666,7 +1819,7 @@ details[open] summary ~ * { animation: fadeIn 0.3s; }
         color-mix(in srgb, white 30%, var(--green)),
         var(--green) 50%,
         color-mix(in srgb, black 10%, var(--green)));
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35);
+    box-shadow: var(--shadow-sm), var(--inset-highlight-md);
     top: -2px; right: -2px;
     border-width: 1.5px;
 }
@@ -1728,7 +1881,7 @@ p { margin: 0.6rem 0; }
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: var(--scrim);
     z-index: 500;
 }
 .overlay > span {
@@ -1792,7 +1945,7 @@ p { margin: 0.6rem 0; }
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.4);
+        background: var(--scrim-soft);
         z-index: 299;
         cursor: pointer;
     }
@@ -1882,7 +2035,7 @@ p { margin: 0.6rem 0; }
     .bottom-nav a.active {
         font-weight: 600;
         color: var(--base);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+        box-shadow: var(--shadow-sm-soft), var(--inset-highlight);
     }
     .area-social .bottom-nav a.active {
         background: color-mix(in srgb, var(--green) 15%, var(--crust));
@@ -1947,7 +2100,7 @@ p { margin: 0.6rem 0; }
         border-radius: 50%;
         background: var(--purple);
         color: var(--base);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        box-shadow: var(--shadow-md);
         z-index: 99;
         text-decoration: none;
         font-size: 1.5rem;
@@ -2132,34 +2285,70 @@ p { margin: 0.6rem 0; }
  * @author Zeno Rocha <hi@zenorocha.com>
  */
 
+ /* Syntax highlighting — token-driven so dark mode (Dracula-ish) and light
+    mode (Catppuccin-Latte-ish) share the same rules and only the palette
+    flips with --hljs-*. */
+ :root {
+    --hljs-bg: #282a36;
+    --hljs-text: #f8f8f2;
+    --hljs-keyword: #ff79c6;
+    --hljs-title: #50fa7b;
+    --hljs-string: #f1fa8c;
+    --hljs-comment: #6272a4;
+    --hljs-number: #bd93f9;
+    --hljs-builtin: #8be9fd;
+ }
+ @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+        --hljs-bg: #eff1f5;
+        --hljs-text: #4c4f69;
+        --hljs-keyword: #8839ef;
+        --hljs-title: #1e66f5;
+        --hljs-string: #40a02b;
+        --hljs-comment: #9ca0b0;
+        --hljs-number: #fe640b;
+        --hljs-builtin: #179299;
+    }
+ }
+ :root[data-theme="light"] {
+    --hljs-bg: #eff1f5;
+    --hljs-text: #4c4f69;
+    --hljs-keyword: #8839ef;
+    --hljs-title: #1e66f5;
+    --hljs-string: #40a02b;
+    --hljs-comment: #9ca0b0;
+    --hljs-number: #fe640b;
+    --hljs-builtin: #179299;
+ }
+
  .hljs {
     display: block;
     overflow-x: auto;
     padding: 0.5em;
-    background: #282a36;
+    background: var(--hljs-bg);
   }
 
   .hljs-built_in,
   .hljs-selector-tag,
   .hljs-section,
   .hljs-link {
-    color: #8be9fd;
+    color: var(--hljs-builtin);
   }
 
   .hljs-keyword {
-    color: #ff79c6;
+    color: var(--hljs-keyword);
   }
 
   .hljs,
   .hljs-subst {
-    color: #f8f8f2;
+    color: var(--hljs-text);
   }
 
   .hljs-title,
   .hljs-attr,
   .hljs-meta-keyword {
     font-style: italic;
-    color: #50fa7b;
+    color: var(--hljs-title);
   }
 
   .hljs-string,
@@ -2172,13 +2361,13 @@ p { margin: 0.6rem 0; }
   .hljs-variable,
   .hljs-template-tag,
   .hljs-template-variable {
-    color: #f1fa8c;
+    color: var(--hljs-string);
   }
 
   .hljs-comment,
   .hljs-quote,
   .hljs-deletion {
-    color: #6272a4;
+    color: var(--hljs-comment);
   }
 
   .hljs-keyword,
@@ -2195,7 +2384,7 @@ p { margin: 0.6rem 0; }
 
   .hljs-literal,
   .hljs-number {
-    color: #bd93f9;
+    color: var(--hljs-number);
   }
 
   .hljs-emphasis {
@@ -2539,7 +2728,7 @@ td {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,.5);
+    background-color: var(--scrim);
     z-index: 500;
 }
 
