@@ -1,0 +1,52 @@
+<div class="container blog-page">
+    <h2 class="mt-2 mb-2">Preview</h2>
+
+    {{#hasTitle}}
+    <h1 class="preview-title">{{title}}</h1>
+    {{/hasTitle}}
+
+    <div class="preview-card">
+        <div class="card-body">
+            {{renderedContent}}
+        </div>
+    </div>
+
+    {{#hasSummary}}
+    <details class="mt-2" open>
+        <summary><small style="color:var(--overlay-1)">Summary</small></summary>
+        <p class="mt-2" style="color:var(--subtext-1)">{{summary}}</p>
+    </details>
+    {{/hasSummary}}
+
+    <div class="preview-actions mt-2">
+        <form method="POST" action="/post" style="display:inline">
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <input type="hidden" name="content" value="{{contentRaw}}" />
+            <input type="hidden" name="name" value="{{title}}" />
+            <input type="hidden" name="summary" value="{{summary}}" />
+            {{categoryInputs}}
+            {{syndicateInputs}}
+            <button type="submit" class="btn">Back to editor</button>
+        </form>
+        <form method="POST" action="/post/{{editOrAdd}}" style="display:inline">
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <input type="hidden" name="content" value="{{contentRaw}}" />
+            <input type="hidden" name="name" value="{{title}}" />
+            <input type="hidden" name="summary" value="{{summary}}" />
+            {{editInput}}
+            {{categoryInputs}}
+            {{syndicateInputs}}
+            <button type="submit" name="status" value="draft" class="btn">Save Draft</button>
+        </form>
+        <form method="POST" action="/post/{{editOrAdd}}" style="display:inline">
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <input type="hidden" name="content" value="{{contentRaw}}" />
+            <input type="hidden" name="name" value="{{title}}" />
+            <input type="hidden" name="summary" value="{{summary}}" />
+            {{editInput}}
+            {{categoryInputs}}
+            {{syndicateInputs}}
+            <button type="submit" name="status" value="publish" class="btn btn-glossy">Publish</button>
+        </form>
+    </div>
+</div>

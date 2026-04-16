@@ -1,10 +1,12 @@
 // Blog routes — post editor, posts list, media list, plus add/edit post and upload/delete media actions.
 import { EditorTemplate } from "../layouts/editor.js";
+import { PreviewTemplate } from "../layouts/preview.js";
 import { BlogTemplate } from "../layouts/blog.js";
 import { MediaTemplate } from "../layouts/media.js";
 import { HTMLPage } from "../layouts/templates.js";
 
 const POST_ROUTE = new URLPattern({ pathname: "/post" });
+const PREVIEW_POST = new URLPattern({ pathname: "/post/preview" });
 const POSTS_ROUTE = new URLPattern({ pathname: "/posts" });
 const MEDIA_ROUTE = new URLPattern({ pathname: "/media" });
 const ADD_POST = new URLPattern({ pathname: "/post/add" });
@@ -18,7 +20,25 @@ export async function tryHandle(req, ctx) {
     const { user, accessTokenValue } = ctx;
 
     if (POST_ROUTE.exec(req.url) && user) {
-        return new Response(await EditorTemplate(user, accessTokenValue, req), {
+        // POST = returning from preview with form data; GET = normal editor load
+        let postData = null;
+        if (req.method === 'POST') {
+            const value = await req.formData();
+            postData = {
+                destination: value.get('destination'),
+                content: value.get('content'),
+                name: value.get('name'),
+                summary: value.get('summary'),
+            };
+        }
+        return new Response(await EditorTemplate(user, accessTokenValue, req, postData), {
+            status: 200,
+            headers: { "content-type": "text/html" },
+        });
+    }
+
+    if (PREVIEW_POST.exec(req.url) && user) {
+        return new Response(await PreviewTemplate(user, accessTokenValue, req), {
             status: 200,
             headers: { "content-type": "text/html" },
         });
@@ -255,7 +275,8 @@ export async function tryHandle(req, ctx) {
 
             const sourceRes = await fetch(`${mediaEndpoint}?q=source&url=${encodeURIComponent(mediaUrl)}`, { method: 'GET', headers: { 'Authorization': 'Bearer ' + accessTokenValue } });
             const source = await sourceRes.json();
-            const alt = source.alt || '';
+            // Response may be { alt: "..." } or { items: [{ alt: "..." }] }
+            const alt = source.alt || (source.items && source.items[0] && source.items[0].alt) || '';
             return new Response(JSON.stringify({ alt }), { headers: { 'content-type': 'application/json' } });
         } catch (err) {
             return new Response('{"alt":""}', { headers: { 'content-type': 'application/json' } });

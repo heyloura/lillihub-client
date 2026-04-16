@@ -1,32 +1,29 @@
-<div class="card mt-2">
-    <div class="card-header">
-        <div class="card-header-scroll">
-            <div class="card-header-main">
-                <div class="tile">
-                    <div class="tile-icon">
-                        <figure class="avatar avatar-lg"><img loading="lazy" src="{{avatar}}" alt="Avatar" height="48" width="48"></figure>
-                    </div>
-                    <div class="tile-content">
-                        <p class="tile-title">{{name}}</p>
-                        <small class="tile-subtitle">Bookmarked {{formattedDate}}</small>
-                        {{tags}}
-                    </div>
-                </div>
-            </div>
-            <div class="card-header-actions btn-group">
-                {{tagDropdown}}
-                <details>
-                    <summary class="btn btn-glossy btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
-                    <form action="/bookmarks/unbookmark" method="POST" style="position:absolute;right:0;background:var(--crust);padding:0.5rem;border-radius:0.25rem;z-index:10;">
-                        <input type="hidden" name="id" value="{{id}}" />
-                        <button type="submit" class="btn btn-glossy btn-sm">Confirm</button>
-                    </form>
-                </details>
-            </div>
+<div class="bookmark-card">
+    <a href="#" class="bookmark-delete-js hide-if-user-has-no-javascript collection-photo-action" title="Delete" data-bookmark-id="{{id}}" onclick="event.preventDefault();if(confirm('Remove this bookmark?')){var f=document.createElement('form');f.method='POST';f.action='/bookmarks/unbookmark';var i=document.createElement('input');i.type='hidden';i.name='id';i.value=this.dataset.bookmarkId;f.appendChild(i);document.body.appendChild(f);f.submit();}">&times;</a>
+    <div class="bookmark-card-header">
+        <figure class="avatar avatar-sm"><img loading="lazy" src="{{avatar}}" alt="Avatar" height="32" width="32"></figure>
+        <div class="bookmark-card-meta">
+            <strong>{{name}}</strong>
+            <small>{{formattedDate}}</small>
         </div>
     </div>
-    <div class="card-body">
+    <div class="bookmark-card-body">
         {{summary}}
         {{highlightCount}}
+    </div>
+    <div class="bookmark-card-footer">
+        <div class="bookmark-card-tags">
+            {{tagPills}}
+            {{tagAddDropdown}}
+        </div>
+        <span class="blog-toolbar-spacer"></span>
+        <a class="btn btn-glossy btn-sm" href="{{postHref}}"><i class="bi bi-pencil-square"></i> Post</a>
+        <details class="bookmark-card-delete hide-if-user-has-javascript">
+            <summary class="btn btn-danger btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
+            <form action="/bookmarks/unbookmark" method="POST" style="display:inline">
+                <input type="hidden" name="id" value="{{id}}" />
+                <button type="submit" class="btn btn-danger btn-sm">Confirm</button>
+            </form>
+        </details>
     </div>
 </div>

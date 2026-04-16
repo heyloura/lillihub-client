@@ -695,8 +695,93 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     color: var(--area-accent);
     font-size: 0.75rem;
 }
+/* --- Bookmark cards --- */
+.bookmark-card {
+    position: relative;
+    border: 1px solid var(--crust);
+    border-radius: 0.5rem;
+    background: var(--bg-dark);
+    padding: 1rem 1.25rem;
+    margin-top: 0.75rem;
+}
+.bookmark-delete-js {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+}
+.bookmark-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+.bookmark-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+}
+.bookmark-card-meta strong {
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bookmark-card-meta small {
+    color: var(--overlay-1);
+    font-size: 0.75rem;
+}
+.bookmark-card-body {
+    overflow-wrap: anywhere;
+    display: flow-root;
+}
+.bookmark-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--crust);
+}
+.bookmark-card-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+}
+.bookmark-tag-remove {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.1rem;
+    font-size: 0.9rem;
+    line-height: 1;
+    opacity: 0.7;
+}
+.bookmark-tag-remove:hover { opacity: 1; }
+.bookmark-add-tag-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.bookmark-add-tag-input {
+    font-size: 0.8rem;
+    padding: 0.15rem 0.4rem;
+    width: 8rem;
+    display: inline-block;
+}
+.bookmark-card-delete > summary {
+    list-style: none;
+    cursor: pointer;
+}
+.bookmark-card-delete > summary::-webkit-details-marker { display: none; }
+
 .bookmark-highlight-chip {
-    background: var(--yellow);
+    background: var(--yellow) !important;
     color: var(--crust);
 }
 
@@ -718,11 +803,15 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     height: 1.15rem;
     accent-color: var(--area-accent);
 }
+.highlight-count {
+    color: var(--overlay-1);
+    font-size: 0.8rem;
+}
 .highlight-card {
     position: relative;
     border: 1px solid var(--crust);
     border-radius: 0.5rem;
-    background: var(--mantle);
+    background: var(--bg-dark);
     padding: 1rem 1.25rem 1rem 2.5rem;
     margin-top: 0.75rem;
 }
@@ -930,7 +1019,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 .media-card {
     border: 1px solid var(--crust);
     border-radius: 0.5rem;
-    background: var(--mantle);
+    background: var(--bg-dark);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1201,6 +1290,28 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     min-height: 3rem;
     font-size: 0.95rem;
 }
+/* Preview page */
+.preview-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+.preview-card {
+    border: 1px solid var(--crust);
+    border-radius: 0.5rem;
+    background: var(--bg-dark);
+    padding: 1.25rem;
+}
+.preview-card img, .preview-card video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.25rem;
+}
+.preview-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
 .editor-char-count {
     text-align: right;
     font-size: 0.8rem;
@@ -1379,7 +1490,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     gap: 0.3rem;
     padding: 0.35rem 0.75rem;
     border: 1px solid var(--mantle);
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
     background: var(--mantle);
     color: var(--text);
     font-size: 1rem;
@@ -2196,8 +2307,8 @@ p { margin: 0.6rem 0; }
         width: calc(100% + 2rem);
     }
     .card {
-        padding-left: 1rem;
-        padding-right: 1rem;
+        /* padding-left: 1rem;
+        padding-right: 1rem; */
     }
     .card-body img {
         width: 100vw;
@@ -2781,21 +2892,6 @@ body {
 }
 .bg-secondary {
     background: var(--mantle) !important;
-}
-.btn {
-    background: var(--mantle);
-    border: .05rem solid var(--area-accent);
-    color: var(--area-accent);
-}
-.btn.btn-primary {
-    background: var(--area-accent);
-    border-color: var(--area-accent);
-    color: var(--base);
-}
-.form-input {
-    background: var(--mantle);
-    border: .05rem solid var(--crust);
-    color: var(--text);
 }
 .highlight {
     background-color: var(--yellow);

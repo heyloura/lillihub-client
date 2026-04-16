@@ -15,6 +15,7 @@ export async function NoteNewTemplate(user, token, notebookId, tab) {
         .replaceAll('{{originalValue}}', '')
         .replaceAll('{{editAppend}}', '')
         .replaceAll('{{noteType}}', noteType)
+        .replaceAll('{{todoSelected}}', noteType === 'todo.txt' ? 'selected' : '')
         .replaceAll('{{vid}}', '')
         .replaceAll('{{viewVersion}}', '');
 

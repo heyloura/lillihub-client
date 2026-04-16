@@ -165,3 +165,18 @@ document.addEventListener('change', function(e) {
         });
     }
 });
+
+// Highlights search — client-side filter over content and title
+document.addEventListener('input', function(e) {
+    if (e.target.id !== 'highlight-search') return;
+    var q = e.target.value.toLowerCase();
+    var visible = 0;
+    document.querySelectorAll('.highlight-card').forEach(function(card) {
+        var text = card.textContent.toLowerCase();
+        var show = !q || text.includes(q);
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    var counter = document.querySelector('.highlight-count');
+    if (counter) counter.textContent = visible + ' highlight' + (visible !== 1 ? 's' : '');
+});

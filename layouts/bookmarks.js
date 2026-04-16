@@ -55,11 +55,6 @@ export async function BookmarksTemplate(user, token, req) {
         return `<a class="chip ${isActive ? 'active' : ''}" href="/bookmarks${isActive ? '' : '?tag=' + encodeURIComponent(tag)}">${tag}${isActive ? ' <i class="bi bi-x-lg"></i>' : ''}</a>`;
     }).join('');
 
-    // Build tag checklist for per-bookmark editing (premium)
-    const tagsCheckList = allTags.length > 0 ? allTags.map(tag =>
-        `<label class="editor-checklist-item"><input {{${tag}}} type="checkbox" name="tags[]" value="${tag}"> ${tag}</label>`
-    ).join('') : '';
-
     // Build highlight lookup map for O(1) access
     const highlightMap = new Map();
     for (const h of highlightItems) {
@@ -67,28 +62,34 @@ export async function BookmarksTemplate(user, token, req) {
     }
 
     const feed = items.map(item => {
-        const tags = item.tags && user.plan == 'premium'
-            ? item.tags.split(',').map(tag => `<span class="chip bookmark-tag-chip">${tag}</span>`).join('')
-            : '';
+        const itemTags = item.tags ? item.tags.split(',').filter(t => t) : [];
+        const currentTagsCSV = itemTags.join(',');
 
-        // Build tag edit dropdown for premium users
-        let tagDropdown = '';
-        if(user.plan == 'premium') {
-            let checklist = tagsCheckList;
-            if(item.tags) {
-                item.tags.split(',').forEach(tag => checklist = checklist.replaceAll(`{{${tag}}}`, 'checked="checked"'));
-            }
-            tagDropdown = `<div class="dropdown dropdown-right">
-                <a class="btn btn-glossy btn-sm dropdown-toggle" tabindex="0"><i class="bi bi-tags"></i></a>
-                <ul class="menu" style="min-width:200px; padding:0.5rem;">
-                    <form action="/bookmarks/update" method="POST">
-                        <input type="hidden" name="id" value="${item.id}" />
-                        <div class="editor-checklist">${checklist}</div>
-                        <input class="form-input mt-2" name="newTag" type="text" placeholder="New tag..." />
-                        <button type="submit" class="btn btn-glossy btn-sm mt-2">Save</button>
-                    </form>
-                </ul>
-            </div>`;
+        // Removable tag pills
+        const tagPills = user.plan == 'premium' && itemTags.length > 0
+            ? itemTags.map(tag =>
+                `<span class="chip bookmark-tag-chip">${tag}<form method="POST" action="/bookmarks/remove-tag" style="display:inline">` +
+                `<input type="hidden" name="id" value="${item.id}" />` +
+                `<input type="hidden" name="tag" value="${tag}" />` +
+                `<input type="hidden" name="currentTags" value="${currentTagsCSV}" />` +
+                `<button type="submit" class="bookmark-tag-remove" title="Remove tag" onclick="return confirm('Remove tag: ${tag}?')"><i class="bi bi-x"></i></button>` +
+                `</form></span>`
+            ).join('')
+            : itemTags.map(tag => `<span class="chip bookmark-tag-chip">${tag}</span>`).join('');
+
+        // Add-tag dropdown — shows tags not already on this bookmark
+        let tagAddDropdown = '';
+        if (user.plan == 'premium') {
+            const availableTags = allTags.filter(t => !itemTags.includes(t));
+            const datalistId = `tags-${item.id}`;
+            const opts = availableTags.map(t => `<option value="${t}">`).join('');
+            tagAddDropdown = `<form method="POST" action="/bookmarks/add-tag" class="bookmark-add-tag-form">` +
+                `<input type="hidden" name="id" value="${item.id}" />` +
+                `<input type="hidden" name="currentTags" value="${currentTagsCSV}" />` +
+                `<input type="text" name="tag" list="${datalistId}" class="form-input bookmark-add-tag-input" placeholder="Add tag\u2026" required />` +
+                `<datalist id="${datalistId}">${opts}</datalist>` +
+                `<button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-plus"></i></button>` +
+                `</form>`;
         }
 
         const highlightCount = highlightMap.get(item.url) || 0;
@@ -96,13 +97,19 @@ export async function BookmarksTemplate(user, token, req) {
             ? item.content_html.replace('Reader:', `<span class="chip bookmark-highlight-chip">${highlightCount} highlight${highlightCount > 1 ? 's' : ''}</span> Reader:`)
             : item.content_html;
 
+        const quoteback = `<blockquote class="quoteback" data-author="${item.author.name}" data-avatar="${item.author.avatar}" cite="${item.url}">` +
+            `<p>${item.author.name} <a href="${item.url}">${item.url.replace(/^https?:\/\//, '').split('/')[0]}</a></p>` +
+            `<footer>${item.author.name} <cite><a href="${item.url}" class="u-in-reply-to">${item.url}</a></cite></footer>` +
+            `</blockquote>`;
+
         return _bookmarkTemplate
             .replaceAll('{{avatar}}', item.author.avatar)
             .replaceAll('{{name}}', item.author.name)
             .replaceAll('{{formattedDate}}', formatDate(item.date_published))
-            .replaceAll('{{tags}}', tags)
-            .replaceAll('{{tagDropdown}}', tagDropdown)
+            .replaceAll('{{tagPills}}', tagPills)
+            .replaceAll('{{tagAddDropdown}}', tagAddDropdown)
             .replaceAll('{{id}}', item.id)
+            .replaceAll('{{postHref}}', `/post?content=${encodeURIComponent(quoteback)}`)
             .replaceAll('{{summary}}', item.summary ? _summaryTemplate.replaceAll('{{summary}}', item.summary) : '')
             .replaceAll('{{highlightCount}}', contentHtml);
     }).join('');
@@ -146,6 +153,8 @@ export async function HighlightsTemplate(user, token) {
     const hasItems = highlights.length > 0;
     const content = _highlightsTemplate
         .replaceAll('{{feed}}', feed)
+        .replaceAll('{{count}}', String(highlights.length))
+        .replaceAll('{{countPlural}}', highlights.length === 1 ? '' : 's')
         .replaceAll('{{#empty}}', hasItems ? '<!--' : '')
         .replaceAll('{{/empty}}', hasItems ? '-->' : '')
         .replaceAll('{{#hasItems}}', hasItems ? '' : '<!--')

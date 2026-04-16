@@ -8,6 +8,8 @@ const HIGHLIGHTS_DELETE = new URLPattern({ pathname: "/highlights/delete" });
 const HIGHLIGHTS_POST = new URLPattern({ pathname: "/highlights/post" });
 const BOOKMARK_NEW_ROUTE = new URLPattern({ pathname: "/bookmark/new" });
 const BOOKMARKS_UPDATE_TAGS = new URLPattern({ pathname: "/bookmarks/update" });
+const BOOKMARKS_ADD_TAG = new URLPattern({ pathname: "/bookmarks/add-tag" });
+const BOOKMARKS_REMOVE_TAG = new URLPattern({ pathname: "/bookmarks/remove-tag" });
 const BOOKMARKS_NEW = new URLPattern({ pathname: "/bookmarks/new" });
 const BOOKMARKS_UNBOOKMARK = new URLPattern({ pathname: "/bookmarks/unbookmark" });
 
@@ -196,6 +198,54 @@ export async function tryHandle(req, ctx) {
             } catch (err) {
                 console.log(`${user.username} tried to change tags and fetch failed: ${err?.message || err}`);
             }
+        }
+
+        return Response.redirect(new URL('/bookmarks', req.url).href, 303);
+    }
+
+    // Add a single tag to a bookmark (appends to existing tags)
+    if (BOOKMARKS_ADD_TAG.exec(req.url) && user && user.plan == 'premium') {
+        const value = await req.formData();
+        const id = value.get('id');
+        const tag = value.get('tag');
+        const currentTags = value.get('currentTags') || '';
+
+        const newTags = currentTags ? currentTags + ',' + tag : tag;
+
+        try {
+            const formBody = new URLSearchParams();
+            formBody.append('tags', newTags);
+            await fetch(`https://micro.blog/posts/bookmarks/${id}`, {
+                method: 'POST',
+                body: formBody.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Authorization': 'Bearer ' + accessTokenValue }
+            });
+        } catch (err) {
+            console.log(`${user.username} add-tag failed: ${err?.message || err}`);
+        }
+
+        return Response.redirect(new URL('/bookmarks', req.url).href, 303);
+    }
+
+    // Remove a single tag from a bookmark (replaces with remaining tags)
+    if (BOOKMARKS_REMOVE_TAG.exec(req.url) && user && user.plan == 'premium') {
+        const value = await req.formData();
+        const id = value.get('id');
+        const removeTag = value.get('tag');
+        const currentTags = value.get('currentTags') || '';
+
+        const remaining = currentTags.split(',').filter(t => t !== removeTag).join(',');
+
+        try {
+            const formBody = new URLSearchParams();
+            formBody.append('tags', remaining);
+            await fetch(`https://micro.blog/posts/bookmarks/${id}`, {
+                method: 'POST',
+                body: formBody.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Authorization': 'Bearer ' + accessTokenValue }
+            });
+        } catch (err) {
+            console.log(`${user.username} remove-tag failed: ${err?.message || err}`);
         }
 
         return Response.redirect(new URL('/bookmarks', req.url).href, 303);

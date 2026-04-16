@@ -4,9 +4,9 @@ import { getConversation } from "../scripts/server/mb.js";
 const _quoteTemplate = new TextDecoder().decode(await Deno.readFile("templates/blog/_quote.html"));
 const _editorTemplate = new TextDecoder().decode(await Deno.readFile("templates/blog/editor.html"));
 
-export async function EditorTemplate(user, token, req) {
+export async function EditorTemplate(user, token, req, postData) {
     const searchParams = new URLSearchParams(req.url.split('?')[1]);
-    const destination = searchParams.get('destination');
+    const destination = postData?.destination || searchParams.get('destination');
     const edit = searchParams.get('edit');
     const quote = searchParams.get('quote');
     const image = searchParams.get('img');
@@ -16,7 +16,9 @@ export async function EditorTemplate(user, token, req) {
     const link = searchParams.get('link');
     const alt = searchParams.get('alt');
     const area = searchParams.get('area');
-    const prefill = searchParams.get('content');
+    const prefill = postData?.content || searchParams.get('content');
+    const prefillTitle = postData?.name || '';
+    const prefillSummary = postData?.summary || '';
     let post = undefined;
     let quoteback = '';
     let bookPost = '';
@@ -125,13 +127,13 @@ export async function EditorTemplate(user, token, req) {
         .replaceAll('{{collectionsDropdown}}', collectionsDropdown)
         .replaceAll('{{collectionsJSON}}', collectionsJSON.replace(/&/g, '&amp;').replace(/'/g, '&#39;'))
         .replaceAll('{{editInput}}', edit ? `<input type="hidden" name="url" value="${edit}" />` : '')
-        .replaceAll('{{title}}', post && post.properties.name[0] ? post.properties.name[0] : '' )
+        .replaceAll('{{title}}', post && post.properties.name[0] ? post.properties.name[0] : prefillTitle )
         .replaceAll('{{image}}', image ? `![${alt ? `Auto-generated description: ${alt}` : ''}](${image})` : '')
         .replaceAll('{{quoteback}}', quoteback)
         .replaceAll('{{bookPost}}', bookPost)
         .replaceAll('{{content}}', post && post.properties.content[0] ? post.properties.content[0] : (prefill || '') )
-        .replaceAll('{{summary}}', post && post.properties.summary && post.properties.summary[0] ? post.properties.summary[0] : '')
-        .replaceAll('{{summaryOpen}}', post && post.properties.summary && post.properties.summary[0] ? 'open' : '')
+        .replaceAll('{{summary}}', post && post.properties.summary && post.properties.summary[0] ? post.properties.summary[0] : prefillSummary)
+        .replaceAll('{{summaryOpen}}', (post && post.properties.summary && post.properties.summary[0]) || prefillSummary ? 'open' : '')
         .replaceAll('{{deleteButton}}', edit
             ? `<details class="editor-delete-details hide-if-user-has-javascript">
                     <summary class="btn btn-danger"><i class="bi bi-trash"></i> Delete</summary>

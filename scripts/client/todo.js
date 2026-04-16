@@ -27,8 +27,10 @@ export function initTodo(markdown, key, notebookId, noteId) {
         tables: true, ghCodeBlocks: true, simpleLineBreaks: true, emoji: true,
     });
 
-    // Parse initial markdown — strip frontmatter
+    // Parse initial markdown — strip frontmatter, capture title from metadata
     const html = converter.makeHtml(markdown);
+    const meta = converter.getMetadata() || {};
+    const todoTitle = (meta.title || '').trim();
 
     const taskList = document.getElementById('tasks');
     const searchBox = document.getElementById('todo-search');
@@ -196,7 +198,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
     }
 
     async function saveTodos() {
-        let note = '---\ntype: todo.txt\ntitle: todo.txt\n---\n';
+        let note = '---\ntype: todo.txt\n' + (todoTitle ? `title: ${todoTitle}\n` : '') + '---\n';
         for (const task of tasks) {
             note += task + '\n\n';
         }
