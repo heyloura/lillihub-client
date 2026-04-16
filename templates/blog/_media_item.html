@@ -1,22 +1,28 @@
-<div class="media-row">
-    <div class="media-row-main">
-        <div class="tile-icon">
-            {{thumbnail}}
-        </div>
-        <div class="tile-content">
-            <p class="media-url"><a target="_blank" href="{{url}}">{{url}}</a></p>
-            {{altDisp}}
-            <small class="tile-subtitle">{{formattedDate}}</small>
-        </div>
+<div class="media-card {{addedClass}}" id="media-{{mediaId}}">
+    <div class="media-card-thumb">
+        {{thumbnail}}
+        <form action="/media/delete" method="POST" class="media-card-delete-js hide-if-user-has-no-javascript">
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <input type="hidden" name="url" value="{{url}}" />
+            <button type="submit" class="collection-photo-action" title="Delete" onclick="return confirm('Delete this upload?')">&times;</button>
+        </form>
     </div>
-    <div class="media-row-actions">
-        <a class="btn btn-glossy btn-sm" href="/post?img={{encodedUrl}}&alt={{altEncoded}}&area=blog"><i class="bi bi-pencil"></i> Post</a>
-        <details>
-            <summary class="btn btn-glossy btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
-            <form action="/media/delete" method="POST" style="position:absolute;right:0;background:var(--crust);padding:0.5rem;border-radius:0.25rem;z-index:10;">
+    <div class="media-card-info">
+        {{altDisp}}
+        <small class="media-card-date">{{formattedDate}}</small>
+        <a class="media-card-url" target="_blank" href="{{url}}">{{shortUrl}}</a>
+    </div>
+    <div class="media-card-actions">
+        <a class="btn btn-glossy btn-sm" href="/post?img={{encodedUrl}}&alt={{altEncoded}}&area=blog"><i class="bi bi-pencil-square"></i></a>
+        {{collectionSelect}}
+    </div>
+    <div class="media-card-actions-noscript hide-if-user-has-javascript">
+        <details class="media-card-delete">
+            <summary class="btn btn-danger btn-sm" style="list-style:none"><i class="bi bi-trash"></i> Delete</summary>
+            <form action="/media/delete" method="POST" class="media-card-delete-confirm">
                 <input type="hidden" name="destination" value="{{destination}}" />
                 <input type="hidden" name="url" value="{{url}}" />
-                <button type="submit" class="btn btn-glossy btn-sm">Confirm</button>
+                <button type="submit" class="btn btn-danger btn-sm">Confirm</button>
             </form>
         </details>
     </div>

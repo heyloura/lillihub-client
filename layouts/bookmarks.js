@@ -4,6 +4,8 @@ import { HTMLPage } from "./templates.js";
 const _bookmarkTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookmarks/_bookmark.html"));
 const _summaryTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookmarks/_summary.html"));
 const _bookmarksTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookmarks/bookmarks.html"));
+const _highlightTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookmarks/_highlight.html"));
+const _highlightsTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookmarks/highlights.html"));
 
 export async function BookmarksTemplate(user, token, req) {
     const searchParams = new URLSearchParams(req.url.split('?')[1]);
@@ -124,6 +126,32 @@ export async function BookmarksTemplate(user, token, req) {
         .replaceAll('{{loadAllLink}}', loadAllLink);
 
     return HTMLPage(token, 'Bookmarks', content, user);
+}
+
+// --- Highlights page ---
+export async function HighlightsTemplate(user, token) {
+    const highlights = await fetchAllHighlights(token);
+
+    const feed = highlights.map(h => {
+        const blockquote = `> ${h.content_text}\n>\n> — [${h.title}]`;
+        return _highlightTemplate
+            .replaceAll('{{id}}', h.id)
+            .replaceAll('{{contentText}}', h.content_text)
+            .replaceAll('{{title}}', h.title || 'Untitled')
+            .replaceAll('{{formattedDate}}', formatDate(h.date_published, 'short'))
+            .replaceAll('{{blockquoteEncoded}}', encodeURIComponent(blockquote))
+            .replaceAll('{{blockquoteRaw}}', blockquote.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+    }).join('');
+
+    const hasItems = highlights.length > 0;
+    const content = _highlightsTemplate
+        .replaceAll('{{feed}}', feed)
+        .replaceAll('{{#empty}}', hasItems ? '<!--' : '')
+        .replaceAll('{{/empty}}', hasItems ? '-->' : '')
+        .replaceAll('{{#hasItems}}', hasItems ? '' : '<!--')
+        .replaceAll('{{/hasItems}}', hasItems ? '' : '-->');
+
+    return HTMLPage(token, 'Highlights', content, user);
 }
 
 // Fetch bookmarks from micro.blog. When fetchAll is false, returns only the

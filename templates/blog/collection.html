@@ -1,0 +1,53 @@
+<div class="container blog-page">
+    <h2 style="margin:0">{{name}}</h2>
+    <div class="collection-shortcode mt-2 mb-2">
+        <label><small>Hugo shortcode</small></label>
+        <div class="input-group">
+            <input type="text" class="form-input" readonly value='{{shortcode}}' onclick="this.select()">
+            <button type="button" class="btn btn-glossy btn-sm hide-if-user-has-no-javascript" onclick="navigator.clipboard.writeText(this.previousElementSibling.value);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+            <a href="/post?content={{shortcodeEncoded}}&destination={{destinationEncoded}}" class="btn btn-glossy btn-sm"><i class="bi bi-pencil-square"></i> New Post</a>
+        </div>
+    </div>
+
+    <div class="collection-add mt-2 mb-2">
+        <form method="POST" action="/collections/add-photo" class="input-group">
+            <input type="hidden" name="url" value="{{collectionUrl}}" />
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <input type="text" name="photo" class="form-input" placeholder="Paste image URL to add..." required />
+            <button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-plus-lg"></i> Add</button>
+        </form>
+        <form method="POST" action="/collections/upload-photo" enctype="multipart/form-data" class="mt-2">
+            <input type="hidden" name="url" value="{{collectionUrl}}" />
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <label class="btn btn-glossy btn-sm">
+                <i class="bi bi-upload"></i> Upload photo
+                <input type="file" name="media" accept="image/*" style="display:none" onchange="this.form.submit()">
+            </label>
+            <noscript><button type="submit" class="btn btn-glossy btn-sm">Go</button></noscript>
+        </form>
+    </div>
+
+    {{#empty}}
+    <p class="mt-2" style="color:var(--overlay-1)">This collection has no photos yet.</p>
+    {{/empty}}
+
+    <div class="collection-photos mt-2">
+        {{feed}}
+    </div>
+
+    <div style="margin-top:1em;">
+    <details class="editor-delete-details hide-if-user-has-javascript">
+        <summary class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Delete Collection</summary>
+        <form method="POST" action="/collections/delete" style="display:inline">
+            <input type="hidden" name="url" value="{{collectionUrl}}" />
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <button type="submit" class="btn btn-danger btn-sm">Confirm</button>
+        </form>
+    </details>
+    <form method="POST" action="/collections/delete" class="hide-if-user-has-no-javascript" style="display:inline">
+        <input type="hidden" name="url" value="{{collectionUrl}}" />
+        <input type="hidden" name="destination" value="{{destination}}" />
+        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this collection and all its photos?')"><i class="bi bi-trash"></i> Delete Collection</button>
+    </form>
+    </div>
+</div>

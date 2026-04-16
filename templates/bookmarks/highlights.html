@@ -1,0 +1,19 @@
+<div class="container">
+    {{#empty}}
+    <p class="mt-2" style="color:var(--overlay-1)">No highlights yet. Highlights are created in Micro.blog's Reader.</p>
+    {{/empty}}
+
+    {{#hasItems}}
+    <form method="POST" action="/highlights/post" id="highlights-form">
+        <div class="highlights-toolbar mt-2 mb-2">
+            <label class="highlight-select-all hide-if-user-has-no-javascript">
+                <input type="checkbox" id="highlight-select-all-cb" /> <small>Select all</small>
+            </label>
+            <span class="blog-toolbar-spacer"></span>
+            <button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-pencil-square"></i> Post selected</button>
+        </div>
+
+        {{feed}}
+    </form>
+    {{/hasItems}}
+</div>

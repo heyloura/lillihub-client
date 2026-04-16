@@ -8,6 +8,7 @@
                 {{destinationDropdown}}
             </div>
             <div class="editor-toolbar-right">
+                {{collectionsDropdown}}
                 {{categoriesDropdown}}
                 {{syndicatesDropdown}}
             </div>
@@ -28,7 +29,7 @@
             <textarea class="form-input editor-summary" name="summary" placeholder="A short summary for your post (optional)" rows="2">{{summary}}</textarea>
         </details>
 
-        <div id="editor-previews" class="editor-previews hide-if-user-has-no-javascript"></div>
+        <div id="editor-previews" class="editor-previews hide-if-user-has-no-javascript" data-collections='{{collectionsJSON}}'></div>
 
         <div class="editor-footer">
             {{deleteButton}}
@@ -121,6 +122,19 @@
     });
 
     var previewsEl = document.getElementById('editor-previews');
+    var _collections = [];
+    try { _collections = JSON.parse(previewsEl.dataset.collections || '[]'); } catch(e) {}
+
+    function collectionSelectHTML() {
+        if (!_collections.length) return '';
+        var opts = _collections.map(function(c) {
+            return '<option value="' + c.url + '">' + c.name + '</option>';
+        }).join('');
+        return '<div class="editor-preview-collection">' +
+            '<select class="form-select editor-preview-coll-select">' +
+                '<option value="">Add to collection\u2026</option>' + opts +
+            '</select></div>';
+    }
 
     // Poll for AI-generated alt text after upload. Checks every 4s for up to 60s.
     // Updates the preview card and stored markdown when alt text arrives.
@@ -212,7 +226,8 @@
                             '<option value="copy">Copy markdown</option>' +
                         '</select>' +
                         '<button type="button" class="btn btn-glossy btn-sm editor-preview-go">Insert</button>' +
-                    '</div>';
+                    '</div>' +
+                    (type === 'image' ? collectionSelectHTML() : '');
                 // Only poll for AI alt text on images
                 if (type === 'image') pollForAlt(card, url);
             })
@@ -223,9 +238,26 @@
 
     // Update the action button label when the dropdown changes
     previewsEl.addEventListener('change', function(e) {
-        if (!e.target.matches('.editor-preview-mode')) return;
-        var btn = e.target.closest('.editor-preview-card').querySelector('.editor-preview-go');
-        btn.textContent = e.target.value === 'copy' ? 'Copy' : 'Insert';
+        if (e.target.matches('.editor-preview-mode')) {
+            var btn = e.target.closest('.editor-preview-card').querySelector('.editor-preview-go');
+            btn.textContent = e.target.value === 'copy' ? 'Copy' : 'Insert';
+        }
+        // Add to collection — fires a POST to /collections/add-photo via fetch
+        if (e.target.matches('.editor-preview-coll-select')) {
+            var collUrl = e.target.value;
+            if (!collUrl) return;
+            var card = e.target.closest('.editor-preview-card');
+            var dest = document.querySelector('input[name="destination"]').value;
+            var fd = new FormData();
+            fd.append('url', collUrl);
+            fd.append('photo', card.dataset.url);
+            fd.append('destination', dest);
+            fetch('/collections/add-photo', { method: 'POST', body: fd });
+            // Visual feedback
+            var sel = e.target;
+            var chosen = sel.options[sel.selectedIndex].text;
+            sel.parentNode.innerHTML = '<small style="color:var(--area-accent)">Added to ' + chosen + '</small>';
+        }
     });
 
     // Preview actions — delegated from the previews container
@@ -278,6 +310,22 @@
         cb.addEventListener('change', updateAllBadges);
     });
     updateAllBadges();
+
+    // Collection shortcode insertion — click a collection name to insert its
+    // shortcode at the cursor position. With JS this inserts inline; without
+    // JS the links are plain anchors (href="#") that do nothing harmful.
+    document.addEventListener('click', function(e) {
+        var link = e.target.closest('.collection-insert-shortcode');
+        if (!link) return;
+        e.preventDefault();
+        var shortcode = link.dataset.shortcode;
+        var pos = ta.selectionStart;
+        ta.value = ta.value.slice(0, pos) + shortcode + ta.value.slice(pos);
+        ta.selectionStart = ta.selectionEnd = pos + shortcode.length;
+        ta.focus();
+        growTextArea(ta);
+        updateCharCount();
+    });
 
     // Tab key inserts spaces instead of changing focus
     ta.addEventListener('keydown', function(e) {

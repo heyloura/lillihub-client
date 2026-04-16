@@ -25,6 +25,7 @@ import { tryHandle as trySocialRoute } from "./routes/social.js";
 import { tryHandle as tryBookmarksRoute } from "./routes/bookmarks.js";
 import { tryHandle as tryBooksRoute } from "./routes/books.js";
 import { tryHandle as tryBlogRoute } from "./routes/blog.js";
+import { tryHandle as tryCollectionsRoute } from "./routes/collections.js";
 import { tryHandle as tryNotesRoute } from "./routes/notes.js";
 import { tryHandle as tryAuthRoute } from "./routes/auth.js";
 
@@ -36,6 +37,7 @@ const ROUTE_GROUPS = [
     tryBookmarksRoute,
     tryBooksRoute,
     tryBlogRoute,
+    tryCollectionsRoute,
     tryNotesRoute,
     tryAuthRoute,
 ];

@@ -16,6 +16,7 @@ export async function EditorTemplate(user, token, req) {
     const link = searchParams.get('link');
     const alt = searchParams.get('alt');
     const area = searchParams.get('area');
+    const prefill = searchParams.get('content');
     let post = undefined;
     let quoteback = '';
     let bookPost = '';
@@ -90,18 +91,45 @@ export async function EditorTemplate(user, token, req) {
            </div>`
         : '';
 
+    // Fetch collections for the shortcode picker and preview-card "add to collection"
+    let collectionsDropdown = '';
+    let collectionsJSON = '[]';
+    try {
+        const collRes = await fetch(`https://micro.blog/micropub?q=source&mp-channel=collections&mp-destination=${encodeURIComponent(mpDestination)}`, {
+            method: 'GET', headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const collData = await collRes.json();
+        const collList = (collData.items || []).map(item => ({
+            name: item.properties.name[0],
+            url: item.properties.url[0]
+        }));
+        collectionsJSON = JSON.stringify(collList);
+        const collItems = collList.map(c => {
+            const shortcode = `{{< collection "${c.name}" >}}`;
+            return `<li class="menu-item"><a href="#" class="collection-insert-shortcode" data-shortcode="${shortcode.replace(/"/g, '&quot;')}">${c.name}</a></li>`;
+        }).join('');
+        if (collItems) {
+            collectionsDropdown = `<div class="dropdown dropdown-right">
+                <a class="btn btn-glossy dropdown-toggle" tabindex="0"><i class="bi bi-grid"></i></a>
+                <ul class="menu">${collItems}</ul>
+            </div>`;
+        }
+    } catch (e) { /* collections not available — skip */ }
+
     const content = _editorTemplate
         .replaceAll('{{editOrAdd}}', edit ? 'edit' : 'add')
         .replaceAll('{{mpDestination}}', mpDestination)
         .replaceAll('{{destinationDropdown}}', destinationDropdown)
         .replaceAll('{{categoriesDropdown}}', categoriesDropdown)
         .replaceAll('{{syndicatesDropdown}}', syndicatesDropdown)
+        .replaceAll('{{collectionsDropdown}}', collectionsDropdown)
+        .replaceAll('{{collectionsJSON}}', collectionsJSON.replace(/&/g, '&amp;').replace(/'/g, '&#39;'))
         .replaceAll('{{editInput}}', edit ? `<input type="hidden" name="url" value="${edit}" />` : '')
         .replaceAll('{{title}}', post && post.properties.name[0] ? post.properties.name[0] : '' )
         .replaceAll('{{image}}', image ? `![${alt ? `Auto-generated description: ${alt}` : ''}](${image})` : '')
         .replaceAll('{{quoteback}}', quoteback)
         .replaceAll('{{bookPost}}', bookPost)
-        .replaceAll('{{content}}', post && post.properties.content[0] ? post.properties.content[0] : '' )
+        .replaceAll('{{content}}', post && post.properties.content[0] ? post.properties.content[0] : (prefill || '') )
         .replaceAll('{{summary}}', post && post.properties.summary && post.properties.summary[0] ? post.properties.summary[0] : '')
         .replaceAll('{{summaryOpen}}', post && post.properties.summary && post.properties.summary[0] ? 'open' : '')
         .replaceAll('{{deleteButton}}', edit

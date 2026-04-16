@@ -1,0 +1,17 @@
+<div class="container blog-page">
+    <div class="blog-toolbar mb-2 mt-2">
+        <div class="blog-toolbar-row">
+            {{destinationDropdown}}
+            <span class="blog-toolbar-spacer"></span>
+            <a href="/collections/new{{destQuery}}" class="btn btn-glossy"><i class="bi bi-plus-lg"></i> New Collection</a>
+        </div>
+    </div>
+
+    {{#empty}}
+    <p class="mt-2" style="color:var(--overlay-1)">No photo collections yet.</p>
+    {{/empty}}
+
+    <div class="collections-grid mt-2">
+        {{feed}}
+    </div>
+</div>

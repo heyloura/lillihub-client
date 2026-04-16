@@ -1,0 +1,12 @@
+<div class="collection-photo">
+    <img src="{{photoUrl}}" alt="" loading="lazy" />
+    <div class="collection-photo-actions">
+        <a href="/post?img={{photoUrlEncoded}}" class="collection-photo-action" title="Use in post"><i class="bi bi-pencil-square"></i></a>
+        <form method="POST" action="/collections/remove-photo" style="display:inline">
+            <input type="hidden" name="url" value="{{collectionUrl}}" />
+            <input type="hidden" name="photo" value="{{photoUrl}}" />
+            <input type="hidden" name="destination" value="{{destination}}" />
+            <button type="submit" class="collection-photo-action" title="Remove photo" onclick="return confirm('Remove this photo from the collection?')"><i class="bi bi-x-lg"></i></button>
+        </form>
+    </div>
+</div>

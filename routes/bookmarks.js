@@ -1,9 +1,11 @@
 // Bookmark routes — list, highlights, new bookmark form, and create/update/delete actions.
-import { BookmarksTemplate } from "../layouts/bookmarks.js";
+import { BookmarksTemplate, HighlightsTemplate } from "../layouts/bookmarks.js";
 import { HTMLPage } from "../layouts/templates.js";
 
 const BOOKMARKS_ROUTE = new URLPattern({ pathname: "/bookmarks" });
 const HIGHLIGHTS_ROUTE = new URLPattern({ pathname: "/highlights" });
+const HIGHLIGHTS_DELETE = new URLPattern({ pathname: "/highlights/delete" });
+const HIGHLIGHTS_POST = new URLPattern({ pathname: "/highlights/post" });
 const BOOKMARK_NEW_ROUTE = new URLPattern({ pathname: "/bookmark/new" });
 const BOOKMARKS_UPDATE_TAGS = new URLPattern({ pathname: "/bookmarks/update" });
 const BOOKMARKS_NEW = new URLPattern({ pathname: "/bookmarks/new" });
@@ -20,13 +22,33 @@ export async function tryHandle(req, ctx) {
     }
 
     if (HIGHLIGHTS_ROUTE.exec(req.url) && user) {
-        return new Response(
-            await HTMLPage(accessTokenValue, 'Highlights', `<div class="container mt-2"><p>Highlights coming soon.</p></div>`, user),
-            {
-                status: 200,
-                headers: { "content-type": "text/html" },
-            }
-        );
+        return new Response(await HighlightsTemplate(user, accessTokenValue), {
+            status: 200,
+            headers: { "content-type": "text/html" },
+        });
+    }
+
+    if (HIGHLIGHTS_DELETE.exec(req.url) && user) {
+        const value = await req.formData();
+        const id = value.get('id');
+
+        try {
+            await fetch(`https://micro.blog/posts/bookmarks/highlights/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + accessTokenValue }
+            });
+        } catch (err) {
+            console.log(`${user.username} tried to delete highlight ${id}: ${err?.message || err}`);
+        }
+
+        return Response.redirect(new URL('/highlights', req.url).href, 303);
+    }
+
+    if (HIGHLIGHTS_POST.exec(req.url) && user) {
+        const value = await req.formData();
+        const selected = value.getAll('selected[]');
+        const combined = selected.join('\n\n');
+        return Response.redirect(new URL(`/post?content=${encodeURIComponent(combined)}`, req.url).href, 303);
     }
 
     if (BOOKMARK_NEW_ROUTE.exec(req.url) && user) {

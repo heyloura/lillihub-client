@@ -700,6 +700,102 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     color: var(--crust);
 }
 
+/* --- Highlights page --- */
+.highlights-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.highlight-select-all {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    color: var(--overlay-1);
+}
+.highlight-select-all input {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--area-accent);
+}
+.highlight-card {
+    position: relative;
+    border: 1px solid var(--crust);
+    border-radius: 0.5rem;
+    background: var(--mantle);
+    padding: 1rem 1.25rem 1rem 2.5rem;
+    margin-top: 0.75rem;
+}
+.highlight-select {
+    position: absolute;
+    left: 0.75rem;
+    top: 1.1rem;
+    cursor: pointer;
+}
+.highlight-checkbox {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--area-accent);
+    cursor: pointer;
+}
+.highlight-delete-js {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+}
+.highlight-text {
+    border-left: 3px solid var(--area-accent);
+    padding-left: 1rem;
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+}
+.highlight-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--crust);
+}
+.highlight-source {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.highlight-source strong {
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.highlight-source small {
+    color: var(--overlay-1);
+    font-size: 0.75rem;
+}
+.highlight-actions {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+.highlight-copy-btn {
+    background: none;
+    border: none;
+    color: var(--overlay-2);
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+}
+.highlight-copy-btn:hover { color: var(--area-accent); }
+.highlight-delete > summary {
+    list-style: none;
+    cursor: pointer;
+}
+.highlight-delete > summary::-webkit-details-marker { display: none; }
+
 /* Blog toolbar */
 .blog-toolbar-row {
     display: flex;
@@ -707,37 +803,236 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     align-items: center;
     flex-wrap: wrap;
 }
-.blog-toolbar-spacer { flex: 1;
+.blog-toolbar-spacer { flex: 1; }
+
+/* --- Photo Collections --- */
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
 }
-/* --- Media page --- */
-.media-thumb {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 0.25rem;
+.collection-card {
     display: block;
+    border: 1px solid var(--crust);
+    border-radius: 0.5rem;
+    background: var(--mantle);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s;
 }
-.media-thumb.media-file {
+.collection-card:hover {
+    border-color: var(--area-accent);
+    opacity: 1;
+}
+.collection-card-thumb {
+    aspect-ratio: 1;
     background: var(--crust);
+    overflow: hidden;
+}
+.collection-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.collection-card-empty {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
     color: var(--overlay-1);
 }
-.media-url {
-    font-size: 0.75rem;
-    overflow-wrap: anywhere;
-    margin: 0;
+.collection-card-info {
+    padding: 0.5rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
 }
-.media-alt {
+.collection-card-info strong {
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.collection-card-info small {
+    color: var(--overlay-1);
+    font-size: 0.8rem;
+}
+
+.collection-shortcode label {
+    color: var(--overlay-1);
+    display: block;
+    margin-bottom: 0.2rem;
+}
+.collection-shortcode .input-group {
+    max-width: 400px;
+}
+
+.collection-photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+}
+.collection-photo {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--crust);
+}
+.collection-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.collection-photo-actions {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.collection-photo:hover .collection-photo-actions { opacity: 1; }
+.collection-photo-action {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: none;
+    background: var(--scrim);
+    color: var(--on-scrim) !important;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+.collection-photo-action:hover { background: var(--area-accent); opacity: 1; }
+
+/* Media page — collection dropdown per item */
+.media-coll-form { display: inline-flex; align-items: center; gap: 0.25rem; }
+.media-coll-select {
+    font-size: 0.8rem;
+    padding: 0.2rem 1.2rem 0.2rem 0.3rem;
+    width: auto;
+}
+
+/* --- Media page (card grid) --- */
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+.media-card {
+    border: 1px solid var(--crust);
+    border-radius: 0.5rem;
+    background: var(--mantle);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    scroll-margin-top: 3.5rem;
+}
+.media-card-thumb {
+    aspect-ratio: 1;
+    background: var(--crust);
+    overflow: hidden;
+    position: relative;
+}
+.media-card-delete-js {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+}
+.media-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.media-card-file {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--overlay-1);
+}
+.media-card-info {
+    padding: 0.5rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+}
+.media-card-alt {
     font-size: 0.8rem;
     color: var(--overlay-1);
-    margin: 0.25rem 0 0;
-    padding: 1em;
+    margin: 0;
+    line-height: 1.3;
 }
-.media-file-input {
-    padding: 0.25rem !important;
+.media-card-date {
+    color: var(--overlay-1);
+    font-size: 0.75rem;
+}
+.media-card-url {
+    font-size: 0.7rem;
+    color: var(--overlay-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.media-card-actions {
+    padding: 0.4rem 0.6rem;
+    border-top: 1px solid var(--crust);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.media-card-actions .media-coll-form {
+    flex: 1;
+    min-width: 0;
+}
+.media-card-actions .media-coll-select {
+    width: 100%;
+}
+.media-card-actions-noscript {
+    padding: 0.4rem 0.6rem;
+    border-top: 1px solid var(--crust);
+}
+.media-card-added {
+    outline: 2px solid var(--area-accent);
+    outline-offset: -2px;
+}
+.media-card-added::after {
+    content: "Added to collection";
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--area-accent);
+    padding: 0.25rem;
+    background: color-mix(in srgb, var(--area-accent) 10%, var(--mantle));
+}
+.media-card-delete > summary {
+    list-style: none;
+    cursor: pointer;
+}
+.media-card-delete > summary::-webkit-details-marker { display: none; }
+.media-card-delete-confirm {
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    background: var(--crust);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    z-index: 10;
+}
+.media-card-delete {
+    position: relative;
 }
 
 /* --- Editor page --- */
@@ -879,6 +1174,16 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 }
 .editor-preview-actions .btn-sm {
     white-space: nowrap;
+}
+.editor-preview-collection {
+    padding: 0.25rem 0.4rem 0.4rem;
+}
+.editor-preview-collection .form-select {
+    font-size: 0.75rem;
+    padding: 0.2rem 1rem 0.2rem 0.3rem;
+}
+.editor-preview-collection small {
+    font-size: 0.75rem;
 }
 /* Summary toggle — works without JS via native <details> */
 .editor-summary-toggle {

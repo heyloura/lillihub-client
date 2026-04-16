@@ -1,0 +1,24 @@
+<div class="highlight-card">
+    <a href="#" class="highlight-delete-js hide-if-user-has-no-javascript collection-photo-action" title="Delete" data-highlight-id="{{id}}" onclick="event.preventDefault();if(confirm('Delete this highlight?')){var f=document.createElement('form');f.method='POST';f.action='/highlights/delete';var i=document.createElement('input');i.type='hidden';i.name='id';i.value=this.dataset.highlightId;f.appendChild(i);document.body.appendChild(f);f.submit();}">&times;</a>
+    <label class="highlight-select">
+        <input type="checkbox" name="selected[]" value="{{blockquoteRaw}}" class="highlight-checkbox" />
+    </label>
+    <blockquote class="highlight-text">{{contentText}}</blockquote>
+    <div class="highlight-footer">
+        <div class="highlight-source">
+            <strong>{{title}}</strong>
+            <small>{{formattedDate}}</small>
+        </div>
+        <div class="highlight-actions">
+            <button type="button" class="btn btn-sm hide-if-user-has-no-javascript highlight-copy-btn" data-md="{{blockquoteRaw}}" title="Copy as blockquote"><i class="bi bi-clipboard"></i></button>
+            <a class="btn btn-glossy btn-sm" href="/post?content={{blockquoteEncoded}}"><i class="bi bi-pencil-square"></i> Post</a>
+            <details class="highlight-delete hide-if-user-has-javascript">
+                <summary class="btn btn-danger btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
+                <form method="POST" action="/highlights/delete" style="display:inline">
+                    <input type="hidden" name="id" value="{{id}}" />
+                    <button type="submit" class="btn btn-danger btn-sm">Confirm</button>
+                </form>
+            </details>
+        </div>
+    </div>
+</div>

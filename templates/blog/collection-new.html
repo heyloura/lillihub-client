@@ -1,0 +1,11 @@
+<div class="container blog-page">
+    <h2 class="mt-2 mb-2">New Collection</h2>
+    <form method="POST" action="/collections/create">
+        <input type="hidden" name="destination" value="{{destination}}" />
+        <input type="text" name="name" class="form-input" placeholder="Collection name" required autofocus />
+        <div class="mt-2" style="display:flex;gap:0.5rem;">
+            <a href="/collections{{destQuery}}" class="btn"><i class="bi bi-arrow-left"></i> Cancel</a>
+            <button type="submit" class="btn btn-glossy"><i class="bi bi-plus-lg"></i> Create</button>
+        </div>
+    </form>
+</div>

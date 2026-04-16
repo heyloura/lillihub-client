@@ -3,7 +3,7 @@ const _commonjs = await Deno.readTextFile("scripts/client/common.js");
 
 function getArea(title) {
     if(title == 'Bookmarks' || title == 'Highlights') return 'bookmarks';
-    if(title == 'Posts' || title == 'Draft' || title == 'Media' || title == 'Post' || title == 'Editor') return 'blog';
+    if(title == 'Posts' || title == 'Draft' || title == 'Media' || title == 'Post' || title == 'Editor' || title == 'Collections' || title == 'Collection') return 'blog';
     if(title == 'Bookshelves' || title == 'Books' || title == 'Bookshelf' || title == 'Edit book') return 'bookshelves';
     if(title == 'Notebooks' || title == 'Notes' || title == 'Note') return 'notes';
     return 'social';
@@ -35,7 +35,8 @@ function PageNavContent(user, area, title, navContent, context) {
         return `
             <a href="/posts${destParam ? '?' + destParam : ''}" class="${title == 'Posts' ? 'active' : ''}"><i class="bi bi-window-stack"></i> Posts</a>
             <a href="/posts?status=draft${amp}${destParam}" class="${title == 'Draft' ? 'active' : ''}"><i class="bi bi-pencil"></i> Drafts</a>
-            <a href="/media${destParam ? '?' + destParam : ''}" class="${title == 'Media' ? 'active' : ''}"><i class="bi bi-images"></i> Uploads</a>`;
+            <a href="/media${destParam ? '?' + destParam : ''}" class="${title == 'Media' ? 'active' : ''}"><i class="bi bi-images"></i> Uploads</a>
+            <a href="/collections${destParam ? '?' + destParam : ''}" class="${title == 'Collections' || title == 'Collection' ? 'active' : ''}"><i class="bi bi-grid"></i> Collections</a>`;
     }
     if(area == 'bookmarks') {
         return `
@@ -70,6 +71,7 @@ function BottomNavContent(user, title, area, context) {
             <a href="/posts${destParam ? '?' + destParam : ''}" class="${title == 'Posts' ? 'active' : ''}"><i class="bi bi-window-stack"></i> Posts</a>
             <a href="/posts?status=draft${amp}${destParam}" class="${title == 'Draft' ? 'active' : ''}"><i class="bi bi-pencil"></i> Drafts</a>
             <a href="/media${destParam ? '?' + destParam : ''}" class="${title == 'Media' ? 'active' : ''}"><i class="bi bi-images"></i> Uploads</a>
+            <a href="/collections${destParam ? '?' + destParam : ''}" class="${title == 'Collections' || title == 'Collection' ? 'active' : ''}"><i class="bi bi-grid"></i> Collections</a>
         </div>`;
     }
     if(area == 'bookmarks') {

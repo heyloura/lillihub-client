@@ -145,3 +145,23 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// ---------------------------------------------------------------------------
+// Highlights page — copy as blockquote + select all
+// ---------------------------------------------------------------------------
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.highlight-copy-btn');
+    if (!btn) return;
+    navigator.clipboard.writeText(btn.dataset.md);
+    var icon = btn.querySelector('i');
+    if (icon) { icon.className = 'bi bi-check-lg'; setTimeout(function() { icon.className = 'bi bi-clipboard'; }, 1500); }
+});
+
+document.addEventListener('change', function(e) {
+    if (e.target.id === 'highlight-select-all-cb') {
+        var checked = e.target.checked;
+        document.querySelectorAll('.highlight-checkbox').forEach(function(cb) {
+            cb.checked = checked;
+        });
+    }
+});
