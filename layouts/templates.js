@@ -10,7 +10,7 @@ function getArea(title) {
 }
 
 function PrimaryAction(area, title, context) {
-    if(title == 'Editor' || title == 'Post') return '';
+    if(title == 'Editor' || title == 'Post') return '<div class="sidebar-action"></div>';
     if(area == 'notes' && context?.notebookId) return `<div class="sidebar-action sidebar-action"><a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}"><i class="bi bi-pencil-square"></i> New Note</a></div>`;
     if(area == 'notes') return `<div class="sidebar-action sidebar-action"><a href="/notebook/new"><i class="bi bi-journal-plus"></i> New Notebook</a></div>`;
     if(area == 'bookmarks') return `<div class="sidebar-action sidebar-action"><a href="/bookmark/new"><i class="bi bi-bookmark-plus"></i> New Bookmark</a></div>`;
@@ -30,10 +30,12 @@ function FabAction(area, title, context) {
 
 function PageNavContent(user, area, title, navContent, context) {
     if(area == 'blog') {
+        const destParam = context?.destination ? `destination=${encodeURIComponent(context.destination)}` : '';
+        const amp = destParam ? '&' : '';
         return `
-            <a href="/posts" class="${title == 'Posts' ? 'active' : ''}"><i class="bi bi-window-stack"></i> Posts</a>
-            <a href="/posts?status=draft" class="${title == 'Draft' ? 'active' : ''}"><i class="bi bi-pencil"></i> Drafts</a>
-            <a href="/media" class="${title == 'Media' ? 'active' : ''}"><i class="bi bi-images"></i> Uploads</a>`;
+            <a href="/posts${destParam ? '?' + destParam : ''}" class="${title == 'Posts' ? 'active' : ''}"><i class="bi bi-window-stack"></i> Posts</a>
+            <a href="/posts?status=draft${amp}${destParam}" class="${title == 'Draft' ? 'active' : ''}"><i class="bi bi-pencil"></i> Drafts</a>
+            <a href="/media${destParam ? '?' + destParam : ''}" class="${title == 'Media' ? 'active' : ''}"><i class="bi bi-images"></i> Uploads</a>`;
     }
     if(area == 'bookmarks') {
         return `
@@ -60,12 +62,14 @@ function PageNavContent(user, area, title, navContent, context) {
 function BottomNavContent(user, title, area, context) {
     if(!user || user.error) return '';
     if(area == 'blog') {
+        const destParam = context?.destination ? `destination=${encodeURIComponent(context.destination)}` : '';
+        const amp = destParam ? '&' : '';
         return `
         <div class="bottom-nav-links">
             <label for="sidebar-toggle"><i class="bi bi-list"></i></label>
-            <a href="/posts" class="${title == 'Posts' ? 'active' : ''}"><i class="bi bi-window-stack"></i> Posts</a>
-            <a href="/posts?status=draft" class="${title == 'Draft' ? 'active' : ''}"><i class="bi bi-pencil"></i> Drafts</a>
-            <a href="/media" class="${title == 'Media' ? 'active' : ''}"><i class="bi bi-images"></i> Uploads</a>
+            <a href="/posts${destParam ? '?' + destParam : ''}" class="${title == 'Posts' ? 'active' : ''}"><i class="bi bi-window-stack"></i> Posts</a>
+            <a href="/posts?status=draft${amp}${destParam}" class="${title == 'Draft' ? 'active' : ''}"><i class="bi bi-pencil"></i> Drafts</a>
+            <a href="/media${destParam ? '?' + destParam : ''}" class="${title == 'Media' ? 'active' : ''}"><i class="bi bi-images"></i> Uploads</a>
         </div>`;
     }
     if(area == 'bookmarks') {
@@ -139,6 +143,7 @@ function _pageHead(title, redirect) {
         });}</script>
     <script>document.write('<style>.hide-if-user-has-javascript{display:none}</style>');</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script>${_commonjs}</script>
 </head>`;
 }
 
@@ -207,12 +212,13 @@ ${FabAction(area, title, context)}
                     <ul>
                         <li><a href="/logout">Logout</a></li>
                         <li><a href="https://github.com/heyloura/lillihub-client">Github</a></li>
-                        <li class="theme-picker-label"><small>Theme</small></li>
-                        <li class="theme-picker">
+                        <li class="theme-picker-label hide-if-user-has-no-javascript"><small>Theme</small></li>
+                        <li class="theme-picker hide-if-user-has-no-javascript">
                             <button type="button" class="theme-picker-btn" data-theme-choice="system"><i class="bi bi-circle-half"></i> System</button>
                             <button type="button" class="theme-picker-btn" data-theme-choice="light"><i class="bi bi-sun"></i> Light</button>
                             <button type="button" class="theme-picker-btn" data-theme-choice="dark"><i class="bi bi-moon-stars"></i> Dark</button>
                         </li>
+                        <li class="hide-if-user-has-no-javascript"><a href="#" onclick="event.preventDefault();document.getElementById('kb-help').showModal()"><i class="bi bi-keyboard"></i> Keyboard shortcuts</a></li>
                         <li><small>v2.0</small></li>
                         <li><small>Built with ♥ by <a href="https://heyloura.com">Loura</a></small></li>
                     </ul>
@@ -240,7 +246,6 @@ function _pageShellEnd(user) {
 </div>
 </body>
 <style>.small-img{width:unset!important;margin-left:unset!important;}</style>
-<script>${_commonjs}</script>
 </html>`;
     }
     return `
@@ -248,9 +253,33 @@ function _pageShellEnd(user) {
     </div>
 </div>
 
+<dialog id="kb-help" class="kb-help-dialog hide-if-user-has-no-javascript">
+    <div class="kb-help-header">
+        <strong>Keyboard shortcuts</strong>
+        <button type="button" onclick="this.closest('dialog').close()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="kb-help-body">
+        <h3>Navigation</h3>
+        <dl>
+            <dt><kbd>j</kbd></dt><dd>Next post</dd>
+            <dt><kbd>k</kbd></dt><dd>Previous post</dd>
+            <dt><kbd>o</kbd></dt><dd>Open post</dd>
+            <dt><kbd>r</kbd></dt><dd>Reply to post</dd>
+        </dl>
+        <h3>Paging</h3>
+        <dl>
+            <dt><kbd>n</kbd></dt><dd>Next page</dd>
+            <dt><kbd>p</kbd></dt><dd>Previous page</dd>
+        </dl>
+        <h3>Other</h3>
+        <dl>
+            <dt><kbd>?</kbd></dt><dd>Toggle this help</dd>
+        </dl>
+    </div>
+</dialog>
+
 </body>
 <style>.small-img{width:unset!important;margin-left:unset!important;}</style>
-<script>${_commonjs}</script>
 </html>`;
 }
 

@@ -15,19 +15,26 @@
 
         <input class="form-input editor-title" name="name" type="text" placeholder="Title (optional)" value="{{title}}">
 
-        <label class="editor-upload-label {{btnClass}}" hidden>
-            <i class="bi bi-image"></i> Attach image
-            <input type="file" accept="image/*" class="editor-file-input">
+        <label class="editor-upload-label btn-glossy" hidden>
+            <i class="bi bi-paperclip"></i> Attach media
+            <input type="file" accept="image/*,video/*,audio/*,.pdf,.zip" multiple class="editor-file-input">
         </label>
 
         <textarea id="editor-content" class="form-input editor-textarea" name="content" placeholder="Write here...">{{image}}{{quoteback}}{{content}}{{bookPost}}</textarea>
+        <div id="char-count" class="editor-char-count hide-if-user-has-no-javascript"></div>
+
+        <details class="editor-summary-toggle" {{summaryOpen}}>
+            <summary>Summary</summary>
+            <textarea class="form-input editor-summary" name="summary" placeholder="A short summary for your post (optional)" rows="2">{{summary}}</textarea>
+        </details>
+
+        <div id="editor-previews" class="editor-previews hide-if-user-has-no-javascript"></div>
 
         <div class="editor-footer">
-            <select class="form-select editor-status" name="status">
-                <option value="publish" {{publishSelected}}>Publish</option>
-                <option value="draft" {{draftSelected}}>Draft</option>
-            </select>
-            <button type="submit" class="btn {{btnClass}}">Save</button>
+            {{deleteButton}}
+            <span class="editor-footer-spacer"></span>
+            <button type="submit" name="status" value="draft" class="btn">Save Draft</button>
+            <button type="submit" name="status" value="publish" class="btn btn-glossy">Publish</button>
         </div>
     </form>
 </div>
@@ -36,22 +43,42 @@
     var ta = document.getElementById('editor-content');
     if (!ta) return;
 
-    // Show image upload button (hidden without JS)
+    // Show upload button (hidden without JS)
     var uploadLabel = document.querySelector('.editor-upload-label');
     if (uploadLabel) {
         uploadLabel.removeAttribute('hidden');
         var fileInput = uploadLabel.querySelector('.editor-file-input');
         if (fileInput) {
             fileInput.addEventListener('change', function() {
-                if (fileInput.files.length > 0) uploadImage(fileInput.files[0]);
+                for (var i = 0; i < fileInput.files.length; i++) uploadFile(fileInput.files[i]);
                 fileInput.value = '';
             });
         }
     }
 
     // Auto-grow textarea (growTextArea is defined in common.js)
-    ta.addEventListener('input', function() { growTextArea(ta); });
+    ta.addEventListener('input', function() { growTextArea(ta); updateCharCount(); });
     growTextArea(ta);
+
+    // Smart character count — strips markdown to approximate displayed text length.
+    var charCountEl = document.getElementById('char-count');
+    function stripMarkdown(s) {
+        return s
+            .replace(/!\[[^\]]*\]\([^)]*\)/g, '')       // images (remove entirely)
+            .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')    // links → keep text
+            .replace(/[*_~`]{1,3}([^*_~`]+)[*_~`]{1,3}/g, '$1') // bold/italic/strike/code
+            .replace(/^#{1,6}\s+/gm, '')                 // headings
+            .replace(/^>\s?/gm, '')                      // blockquotes
+            .replace(/^[-*+]\s+/gm, '')                  // list markers
+            .replace(/^\d+\.\s+/gm, '');                 // ordered list markers
+    }
+    function updateCharCount() {
+        var text = stripMarkdown(ta.value).trim();
+        var len = text.length;
+        charCountEl.textContent = len + ' character' + (len !== 1 ? 's' : '');
+        charCountEl.classList.toggle('over-limit', len > 300);
+    }
+    updateCharCount();
 
     // Wrap selection with markdown syntax
     function wrapSelection(before, after) {
@@ -71,52 +98,186 @@
         if (e.key === 'k') { e.preventDefault(); wrapSelection('[', '](url)'); }
     });
 
-    // Drag-drop image upload
+    // Drag-drop file upload
     ta.addEventListener('dragover', function(e) { e.preventDefault(); ta.classList.add('dragover'); });
     ta.addEventListener('dragleave', function() { ta.classList.remove('dragover'); });
     ta.addEventListener('drop', function(e) {
         e.preventDefault();
         ta.classList.remove('dragover');
         var files = e.dataTransfer.files;
-        for (var i = 0; i < files.length; i++) {
-            if (!files[i].type.startsWith('image/')) continue;
-            uploadImage(files[i]);
-        }
+        for (var i = 0; i < files.length; i++) uploadFile(files[i]);
     });
 
-    // Paste image upload
+    // Paste file upload (images from clipboard, etc.)
     ta.addEventListener('paste', function(e) {
         var items = e.clipboardData && e.clipboardData.items;
         if (!items) return;
         for (var i = 0; i < items.length; i++) {
-            if (items[i].type.startsWith('image/')) {
+            if (items[i].kind === 'file') {
                 e.preventDefault();
-                uploadImage(items[i].getAsFile());
+                uploadFile(items[i].getAsFile());
             }
         }
     });
 
-    function uploadImage(file) {
+    var previewsEl = document.getElementById('editor-previews');
+
+    // Poll for AI-generated alt text after upload. Checks every 4s for up to 60s.
+    // Updates the preview card and stored markdown when alt text arrives.
+    function pollForAlt(card, url) {
+        var altEl = card.querySelector('.editor-preview-alt');
+        altEl.textContent = 'Waiting for AI description\u2026';
+        altEl.className = 'editor-preview-alt polling';
+        var attempts = 0;
+        var maxAttempts = 15; // 15 * 4s = 60s
+        var timer = setInterval(function() {
+            attempts++;
+            fetch('/media/check-alt?url=' + encodeURIComponent(url))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.alt) {
+                        clearInterval(timer);
+                        card.dataset.md = markdownFor(card.dataset.type, url, data.alt, card.dataset.filename);
+                        altEl.textContent = data.alt;
+                        altEl.className = 'editor-preview-alt found';
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(timer);
+                        altEl.textContent = 'No AI description found';
+                        altEl.className = 'editor-preview-alt not-found';
+                    }
+                })
+                .catch(function() {
+                    if (attempts >= maxAttempts) {
+                        clearInterval(timer);
+                        altEl.textContent = 'No AI description found';
+                        altEl.className = 'editor-preview-alt not-found';
+                    }
+                });
+        }, 4000);
+    }
+
+    function mediaType(file) {
+        if (file.type.startsWith('image/')) return 'image';
+        if (file.type.startsWith('video/')) return 'video';
+        if (file.type.startsWith('audio/')) return 'audio';
+        return 'file';
+    }
+
+    function previewHTML(type, url, filename) {
+        if (type === 'image') return '<img src="' + url + '" class="editor-preview-thumb" alt="Preview">';
+        if (type === 'video') return '<video src="' + url + '" class="editor-preview-thumb" muted playsinline></video>';
+        if (type === 'audio') return '<div class="editor-preview-icon"><i class="bi bi-file-music"></i></div><audio src="' + url + '" controls class="editor-preview-audio"></audio>';
+        return '<div class="editor-preview-icon"><i class="bi bi-file-earmark"></i></div><span class="editor-preview-filename">' + (filename || 'file') + '</span>';
+    }
+
+    function markdownFor(type, url, alt, filename) {
+        if (type === 'image') return '![' + (alt || '') + '](' + url + ')';
+        if (type === 'video') return '![](' + url + ')';
+        return '[' + (filename || url) + '](' + url + ')';
+    }
+
+    function uploadFile(file) {
         var dest = document.querySelector('input[name="destination"]').value;
-        var placeholder = '![Uploading...]()';
-        var pos = ta.selectionStart;
-        ta.value = ta.value.slice(0, pos) + placeholder + ta.value.slice(pos);
-        autoGrow();
+        var type = mediaType(file);
+        var filename = file.name;
+
+        // Show a loading preview card immediately
+        var card = document.createElement('div');
+        card.className = 'editor-preview-card loading';
+        card.dataset.type = type;
+        card.dataset.filename = filename;
+        card.innerHTML = '<div class="editor-preview-thumb-wrap"><span class="editor-preview-loading">Uploading\u2026</span></div>';
+        previewsEl.appendChild(card);
 
         var fd = new FormData();
         fd.append('destination', dest);
-        fd.append('media', file, file.name);
+        fd.append('media', file, filename);
         fetch('/media/upload', { method: 'POST', body: fd })
             .then(function(r) { return r.text(); })
             .then(function(url) {
-                ta.value = ta.value.replace(placeholder, '![](' + url + ')');
-                autoGrow();
+                url = url.trim();
+                card.className = 'editor-preview-card';
+                card.dataset.url = url;
+                card.dataset.md = markdownFor(type, url, '', filename);
+                card.innerHTML =
+                    '<div class="editor-preview-thumb-wrap">' +
+                        previewHTML(type, url, filename) +
+                        '<button type="button" class="editor-preview-remove" title="Delete">&times;</button>' +
+                    '</div>' +
+                    '<div class="editor-preview-alt"></div>' +
+                    '<div class="editor-preview-actions">' +
+                        '<select class="form-select editor-preview-mode">' +
+                            '<option value="append">Append to post</option>' +
+                            '<option value="prepend">Prepend to post</option>' +
+                            '<option value="copy">Copy markdown</option>' +
+                        '</select>' +
+                        '<button type="button" class="btn btn-glossy btn-sm editor-preview-go">Insert</button>' +
+                    '</div>';
+                // Only poll for AI alt text on images
+                if (type === 'image') pollForAlt(card, url);
             })
             .catch(function() {
-                ta.value = ta.value.replace(placeholder, '');
-                autoGrow();
+                card.remove();
             });
     }
+
+    // Update the action button label when the dropdown changes
+    previewsEl.addEventListener('change', function(e) {
+        if (!e.target.matches('.editor-preview-mode')) return;
+        var btn = e.target.closest('.editor-preview-card').querySelector('.editor-preview-go');
+        btn.textContent = e.target.value === 'copy' ? 'Copy' : 'Insert';
+    });
+
+    // Preview actions — delegated from the previews container
+    previewsEl.addEventListener('click', function(e) {
+        var card = e.target.closest('.editor-preview-card');
+        if (!card) return;
+
+        // Delete
+        if (e.target.closest('.editor-preview-remove')) {
+            var dest = document.querySelector('input[name="destination"]').value;
+            var fd = new FormData();
+            fd.append('destination', dest);
+            fd.append('url', card.dataset.url);
+            fetch('/media/delete', { method: 'POST', body: fd });
+            card.remove();
+            return;
+        }
+
+        // Insert / Copy
+        if (e.target.closest('.editor-preview-go')) {
+            var mode = card.querySelector('.editor-preview-mode').value;
+            var md = card.dataset.md;
+            if (mode === 'append') {
+                ta.value = ta.value.trimEnd() + '\n\n' + md;
+                growTextArea(ta); updateCharCount();
+            } else if (mode === 'prepend') {
+                ta.value = md + '\n\n' + ta.value.trimStart();
+                growTextArea(ta); updateCharCount();
+            } else if (mode === 'copy') {
+                navigator.clipboard.writeText(md);
+                var btn = card.querySelector('.editor-preview-go');
+                btn.textContent = 'Copied!';
+                setTimeout(function() { btn.textContent = 'Insert'; }, 1500);
+                return;
+            }
+            card.classList.add('inserted');
+        }
+    });
+
+    // Badge counts on tag/syndicate dropdown buttons
+    function updateBadge(dropdownId) {
+        var dd = document.getElementById(dropdownId);
+        if (!dd) return;
+        var count = dd.querySelectorAll('input[type="checkbox"]:checked').length;
+        var badge = dd.querySelector('.editor-badge');
+        if (badge) badge.textContent = count || '';
+    }
+    function updateAllBadges() { updateBadge('categories-dropdown'); updateBadge('syndicates-dropdown'); }
+    document.querySelectorAll('.editor-checklist input[type="checkbox"]').forEach(function(cb) {
+        cb.addEventListener('change', updateAllBadges);
+    });
+    updateAllBadges();
 
     // Tab key inserts spaces instead of changing focus
     ta.addEventListener('keydown', function(e) {

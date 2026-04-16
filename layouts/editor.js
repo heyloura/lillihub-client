@@ -42,7 +42,7 @@ export async function EditorTemplate(user, token, req) {
     ).join('');
 
     if(edit) {
-        fetching = await fetch(`https://micro.blog/micropub?q=source&properties=content&url=${edit}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
+        fetching = await fetch(`https://micro.blog/micropub?q=source&url=${edit}&mp-destination=${encodeURIComponent(mpDestination)}`, { method: "GET", headers: { "Authorization": "Bearer " + token } } );
         post = await fetching.json();
     }
 
@@ -77,15 +77,15 @@ export async function EditorTemplate(user, token, req) {
         : `<span class="editor-dest-label">${destinationName}</span>`;
 
     const categoriesDropdown = categories.categories && categories.categories.length > 0
-        ? `<div class="dropdown dropdown-right">
-            <a class="btn ${btnClass} dropdown-toggle" tabindex="0"><i class="bi bi-tags"></i></a>
+        ? `<div class="dropdown dropdown-right" id="categories-dropdown">
+            <a class="btn btn-glossy dropdown-toggle" tabindex="0"><i class="bi bi-tags"></i><span class="editor-badge hide-if-user-has-no-javascript"></span></a>
             <ul class="menu editor-checklist">${categoryCheckboxes}</ul>
            </div>`
         : '';
 
     const syndicatesDropdown = syndicateList.length > 0
-        ? `<div class="dropdown dropdown-right">
-            <a class="btn ${btnClass} dropdown-toggle" tabindex="0"><i class="bi bi-share"></i></a>
+        ? `<div class="dropdown dropdown-right" id="syndicates-dropdown">
+            <a class="btn btn-glossy dropdown-toggle" tabindex="0"><i class="bi bi-share"></i><span class="editor-badge hide-if-user-has-no-javascript"></span></a>
             <ul class="menu editor-checklist">${syndicateCheckboxes}</ul>
            </div>`
         : '';
@@ -102,9 +102,15 @@ export async function EditorTemplate(user, token, req) {
         .replaceAll('{{quoteback}}', quoteback)
         .replaceAll('{{bookPost}}', bookPost)
         .replaceAll('{{content}}', post && post.properties.content[0] ? post.properties.content[0] : '' )
-        .replaceAll('{{publishSelected}}', post && post.properties["post-status"][0] == 'published' ? `selected="selected"` : '' )
-        .replaceAll('{{draftSelected}}', post && post.properties["post-status"][0] == 'draft' ? `selected="selected"` : '' )
-        .replaceAll('{{btnClass}}', btnClass)
+        .replaceAll('{{summary}}', post && post.properties.summary && post.properties.summary[0] ? post.properties.summary[0] : '')
+        .replaceAll('{{summaryOpen}}', post && post.properties.summary && post.properties.summary[0] ? 'open' : '')
+        .replaceAll('{{deleteButton}}', edit
+            ? `<details class="editor-delete-details hide-if-user-has-javascript">
+                    <summary class="btn btn-danger"><i class="bi bi-trash"></i> Delete</summary>
+                    <button type="submit" formaction="/post/delete" class="btn btn-danger">Confirm Delete</button>
+               </details>
+               <button type="submit" formaction="/post/delete" class="btn btn-danger hide-if-user-has-no-javascript" onclick="return confirm('Permanently delete this post?')"><i class="bi bi-trash"></i> Delete</button>`
+            : '')
 
     return HTMLPage(token, edit ? 'Editor' : 'Post', content, user);
 }

@@ -63,6 +63,7 @@
     <div class="blog-toolbar mb-2 mt-2">
         <div class="blog-toolbar-row">
             {{destinationDropdown}}
+            <span class="blog-toolbar-spacer"></span>
             <form enctype="multipart/form-data" action="/media/upload" method="POST">
                 <input type="hidden" name="destination" value="{{destination}}" />
                 <input type="hidden" name="redirect" value="true" />

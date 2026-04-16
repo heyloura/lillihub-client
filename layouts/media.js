@@ -60,5 +60,5 @@ export async function MediaTemplate(user, token, req) {
         .replaceAll('{{q}}', q ? q : '')
         .replaceAll('{{nextHref}}', nextHref)
 
-    return HTMLPage(token, 'Media', content, user);
+    return HTMLPage(token, 'Media', content, user, '', undefined, { destination: mpDestination });
 }

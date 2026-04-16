@@ -10,7 +10,9 @@ const MEDIA_ROUTE = new URLPattern({ pathname: "/media" });
 const ADD_POST = new URLPattern({ pathname: "/post/add" });
 const EDIT_POST = new URLPattern({ pathname: "/post/edit" });
 const UPLOAD_MEDIA_ROUTE = new URLPattern({ pathname: "/media/upload" });
+const DELETE_POST_ROUTE = new URLPattern({ pathname: "/post/delete" });
 const DELETE_MEDIA_ROUTE = new URLPattern({ pathname: "/media/delete" });
+const CHECK_ALT_ROUTE = new URLPattern({ pathname: "/media/check-alt" });
 
 export async function tryHandle(req, ctx) {
     const { user, accessTokenValue } = ctx;
@@ -94,12 +96,15 @@ export async function tryHandle(req, ctx) {
         const name = value.get('name');
         const url = value.get('url');
 
+        const summary = value.get('summary');
+
         const updatePost = {
             action: "update",
             url: url,
             replace: {
                 content: [content],
                 name: [name],
+                summary: [summary || ''],
                 category: categories,
                 "post-status": status == 'draft' ? ['draft'] : ['published']
             }
@@ -126,6 +131,29 @@ export async function tryHandle(req, ctx) {
         }
 
         return Response.redirect(req.url.replaceAll('/post/edit', `/posts?destination=${destination}`));
+    }
+
+    if (DELETE_POST_ROUTE.exec(req.url) && user) {
+        const value = await req.formData();
+        const destination = value.get('destination');
+        const url = value.get('url');
+
+        const deleteBody = JSON.stringify({
+            action: "delete",
+            url: url,
+            ...(destination ? { "mp-destination": destination } : {})
+        });
+
+        const posting = await fetch('https://micro.blog/micropub', {
+            method: 'POST',
+            body: deleteBody,
+            headers: { 'Authorization': 'Bearer ' + accessTokenValue, 'Content-Type': 'application/json' }
+        });
+        if (!posting.ok) {
+            console.log(`${user.username} tried to delete a post and ${await posting.text()}`);
+        }
+
+        return Response.redirect(req.url.replaceAll('/post/delete', `/posts?destination=${destination}`));
     }
 
     if (UPLOAD_MEDIA_ROUTE.exec(req.url) && user) {
@@ -210,6 +238,28 @@ export async function tryHandle(req, ctx) {
         }
 
         return Response.redirect(req.url.replaceAll('/media/delete', `/media?destination=${destination}`));
+    }
+
+    // Proxy for checking AI-generated alt text on uploaded media.
+    // Client polls this after upload; returns JSON { alt: "..." } or { alt: "" }.
+    if (CHECK_ALT_ROUTE.exec(req.url) && user) {
+        const params = new URL(req.url).searchParams;
+        const mediaUrl = params.get('url');
+        if (!mediaUrl) return new Response('{"alt":""}', { headers: { "content-type": "application/json" } });
+
+        try {
+            const configRes = await fetch('https://micro.blog/micropub?q=config', { method: 'GET', headers: { 'Authorization': 'Bearer ' + accessTokenValue } });
+            const config = await configRes.json();
+            const mediaEndpoint = config['media-endpoint'];
+            if (!mediaEndpoint) throw new Error('No media-endpoint');
+
+            const sourceRes = await fetch(`${mediaEndpoint}?q=source&url=${encodeURIComponent(mediaUrl)}`, { method: 'GET', headers: { 'Authorization': 'Bearer ' + accessTokenValue } });
+            const source = await sourceRes.json();
+            const alt = source.alt || '';
+            return new Response(JSON.stringify({ alt }), { headers: { 'content-type': 'application/json' } });
+        } catch (err) {
+            return new Response('{"alt":""}', { headers: { 'content-type': 'application/json' } });
+        }
     }
 
     return null;

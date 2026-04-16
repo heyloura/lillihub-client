@@ -103,5 +103,5 @@ export async function BlogTemplate(user, token, req) {
         .replaceAll('{{feed}}', feed)
         .replaceAll('{{nextHref}}', nextHref);
 
-    return HTMLPage(token, status ? 'Draft' : 'Posts', content, user);
+    return HTMLPage(token, status ? 'Draft' : 'Posts', content, user, '', undefined, { destination: mpDestination });
 }

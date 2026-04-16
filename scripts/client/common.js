@@ -69,3 +69,79 @@ document.addEventListener('click', (e) => {
 
 // Initial sync — reflects whatever the inline head script already applied.
 syncThemePickerPressed();
+
+// ---------------------------------------------------------------------------
+// Keyboard navigation
+// ---------------------------------------------------------------------------
+// Shortcuts are guarded so they never fire inside form fields. Post-level
+// navigation (j/k/o/r) only activates when .card elements exist on the page.
+// Paging (n/p) works anywhere a .paging element is present.
+
+var _kbIdx = -1; // index of the currently focused post card
+
+function _kbCards() { return document.querySelectorAll('.content > .card, .content > .container > .card'); }
+
+function _kbFocus(idx) {
+    var cards = _kbCards();
+    if (!cards.length) return;
+    // Remove previous highlight
+    var prev = document.querySelector('.card.kb-focus');
+    if (prev) prev.classList.remove('kb-focus');
+    // Clamp
+    if (idx < 0) idx = 0;
+    if (idx >= cards.length) idx = cards.length - 1;
+    _kbIdx = idx;
+    cards[idx].classList.add('kb-focus');
+    cards[idx].scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+
+document.addEventListener('keydown', function(e) {
+    // Never intercept when typing in a form field or when modifiers are held
+    if (e.target.matches('input, textarea, select, [contenteditable]')) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    var cards = _kbCards();
+
+    switch (e.key) {
+        // Post navigation
+        case 'j': if (cards.length) { e.preventDefault(); _kbFocus(_kbIdx + 1); } break;
+        case 'k': if (cards.length) { e.preventDefault(); _kbFocus(_kbIdx - 1); } break;
+        case 'o': // fall through
+        case 'Enter':
+            if (_kbIdx >= 0 && cards[_kbIdx]) {
+                var link = cards[_kbIdx].querySelector('.card-footer a[href*="/timeline/"]') ||
+                           cards[_kbIdx].querySelector('.card-footer a[href]');
+                if (link) { e.preventDefault(); link.click(); }
+            }
+            break;
+        case 'r':
+            if (_kbIdx >= 0 && cards[_kbIdx]) {
+                var details = cards[_kbIdx].querySelector('details.reply-details');
+                if (details) {
+                    e.preventDefault();
+                    details.open = true;
+                    var ta = details.querySelector('textarea');
+                    if (ta) ta.focus();
+                }
+            }
+            break;
+        // Paging
+        case 'n': {
+            var next = document.querySelector('.paging a[href*="last="]');
+            if (next && !next.classList.contains('hide')) { e.preventDefault(); next.click(); }
+            break;
+        }
+        case 'p': {
+            var prev = document.querySelector('.paging a[href*="before="]');
+            if (prev && !prev.classList.contains('hide')) { e.preventDefault(); prev.click(); }
+            break;
+        }
+        // Help
+        case '?': {
+            e.preventDefault();
+            var dlg = document.getElementById('kb-help');
+            if (dlg) dlg.open ? dlg.close() : dlg.showModal();
+            break;
+        }
+    }
+});
