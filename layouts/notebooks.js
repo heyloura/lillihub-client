@@ -27,21 +27,21 @@ export async function NotebooksTemplate(user, token, req) {
                     </div>
                     <div class="card-header-actions btn-group">
                         <div class="dropdown dropdown-right">
-                            <a class="btn btn-glossy-orange btn-sm dropdown-toggle" tabindex="0"><i class="bi bi-three-dots-vertical"></i></a>
+                            <a class="btn btn-glossy btn-sm dropdown-toggle" tabindex="0"><i class="bi bi-three-dots-vertical"></i></a>
                             <ul class="menu" style="min-width:200px; padding:0.5rem;">
                                 <form action="/notebook/rename" method="POST" class="mb-2">
                                     <input type="hidden" name="notebook_id" value="${item.id}" />
                                     <div class="input-group">
                                         <input type="text" name="name" value="${item.title}" class="form-input" required />
-                                        <button type="submit" class="btn btn-glossy-orange btn-sm">Rename</button>
+                                        <button type="submit" class="btn btn-glossy btn-sm">Rename</button>
                                     </div>
                                 </form>
                                 <details>
-                                    <summary class="btn btn-glossy-orange btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete notebook</summary>
+                                    <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete notebook</summary>
                                     <form action="/notebook/delete" method="POST" class="mt-2">
                                         <input type="hidden" name="notebook_id" value="${item.id}" />
                                         <p style="font-size:0.85rem;color:var(--overlay-1);">This will delete all notes in this notebook.</p>
-                                        <button type="submit" class="btn btn-glossy-orange btn-sm">Confirm Delete</button>
+                                        <button type="submit" class="btn btn-glossy btn-sm">Confirm Delete</button>
                                     </form>
                                 </details>
                             </ul>

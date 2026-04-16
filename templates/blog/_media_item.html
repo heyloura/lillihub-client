@@ -10,13 +10,13 @@
         </div>
     </div>
     <div class="media-row-actions">
-        <a class="btn btn-glossy-blue btn-sm" href="/post?img={{encodedUrl}}&alt={{altEncoded}}&area=blog"><i class="bi bi-pencil"></i> Post</a>
+        <a class="btn btn-glossy btn-sm" href="/post?img={{encodedUrl}}&alt={{altEncoded}}&area=blog"><i class="bi bi-pencil"></i> Post</a>
         <details>
-            <summary class="btn btn-glossy-blue btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
+            <summary class="btn btn-glossy btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
             <form action="/media/delete" method="POST" style="position:absolute;right:0;background:var(--crust);padding:0.5rem;border-radius:0.25rem;z-index:10;">
                 <input type="hidden" name="destination" value="{{destination}}" />
                 <input type="hidden" name="url" value="{{url}}" />
-                <button type="submit" class="btn btn-glossy-blue btn-sm">Confirm</button>
+                <button type="submit" class="btn btn-glossy btn-sm">Confirm</button>
             </form>
         </details>
     </div>

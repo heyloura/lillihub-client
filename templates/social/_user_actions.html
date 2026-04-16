@@ -6,13 +6,13 @@
         <li class="menu-item">
             <form method="POST" action="/users/{{muteUnmute}}" class="inline-action">
                 <input type="hidden" name="username" value="{{username}}" />
-                <button class="btn btn-block" type="submit">{{muteUnmute}} user</button>
+                <button class="btn btn-block" type="submit" onclick="return confirm('{{muteUnmute}} this user?')">{{muteUnmute}} user</button>
             </form>
         </li>
         <li class="menu-item">
             <form method="POST" action="/users/{{blockUnblock}}" class="inline-action">
                 <input type="hidden" name="username" value="{{username}}" />
-                <button class="btn btn-block" type="submit">{{blockUnblock}} user</button>
+                <button class="btn btn-block" type="submit" onclick="return confirm('{{blockUnblock}} this user?')">{{blockUnblock}} user</button>
             </form>
         </li>
     </ul>

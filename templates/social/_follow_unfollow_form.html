@@ -1,6 +1,6 @@
 <li class="menu-item">
     <form method="POST" action="/users/unfollow" class="inline-action">
         <input type="hidden" name="username" value="{{username}}" />
-        <button class="btn btn-block" type="submit">unfollow <i class="bi bi-person-dash"></i></button>
+        <button class="btn btn-block" type="submit" onclick="return confirm('Unfollow this user?')">unfollow <i class="bi bi-person-dash"></i></button>
     </form>
 </li>

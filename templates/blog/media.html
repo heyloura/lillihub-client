@@ -66,18 +66,18 @@
             <form enctype="multipart/form-data" action="/media/upload" method="POST">
                 <input type="hidden" name="destination" value="{{destination}}" />
                 <input type="hidden" name="redirect" value="true" />
-                <label class="btn btn-glossy-blue">
+                <label class="btn btn-glossy">
                     <i class="bi bi-upload"></i> Upload
                     <input type="file" name="media" style="display:none" onchange="this.form.submit()">
                 </label>
-                <noscript><button type="submit" class="btn btn-glossy-blue">Go</button></noscript>
+                <noscript><button type="submit" class="btn btn-glossy">Go</button></noscript>
             </form>
         </div>
         <form method="GET" action="/media" class="mt-2">
             <input type="hidden" name="destination" value="{{destination}}" />
             <div class="input-group">
                 <input autocomplete="off" type="search" name="q" value="{{q}}" class="form-input" placeholder="Search uploads..." />
-                <button type="submit" class="btn btn-glossy-blue"><i class="bi bi-search"></i></button>
+                <button type="submit" class="btn btn-glossy"><i class="bi bi-search"></i></button>
             </div>
         </form>
     </div>
@@ -85,6 +85,6 @@
     {{feed}}
 
     <div class="mt-2 mb-2" style="text-align:right;">
-        <a href="{{nextHref}}" class="btn btn-glossy-blue">Next <i class="bi bi-arrow-right"></i></a>
+        <a href="{{nextHref}}" class="btn btn-glossy">Next <i class="bi bi-arrow-right"></i></a>
     </div>
 </div>

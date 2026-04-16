@@ -77,13 +77,13 @@ export async function BookmarksTemplate(user, token, req) {
                 item.tags.split(',').forEach(tag => checklist = checklist.replaceAll(`{{${tag}}}`, 'checked="checked"'));
             }
             tagDropdown = `<div class="dropdown dropdown-right">
-                <a class="btn btn-glossy-purple btn-sm dropdown-toggle" tabindex="0"><i class="bi bi-tags"></i></a>
+                <a class="btn btn-glossy btn-sm dropdown-toggle" tabindex="0"><i class="bi bi-tags"></i></a>
                 <ul class="menu" style="min-width:200px; padding:0.5rem;">
                     <form action="/bookmarks/update" method="POST">
                         <input type="hidden" name="id" value="${item.id}" />
                         <div class="editor-checklist">${checklist}</div>
                         <input class="form-input mt-2" name="newTag" type="text" placeholder="New tag..." />
-                        <button type="submit" class="btn btn-glossy-purple btn-sm mt-2">Save</button>
+                        <button type="submit" class="btn btn-glossy btn-sm mt-2">Save</button>
                     </form>
                 </ul>
             </div>`;

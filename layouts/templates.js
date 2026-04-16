@@ -11,11 +11,11 @@ function getArea(title) {
 
 function PrimaryAction(area, title, context) {
     if(title == 'Editor' || title == 'Post') return '';
-    if(area == 'notes' && context?.notebookId) return `<div class="sidebar-action sidebar-action-orange"><a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}"><i class="bi bi-pencil-square"></i> New Note</a></div>`;
-    if(area == 'notes') return `<div class="sidebar-action sidebar-action-orange"><a href="/notebook/new"><i class="bi bi-journal-plus"></i> New Notebook</a></div>`;
-    if(area == 'bookmarks') return `<div class="sidebar-action sidebar-action-purple"><a href="/bookmark/new"><i class="bi bi-bookmark-plus"></i> New Bookmark</a></div>`;
-    if(area == 'bookshelves' && context?.shelfId) return `<div class="sidebar-action sidebar-action-red"><a href="/books"><i class="bi bi-plus-circle"></i> Add Book</a></div>`;
-    if(area == 'bookshelves') return `<div class="sidebar-action sidebar-action-red"><a href="/books"><i class="bi bi-search-heart"></i> Discover Books</a></div>`;
+    if(area == 'notes' && context?.notebookId) return `<div class="sidebar-action sidebar-action"><a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}"><i class="bi bi-pencil-square"></i> New Note</a></div>`;
+    if(area == 'notes') return `<div class="sidebar-action sidebar-action"><a href="/notebook/new"><i class="bi bi-journal-plus"></i> New Notebook</a></div>`;
+    if(area == 'bookmarks') return `<div class="sidebar-action sidebar-action"><a href="/bookmark/new"><i class="bi bi-bookmark-plus"></i> New Bookmark</a></div>`;
+    if(area == 'bookshelves' && context?.shelfId) return `<div class="sidebar-action sidebar-action"><a href="/books"><i class="bi bi-plus-circle"></i> Add Book</a></div>`;
+    if(area == 'bookshelves') return `<div class="sidebar-action sidebar-action"><a href="/books"><i class="bi bi-search-heart"></i> Discover Books</a></div>`;
     return `<div class="sidebar-action"><a href="/post"><i class="bi bi-pencil-square"></i> New Post</a></div>`;
 }
 
@@ -179,19 +179,19 @@ ${FabAction(area, title, context)}
         ${PrimaryAction(area, title, context)}
 
         <nav class="sidebar-nav">
-            <a href="/" class="sidebar-nav-item sidebar-nav-green${area == 'social' ? ' active' : ''}">
+            <a href="/" class="sidebar-nav-item sidebar-nav-social${area == 'social' ? ' active' : ''}">
                 <i class="bi bi-card-list"></i> Timeline
             </a>
-            <a href="/posts" class="sidebar-nav-item sidebar-nav-blue${area == 'blog' ? ' active' : ''}">
+            <a href="/posts" class="sidebar-nav-item sidebar-nav-blog${area == 'blog' ? ' active' : ''}">
                 <i class="bi bi-pencil-square"></i> Blog
             </a>
-            <a href="/bookmarks" class="sidebar-nav-item sidebar-nav-purple${area == 'bookmarks' ? ' active' : ''}">
+            <a href="/bookmarks" class="sidebar-nav-item sidebar-nav-bookmarks${area == 'bookmarks' ? ' active' : ''}">
                 <i class="bi bi-bookmark"></i> Bookmarks
             </a>
-            <a href="/bookshelves" class="sidebar-nav-item sidebar-nav-red${area == 'bookshelves' ? ' active' : ''}">
+            <a href="/bookshelves" class="sidebar-nav-item sidebar-nav-bookshelves${area == 'bookshelves' ? ' active' : ''}">
                 <i class="bi bi-book"></i> Bookshelves
             </a>
-            <a href="/notes" class="sidebar-nav-item sidebar-nav-orange${area == 'notes' ? ' active' : ''}">
+            <a href="/notes" class="sidebar-nav-item sidebar-nav-notes${area == 'notes' ? ' active' : ''}">
                 <i class="bi bi-journal"></i> Notebooks
             </a>
         </nav>

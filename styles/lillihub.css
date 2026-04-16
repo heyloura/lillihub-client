@@ -67,7 +67,7 @@
         color-scheme: light;
         --base: #eff1f5;
         --on-base: #4c4f69;
-        --link: #179299;
+        --link: #41929c;
         --bg-dark: #e6e9ef;
         --bg-on-dark: #4c4f69;
         --bg-secondary: #e6e9ef;
@@ -83,18 +83,18 @@
         --mantle: #e6e9ef;
         --crust: #dce0e8;
 
-        --red: #d20f39;
-        --redorange: #e64553;
-        --orange: #fe640b;
-        --orangeyellow: #e88339;
-        --yellow: #df8e1d;
-        --yellowgreen: #a0a73c;
-        --green: #40a02b;
-        --greenblue: #179299;
-        --blue: #1e66f5;
-        --bluepurple: #7287fd;
-        --purple: #8839ef;
-        --purplered: #ea76cb;
+        --red: #b14362;
+        --redorange: #bd6372;
+        --orange: #cb7647;
+        --orangeyellow: #be8962;
+        --yellow: #b98f51;
+        --yellowgreen: #939e64;
+        --green: #599a5a;
+        --greenblue: #41929c;
+        --blue: #4577d3;
+        --bluepurple: #778bd8;
+        --purple: #855ccf;
+        --purplered: #bf81ba;
 
         --shadow-sm-soft: 0 1px 3px rgba(0,0,0,0.08);
         --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
@@ -116,7 +116,7 @@
     color-scheme: light;
     --base: #eff1f5;
     --on-base: #4c4f69;
-    --link: #179299;
+    --link: #41929c;
     --bg-dark: #e6e9ef;
     --bg-on-dark: #4c4f69;
     --bg-secondary: #e6e9ef;
@@ -132,18 +132,18 @@
     --mantle: #e6e9ef;
     --crust: #dce0e8;
 
-    --red: #d20f39;
-    --redorange: #e64553;
-    --orange: #fe640b;
-    --orangeyellow: #e88339;
-    --yellow: #df8e1d;
-    --yellowgreen: #a0a73c;
-    --green: #40a02b;
-    --greenblue: #179299;
-    --blue: #1e66f5;
-    --bluepurple: #7287fd;
-    --purple: #8839ef;
-    --purplered: #ea76cb;
+    --red: #b14362;
+    --redorange: #bd6372;
+    --orange: #cb7647;
+    --orangeyellow: #be8962;
+    --yellow: #b98f51;
+    --yellowgreen: #939e64;
+    --green: #599a5a;
+    --greenblue: #41929c;
+    --blue: #4577d3;
+    --bluepurple: #778bd8;
+    --purple: #855ccf;
+    --purplered: #bf81ba;
 
     --shadow-sm-soft: 0 1px 3px rgba(0,0,0,0.08);
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
@@ -159,6 +159,15 @@
     --scrim: rgba(0,0,0,0.4);
     --scrim-soft: rgba(0,0,0,0.3);
 }
+
+/* --- Area accent tokens — the green→purplered arc.
+   Each area sets --area-accent so buttons, nav, paging, and FABs
+   all pick up the right color without per-area overrides. */
+.area-social     { --area-accent: var(--green); }
+.area-blog       { --area-accent: var(--greenblue); }
+.area-bookmarks  { --area-accent: var(--blue); }
+.area-bookshelves { --area-accent: var(--purple); }
+.area-notes      { --area-accent: var(--purplered); }
 
 /* --- Reset & Base --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -240,23 +249,8 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 }
 .landing-input-row .btn-glossy {
     flex-shrink: 0;
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--green)),
-        var(--green) 40%,
-        color-mix(in srgb, black 10%, var(--green))) !important;
-    border: 1px solid color-mix(in srgb, black 20%, var(--green)) !important;
-    border-radius: 0.5rem !important;
-    color: var(--crust) !important;
     padding: 0.5rem 1rem;
-    box-shadow: var(--shadow-sm), var(--inset-highlight);
-    cursor: pointer;
     font-weight: 600;
-}
-.landing-input-row .btn-glossy:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--green)),
-        color-mix(in srgb, white 15%, var(--green)) 50%,
-        color-mix(in srgb, white 5%, var(--green))) !important;
 }
 .landing-details {
     margin-top: 1rem;
@@ -326,89 +320,23 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     text-align: center;
     padding: 0.45rem 0.75rem;
     background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--purple)),
-        var(--purple) 40%,
-        color-mix(in srgb, black 10%, var(--purple)));
+        color-mix(in srgb, white 15%, var(--area-accent)),
+        var(--area-accent) 40%,
+        color-mix(in srgb, black 10%, var(--area-accent)));
     color: var(--base);
     border-radius: 0.5rem;
     font-weight: 600;
     font-size: 1rem;
     text-decoration: none;
     box-shadow: var(--shadow-sm), var(--inset-highlight);
-    border: 1px solid color-mix(in srgb, black 20%, var(--purple));
+    border: 1px solid color-mix(in srgb, black 20%, var(--area-accent));
 }
 .sidebar-action a:hover {
     background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--purple)),
-        var(--purple) 40%,
-        color-mix(in srgb, black 5%, var(--purple)));
+        color-mix(in srgb, white 22%, var(--area-accent)),
+        var(--area-accent) 40%,
+        color-mix(in srgb, black 5%, var(--area-accent)));
     color: var(--base);
-}
-/* Area-colored sidebar action button */
-.area-social .sidebar-action a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--green)),
-        var(--green) 40%,
-        color-mix(in srgb, black 10%, var(--green)));
-    border-color: color-mix(in srgb, black 20%, var(--green));
-}
-.area-social .sidebar-action a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--green)),
-        var(--green) 40%,
-        color-mix(in srgb, black 5%, var(--green)));
-}
-.area-blog .sidebar-action a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--blue)),
-        var(--blue) 40%,
-        color-mix(in srgb, black 10%, var(--blue)));
-    border-color: color-mix(in srgb, black 20%, var(--blue));
-}
-.area-blog .sidebar-action a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--blue)),
-        var(--blue) 40%,
-        color-mix(in srgb, black 5%, var(--blue)));
-}
-.area-notes .sidebar-action a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--orange)),
-        var(--orange) 40%,
-        color-mix(in srgb, black 10%, var(--orange)));
-    border-color: color-mix(in srgb, black 20%, var(--orange));
-}
-.area-notes .sidebar-action a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--orange)),
-        var(--orange) 40%,
-        color-mix(in srgb, black 5%, var(--orange)));
-}
-.area-bookmarks .sidebar-action a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--purple)),
-        var(--purple) 40%,
-        color-mix(in srgb, black 10%, var(--purple)));
-    border-color: color-mix(in srgb, black 20%, var(--purple));
-}
-.area-bookmarks .sidebar-action a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--purple)),
-        var(--purple) 40%,
-        color-mix(in srgb, black 5%, var(--purple)));
-}
-.area-bookshelves .sidebar-action a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--red)),
-        var(--red) 40%,
-        color-mix(in srgb, black 10%, var(--red)));
-    border-color: color-mix(in srgb, black 20%, var(--red));
-}
-.area-bookshelves .sidebar-action a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--red)),
-        var(--red) 40%,
-        color-mix(in srgb, black 5%, var(--red)));
 }
 
 /* Sidebar nav — compact list with colored left border accents */
@@ -431,10 +359,8 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 }
 .sidebar-nav-item:hover {
     background: var(--surface-subtle);
-    /* No color override: let the per-area color (.sidebar-nav-green, etc.)
-       show through on hover. Setting `color: var(--text)` here used to wipe
-       the per-area color because :hover is higher specificity than the
-       plain class. */
+    /* No color override: let the per-area color (.sidebar-nav-social, etc.)
+       show through on hover. */
 }
 .sidebar-nav-item .bi {
     font-size: 1rem;
@@ -447,16 +373,16 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
    so they beat the global `a:hover` rule on anchor-tag sidebar items. Without
    the class+class+pseudo specificity, hover would fall through to the global
    link hover color. */
-.sidebar-nav-green,
-.sidebar-nav-item.sidebar-nav-green:hover { border-left-color: var(--green); color: var(--green); }
-.sidebar-nav-blue,
-.sidebar-nav-item.sidebar-nav-blue:hover { border-left-color: var(--blue); color: var(--blue); }
-.sidebar-nav-purple,
-.sidebar-nav-item.sidebar-nav-purple:hover { border-left-color: var(--purple); color: var(--purple); }
-.sidebar-nav-orange,
-.sidebar-nav-item.sidebar-nav-orange:hover { border-left-color: var(--orange); color: var(--orange); }
-.sidebar-nav-red,
-.sidebar-nav-item.sidebar-nav-red:hover { border-left-color: var(--red); color: var(--red); }
+.sidebar-nav-social,
+.sidebar-nav-item.sidebar-nav-social:hover { border-left-color: var(--green); color: var(--green); }
+.sidebar-nav-blog,
+.sidebar-nav-item.sidebar-nav-blog:hover { border-left-color: var(--greenblue); color: var(--greenblue); }
+.sidebar-nav-bookmarks,
+.sidebar-nav-item.sidebar-nav-bookmarks:hover { border-left-color: var(--blue); color: var(--blue); }
+.sidebar-nav-bookshelves,
+.sidebar-nav-item.sidebar-nav-bookshelves:hover { border-left-color: var(--purple); color: var(--purple); }
+.sidebar-nav-notes,
+.sidebar-nav-item.sidebar-nav-notes:hover { border-left-color: var(--purplered); color: var(--purplered); }
 
 /* Active nav item — colored background glow */
 .sidebar-nav-item.active {
@@ -464,26 +390,26 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     color: var(--text);
     background: var(--surface-subtle);
 }
-.sidebar-nav-green.active {
+.sidebar-nav-social.active {
     background: color-mix(in srgb, var(--green) 15%, var(--crust));
     color: var(--green);
     border-left-width: 3px;
 }
-.sidebar-nav-blue.active {
+.sidebar-nav-blog.active {
+    background: color-mix(in srgb, var(--greenblue) 15%, var(--crust));
+    color: var(--greenblue);
+}
+.sidebar-nav-bookmarks.active {
     background: color-mix(in srgb, var(--blue) 15%, var(--crust));
     color: var(--blue);
 }
-.sidebar-nav-purple.active {
+.sidebar-nav-bookshelves.active {
     background: color-mix(in srgb, var(--purple) 15%, var(--crust));
     color: var(--purple);
 }
-.sidebar-nav-orange.active {
-    background: color-mix(in srgb, var(--orange) 15%, var(--crust));
-    color: var(--orange);
-}
-.sidebar-nav-red.active {
-    background: color-mix(in srgb, var(--red) 15%, var(--crust));
-    color: var(--red);
+.sidebar-nav-notes.active {
+    background: color-mix(in srgb, var(--purplered) 15%, var(--crust));
+    color: var(--purplered);
 }
 
 .sidebar-footer {
@@ -610,59 +536,24 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     transition: background 0.15s;
 }
 .page-nav a:hover { background: var(--mantle); }
-.area-social .page-nav a { color: var(--greenblue); }
-.area-social .page-nav a:hover { color: var(--greenblue); }
+.page-nav a { color: var(--area-accent); }
+.page-nav a:hover { color: var(--area-accent); }
 .page-nav a.active {
     font-weight: 600;
-    color: var(--base);
+    background: color-mix(in srgb, var(--area-accent) 15%, var(--crust));
+    color: var(--area-accent);
     border: none;
     box-shadow: var(--shadow-sm-soft), var(--inset-highlight);
-}
-/* Area-colored glossy active nav buttons */
-.area-social .page-nav a.active {
-    background: color-mix(in srgb, var(--green) 15%, var(--crust));
-    color: var(--green);
-    border-left-width: 3px;
-}
-.area-blog .page-nav a.active {
-    background: 
-    color-mix(in srgb, var(--blue) 15%, var(--crust));
-        color: var(--blue);
-}
-.area-bookmarks .page-nav a { color: var(--purple); }
-.area-bookmarks .page-nav a:hover { color: var(--purple); }
-.area-bookmarks .page-nav a.active {
-    background: color-mix(in srgb, var(--purple) 15%, var(--crust));
-    color: var(--purple);
-}
-.area-notes .page-nav a { color: var(--orange); }
-.area-notes .page-nav a:hover { color: var(--orange); }
-.area-notes .page-nav a.active {
-    background: color-mix(in srgb, var(--orange) 15%, var(--crust));
-    color: var(--orange);
-}
-.area-bookshelves .page-nav a.active {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--red)),
-        var(--red) 40%,
-        color-mix(in srgb, black 10%, var(--red)));
-}
-.area-bookshelves .card-header-actions .btn-link {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--red)),
-        var(--red) 40%,
-        color-mix(in srgb, black 10%, var(--red))) !important;
-    border-color: color-mix(in srgb, black 20%, var(--red)) !important;
-}
-.area-bookshelves .card-header-actions .btn-link,
-.area-bookshelves .card-header-actions .btn-glossy-red {
-    height: 2rem;
-    display: inline-flex;
-    align-items: center;
 }
 /* The Add-Book button on discover books is wrapped in a <form>; the form
    needs matching display, alignment, AND height so its child button lines up
    with the other .btn-link siblings in the action row. */
+.area-bookshelves .card-header-actions .btn-link,
+.area-bookshelves .card-header-actions .btn-glossy {
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+}
 .area-bookshelves .card-header-actions form {
     display: inline-flex;
     align-items: center;
@@ -736,186 +627,54 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 .card-header-actions:focus-within {
     opacity: 1;
 }
-/* Glossy green action buttons */
+/* Glossy action buttons — reads --area-accent from the body's .area-* class.
+   One rule set handles all five areas. */
 .card-header-actions.btn-group .btn {
     border-radius: 0.5rem;
 }
 .btn-glossy,
 .card-header-actions .btn-link {
     background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--green)),
-        var(--green) 40%,
-        color-mix(in srgb, black 10%, var(--green))) !important;
-    border: 1px solid color-mix(in srgb, black 20%, var(--green)) !important;
+        color-mix(in srgb, white 15%, var(--area-accent)),
+        var(--area-accent) 40%,
+        color-mix(in srgb, black 10%, var(--area-accent))) !important;
+    border: 1px solid color-mix(in srgb, black 20%, var(--area-accent)) !important;
     border-radius: 0.5rem !important;
     padding: 0.35rem 0.5rem;
     box-shadow: var(--shadow-sm), var(--inset-highlight);
     color: var(--crust) !important;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: inherit;
+    line-height: 1.4;
+    display: inline-block;
     transition: background 0.15s, box-shadow 0.15s;
 }
 .btn-glossy *,
 .card-header-actions .btn-link * { color: inherit !important; }
-/* Hover state — big bright gradient lift. opacity: 1 is important because
-   the anchor-tag variants (<a class="btn btn-link">) would otherwise pick up
-   `a:hover { opacity: 0.85 }` and end up looking dimmer than their
-   button-tag siblings, breaking visual parity between the two markup forms.
-   Default hover uses green (social area); per-area overrides follow below. */
 .btn-glossy:hover,
 .card-header-actions .btn-link:hover,
 .card-header-actions .inline-action:hover button.btn-link,
 .card-header-actions form:hover button.btn-link {
     background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--green)),
-        color-mix(in srgb, white 15%, var(--green)) 50%,
-        color-mix(in srgb, white 5%, var(--green))) !important;
+        color-mix(in srgb, white 55%, var(--area-accent)),
+        color-mix(in srgb, white 15%, var(--area-accent)) 50%,
+        color-mix(in srgb, white 5%, var(--area-accent))) !important;
     color: var(--crust) !important;
     opacity: 1 !important;
     box-shadow: var(--shadow-md-strong), var(--inset-highlight-strong) !important;
 }
-/* Per-area hover overrides — each area's action buttons hover to the area
-   accent color. Defined after the default so they win the cascade. Selectors
-   match the same set (button AND <a> AND form-wrapped button). */
-.area-bookshelves .btn-glossy:hover,
-.area-bookshelves .card-header-actions .btn-link:hover,
-.area-bookshelves .card-header-actions .inline-action:hover button.btn-link,
-.area-bookshelves .card-header-actions form:hover button.btn-glossy-red,
-.area-bookshelves .card-header-actions form:hover button.btn-link {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--red)),
-        color-mix(in srgb, white 15%, var(--red)) 50%,
-        color-mix(in srgb, white 5%, var(--red))) !important;
+.btn-glossy.btn-sm {
+    font-size: 0.85rem;
+    padding: 0.2rem 0.4rem;
 }
-.area-bookmarks .btn-glossy:hover,
-.area-bookmarks .card-header-actions .btn-link:hover,
-.area-bookmarks .card-header-actions .inline-action:hover button.btn-link,
-.area-bookmarks .card-header-actions form:hover button.btn-link {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--purple)),
-        color-mix(in srgb, white 15%, var(--purple)) 50%,
-        color-mix(in srgb, white 5%, var(--purple))) !important;
-}
-.area-notes .btn-glossy:hover,
-.area-notes .card-header-actions .btn-link:hover,
-.area-notes .card-header-actions .inline-action:hover button.btn-link,
-.area-notes .card-header-actions form:hover button.btn-link {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--orange)),
-        color-mix(in srgb, white 15%, var(--orange)) 50%,
-        color-mix(in srgb, white 5%, var(--orange))) !important;
-}
-.area-blog .btn-glossy:hover,
-.area-blog .card-header-actions .btn-link:hover,
-.area-blog .card-header-actions .inline-action:hover button.btn-link,
-.area-blog .card-header-actions form:hover button.btn-link {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--blue)),
-        color-mix(in srgb, white 15%, var(--blue)) 50%,
-        color-mix(in srgb, white 5%, var(--blue))) !important;
+.input-group .btn-glossy {
+    border-radius: 0 0.5rem 0.5rem 0 !important;
+    flex: 0 0 auto;
 }
 .card-body {
     overflow-wrap: anywhere;
     display: flow-root;
-}
-
-/* Glossy blue action buttons (blog area) */
-.btn-glossy-blue {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--blue)),
-        var(--blue) 40%,
-        color-mix(in srgb, black 10%, var(--blue))) !important;
-    border: 1px solid color-mix(in srgb, black 20%, var(--blue)) !important;
-    border-radius: 0.5rem !important;
-    padding: 0.35rem 0.5rem;
-    box-shadow: var(--shadow-sm), var(--inset-highlight);
-    color: var(--crust) !important;
-    text-decoration: none;
-    cursor: pointer;
-    font-size: inherit;
-    line-height: 1.4;
-    display: inline-block;
-}
-.btn-glossy-blue * { color: inherit !important; }
-.btn-glossy-blue:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--blue)),
-        var(--blue) 40%,
-        color-mix(in srgb, black 5%, var(--blue))) !important;
-    color: var(--crust) !important;
-}
-.btn-glossy-blue.btn-sm {
-    font-size: 0.85rem;
-    padding: 0.2rem 0.4rem;
-}
-.input-group .btn-glossy-blue {
-    border-radius: 0 0.5rem 0.5rem 0 !important;
-    flex: 0 0 auto;
-}
-
-/* Glossy purple action buttons (bookmarks area) */
-.btn-glossy-purple {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--purple)),
-        var(--purple) 40%,
-        color-mix(in srgb, black 10%, var(--purple))) !important;
-    border: 1px solid color-mix(in srgb, black 20%, var(--purple)) !important;
-    border-radius: 0.5rem !important;
-    padding: 0.35rem 0.5rem;
-    box-shadow: var(--shadow-sm), var(--inset-highlight);
-    color: var(--crust) !important;
-    text-decoration: none;
-    cursor: pointer;
-    font-size: inherit;
-    line-height: 1.4;
-    display: inline-block;
-}
-.btn-glossy-purple * { color: inherit !important; }
-.btn-glossy-purple:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--purple)),
-        var(--purple) 40%,
-        color-mix(in srgb, black 5%, var(--purple))) !important;
-    color: var(--crust) !important;
-}
-.btn-glossy-purple.btn-sm {
-    font-size: 0.85rem;
-    padding: 0.2rem 0.4rem;
-}
-.input-group .btn-glossy-purple {
-    border-radius: 0 0.5rem 0.5rem 0 !important;
-    flex: 0 0 auto;
-}
-
-.btn-glossy-red {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--red)),
-        var(--red) 40%,
-        color-mix(in srgb, black 10%, var(--red))) !important;
-    border: 1px solid color-mix(in srgb, black 20%, var(--red)) !important;
-    border-radius: 0.5rem !important;
-    padding: 0.35rem 0.5rem;
-    box-shadow: var(--shadow-sm), var(--inset-highlight);
-    color: var(--crust) !important;
-    text-decoration: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-.btn-glossy-red * { color: inherit !important; }
-.btn-glossy-red:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--red)),
-        var(--red) 40%,
-        color-mix(in srgb, black 5%, var(--red))) !important;
-    color: var(--crust) !important;
-}
-.btn-glossy-red.btn-sm {
-    font-size: 0.85rem;
-    padding: 0.2rem 0.4rem;
-}
-.input-group .btn-glossy-red {
-    border-radius: 0 0.5rem 0.5rem 0 !important;
-    flex: 0 0 auto;
 }
 
 /* Bookmark page */
@@ -926,52 +685,18 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 }
 .bookmark-tags .chip { cursor: pointer; }
 .bookmark-tags .chip.active {
-    background: var(--purple);
+    background: var(--area-accent);
     color: var(--base);
 }
 .bookmark-tags .chip.active a { color: var(--base); }
 .bookmark-tag-chip {
-    background: color-mix(in srgb, var(--purple) 20%, var(--mantle));
-    color: var(--purple);
+    background: color-mix(in srgb, var(--area-accent) 20%, var(--mantle));
+    color: var(--area-accent);
     font-size: 0.75rem;
 }
 .bookmark-highlight-chip {
     background: var(--yellow);
     color: var(--crust);
-}
-
-/* Glossy orange action buttons (notes area) */
-.btn-glossy-orange {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--orange)),
-        var(--orange) 40%,
-        color-mix(in srgb, black 10%, var(--orange))) !important;
-    border: 1px solid color-mix(in srgb, black 20%, var(--orange)) !important;
-    border-radius: 0.5rem !important;
-    padding: 0.35rem 0.5rem;
-    box-shadow: var(--shadow-sm), var(--inset-highlight);
-    color: var(--crust) !important;
-    text-decoration: none;
-    cursor: pointer;
-    font-size: inherit;
-    line-height: 1.4;
-    display: inline-block;
-}
-.btn-glossy-orange * { color: inherit !important; }
-.btn-glossy-orange:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--orange)),
-        var(--orange) 40%,
-        color-mix(in srgb, black 5%, var(--orange))) !important;
-    color: var(--crust) !important;
-}
-.btn-glossy-orange.btn-sm {
-    font-size: 0.85rem;
-    padding: 0.2rem 0.4rem;
-}
-.input-group .btn-glossy-orange {
-    border-radius: 0 0.5rem 0.5rem 0 !important;
-    flex: 0 0 auto;
 }
 
 /* Blog toolbar */
@@ -1414,8 +1139,8 @@ span.badge::after {
     font-weight: 600;
 }
 .area-notes .tab-item.active a {
-    border-bottom-color: var(--orange);
-    color: var(--orange);
+    border-bottom-color: var(--area-accent);
+    color: var(--area-accent);
 }
 
 /* --- Todo List --- */
@@ -1676,79 +1401,24 @@ span.badge::after {
     font-size: 0.9rem;
     text-decoration: none;
     background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--green)),
-        var(--green) 40%,
-        color-mix(in srgb, black 10%, var(--green)));
-    border: 1px solid color-mix(in srgb, black 20%, var(--green));
+        color-mix(in srgb, white 15%, var(--area-accent)),
+        var(--area-accent) 40%,
+        color-mix(in srgb, black 10%, var(--area-accent)));
+    border: 1px solid color-mix(in srgb, black 20%, var(--area-accent));
     color: var(--crust);
     box-shadow: var(--shadow-sm), var(--inset-highlight);
 }
 .paging a:hover {
     background: linear-gradient(180deg,
-        color-mix(in srgb, white 22%, var(--green)),
-        var(--green) 40%,
-        color-mix(in srgb, black 5%, var(--green)));
+        color-mix(in srgb, white 22%, var(--area-accent)),
+        var(--area-accent) 40%,
+        color-mix(in srgb, black 5%, var(--area-accent)));
     color: var(--crust);
     opacity: 1;
 }
 .paging a[disabled] {
     opacity: 0.4;
     pointer-events: none;
-}
-
-/* Per-area paging button colors — each area's paging link matches its accent
-   color. Defined after the default so they win the cascade. */
-.area-bookmarks .paging a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--purple)),
-        var(--purple) 40%,
-        color-mix(in srgb, black 10%, var(--purple)));
-    border-color: color-mix(in srgb, black 20%, var(--purple));
-}
-.area-bookmarks .paging a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--purple)),
-        color-mix(in srgb, white 15%, var(--purple)) 50%,
-        color-mix(in srgb, white 5%, var(--purple)));
-}
-.area-blog .paging a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--blue)),
-        var(--blue) 40%,
-        color-mix(in srgb, black 10%, var(--blue)));
-    border-color: color-mix(in srgb, black 20%, var(--blue));
-}
-.area-blog .paging a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--blue)),
-        color-mix(in srgb, white 15%, var(--blue)) 50%,
-        color-mix(in srgb, white 5%, var(--blue)));
-}
-.area-bookshelves .paging a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--red)),
-        var(--red) 40%,
-        color-mix(in srgb, black 10%, var(--red)));
-    border-color: color-mix(in srgb, black 20%, var(--red));
-}
-.area-bookshelves .paging a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--red)),
-        color-mix(in srgb, white 15%, var(--red)) 50%,
-        color-mix(in srgb, white 5%, var(--red)));
-}
-.area-notes .paging a {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 15%, var(--orange)),
-        var(--orange) 40%,
-        color-mix(in srgb, black 10%, var(--orange)));
-    border-color: color-mix(in srgb, black 20%, var(--orange));
-}
-.area-notes .paging a:hover {
-    background: linear-gradient(180deg,
-        color-mix(in srgb, white 55%, var(--orange)),
-        color-mix(in srgb, white 15%, var(--orange)) 50%,
-        color-mix(in srgb, white 5%, var(--orange)));
 }
 
 /* --- Utilities --- */
@@ -2030,35 +1700,12 @@ p { margin: 0.6rem 0; }
         transition: background 0.15s;
     }
     .bottom-nav a:hover, .bottom-nav label:hover { background: var(--mantle); }
-    .area-social .bottom-nav a { color: var(--greenblue); }
-    .area-blog .bottom-nav a { color: var(--blue); }
+    .bottom-nav a { color: var(--area-accent); }
     .bottom-nav a.active {
         font-weight: 600;
-        color: var(--base);
+        background: color-mix(in srgb, var(--area-accent) 15%, var(--crust));
+        color: var(--area-accent);
         box-shadow: var(--shadow-sm-soft), var(--inset-highlight);
-    }
-    .area-social .bottom-nav a.active {
-        background: color-mix(in srgb, var(--green) 15%, var(--crust));
-        color: var(--green);
-        border-left-width: 3px;
-    }
-    .area-blog .bottom-nav a.active {
-        background: 
-            color-mix(in srgb, var(--blue) 15%, var(--crust));
-                color: var(--blue);
-    }
-    .area-bookmarks .bottom-nav a { color: var(--purple); }
-    .area-bookmarks .bottom-nav a.active {
-        background: color-mix(in srgb, var(--purple) 15%, var(--crust));
-        color: var(--purple);
-    }
-    .area-notes .bottom-nav a { color: var(--orange); }
-    .area-notes .bottom-nav a.active {
-        background: color-mix(in srgb, var(--orange) 15%, var(--crust));
-        color: var(--orange);
-    }
-    .area-bookshelves .bottom-nav a.active {
-        background: linear-gradient(180deg, color-mix(in srgb, white 15%, var(--red)), var(--red) 40%, color-mix(in srgb, black 10%, var(--red)));
     }
     .bottom-nav .bi { font-size: 1rem; }
 
@@ -2098,7 +1745,10 @@ p { margin: 0.6rem 0; }
         width: 3rem;
         height: 3rem;
         border-radius: 50%;
-        background: var(--purple);
+        background: linear-gradient(180deg,
+            color-mix(in srgb, white 15%, var(--area-accent)),
+            var(--area-accent) 40%,
+            color-mix(in srgb, black 10%, var(--area-accent)));
         color: var(--base);
         box-shadow: var(--shadow-md);
         z-index: 99;
@@ -2106,36 +1756,6 @@ p { margin: 0.6rem 0; }
         font-size: 1.5rem;
     }
     .fab:hover { opacity: 0.9; }
-    .area-social .fab {
-        background: linear-gradient(180deg,
-            color-mix(in srgb, white 15%, var(--green)),
-            var(--green) 40%,
-            color-mix(in srgb, black 10%, var(--green)));
-    }
-    .area-blog .fab {
-        background: linear-gradient(180deg,
-            color-mix(in srgb, white 15%, var(--blue)),
-            var(--blue) 40%,
-            color-mix(in srgb, black 10%, var(--blue)));
-    }
-    .area-bookmarks .fab {
-        background: linear-gradient(180deg,
-            color-mix(in srgb, white 15%, var(--purple)),
-            var(--purple) 40%,
-            color-mix(in srgb, black 10%, var(--purple)));
-    }
-    .area-notes .fab {
-        background: linear-gradient(180deg,
-            color-mix(in srgb, white 15%, var(--orange)),
-            var(--orange) 40%,
-            color-mix(in srgb, black 10%, var(--orange)));
-    }
-    .area-bookshelves .fab {
-        background: linear-gradient(180deg,
-            color-mix(in srgb, white 15%, var(--red)),
-            var(--red) 40%,
-            color-mix(in srgb, black 10%, var(--red)));
-    }
 
     /* Hamburger toggle button */
     .sidebar-toggle-btn {
@@ -2302,23 +1922,23 @@ p { margin: 0.6rem 0; }
     :root:not([data-theme="dark"]) {
         --hljs-bg: #eff1f5;
         --hljs-text: #4c4f69;
-        --hljs-keyword: #8839ef;
-        --hljs-title: #1e66f5;
-        --hljs-string: #40a02b;
+        --hljs-keyword: #855ccf;
+        --hljs-title: #4577d3;
+        --hljs-string: #599a5a;
         --hljs-comment: #9ca0b0;
-        --hljs-number: #fe640b;
-        --hljs-builtin: #179299;
+        --hljs-number: #cb7647;
+        --hljs-builtin: #41929c;
     }
  }
  :root[data-theme="light"] {
     --hljs-bg: #eff1f5;
     --hljs-text: #4c4f69;
-    --hljs-keyword: #8839ef;
-    --hljs-title: #1e66f5;
-    --hljs-string: #40a02b;
+    --hljs-keyword: #855ccf;
+    --hljs-title: #4577d3;
+    --hljs-string: #599a5a;
     --hljs-comment: #9ca0b0;
-    --hljs-number: #fe640b;
-    --hljs-builtin: #179299;
+    --hljs-number: #cb7647;
+    --hljs-builtin: #41929c;
  }
 
  .hljs {

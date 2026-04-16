@@ -3,7 +3,7 @@
         <p>Enter your secret key to access your notes.</p>
         <div class="input-group">
             <input id="notes_key" type="text" class="form-input" placeholder="Micro.blog Key">
-            <button class="btn btn-glossy-orange" id="saveKeyBtn"><i class="bi bi-save"></i></button>
+            <button class="btn btn-glossy" id="saveKeyBtn"><i class="bi bi-save"></i></button>
         </div>
     </div>
     <div id="note_editor" style="display:none;">
@@ -16,7 +16,7 @@
         <textarea id="note-content" class="form-input mt-2" placeholder="Write here..." style="min-height:200px;"></textarea>
 
         <div class="mt-2" style="display:flex;justify-content:flex-end;">
-            <button class="btn btn-glossy-orange" id="saveNoteBtn">Save Note</button>
+            <button class="btn btn-glossy" id="saveNoteBtn">Save Note</button>
         </div>
     </div>
 </div>
@@ -69,14 +69,10 @@
         }
     }
 
-    // Auto-grow textarea
+    // Auto-grow textarea (growTextArea is defined in common.js)
     const ta = document.getElementById('note-content');
-    function autoGrow() {
-        ta.style.height = 'auto';
-        ta.style.height = Math.max(ta.scrollHeight, 200) + 'px';
-    }
-    ta.addEventListener('input', autoGrow);
-    autoGrow();
+    ta.addEventListener('input', function() { growTextArea(ta); });
+    growTextArea(ta);
 
     // Keyboard shortcuts: Ctrl+B = bold, Ctrl+I = italic, Ctrl+K = link
     ta.addEventListener('keydown', function(e) {

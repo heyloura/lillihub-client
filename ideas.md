@@ -10,12 +10,6 @@ Resolved items from the 2.0 work have been moved into [CHANGELOG.md](CHANGELOG.m
 
 ## Bugs
 
-- **Videos in the timeline aren't playing.** Posts that contain `<video>` tags
-  from the micro.blog API render but don't actually play. May or may not be a
-  Lillihub bug — possibly a browser issue. Needs reproduction and investigation:
-  `cleanFormatHTML` in `scripts/server/utilities.js` (which sanitizes post HTML
-  via ammonia), video-related CSS rules, and whether controls/src/poster
-  attributes survive the ammonia pass.
 
 ---
 

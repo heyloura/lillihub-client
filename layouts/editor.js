@@ -69,12 +69,9 @@ export async function EditorTemplate(user, token, req) {
         </label></li>`
     ).join('') : '';
 
-    const isBlueArea = area === 'blog';
-    const btnClass = isBlueArea ? 'btn-glossy-blue' : 'btn-glossy';
-
     const destinationDropdown = config.destination && config.destination.length > 1
         ? `<div class="dropdown">
-            <a class="btn ${btnClass} dropdown-toggle" tabindex="0">${destinationName} <i class="bi bi-caret-down-fill"></i></a>
+            <a class="btn btn-glossy dropdown-toggle" tabindex="0">${destinationName} <i class="bi bi-caret-down-fill"></i></a>
             <ul class="menu">${destinationItems}</ul>
            </div>`
         : `<span class="editor-dest-label">${destinationName}</span>`;

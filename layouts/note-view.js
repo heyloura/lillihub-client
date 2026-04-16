@@ -26,7 +26,7 @@ export async function NoteViewTemplate(user, token, notebookId, noteId, isTodo) 
     let versionsButton = '';
     if (versions?.items?.length > 0) {
         versionsButton = `<details style="display:inline;">
-            <summary class="btn btn-glossy-orange btn-sm" style="list-style:none;"><i class="bi bi-clock-history"></i> Versions</summary>
+            <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-clock-history"></i> Versions</summary>
             <div class="mt-2 mb-2">
                 ${versions.items.reverse().map((v, i) => `<p>
                     <a href="/notes/${notebookId}/update?id=${noteId}&vid=${v.id}">${formatDate(v.date_published)}</a>${i === 0 ? ' (current)' : ''}

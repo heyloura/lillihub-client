@@ -1,21 +1,3 @@
 <div class="container">
-    <div class="blog-toolbar mb-2 mt-2">
-        <div class="input-group">
-            <input type="search" id="searchbox" class="form-input" placeholder="Search books..." />
-            <button type="button" class="btn btn-glossy-red"><i class="bi bi-search"></i></button>
-        </div>
-    </div>
     {{feed}}
 </div>
-<script>
-(function() {
-    var searchbox = document.getElementById('searchbox');
-    if (!searchbox) return;
-    searchbox.addEventListener('input', function() {
-        var q = this.value.toLowerCase();
-        document.querySelectorAll('.book-card').forEach(function(card) {
-            card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none';
-        });
-    });
-})();
-</script>

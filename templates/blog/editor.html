@@ -49,13 +49,9 @@
         }
     }
 
-    // Auto-grow textarea
-    function autoGrow() {
-        ta.style.height = 'auto';
-        ta.style.height = Math.max(ta.scrollHeight, 200) + 'px';
-    }
-    ta.addEventListener('input', autoGrow);
-    autoGrow();
+    // Auto-grow textarea (growTextArea is defined in common.js)
+    ta.addEventListener('input', function() { growTextArea(ta); });
+    growTextArea(ta);
 
     // Wrap selection with markdown syntax
     function wrapSelection(before, after) {

@@ -4,12 +4,12 @@
         <p>Enter your secret key to access your notes.</p>
         <div class="input-group">
             <input id="notes_key" type="text" class="form-input" placeholder="Micro.blog Key">
-            <button class="btn btn-glossy-orange" id="saveKeyBtn"><i class="bi bi-save"></i></button>
+            <button class="btn btn-glossy" id="saveKeyBtn"><i class="bi bi-save"></i></button>
         </div>
     </div>
     <div id="note_view" style="display:none;">
         <div class="mt-2 mb-2" style="display:flex;gap:0.5rem;align-items:center;">
-            <a href="/notes/{{notebookId}}/update?id={{noteId}}" class="btn btn-glossy-orange btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+            <a href="/notes/{{notebookId}}/update?id={{noteId}}" class="btn btn-glossy btn-sm"><i class="bi bi-pencil"></i> Edit</a>
             {{sharedChip}}
         </div>
 
@@ -27,12 +27,12 @@
         <div class="mt-2 pt-2" style="border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;">
             {{versionsButton}}
             <details style="display:inline;">
-                <summary class="btn btn-glossy-orange btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete</summary>
+                <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete</summary>
                 <form method="POST" action="/note/delete" class="mt-2">
                     <input type="hidden" name="id" value="{{noteId}}" />
                     <input type="hidden" name="notebookId" value="{{notebookId}}" />
                     <p style="font-size:0.85rem;color:var(--overlay-1);">This will permanently delete this note.</p>
-                    <button type="submit" class="btn btn-glossy-orange btn-sm">Confirm Delete</button>
+                    <button type="submit" class="btn btn-glossy btn-sm">Confirm Delete</button>
                 </form>
             </details>
         </div>

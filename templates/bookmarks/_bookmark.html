@@ -16,10 +16,10 @@
             <div class="card-header-actions btn-group">
                 {{tagDropdown}}
                 <details>
-                    <summary class="btn btn-glossy-purple btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
+                    <summary class="btn btn-glossy btn-sm" style="list-style:none"><i class="bi bi-trash"></i></summary>
                     <form action="/bookmarks/unbookmark" method="POST" style="position:absolute;right:0;background:var(--crust);padding:0.5rem;border-radius:0.25rem;z-index:10;">
                         <input type="hidden" name="id" value="{{id}}" />
-                        <button type="submit" class="btn btn-glossy-purple btn-sm">Confirm</button>
+                        <button type="submit" class="btn btn-glossy btn-sm">Confirm</button>
                     </form>
                 </details>
             </div>

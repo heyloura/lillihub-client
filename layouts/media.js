@@ -28,7 +28,7 @@ export async function MediaTemplate(user, token, req) {
 
     const destinationDropdown = config.destination && config.destination.length > 1
         ? `<div class="dropdown">
-            <a class="btn btn-glossy-blue dropdown-toggle" tabindex="0">${destinationName} <i class="bi bi-caret-down-fill"></i></a>
+            <a class="btn btn-glossy dropdown-toggle" tabindex="0">${destinationName} <i class="bi bi-caret-down-fill"></i></a>
             <ul class="menu">${destinationItems}</ul>
            </div>`
         : `<span class="editor-dest-label">${destinationName}</span>`;

@@ -1,11 +1,11 @@
 // Tiny client-side helpers used by the page shell.
 // Anything bigger lives in its own file (todo.js, crypto.js).
 
-// Mirror textarea content into a hidden ::after pseudo-element so the textarea
-// can grow with its content. The CSS uses .grow-wrap > textarea + .grow-wrap::after
-// stacked in the same grid cell to make this work without JS-driven height math.
+// Auto-grow a textarea to fit its content. Reset to `auto` first so shrinking
+// works when the user deletes lines, then set to scrollHeight.
 function growTextArea(el) {
-    el.parentNode.dataset.replicatedValue = el.value;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
 }
 
 // Show a full-screen loading overlay. Used as `onclick="addLoading(this)"` on

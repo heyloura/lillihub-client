@@ -2,11 +2,11 @@
     <div class="blog-toolbar mb-2 mt-2">
         <div class="blog-toolbar-row">
             <div class="dropdown">
-                <a class="btn btn-glossy-blue dropdown-toggle" tabindex="0">{{destinationName}} <i class="bi bi-caret-down-fill"></i></a>
+                <a class="btn btn-glossy dropdown-toggle" tabindex="0">{{destinationName}} <i class="bi bi-caret-down-fill"></i></a>
                 <ul class="menu">{{destinationItems}}</ul>
             </div>
             <div class="dropdown dropdown-right">
-                <a class="btn btn-glossy-blue dropdown-toggle" tabindex="0"><span class="{{categoryBadge}}"><i class="bi bi-tags"></i></span></a>
+                <a class="btn btn-glossy dropdown-toggle" tabindex="0"><span class="{{categoryBadge}}"><i class="bi bi-tags"></i></span></a>
                 <ul class="menu">{{categoryItems}}</ul>
             </div>
         </div>
@@ -15,7 +15,7 @@
             <input type="hidden" name="destination" value="{{destination}}" />
             <div class="input-group">
                 <input autocomplete="off" type="search" name="q" value="{{q}}" class="form-input" placeholder="Search posts..." />
-                <button type="submit" class="btn btn-glossy-blue"><i class="bi bi-search"></i></button>
+                <button type="submit" class="btn btn-glossy"><i class="bi bi-search"></i></button>
             </div>
         </form>
     </div>
@@ -23,6 +23,6 @@
     {{feed}}
 
     <div class="mt-2 mb-2" style="text-align:right;">
-        <a href="{{nextHref}}" class="btn btn-glossy-blue">Next <i class="bi bi-arrow-right"></i></a>
+        <a href="{{nextHref}}" class="btn btn-glossy">Next <i class="bi bi-arrow-right"></i></a>
     </div>
 </div>
