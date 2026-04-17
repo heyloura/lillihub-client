@@ -1606,6 +1606,12 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 .card-header-actions.btn-group .btn:last-child { border-radius: 0.5rem; }
 
 /* --- Forms --- */
+.form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
 .form-input, .form-select {
     display: block;
     width: 100%;
@@ -2230,8 +2236,9 @@ kbd {
     flex-shrink: 0;
 }
 
-/* --- Notebook manage dialog --- */
-.notebook-dialog {
+/* --- Manage dialogs (notebooks, bookshelves) --- */
+.notebook-dialog,
+.bookshelf-dialog {
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     background: var(--base);
@@ -2244,16 +2251,19 @@ kbd {
     transform: translate(-50%, -50%);
     margin: 0;
 }
-.notebook-dialog::backdrop {
+.notebook-dialog::backdrop,
+.bookshelf-dialog::backdrop {
     background: var(--scrim);
 }
-.notebook-dialog-header {
+.notebook-dialog-header,
+.bookshelf-dialog-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
 }
-.notebook-dialog-header h3 {
+.notebook-dialog-header h3,
+.bookshelf-dialog-header h3 {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
@@ -2263,7 +2273,8 @@ kbd {
     min-width: 0;
     flex: 1;
 }
-.notebook-dialog-header button {
+.notebook-dialog-header button,
+.bookshelf-dialog-header button {
     background: none;
     border: none;
     color: var(--text);
@@ -2271,7 +2282,8 @@ kbd {
     font-size: 1.2rem;
     flex-shrink: 0;
 }
-.notebook-dialog-label {
+.notebook-dialog-label,
+.bookshelf-dialog-label {
     display: block;
     font-size: 0.85rem;
     color: var(--overlay-1);

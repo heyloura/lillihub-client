@@ -1,0 +1,10 @@
+<div class="container mt-2">
+    <h5>Search Books</h5>
+    <form method="GET" action="/books/search">
+        <div class="input-group mt-2">
+            <input type="search" name="q" class="form-input" placeholder="Search by title or author..." value="{{query}}" required autofocus>
+            <button type="submit" class="btn btn-glossy"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+    {{results}}
+</div>

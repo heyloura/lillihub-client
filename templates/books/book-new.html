@@ -1,0 +1,29 @@
+<div class="container mt-2">
+    <h5>Add Book</h5>
+    <p class="mt-2"><a href="/books/search" class="btn btn-glossy btn-sm"><i class="bi bi-search"></i> Search Open Library</a></p>
+    <form method="POST" action="/book/add">
+        <div class="mt-2">
+            <label class="form-label">Title</label>
+            <input type="text" name="title" class="form-input" placeholder="Book title..." value="{{prefillTitle}}" required autofocus>
+        </div>
+        <div class="mt-2">
+            <label class="form-label">Author</label>
+            <input type="text" name="author" class="form-input" placeholder="Author name..." value="{{prefillAuthor}}">
+        </div>
+        <div class="mt-2">
+            <label class="form-label">ISBN <small style="color:var(--overlay-1);">(optional)</small></label>
+            <input type="text" name="isbn" class="form-input" placeholder="ISBN..." value="{{prefillIsbn}}">
+        </div>
+        <div class="mt-2">
+            <label class="form-label">Cover URL <small style="color:var(--overlay-1);">(optional)</small></label>
+            <input type="url" name="cover_url" class="form-input" placeholder="https://..." value="{{prefillCoverUrl}}">
+        </div>
+        <div class="mt-2">
+            <label class="form-label">Bookshelf</label>
+            <ul style="list-style:none;padding:0;" class="mt-2">
+                {{shelfList}}
+            </ul>
+        </div>
+        <button type="submit" class="btn btn-glossy mt-2"><i class="bi bi-journal-plus"></i> Add Book</button>
+    </form>
+</div>

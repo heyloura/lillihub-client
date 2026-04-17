@@ -4,7 +4,7 @@ const _commonjs = await Deno.readTextFile("scripts/client/common.js");
 function getArea(title) {
     if(title == 'Bookmarks' || title == 'Highlights') return 'bookmarks';
     if(title == 'Posts' || title == 'Draft' || title == 'Media' || title == 'Post' || title == 'Editor' || title == 'Collections' || title == 'Collection') return 'blog';
-    if(title == 'Bookshelves' || title == 'Books' || title == 'Bookshelf' || title == 'Edit book') return 'bookshelves';
+    if(title == 'Bookshelves' || title == 'Books' || title == 'Bookshelf' || title == 'Edit book' || title == 'Add Book' || title == 'Search Books') return 'bookshelves';
     if(title == 'Notebooks' || title == 'Notes' || title == 'Note') return 'notes';
     return 'social';
 }
@@ -14,8 +14,7 @@ function PrimaryAction(area, title, context) {
     if(area == 'notes' && context?.notebookId) return `<div class="sidebar-action sidebar-action"><a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}"><i class="bi bi-pencil-square"></i> New Note</a></div>`;
     if(area == 'notes') return `<div class="sidebar-action sidebar-action"><a href="/notebook/new"><i class="bi bi-journal-plus"></i> New Notebook</a></div>`;
     if(area == 'bookmarks') return `<div class="sidebar-action sidebar-action"><a href="/bookmark/new"><i class="bi bi-bookmark-plus"></i> New Bookmark</a></div>`;
-    if(area == 'bookshelves' && context?.shelfId) return `<div class="sidebar-action sidebar-action"><a href="/books"><i class="bi bi-plus-circle"></i> Add Book</a></div>`;
-    if(area == 'bookshelves') return `<div class="sidebar-action sidebar-action"><a href="/books"><i class="bi bi-search-heart"></i> Discover Books</a></div>`;
+    if(area == 'bookshelves') return `<div class="sidebar-action sidebar-action"><a href="/book/new"><i class="bi bi-journal-plus"></i> Add Book</a></div>`;
     return `<div class="sidebar-action"><a href="/post"><i class="bi bi-pencil-square"></i> New Post</a></div>`;
 }
 
@@ -24,7 +23,7 @@ function FabAction(area, title, context) {
     if(area == 'notes' && context?.notebookId) return `<a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}" class="fab"><i class="bi bi-pencil-square"></i></a>`;
     if(area == 'notes') return `<a href="/notebook/new" class="fab"><i class="bi bi-journal-plus"></i></a>`;
     if(area == 'bookmarks') return `<a href="/bookmark/new" class="fab"><i class="bi bi-bookmark-plus"></i></a>`;
-    if(area == 'bookshelves') return `<a href="/books" class="fab"><i class="bi bi-search-heart"></i></a>`;
+    if(area == 'bookshelves') return `<a href="/book/new" class="fab"><i class="bi bi-journal-plus"></i></a>`;
     return `<a href="/post" class="fab"><i class="bi bi-pencil-square"></i></a>`;
 }
 
@@ -44,7 +43,7 @@ function PageNavContent(user, area, title, navContent, context) {
             <a href="/highlights" class="${title == 'Highlights' ? 'active' : ''}"><i class="bi bi-highlighter"></i> Highlights</a>`;
     }
     if(area == 'bookshelves') {
-        return `<a href="/bookshelves" class="${title == 'Bookshelves' ? 'active' : ''}"><i class="bi bi-book"></i> Bookshelves</a>${context?.shelfName ? `<a href="/bookshelves/shelf/${context.shelfId}" class="active"><i class="bi bi-bookshelf"></i> ${context.shelfName}</a>` : ''}`;
+        return `<a href="/bookshelves" class="${title == 'Bookshelves' ? 'active' : ''}"><i class="bi bi-book"></i> Bookshelves</a><a href="/books" class="${title == 'Books' ? 'active' : ''}"><i class="bi bi-search-heart"></i> Discover</a>${context?.shelfName ? `<a href="/bookshelves/shelf/${context.shelfId}" class="active"><i class="bi bi-bookshelf"></i> ${context.shelfName}</a>` : ''}`;
     }
     if(area == 'notes') {
         if(title == 'Notebooks') return '';
@@ -101,6 +100,7 @@ function BottomNavContent(user, title, area, context) {
         <div class="bottom-nav-links">
             <label for="sidebar-toggle"><i class="bi bi-list"></i></label>
             <a href="/bookshelves" class="${title == 'Bookshelves' ? 'active' : ''}"><i class="bi bi-book"></i> Bookshelves</a>
+            <a href="/books" class="${title == 'Books' ? 'active' : ''}"><i class="bi bi-search-heart"></i> Discover</a>
             ${context?.shelfName ? `<a href="/bookshelves/shelf/${context.shelfId}" class="active"><i class="bi bi-bookshelf"></i> ${context.shelfName}</a>` : ''}
         </div>`;
     }

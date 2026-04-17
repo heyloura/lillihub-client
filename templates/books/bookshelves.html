@@ -1,3 +1,110 @@
 <div class="container mt-2">
+    {{errorBanner}}
+
+    <div class="hide-if-user-has-javascript">
+        <details class="mt-2 mb-2">
+            <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-plus"></i> New Bookshelf</summary>
+            <form method="POST" action="/bookshelf/create" class="mt-2">
+                <div class="input-group">
+                    <input type="text" name="name" class="form-input" placeholder="Bookshelf name..." required>
+                    <button type="submit" class="btn btn-glossy btn-sm">Create</button>
+                </div>
+            </form>
+        </details>
+    </div>
+
+    <div class="hide-if-user-has-no-javascript" id="bookshelf-create-section">
+        <div class="input-group mt-2 mb-2">
+            <input type="text" id="bookshelf-create-name" class="form-input" placeholder="New bookshelf name...">
+            <button type="button" class="btn btn-glossy btn-sm" id="bookshelf-create-btn"><i class="bi bi-plus"></i> Create</button>
+        </div>
+    </div>
+
     {{feed}}
 </div>
+
+<dialog id="bookshelf-dialog" class="bookshelf-dialog hide-if-user-has-no-javascript">
+    <div class="bookshelf-dialog-header">
+        <h3 id="bookshelf-dialog-title"></h3>
+        <button type="button" id="bookshelf-dialog-close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="bookshelf-dialog-body">
+        <label class="bookshelf-dialog-label">Rename</label>
+        <div class="input-group">
+            <input type="text" id="bookshelf-dialog-name" class="form-input" required />
+            <button type="button" class="btn btn-glossy btn-sm" id="bookshelf-dialog-rename-btn">Save</button>
+        </div>
+    </div>
+</dialog>
+
+<script>
+    // --- Bookshelf manage dialog ---
+    const dialog = document.getElementById('bookshelf-dialog');
+    const dialogTitle = document.getElementById('bookshelf-dialog-title');
+    const dialogName = document.getElementById('bookshelf-dialog-name');
+    let activeShelfId = null;
+    let activeCard = null;
+
+    // Replace dropdown contents with a single button that opens the dialog
+    document.querySelectorAll('.bookshelf-card').forEach(card => {
+        const actions = card.querySelector('.card-header-actions');
+        if (!actions) return;
+        actions.innerHTML = '';
+        const manageBtn = document.createElement('button');
+        manageBtn.type = 'button';
+        manageBtn.className = 'btn btn-glossy btn-sm';
+        manageBtn.innerHTML = '<i class="bi bi-three-dots-vertical"></i>';
+        manageBtn.addEventListener('click', () => openDialog(card));
+        actions.appendChild(manageBtn);
+    });
+
+    function openDialog(card) {
+        activeCard = card;
+        activeShelfId = card.dataset.bookshelfId;
+        const title = card.querySelector('.tile-title').textContent;
+        dialogTitle.textContent = title;
+        dialogName.value = title;
+        dialog.showModal();
+    }
+
+    document.getElementById('bookshelf-dialog-close').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+    document.getElementById('bookshelf-dialog-rename-btn').addEventListener('click', async () => {
+        const name = dialogName.value.trim();
+        if (!name) return;
+        const form = new URLSearchParams();
+        form.append('bookshelf_id', activeShelfId);
+        form.append('name', name);
+        const res = await fetch('/bookshelf/rename', {
+            method: 'POST',
+            body: form.toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+        });
+        if (res.url?.includes('error=')) {
+            alert('Could not rename bookshelf. Please try again.');
+            return;
+        }
+        activeCard.querySelector('.tile-title').textContent = name;
+        dialog.close();
+    });
+
+    // --- Create bookshelf ---
+    document.getElementById('bookshelf-create-btn').addEventListener('click', async () => {
+        const nameInput = document.getElementById('bookshelf-create-name');
+        const name = nameInput.value.trim();
+        if (!name) return;
+        const form = new URLSearchParams();
+        form.append('name', name);
+        const res = await fetch('/bookshelf/create', {
+            method: 'POST',
+            body: form.toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+        });
+        if (res.url?.includes('error=')) {
+            alert('Could not create bookshelf. Please try again.');
+            return;
+        }
+        window.location.reload();
+    });
+</script>
