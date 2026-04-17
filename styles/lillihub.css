@@ -2230,6 +2230,54 @@ kbd {
     flex-shrink: 0;
 }
 
+/* --- Notebook manage dialog --- */
+.notebook-dialog {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--base);
+    color: var(--text);
+    padding: 1.5rem;
+    width: min(24rem, 90vw);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+}
+.notebook-dialog::backdrop {
+    background: var(--scrim);
+}
+.notebook-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.notebook-dialog-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
+}
+.notebook-dialog-header button {
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+.notebook-dialog-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--overlay-1);
+    margin-bottom: 0.4rem;
+}
+
 /* --- User Profile --- */
 .user-profile {
     text-align: center;
@@ -2683,6 +2731,7 @@ p { margin: 0.6rem 0; }
 
     .note-slideout { width: 100%; max-width: none; }
     .card { padding: 1rem 0 !important; }
+    .note-card { padding-left: 1.8rem !important; }
     .todo-slideout { width: 100%; max-width: none; }
     .todo-item { overflow-x: auto; }
     .todo-text { word-break: normal; white-space: nowrap; }
@@ -2810,9 +2859,10 @@ p { margin: 0.6rem 0; }
         font-size: 1.2rem;
     }
 
-    /* Add padding at top for top nav bar */
+    /* Add padding at top for top nav bar and bottom so FAB doesn't cover last row */
     .content {
         padding-top: 4rem;
+        padding-bottom: 5rem;
     }
 
     /* Swipe-hint chevron on card headers — aligned with action button centers */
@@ -2832,7 +2882,6 @@ p { margin: 0.6rem 0; }
         pointer-events: none;
         padding-right: 0.25rem;
     }
-
     .replyIframe {
         padding-top: 70%;
     }

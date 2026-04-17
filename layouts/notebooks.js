@@ -17,7 +17,7 @@ export async function NotebooksTemplate(user, token, req) {
     const sortedItems = items.sort((a, b) => a.title.localeCompare(b.title));
     const notebooksList = sortedItems.map(item => ({ id: item.id, title: item.title }));
     const notebooks = sortedItems.map(item => {
-        return `<div class="card mt-2">
+        return `<div class="card mt-2 notebook-card" data-notebook-id="${item.id}">
             <div class="card-header">
                 <div class="card-header-scroll">
                     <div class="card-header-main">

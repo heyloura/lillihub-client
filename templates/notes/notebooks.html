@@ -18,6 +18,28 @@
         {{notebooks}}
     </div>
 </div>
+
+<dialog id="notebook-dialog" class="notebook-dialog hide-if-user-has-no-javascript">
+    <div class="notebook-dialog-header">
+        <h3 id="notebook-dialog-title"></h3>
+        <button type="button" id="notebook-dialog-close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="notebook-dialog-body">
+        <label class="notebook-dialog-label">Rename</label>
+        <div class="input-group">
+            <input type="text" id="notebook-dialog-name" class="form-input" required />
+            <button type="button" class="btn btn-glossy btn-sm" id="notebook-dialog-rename-btn">Save</button>
+        </div>
+        <details class="mt-2" id="notebook-dialog-delete-details">
+            <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete notebook</summary>
+            <div class="mt-2">
+                <p style="font-size:0.85rem;color:var(--overlay-1);">This will delete all notes in this notebook.</p>
+                <button type="button" class="btn btn-glossy btn-sm" id="notebook-dialog-delete-btn">Confirm Delete</button>
+            </div>
+        </details>
+    </div>
+</dialog>
+
 <script type="module">
     import { importNotesKey } from '/scripts/crypto.js';
     const key = await importNotesKey();
@@ -35,5 +57,75 @@
     document.getElementById('clearKeyBtn')?.addEventListener('click', () => {
         localStorage.setItem('notes_key', '');
         window.location.href = '/notes';
+    });
+
+    // --- Notebook manage dialog ---
+    const dialog = document.getElementById('notebook-dialog');
+    const dialogTitle = document.getElementById('notebook-dialog-title');
+    const dialogName = document.getElementById('notebook-dialog-name');
+    const deleteDetails = document.getElementById('notebook-dialog-delete-details');
+    let activeNotebookId = null;
+    let activeCard = null;
+
+    // Replace dropdown contents with a single button that opens the dialog
+    document.querySelectorAll('.notebook-card').forEach(card => {
+        const actions = card.querySelector('.card-header-actions');
+        if (!actions) return;
+        actions.innerHTML = '';
+        const manageBtn = document.createElement('button');
+        manageBtn.type = 'button';
+        manageBtn.className = 'btn btn-glossy btn-sm';
+        manageBtn.innerHTML = '<i class="bi bi-three-dots-vertical"></i>';
+        manageBtn.addEventListener('click', () => openDialog(card));
+        actions.appendChild(manageBtn);
+    });
+
+    function openDialog(card) {
+        activeCard = card;
+        activeNotebookId = card.dataset.notebookId;
+        const title = card.querySelector('.tile-title').textContent;
+        dialogTitle.textContent = title;
+        dialogName.value = title;
+        deleteDetails.open = false;
+        dialog.showModal();
+    }
+
+    document.getElementById('notebook-dialog-close').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+    document.getElementById('notebook-dialog-rename-btn').addEventListener('click', async () => {
+        const name = dialogName.value.trim();
+        if (!name) return;
+        const form = new URLSearchParams();
+        form.append('notebook_id', activeNotebookId);
+        form.append('name', name);
+        const res = await fetch('/notebook/rename', {
+            method: 'POST',
+            body: form.toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+        });
+        if (res.url?.includes('error=')) {
+            alert('Could not rename notebook. Please try again.');
+            return;
+        }
+        activeCard.querySelector('.tile-title').textContent = name;
+        dialog.close();
+    });
+
+    document.getElementById('notebook-dialog-delete-btn').addEventListener('click', async () => {
+        if (!confirm('Delete this notebook and all its notes?')) return;
+        const form = new URLSearchParams();
+        form.append('notebook_id', activeNotebookId);
+        const res = await fetch('/notebook/delete', {
+            method: 'POST',
+            body: form.toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+        });
+        if (res.url?.includes('error=')) {
+            alert('Could not delete notebook. Please try again.');
+            return;
+        }
+        activeCard.remove();
+        dialog.close();
     });
 </script>
