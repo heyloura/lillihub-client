@@ -1,3 +1,4 @@
+import { fetchNotebooksList } from "../scripts/server/utilities.js";
 import { HTMLPage } from "./templates.js";
 
 const _noteEditTemplate = new TextDecoder().decode(await Deno.readFile("templates/notes/note-edit.html"));
@@ -15,7 +16,10 @@ export async function NoteTemplate(user, token, id, req) {
     let isShared = false;
 
     const headers = { "Authorization": "Bearer " + token };
-    const notebookRes = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers });
+    const [notebookRes, notebooks] = await Promise.all([
+        fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers }),
+        fetchNotebooksList(token)
+    ]);
     const eNotes = await notebookRes.json();
 
     if(vid) {
@@ -42,5 +46,5 @@ export async function NoteTemplate(user, token, id, req) {
         .replaceAll('{{viewVersion}}', viewVersion);
 
     const notebookName = eNotes._microblog?.notebook?.name || 'Notebook';
-    return HTMLPage(token, 'Note', content, user, '', undefined, { notebookId: id, notebookName });
+    return HTMLPage(token, 'Note', content, user, '', undefined, { notebookId: id, notebookName, notebooks });
 }

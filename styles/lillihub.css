@@ -524,11 +524,12 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     display: flex;
     gap: 0.25rem;
     align-items: center;
-    justify-content: flex-end;
     overflow-x: auto;
 }
+.page-nav > :first-child { margin-left: auto; }
 .page-nav a {
     white-space: nowrap;
+    flex-shrink: 0;
     padding: 0.35rem 0.75rem;
     border-radius: 0.5rem;
     color: var(--text);
@@ -545,6 +546,17 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     color: var(--area-accent);
     border: none;
     box-shadow: var(--shadow-sm-soft), var(--inset-highlight);
+}
+/* Thin scrollbar so desktop users can see the nav is scrollable */
+.page-nav {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--area-accent) 40%, transparent) transparent;
+}
+.page-nav::-webkit-scrollbar { height: 4px; }
+.page-nav::-webkit-scrollbar-track { background: transparent; }
+.page-nav::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--area-accent) 40%, transparent);
+    border-radius: 2px;
 }
 /* The Add-Book button on discover books is wrapped in a <form>; the form
    needs matching display, alignment, AND height so its child button lines up
@@ -2884,8 +2896,8 @@ body {
     color: var(--greenblue) !important;
 }
 .tab-item.active a {
-    border-bottom-color: var(--purple) !important;
-    color: var(--purple) !important;
+    border-bottom-color: var(--area-accent) !important;
+    color: var(--area-accent) !important;
 }
 .tab-item a:hover {
     color: var(--purplered) !important;
@@ -2904,8 +2916,8 @@ body {
     margin-top: 5px;
 }
 .tab .tab-item a.active, .tab .tab-item.active a {
-    border-bottom-color: var(--purple);
-    color: var(--purple);
+    border-bottom-color: var(--area-accent);
+    color: var(--area-accent);
 }
 blockquote footer {
     position: unset;

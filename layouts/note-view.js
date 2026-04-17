@@ -1,4 +1,4 @@
-import { formatDate } from "../scripts/server/utilities.js";
+import { formatDate, fetchNotebooksList } from "../scripts/server/utilities.js";
 import { HTMLPage } from "./templates.js";
 
 const _noteViewTemplate = new TextDecoder().decode(await Deno.readFile("templates/notes/note-view.html"));
@@ -6,10 +6,11 @@ const _todoViewTemplate = new TextDecoder().decode(await Deno.readFile("template
 
 export async function NoteViewTemplate(user, token, notebookId, noteId, isTodo) {
     const headers = { "Authorization": "Bearer " + token };
-    const [noteRes, notebookRes, versionsRes] = await Promise.all([
+    const [noteRes, notebookRes, versionsRes, notebooks] = await Promise.all([
         fetch(`https://micro.blog/notes/${noteId}`, { method: "GET", headers }),
         fetch(`https://micro.blog/notes/notebooks/${notebookId}`, { method: "GET", headers }),
-        fetch(`https://micro.blog/notes/${noteId}/versions`, { method: "GET", headers })
+        fetch(`https://micro.blog/notes/${noteId}/versions`, { method: "GET", headers }),
+        fetchNotebooksList(token)
     ]);
 
     const note = await noteRes.json();
@@ -50,5 +51,5 @@ export async function NoteViewTemplate(user, token, notebookId, noteId, isTodo) 
         .replaceAll('{{versionsPanel}}', '');
 
     const notebookName = notebook._microblog?.notebook?.name || 'Notebook';
-    return HTMLPage(token, 'Note', content, user, '', undefined, { notebookId, notebookName });
+    return HTMLPage(token, 'Note', content, user, '', undefined, { notebookId, notebookName, notebooks });
 }

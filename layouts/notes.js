@@ -1,4 +1,4 @@
-import { formatDate, errorBanner } from "../scripts/server/utilities.js";
+import { formatDate, errorBanner, fetchNotebooksList } from "../scripts/server/utilities.js";
 import { HTMLPage } from "./templates.js";
 
 const _noteTemplate = new TextDecoder().decode(await Deno.readFile("templates/notes/_note.html"));
@@ -9,9 +9,14 @@ export async function NotesTemplate(user, token, id, req) {
     const tab = searchParams.get('tab') || 'notes';
 
     let eNotes;
+    let notebooks = [];
     try {
-        const notebookRes = await fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } });
+        const [notebookRes, notebooksList] = await Promise.all([
+            fetch(`https://micro.blog/notes/notebooks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + token } }),
+            fetchNotebooksList(token)
+        ]);
         eNotes = await notebookRes.json();
+        notebooks = notebooksList;
     } catch (err) {
         console.log(`notes fetch failed for notebook ${id} (${user.username}): ${err?.message || err}`);
         return HTMLPage(token, 'Notes', `<p class="container p-2">Could not load notes right now. Please try again.</p>`, user);
@@ -47,5 +52,5 @@ export async function NotesTemplate(user, token, id, req) {
         .replaceAll('{{errorBanner}}', banner);
 
     const notebookName = eNotes?._microblog?.notebook?.name || 'Notebook';
-    return HTMLPage(token, 'Notes', content, user, '', undefined, { notebookId: id, notebookName, tab });
+    return HTMLPage(token, 'Notes', content, user, '', undefined, { notebookId: id, notebookName, tab, notebooks });
 }

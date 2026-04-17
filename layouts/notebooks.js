@@ -14,7 +14,9 @@ export async function NotebooksTemplate(user, token, req) {
     }
 
     const items = Array.isArray(results?.items) ? results.items : [];
-    const notebooks = items.sort((a, b) => a.title.localeCompare(b.title)).map(item => {
+    const sortedItems = items.sort((a, b) => a.title.localeCompare(b.title));
+    const notebooksList = sortedItems.map(item => ({ id: item.id, title: item.title }));
+    const notebooks = sortedItems.map(item => {
         return `<div class="card mt-2">
             <div class="card-header">
                 <div class="card-header-scroll">
@@ -61,5 +63,5 @@ export async function NotebooksTemplate(user, token, req) {
         .replaceAll('{{notebooks}}', notebooks)
         .replaceAll('{{errorBanner}}', banner);
 
-    return HTMLPage(token, 'Notebooks', content, user);
+    return HTMLPage(token, 'Notebooks', content, user, '', undefined, { notebooks: notebooksList });
 }

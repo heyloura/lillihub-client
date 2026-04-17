@@ -47,7 +47,11 @@ function PageNavContent(user, area, title, navContent, context) {
         return `<a href="/bookshelves" class="${title == 'Bookshelves' ? 'active' : ''}"><i class="bi bi-book"></i> Bookshelves</a>${context?.shelfName ? `<a href="/bookshelves/shelf/${context.shelfId}" class="active"><i class="bi bi-bookshelf"></i> ${context.shelfName}</a>` : ''}`;
     }
     if(area == 'notes') {
-        return `<a href="/notes" class="${title == 'Notebooks' ? 'active' : ''}"><i class="bi bi-journals"></i> Notebooks</a>${context?.notebookName ? `<a href="/notes/${context.notebookId}" class="active"><i class="bi bi-journal-text"></i> ${context.notebookName}</a>` : ''}`;
+        if(title == 'Notebooks') return '';
+        const notebooks = context?.notebooks || [];
+        return notebooks.map(nb =>
+            `<a href="/notes/${nb.id}" class="${context?.notebookId == nb.id ? 'active' : ''}"><i class="bi bi-journal-text"></i> ${nb.title}</a>`
+        ).join('');
     }
     let discoverActive = title != "Timeline" && title != "Mentions" && title != "Replies" && title != "following" && title != "muted" && title != "blocked";
     if(parseInt(title) || title.includes('User')) discoverActive = false;
@@ -83,11 +87,14 @@ function BottomNavContent(user, title, area, context) {
         </div>`;
     }
     if(area == 'notes') {
+        if(title == 'Notebooks') return '';
+        const notebooks = context?.notebooks || [];
         return `
         <div class="bottom-nav-links">
             <label for="sidebar-toggle"><i class="bi bi-list"></i></label>
-            <a href="/notes" class="${title == 'Notebooks' ? 'active' : ''}"><i class="bi bi-journals"></i> Notebooks</a>
-            ${context?.notebookName ? `<a href="/notes/${context.notebookId}" class="active"><i class="bi bi-journal-text"></i> ${context.notebookName}</a>` : ''}
+            ${notebooks.map(nb =>
+                `<a href="/notes/${nb.id}" class="${context?.notebookId == nb.id ? 'active' : ''}"><i class="bi bi-journal-text"></i> ${nb.title}</a>`
+            ).join('')}
         </div>`;
     }
     if(area == 'bookshelves') {

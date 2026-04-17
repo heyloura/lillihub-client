@@ -6,6 +6,7 @@ import { NoteTemplate } from "../layouts/note.js";
 import { NoteViewTemplate } from "../layouts/note-view.js";
 import { NoteNewTemplate } from "../layouts/note-new.js";
 import { HTMLPage } from "../layouts/templates.js";
+import { fetchNotebooksList } from "../scripts/server/utilities.js";
 
 const NOTEBOOKS_ROUTE = new URLPattern({ pathname: "/notes" });
 const NOTEBOOK_NEW_ROUTE = new URLPattern({ pathname: "/notebook/new" });
@@ -37,8 +38,11 @@ export async function tryHandle(req, ctx) {
     }
 
     if (NOTEBOOK_NEW_ROUTE.exec(req.url) && user) {
-        const content = new TextDecoder().decode(await Deno.readFile("templates/notes/notebook-new.html"));
-        return new Response(await HTMLPage(accessTokenValue, 'Notebooks', content, user), {
+        const [content, notebooks] = await Promise.all([
+            Deno.readFile("templates/notes/notebook-new.html").then(b => new TextDecoder().decode(b)),
+            fetchNotebooksList(accessTokenValue)
+        ]);
+        return new Response(await HTMLPage(accessTokenValue, 'Notebooks', content, user, '', undefined, { notebooks }), {
             status: 200,
             headers: { "content-type": "text/html" },
         });

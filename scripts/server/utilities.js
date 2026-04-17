@@ -54,6 +54,22 @@ export async function decryptMe(encrypted)
     return new TextDecoder().decode(decryptedBytes);
 }
 
+// Fetch the full list of notebooks (id + title), sorted alphabetically.
+// Used by every notes-area layout so the page nav can list all notebooks.
+export async function fetchNotebooksList(token) {
+    try {
+        const res = await fetch('https://micro.blog/notes/notebooks', {
+            method: "GET",
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const data = await res.json();
+        const items = Array.isArray(data?.items) ? data.items : [];
+        return items.sort((a, b) => a.title.localeCompare(b.title)).map(item => ({ id: item.id, title: item.title }));
+    } catch {
+        return [];
+    }
+}
+
 // Renders a dismiss-able error banner for a given error code.
 // Used by note/notebook layouts to surface write failures passed via `?error=...`
 // in redirect URLs from main.js mutation handlers.
