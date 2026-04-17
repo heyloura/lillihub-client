@@ -13,6 +13,9 @@ const FAVICON_ROUTE = new URLPattern({ pathname: "/favicon.ico" });
 const WEBMANIFEST_ROUTE = new URLPattern({ pathname: "/manifest.webmanifest" });
 const SERVICEWORKER_ROUTE = new URLPattern({ pathname: "/sw.js" });
 const LILLIHUB_ICON_ROUTE = new URLPattern({ pathname: "/lillihub-512.png" });
+const LILLIHUB_ICON_192_ROUTE = new URLPattern({ pathname: "/lillihub-192.png" });
+const LILLIHUB_MASKABLE_ROUTE = new URLPattern({ pathname: "/lillihub-maskable-512.png" });
+const FAVICON_32_ROUTE = new URLPattern({ pathname: "/favicon-32.png" });
 const CHECK_SCRIPT_ROUTE = new URLPattern({ pathname: "/scripts/:id" });
 const CHECK_CSS_ROUTE = new URLPattern({ pathname: "/styles/:id" });
 
@@ -29,6 +32,33 @@ export async function tryHandle(req) {
             status: 200,
             headers: { "content-type": "image/png" },
         });
+    }
+
+    if (LILLIHUB_ICON_192_ROUTE.exec(req.url)) {
+        try {
+            return new Response(new Uint8Array(await Deno.readFile("static/lillihub-192.png")), {
+                status: 200,
+                headers: { "content-type": "image/png" },
+            });
+        } catch { /* file not yet created */ }
+    }
+
+    if (LILLIHUB_MASKABLE_ROUTE.exec(req.url)) {
+        try {
+            return new Response(new Uint8Array(await Deno.readFile("static/lillihub-maskable-512.png")), {
+                status: 200,
+                headers: { "content-type": "image/png" },
+            });
+        } catch { /* file not yet created */ }
+    }
+
+    if (FAVICON_32_ROUTE.exec(req.url)) {
+        try {
+            return new Response(new Uint8Array(await Deno.readFile("static/favicon-32.png")), {
+                status: 200,
+                headers: { "content-type": "image/png" },
+            });
+        } catch { /* file not yet created */ }
     }
 
     if (WEBMANIFEST_ROUTE.exec(req.url)) {

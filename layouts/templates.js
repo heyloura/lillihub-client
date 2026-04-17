@@ -129,8 +129,8 @@ function _pageHead(title, redirect) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Lillihub - A delightful Micro.blog client">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="icon" type="image/x-icon" href="https://lillihub.com/favicon.ico">
-    <link rel="apple-touch-icon" href="/lillihub-512.png">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/lillihub-512.png">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="theme-color" content="#11131a" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#eff1f5" media="(prefers-color-scheme: light)">

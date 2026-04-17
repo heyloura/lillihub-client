@@ -3386,3 +3386,6 @@ previewbox-link {
     margin-top: 1em;
     max-width: 445px;
 }
+.mini_thumbnail {
+    display: inline !important;
+}

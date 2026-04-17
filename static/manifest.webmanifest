@@ -3,15 +3,28 @@
     "short_name": "Lillihub",
     "start_url": "/",
     "display": "standalone",
-    "theme_color": "#000000",
-    "background_color":"#000000",
+    "theme_color": "#11131a",
+    "background_color": "#f5efe6",
     "icons": [
+      {
+        "src": "/lillihub-192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any"
+      },
       {
         "src": "/lillihub-512.png",
         "sizes": "512x512",
         "type": "image/png",
-        "purpose": "any maskable"
-      }],
+        "purpose": "any"
+      },
+      {
+        "src": "/lillihub-maskable-512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
+      }
+    ],
       "share_target": {
         "action": "/share",
         "method": "POST",
