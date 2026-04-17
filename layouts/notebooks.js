@@ -40,7 +40,7 @@ export async function NotebooksTemplate(user, token, req) {
                                 </form>
                                 <details>
                                     <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete notebook</summary>
-                                    <form action="/notebook/delete" method="POST" class="mt-2">
+                                    <form action="/notebook/delete" method="POST" class="mt-2" onsubmit="return confirm('Delete this notebook and all its notes?')">
                                         <input type="hidden" name="notebook_id" value="${item.id}" />
                                         <p style="font-size:0.85rem;color:var(--overlay-1);">This will delete all notes in this notebook.</p>
                                         <button type="submit" class="btn btn-glossy btn-sm">Confirm Delete</button>

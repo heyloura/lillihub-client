@@ -1,4 +1,5 @@
 <script src="https://cdn.jsdelivr.net/npm/showdown@2.0.3/dist/showdown.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
 <div class="container">
     {{errorBanner}}
     <noscript>
@@ -27,10 +28,18 @@
         </div>
         <datalist id="noteTags"></datalist>
         {{notes}}
+
+        <details class="mt-2 pt-2" style="border-top:1px solid var(--border);">
+            <summary style="cursor:pointer;font-size:0.85rem;color:var(--overlay-1);list-style:none;"><i class="bi bi-three-dots"></i> Advanced actions</summary>
+            <div class="mt-2" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <button class="btn btn-glossy btn-sm" id="exportNotesBtn"><i class="bi bi-download"></i> Export notes as zip</button>
+            </div>
+        </details>
     </div>
 
     <script type="module">
         import { importNotesKey, decryptWithKey } from '/scripts/crypto.js';
+        import { initNoteSlideout } from '/scripts/note-slideout.js';
 
         const key = await importNotesKey();
         if (key) {
@@ -64,6 +73,12 @@
 
         const activeTab = '{{tab}}';
 
+        function decodeEntities(str) {
+            const el = document.createElement('span');
+            el.innerHTML = str;
+            return el.textContent;
+        }
+
         // Process notes: decrypt encrypted ones, extract titles for shared ones
         async function processNotes() {
             const datalist = new Set();
@@ -96,8 +111,9 @@
 
                 // Set title or excerpt
                 if (metadata?.title) {
-                    titleEl.textContent = metadata.title;
-                    el.setAttribute('data-title', metadata.title);
+                    const decodedTitle = decodeEntities(metadata.title);
+                    titleEl.textContent = decodedTitle;
+                    el.setAttribute('data-title', decodedTitle);
                 } else {
                     const tmp = document.createElement('div');
                     tmp.innerHTML = html;
@@ -150,6 +166,32 @@
         } else {
             await processNotes();
         }
+
+        if (key) initNoteSlideout('{{notebookId}}', key, JSON.parse('{{notebooksJson}}'));
+
+        document.getElementById('exportNotesBtn')?.addEventListener('click', async () => {
+            const zip = new JSZip();
+            const cards = document.querySelectorAll('.note-card');
+            let count = 0;
+            for (const card of cards) {
+                if (card.style.display === 'none') continue;
+                const noteEl = card.querySelector('.note');
+                const markdown = noteEl?.getAttribute('data-markdown');
+                if (!markdown) continue;
+                const titleText = card.querySelector('.note-title-text')?.textContent?.trim() || `note-${count + 1}`;
+                const safeName = titleText.replace(/[^a-zA-Z0-9 _-]/g, '').substring(0, 60).trim() || `note-${count + 1}`;
+                zip.file(`${safeName}.md`, markdown);
+                count++;
+            }
+            if (count === 0) { alert('No notes to export.'); return; }
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'notes-export.zip';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </div>

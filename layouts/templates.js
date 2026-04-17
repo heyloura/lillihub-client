@@ -87,8 +87,7 @@ function BottomNavContent(user, title, area, context) {
         </div>`;
     }
     if(area == 'notes') {
-        if(title == 'Notebooks') return '';
-        const notebooks = context?.notebooks || [];
+        const notebooks = title == 'Notebooks' ? [] : (context?.notebooks || []);
         return `
         <div class="bottom-nav-links">
             <label for="sidebar-toggle"><i class="bi bi-list"></i></label>

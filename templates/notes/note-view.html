@@ -28,7 +28,7 @@
             {{versionsButton}}
             <details style="display:inline;">
                 <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete</summary>
-                <form method="POST" action="/note/delete" class="mt-2">
+                <form method="POST" action="/note/delete" class="mt-2" onsubmit="return confirm('Permanently delete this note?')">
                     <input type="hidden" name="id" value="{{noteId}}" />
                     <input type="hidden" name="notebookId" value="{{notebookId}}" />
                     <p style="font-size:0.85rem;color:var(--overlay-1);">This will permanently delete this note.</p>
@@ -67,7 +67,9 @@
         const metadata = converter.getMetadata();
 
         if (metadata?.title) {
-            document.getElementById('note-title').textContent = metadata.title;
+            const tmp = document.createElement('span');
+            tmp.innerHTML = metadata.title;
+            document.getElementById('note-title').textContent = tmp.textContent;
         }
         if (metadata?.tags) {
             const tags = metadata.tags.replace('[','').replace(']','').split(',');

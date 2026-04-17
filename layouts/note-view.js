@@ -6,16 +6,22 @@ const _todoViewTemplate = new TextDecoder().decode(await Deno.readFile("template
 
 export async function NoteViewTemplate(user, token, notebookId, noteId, isTodo) {
     const headers = { "Authorization": "Bearer " + token };
-    const [noteRes, notebookRes, versionsRes, notebooks] = await Promise.all([
-        fetch(`https://micro.blog/notes/${noteId}`, { method: "GET", headers }),
-        fetch(`https://micro.blog/notes/notebooks/${notebookId}`, { method: "GET", headers }),
-        fetch(`https://micro.blog/notes/${noteId}/versions`, { method: "GET", headers }),
-        fetchNotebooksList(token)
-    ]);
-
-    const note = await noteRes.json();
-    const notebook = await notebookRes.json();
-    const versions = await versionsRes.json();
+    let note, notebook, versions, notebooks;
+    try {
+        const [noteRes, notebookRes, versionsRes, notebooksList] = await Promise.all([
+            fetch(`https://micro.blog/notes/${noteId}`, { method: "GET", headers }),
+            fetch(`https://micro.blog/notes/notebooks/${notebookId}`, { method: "GET", headers }),
+            fetch(`https://micro.blog/notes/${noteId}/versions`, { method: "GET", headers }),
+            fetchNotebooksList(token)
+        ]);
+        note = await noteRes.json();
+        notebook = await notebookRes.json();
+        versions = await versionsRes.json();
+        notebooks = notebooksList;
+    } catch (err) {
+        console.log(`note-view fetch failed for note ${noteId} (${user.username}): ${err?.message || err}`);
+        return HTMLPage(token, 'Note', `<p class="container p-2">Could not load this note. It may have been moved or deleted.</p>`, user);
+    }
 
     const isShared = note._microblog?.is_shared || false;
 

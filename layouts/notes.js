@@ -49,7 +49,8 @@ export async function NotesTemplate(user, token, id, req) {
         .replaceAll('{{notesActive}}', tab === 'notes' ? 'active' : '')
         .replaceAll('{{todosActive}}', tab === 'todos' ? 'active' : '')
         .replaceAll('{{tab}}', tab)
-        .replaceAll('{{errorBanner}}', banner);
+        .replaceAll('{{errorBanner}}', banner)
+        .replaceAll('{{notebooksJson}}', JSON.stringify(notebooks).replace(/</g, '\\u003c'));
 
     const notebookName = eNotes?._microblog?.notebook?.name || 'Notebook';
     return HTMLPage(token, 'Notes', content, user, '', undefined, { notebookId: id, notebookName, tab, notebooks });

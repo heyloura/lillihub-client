@@ -35,7 +35,9 @@ export function initTodo(markdown, key, notebookId, noteId) {
     const taskList = document.getElementById('tasks');
     const searchBox = document.getElementById('todo-search');
     const showCompletedCheckbox = document.getElementById('showCompleted');
-    const dialog = document.getElementById('todo-dialog');
+    const slideout = document.getElementById('todo-slideout');
+    const slideoutScrim = document.getElementById('todo-slideout-scrim');
+    const slideoutTitle = document.getElementById('todo-slideout-title');
     const contentInput = document.getElementById('todo-content');
     const lineIdInput = { value: '-1' }; // virtual hidden input
     const deleteBtn = document.getElementById('deleteTodoBtn');
@@ -55,6 +57,55 @@ export function initTodo(markdown, key, notebookId, noteId) {
     }
 
     let tasks = parseTasksFromHtml(html);
+
+    // --- FV Mode State (ephemeral) ---
+    let fvState = 'NORMAL';        // 'NORMAL' | 'DOT_SCAN' | 'FOCUS'
+    let dottedIndices = new Set();
+    let scanOrder = [];
+    let scanPosition = 0;
+    let benchmarkIdx = -1;
+    let focusQueue = [];
+    let focusPosition = 0;
+
+    function extractDateTimeId(text) {
+        if (text.startsWith('(') && text.length > 4) {
+            const after = text.substring(4);
+            if (isDateTimeId(after.substring(0, TIME_ID_LEN))) return after.substring(0, TIME_ID_LEN);
+        }
+        if (isDateTimeId(text.substring(0, TIME_ID_LEN))) return text.substring(0, TIME_ID_LEN);
+        return '9999';
+    }
+
+    function buildScanOrder() {
+        return tasks
+            .map((text, idx) => ({ text, idx }))
+            .filter(t => !/^x\s/.test(t.text))
+            .sort((a, b) => {
+                const aId = extractDateTimeId(a.text);
+                const bId = extractDateTimeId(b.text);
+                return aId < bId ? -1 : aId > bId ? 1 : 0;
+            })
+            .map(t => t.idx);
+    }
+
+    function refreshDateTimeId(idx) {
+        let text = tasks[idx];
+        if (text.startsWith('(') && text.length > 4) {
+            const afterPriority = text.substring(4);
+            if (isDateTimeId(afterPriority.substring(0, TIME_ID_LEN))) {
+                text = text.substring(0, 4) + getDateTimeId() + ' ' + afterPriority.substring(TIME_ID_LEN + 1);
+            } else {
+                text = text.substring(0, 4) + getDateTimeId() + ' ' + afterPriority;
+            }
+        } else {
+            if (isDateTimeId(text.substring(0, TIME_ID_LEN))) {
+                text = getDateTimeId() + ' ' + text.substring(TIME_ID_LEN + 1);
+            } else {
+                text = getDateTimeId() + ' ' + text;
+            }
+        }
+        tasks[idx] = text;
+    }
 
     function renderTasks() {
         taskList.innerHTML = '';
@@ -134,10 +185,10 @@ export function initTodo(markdown, key, notebookId, noteId) {
             markup = markup.replace(/^\d{4}-\d{2}-\d{2}\s*/, '');
         }
 
-        // Priorities
-        markup = markup.replace(/\(A\)/g, '<span class="todo-priority-a">(A)</span>');
-        markup = markup.replace(/\(B\)/g, '<span class="todo-priority-b">(B)</span>');
-        markup = markup.replace(/\(C\)/g, '<span class="todo-priority-c">(C)</span>');
+        // Priorities (clickable to filter)
+        markup = markup.replace(/\(A\)/g, '<span class="todo-priority-a todo-searchable" data-search="(A)">(A)</span>');
+        markup = markup.replace(/\(B\)/g, '<span class="todo-priority-b todo-searchable" data-search="(B)">(B)</span>');
+        markup = markup.replace(/\(C\)/g, '<span class="todo-priority-c todo-searchable" data-search="(C)">(C)</span>');
 
         // Contexts and projects (clickable to search)
         markup = markup.replace(/(^|\s)(@\S+)/g, '$1<span class="todo-context todo-searchable" data-search="$2">$2</span>');
@@ -180,13 +231,28 @@ export function initTodo(markdown, key, notebookId, noteId) {
         renderTasks();
     }
 
+    function openSlideout() {
+        slideout.classList.add('open');
+        slideoutScrim.classList.add('open');
+        slideout.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        contentInput.focus();
+    }
+
+    function closeSlideout() {
+        slideout.classList.remove('open');
+        slideoutScrim.classList.remove('open');
+        slideout.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
     function openEditDialog(idx) {
         lineIdInput.value = idx;
-        const text = tasks[idx];
-        contentInput.value = text;
+        contentInput.value = tasks[idx];
         deleteBtn.style.display = '';
         moveBottomBtn.style.display = '';
-        dialog.showModal();
+        slideoutTitle.textContent = 'Edit Task';
+        openSlideout();
     }
 
     function openAddDialog() {
@@ -194,7 +260,8 @@ export function initTodo(markdown, key, notebookId, noteId) {
         contentInput.value = '';
         deleteBtn.style.display = 'none';
         moveBottomBtn.style.display = 'none';
-        dialog.showModal();
+        slideoutTitle.textContent = 'Add Task';
+        openSlideout();
     }
 
     async function saveTodos() {
@@ -239,7 +306,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
 
         saveTodos();
         renderTasks();
-        dialog.close();
+        closeSlideout();
     }
 
     function addDateTimeId(text) {
@@ -258,50 +325,239 @@ export function initTodo(markdown, key, notebookId, noteId) {
             saveTodos();
             renderTasks();
         }
-        dialog.close();
+        closeSlideout();
     }
 
     function moveToBottom() {
         const idx = parseInt(lineIdInput.value);
         if (idx < 0 || idx >= tasks.length) return;
-
-        let text = tasks[idx];
-        // Update datetime ID to now
-        if (text.startsWith('(') && text.length > 4) {
-            const afterPriority = text.substring(4);
-            if (isDateTimeId(afterPriority.substring(0, TIME_ID_LEN))) {
-                text = text.substring(0, 4) + getDateTimeId() + ' ' + afterPriority.substring(TIME_ID_LEN + 1);
-            } else {
-                text = text.substring(0, 4) + getDateTimeId() + ' ' + afterPriority;
-            }
-        } else {
-            if (isDateTimeId(text.substring(0, TIME_ID_LEN))) {
-                text = getDateTimeId() + ' ' + text.substring(TIME_ID_LEN + 1);
-            } else {
-                text = getDateTimeId() + ' ' + text;
-            }
-        }
-
-        tasks[idx] = text;
+        refreshDateTimeId(idx);
         saveTodos();
         renderTasks();
-        dialog.close();
+        closeSlideout();
+    }
+
+    function clearCompleted() {
+        const count = tasks.filter(t => /^x\s/.test(t)).length;
+        if (count === 0) return;
+        if (!confirm(`Remove ${count} completed task${count > 1 ? 's' : ''}?`)) return;
+        tasks = tasks.filter(t => !/^x\s/.test(t));
+        saveTodos();
+        renderTasks();
+    }
+
+    function exportTodoTxt() {
+        let content = '';
+        for (const task of tasks) {
+            content += task + '\n';
+        }
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (todoTitle || 'todo') + '.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // --- FV Mode Functions ---
+
+    function updateFvToolbar() {
+        const inFv = fvState !== 'NORMAL';
+        document.getElementById('startFvBtn').style.display = inFv ? 'none' : '';
+        document.getElementById('addTodoBtn').style.display = inFv ? 'none' : '';
+        document.getElementById('clearCompletedBtn').style.display = inFv ? 'none' : '';
+        searchBox.closest('.blog-toolbar').style.display = inFv ? 'none' : '';
+        showCompletedCheckbox.closest('div').style.display = inFv ? 'none' : '';
+    }
+
+    function startFvRound() {
+        dottedIndices.clear();
+        scanOrder = buildScanOrder();
+
+        if (scanOrder.length < 2) {
+            alert('Need at least 2 open tasks to start a round.');
+            return;
+        }
+
+        fvState = 'DOT_SCAN';
+        benchmarkIdx = scanOrder[0];
+        dottedIndices.add(benchmarkIdx);
+        scanPosition = 1;
+        updateFvToolbar();
+        renderFvScan();
+    }
+
+    function renderFvScan() {
+        taskList.innerHTML = '';
+        const total = scanOrder.length;
+
+        // Progress
+        const progress = document.createElement('div');
+        progress.className = 'fv-progress';
+        progress.innerHTML = `
+            <div class="fv-progress-bar"><div class="fv-progress-fill" style="width:${Math.round((scanPosition / total) * 100)}%"></div></div>
+            <span class="fv-progress-text">${scanPosition} of ${total} scanned &middot; ${dottedIndices.size} dotted</span>`;
+        taskList.appendChild(progress);
+
+        // Benchmark
+        const benchmarkLi = document.createElement('li');
+        benchmarkLi.className = 'todo-item fv-benchmark';
+        benchmarkLi.innerHTML = `
+            <span class="fv-dot">&#x25CF;</span>
+            <span class="todo-text">${formatTaskMarkup(tasks[benchmarkIdx])}</span>
+            <span class="fv-label">benchmark</span>`;
+        taskList.appendChild(benchmarkLi);
+
+        if (scanPosition < scanOrder.length) {
+            const currentIdx = scanOrder[scanPosition];
+
+            const vsLi = document.createElement('li');
+            vsLi.className = 'fv-vs';
+            vsLi.textContent = 'Do you want to do this before the benchmark?';
+            taskList.appendChild(vsLi);
+
+            const assessLi = document.createElement('li');
+            assessLi.className = 'todo-item fv-assess';
+            assessLi.innerHTML = `
+                <span class="fv-dot fv-dot-empty">&#x25CB;</span>
+                <span class="todo-text">${formatTaskMarkup(tasks[currentIdx])}</span>`;
+            taskList.appendChild(assessLi);
+
+            const btnRow = document.createElement('li');
+            btnRow.className = 'fv-actions';
+            btnRow.innerHTML = `
+                <button class="btn btn-glossy btn-sm fv-yes-btn"><i class="bi bi-check-lg"></i> Yes</button>
+                <button class="btn btn-glossy btn-sm fv-no-btn"><i class="bi bi-x-lg"></i> No</button>`;
+            taskList.appendChild(btnRow);
+            btnRow.querySelector('.fv-yes-btn').addEventListener('click', () => {
+                dottedIndices.add(currentIdx);
+                benchmarkIdx = currentIdx;
+                scanPosition++;
+                renderFvScan();
+            });
+            btnRow.querySelector('.fv-no-btn').addEventListener('click', () => {
+                scanPosition++;
+                renderFvScan();
+            });
+        } else {
+            const doneLi = document.createElement('li');
+            doneLi.className = 'fv-scan-done';
+            doneLi.innerHTML = `
+                <p>Scan complete. ${dottedIndices.size} task${dottedIndices.size !== 1 ? 's' : ''} dotted.</p>
+                <button class="btn btn-glossy btn-sm"><i class="bi bi-play-fill"></i> Start Focus</button>`;
+            taskList.appendChild(doneLi);
+            doneLi.querySelector('button').addEventListener('click', startFvFocus);
+        }
+
+        const endLi = document.createElement('li');
+        endLi.className = 'fv-end-session';
+        endLi.innerHTML = `<button class="btn btn-sm">End Session</button>`;
+        taskList.appendChild(endLi);
+        endLi.querySelector('button').addEventListener('click', endFvSession);
+    }
+
+    function startFvFocus() {
+        if (dottedIndices.size === 0) { endFvSession(); return; }
+        fvState = 'FOCUS';
+        focusQueue = scanOrder.filter(idx => dottedIndices.has(idx)).reverse();
+        focusPosition = 0;
+        renderFvFocus();
+    }
+
+    function renderFvFocus() {
+        if (focusPosition >= focusQueue.length) { endFvSession(); return; }
+        taskList.innerHTML = '';
+        const remaining = focusQueue.length - focusPosition;
+        const currentIdx = focusQueue[focusPosition];
+
+        // Progress
+        const progress = document.createElement('div');
+        progress.className = 'fv-progress';
+        progress.innerHTML = `
+            <div class="fv-progress-bar"><div class="fv-progress-fill" style="width:${Math.round((focusPosition / focusQueue.length) * 100)}%"></div></div>
+            <span class="fv-progress-text">Focus: ${remaining} task${remaining !== 1 ? 's' : ''} remaining</span>`;
+        taskList.appendChild(progress);
+
+        // Current task
+        const li = document.createElement('li');
+        li.className = 'todo-item fv-focus-task';
+        li.innerHTML = `
+            <span class="fv-dot">&#x25CF;</span>
+            <span class="todo-text">${formatTaskMarkup(tasks[currentIdx])}</span>`;
+        taskList.appendChild(li);
+
+        // Actions
+        const btnRow = document.createElement('li');
+        btnRow.className = 'fv-actions fv-focus-actions';
+        btnRow.innerHTML = `
+            <button class="btn btn-glossy btn-sm fv-complete-btn"><i class="bi bi-check-lg"></i> Complete</button>
+            <button class="btn btn-glossy btn-sm fv-reenter-btn"><i class="bi bi-arrow-down-circle"></i> Re-enter</button>
+            <button class="btn btn-sm fv-skip-btn">Skip</button>`;
+        taskList.appendChild(btnRow);
+        btnRow.querySelector('.fv-complete-btn').addEventListener('click', () => {
+            checkTask(currentIdx);
+            focusPosition++;
+            renderFvFocus();
+        });
+        btnRow.querySelector('.fv-reenter-btn').addEventListener('click', () => {
+            refreshDateTimeId(currentIdx);
+            saveTodos();
+            focusPosition++;
+            renderFvFocus();
+        });
+        btnRow.querySelector('.fv-skip-btn').addEventListener('click', () => {
+            focusPosition++;
+            renderFvFocus();
+        });
+
+        // Up next preview
+        if (focusPosition + 1 < focusQueue.length) {
+            const upNext = document.createElement('li');
+            upNext.className = 'fv-up-next';
+            upNext.innerHTML = '<span class="fv-label">Up next</span>';
+            for (let i = focusPosition + 1; i < focusQueue.length; i++) {
+                const preview = document.createElement('div');
+                preview.className = 'fv-up-next-item';
+                preview.innerHTML = `<span class="fv-dot" style="font-size:0.8rem;">&#x25CF;</span> <span style="font-size:0.85rem;">${formatTaskMarkup(tasks[focusQueue[i]])}</span>`;
+                upNext.appendChild(preview);
+            }
+            taskList.appendChild(upNext);
+        }
+
+        const endLi = document.createElement('li');
+        endLi.className = 'fv-end-session';
+        endLi.innerHTML = `<button class="btn btn-sm">End Session</button>`;
+        taskList.appendChild(endLi);
+        endLi.querySelector('button').addEventListener('click', endFvSession);
+    }
+
+    function endFvSession() {
+        fvState = 'NORMAL';
+        dottedIndices.clear();
+        scanOrder = [];
+        focusQueue = [];
+        updateFvToolbar();
+        renderTasks();
     }
 
     // Event listeners
     document.getElementById('addTodoBtn').addEventListener('click', openAddDialog);
-    document.getElementById('closeTodoDialog').addEventListener('click', () => dialog.close());
+    document.getElementById('closeTodoDialog').addEventListener('click', closeSlideout);
     document.getElementById('saveTodoBtn').addEventListener('click', saveFromDialog);
     deleteBtn.addEventListener('click', deleteFromDialog);
     moveBottomBtn.addEventListener('click', moveToBottom);
+    document.getElementById('clearCompletedBtn').addEventListener('click', clearCompleted);
+    document.getElementById('exportTodoBtn').addEventListener('click', exportTodoTxt);
+    document.getElementById('startFvBtn').addEventListener('click', startFvRound);
+    slideoutScrim.addEventListener('click', closeSlideout);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && slideout.classList.contains('open')) closeSlideout();
+    });
 
     searchBox.addEventListener('input', renderTasks);
     showCompletedCheckbox.addEventListener('change', renderTasks);
-
-    // Close dialog on backdrop click
-    dialog.addEventListener('click', (e) => {
-        if (e.target === dialog) dialog.close();
-    });
 
     // Initial render
     renderTasks();

@@ -1766,9 +1766,12 @@ span.badge::after {
     border-bottom: 1px solid var(--border);
 }
 .todo-item input[type="checkbox"] {
-    margin-top: 0.25rem;
+    margin-top: 0.2rem;
     flex-shrink: 0;
-    accent-color: var(--orange);
+    accent-color: var(--area-accent);
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
 }
 .todo-item.done .todo-text {
     text-decoration: line-through;
@@ -1853,27 +1856,325 @@ kbd {
     text-align: center;
 }
 
-.todo-dialog {
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    background: var(--base);
-    color: var(--text);
-    padding: 1.5rem;
-    max-width: 500px;
-    width: 90vw;
+/* --- Todo slideout panel --- */
+.todo-slideout-scrim {
+    display: none;
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0;
+    inset: 0;
+    background: var(--scrim-soft);
+    z-index: 199;
+    cursor: pointer;
 }
-.todo-dialog::backdrop {
-    background: var(--scrim);
+.todo-slideout-scrim.open { display: block; }
+.todo-slideout {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 45%;
+    max-width: 500px;
+    background: var(--base);
+    border-left: 1px solid var(--mantle);
+    box-shadow: var(--shadow-xl);
+    z-index: 200;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
 }
-.todo-dialog-header {
+.todo-slideout.open { transform: translateX(0); }
+.todo-slideout-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--mantle);
+    flex-shrink: 0;
+}
+.todo-slideout-body {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+}
+.todo-slideout-hint {
+    font-size: 0.8rem;
+    color: var(--overlay-1);
+    margin-top: 0.5rem;
+}
+.todo-slideout-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--mantle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* --- FV Mode --- */
+.fv-progress {
+    padding: 0.75rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+.fv-progress-bar {
+    height: 4px;
+    background: var(--mantle);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.fv-progress-fill {
+    height: 100%;
+    background: var(--area-accent);
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+.fv-progress-text {
+    font-size: 0.8rem;
+    color: var(--overlay-1);
+}
+.fv-dot {
+    color: var(--area-accent);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+.fv-dot-empty { color: var(--overlay-1); }
+.fv-benchmark {
+    background: color-mix(in srgb, var(--area-accent) 8%, var(--base));
+    border-radius: 0.3rem;
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+.fv-label {
+    font-size: 0.7rem;
+    color: var(--overlay-1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.fv-vs {
+    padding: 0.75rem 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--subtext-1);
+    font-style: italic;
+    list-style: none;
+}
+.fv-assess {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+.fv-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 1rem 0;
+    list-style: none;
+}
+.fv-focus-actions { flex-wrap: wrap; }
+.fv-focus-task {
+    background: color-mix(in srgb, var(--area-accent) 8%, var(--base));
+    border-radius: 0.3rem;
+    padding: 0.8rem;
+    border-bottom: 1px solid var(--border);
+}
+.fv-scan-done {
+    text-align: center;
+    padding: 1.5rem 0;
+    list-style: none;
+}
+.fv-scan-done p {
+    margin-bottom: 0.75rem;
+    color: var(--subtext-1);
+}
+.fv-end-session {
+    text-align: center;
+    padding: 0.75rem 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
+    margin-top: 0.5rem;
+}
+.fv-up-next {
+    padding: 0.75rem 0;
+    list-style: none;
+}
+.fv-up-next-item {
+    padding: 0.3rem 0;
+    color: var(--overlay-1);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+}
+
+/* --- Note slideout panel --- */
+.note-slideout-scrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--scrim-soft);
+    z-index: 199;
+    cursor: pointer;
+}
+.note-slideout-scrim.open { display: block; }
+
+.note-slideout {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 65%;
+    max-width: 700px;
+    background: var(--base);
+    border-left: 1px solid var(--mantle);
+    box-shadow: var(--shadow-xl);
+    z-index: 200;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+}
+.note-slideout.open { transform: translateX(0); }
+
+.note-slideout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--mantle);
+    flex-shrink: 0;
+}
+.note-slideout-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+.note-slideout-header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.note-slideout-body {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+}
+.note-slideout-meta {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.note-slideout-content {
+    overflow-wrap: anywhere;
+}
+
+/* --- Rendered markdown in note content areas --- */
+.note-slideout-content img,
+#note-content img { max-width: 100%; height: auto; }
+
+.note-slideout-content code,
+#note-content code {
+    background: var(--mantle);
+    padding: 0.15em 0.35em;
+    border-radius: 0.25rem;
+    font-size: 0.85em;
+}
+.note-slideout-content pre code,
+#note-content pre code {
+    display: block;
+    background: var(--crust);
+    padding: 0.75rem 1rem;
+    border-radius: 0.4rem;
+    overflow-x: auto;
+    line-height: 1.5;
+}
+.note-slideout-content pre,
+#note-content pre {
+    margin: 0.75rem 0;
+}
+
+.note-slideout-content blockquote,
+#note-content blockquote {
+    border-left: 3px solid var(--area-accent);
+    background: color-mix(in srgb, var(--area-accent) 5%, var(--base));
+    padding: 0.5rem 1rem;
+    margin: 0.75rem 0;
+    border-radius: 0 0.25rem 0.25rem 0;
+    color: var(--subtext-1);
+}
+
+.note-slideout-content table,
+#note-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+}
+.note-slideout-content th,
+#note-content th {
+    background: var(--mantle);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--crust);
+}
+.note-slideout-content td,
+#note-content td {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--crust);
+}
+
+.note-slideout-content ul,
+.note-slideout-content ol,
+#note-content ul,
+#note-content ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+}
+.note-slideout-content li,
+#note-content li {
+    margin: 0.25rem 0;
+}
+.note-slideout-content li input[type="checkbox"],
+#note-content li input[type="checkbox"] {
+    margin-right: 0.3rem;
+    accent-color: var(--area-accent);
+}
+
+.note-slideout-content h1,
+#note-content h1 { font-size: 1.3rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+.note-slideout-content h2,
+#note-content h2 { font-size: 1.1rem; font-weight: 600; margin: 0.9rem 0 0.4rem; }
+.note-slideout-content h3,
+#note-content h3 { font-size: 1rem; font-weight: 600; margin: 0.75rem 0 0.3rem; }
+.note-slideout-content h4,
+#note-content h4 { font-size: 0.9rem; font-weight: 600; margin: 0.6rem 0 0.3rem; }
+
+.note-slideout-content hr,
+#note-content hr {
+    border: 0;
+    border-top: 1px solid var(--mantle);
+    margin: 1.2rem 0;
+}
+
+.note-slideout-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--mantle);
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-shrink: 0;
 }
 
 /* --- User Profile --- */
@@ -2330,6 +2631,11 @@ p { margin: 0.6rem 0; }
         padding: 1rem;
         padding-bottom: 5rem;
     }
+
+    .note-slideout { width: 100%; max-width: none; }
+    .todo-slideout { width: 100%; max-width: none; }
+    .todo-item { overflow-x: auto; }
+    .todo-text { word-break: normal; white-space: nowrap; }
 
     /* Page nav hidden on mobile (shown in top bar) */
     .page-nav {
