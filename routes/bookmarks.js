@@ -50,7 +50,11 @@ export async function tryHandle(req, ctx) {
         const value = await req.formData();
         const selected = value.getAll('selected[]');
         const combined = selected.join('\n\n');
-        return Response.redirect(new URL(`/post?content=${encodeURIComponent(combined)}`, req.url).href, 303);
+        const escaped = combined.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return new Response(
+            `<!DOCTYPE html><html><body><form id="f" method="POST" action="/post"><textarea name="content" hidden>${escaped}</textarea></form><script>document.getElementById('f').submit()</script></body></html>`,
+            { status: 200, headers: { 'content-type': 'text/html' } }
+        );
     }
 
     if (BOOKMARK_NEW_ROUTE.exec(req.url) && user) {

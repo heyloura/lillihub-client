@@ -1341,6 +1341,25 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     padding: 0.5rem 0;
 }
 .editor-footer-spacer { flex: 1; }
+.editor-autosave-status {
+    font-size: 0.8rem;
+    color: var(--overlay-1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.editor-autosave-status.visible { opacity: 1; }
+.editor-restore-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+    background: color-mix(in srgb, var(--area-accent) 10%, var(--base));
+    border: 1px solid var(--area-accent);
+    border-radius: 0.35rem;
+    font-size: 0.85rem;
+}
+.editor-restore-banner span { flex: 1; }
 .btn-danger {
     background: var(--red) !important;
     border-color: color-mix(in srgb, black 20%, var(--red)) !important;
@@ -2076,6 +2095,27 @@ kbd {
 }
 .note-slideout-content {
     overflow-wrap: anywhere;
+}
+
+/* --- Note multi-select --- */
+.note-card { position: relative; padding-left: 1.75rem; }
+.note-select {
+    position: absolute;
+    left: 0.35rem;
+    top: 1.2rem;
+    cursor: pointer;
+    z-index: 1;
+}
+.note-select-cb {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--area-accent);
+    cursor: pointer;
+}
+.notes-select-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 /* --- Rendered markdown in note content areas --- */

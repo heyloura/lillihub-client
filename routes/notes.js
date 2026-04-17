@@ -23,6 +23,7 @@ const DELETE_NOTEBOOK = new URLPattern({ pathname: "/notebook/delete" });
 const MOVE_NOTE = new URLPattern({ pathname: "/notes/notebook/move" });
 const COPY_NOTE = new URLPattern({ pathname: "/notes/notebook/copy" });
 const NOTE_VERSIONS_API = new URLPattern({ pathname: "/api/note-versions" });
+const NOTES_POST_SELECTED = new URLPattern({ pathname: "/notes/post-selected" });
 
 export async function tryHandle(req, ctx) {
     const { user, accessTokenValue } = ctx;
@@ -47,6 +48,18 @@ export async function tryHandle(req, ctx) {
             status: 200,
             headers: { "content-type": "text/html" },
         });
+    }
+
+    // Must be checked before NOTES_ROUTE because /notes/post-selected matches /notes/:id
+    if (NOTES_POST_SELECTED.exec(req.url) && user) {
+        const value = await req.formData();
+        const selected = value.getAll('selected[]');
+        const combined = selected.join('\n\n---\n\n');
+        const escaped = combined.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return new Response(
+            `<!DOCTYPE html><html><body><form id="f" method="POST" action="/post"><textarea name="content" hidden>${escaped}</textarea></form><script>document.getElementById('f').submit()</script></body></html>`,
+            { status: 200, headers: { 'content-type': 'text/html' } }
+        );
     }
 
     if (NOTES_ROUTE.exec(req.url) && user) {

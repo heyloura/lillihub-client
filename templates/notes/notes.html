@@ -27,6 +27,14 @@
             </div>
         </div>
         <datalist id="noteTags"></datalist>
+        <div class="notes-select-toolbar mb-2 hide-if-user-has-no-javascript" id="notes-select-toolbar" style="display:none;">
+            <label class="highlight-select-all">
+                <input type="checkbox" id="note-select-all-cb" /> <small>Select all</small>
+            </label>
+            <span class="blog-toolbar-spacer"></span>
+            <button type="button" class="btn btn-glossy btn-sm" id="post-selected-btn"><i class="bi bi-pencil-square"></i> Create post</button>
+        </div>
+        <form id="notes-post-form" method="POST" action="/notes/post-selected" style="display:none;"></form>
         {{notes}}
 
         <details class="mt-2 pt-2" style="border-top:1px solid var(--border);">
@@ -168,6 +176,47 @@
         }
 
         if (key) initNoteSlideout('{{notebookId}}', key, JSON.parse('{{notebooksJson}}'));
+
+        // --- Multi-select: create post from notes ---
+        if (activeTab === 'notes') {
+            document.getElementById('notes-select-toolbar').style.display = '';
+
+            document.getElementById('note-select-all-cb').addEventListener('change', function() {
+                const checked = this.checked;
+                document.querySelectorAll('.note-card').forEach(card => {
+                    if (card.style.display === 'none') return;
+                    const cb = card.querySelector('.note-select-cb');
+                    if (cb) cb.checked = checked;
+                });
+            });
+
+            document.getElementById('post-selected-btn').addEventListener('click', function() {
+                const form = document.getElementById('notes-post-form');
+                form.innerHTML = '';
+                let count = 0;
+                document.querySelectorAll('.note-card').forEach(card => {
+                    if (card.style.display === 'none') return;
+                    const cb = card.querySelector('.note-select-cb');
+                    if (!cb || !cb.checked) return;
+                    const noteEl = card.querySelector('.note');
+                    let md = noteEl?.getAttribute('data-markdown') || '';
+                    // Strip YAML frontmatter
+                    md = md.replace(/^---\n[\s\S]*?\n---\n?/, '').trim();
+                    if (!md) return;
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'selected[]';
+                    input.value = md;
+                    form.appendChild(input);
+                    count++;
+                });
+                if (count === 0) { alert('No notes selected.'); return; }
+                form.submit();
+            });
+        } else {
+            // Hide checkboxes on todos tab
+            document.querySelectorAll('.note-select').forEach(el => el.style.display = 'none');
+        }
 
         document.getElementById('exportNotesBtn')?.addEventListener('click', async () => {
             const zip = new JSZip();

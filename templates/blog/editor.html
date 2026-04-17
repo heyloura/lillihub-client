@@ -33,6 +33,7 @@
 
         <div class="editor-footer">
             {{deleteButton}}
+            <span id="autosave-status" class="editor-autosave-status hide-if-user-has-no-javascript"></span>
             <span class="editor-footer-spacer"></span>
             <button type="submit" formaction="/post/preview" class="btn">Preview</button>
             <button type="submit" name="status" value="draft" class="btn">Save Draft</button>
@@ -336,6 +337,71 @@
             ta.value = ta.value.slice(0, start) + '    ' + ta.value.slice(ta.selectionEnd);
             ta.selectionStart = ta.selectionEnd = start + 4;
         }
+    });
+
+    // --- Autosave to localStorage ---
+    var titleInput = document.querySelector('.editor-title');
+    var summaryInput = document.querySelector('.editor-summary');
+    var editUrl = document.querySelector('input[name="url"]');
+    var dest = document.querySelector('input[name="destination"]');
+    var storageKey = 'lh-editor-' + (editUrl ? editUrl.value : 'new-' + (dest ? dest.value : ''));
+    var statusEl = document.getElementById('autosave-status');
+    var saveTimer = null;
+
+    function autosave() {
+        var data = {
+            title: titleInput ? titleInput.value : '',
+            content: ta.value,
+            summary: summaryInput ? summaryInput.value : '',
+            ts: Date.now()
+        };
+        try { localStorage.setItem(storageKey, JSON.stringify(data)); } catch(e) {}
+        statusEl.textContent = 'Draft saved';
+        statusEl.classList.add('visible');
+        setTimeout(function() { statusEl.classList.remove('visible'); }, 2000);
+    }
+
+    function scheduleAutosave() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(autosave, 2000);
+    }
+
+    ta.addEventListener('input', scheduleAutosave);
+    if (titleInput) titleInput.addEventListener('input', scheduleAutosave);
+    if (summaryInput) summaryInput.addEventListener('input', scheduleAutosave);
+
+    // Restore saved draft on load
+    try {
+        var saved = JSON.parse(localStorage.getItem(storageKey));
+        if (saved && saved.content) {
+            var hasContent = ta.value.trim() || (titleInput && titleInput.value.trim());
+            if (!hasContent || (saved.ts && saved.content !== ta.value)) {
+                var age = Date.now() - (saved.ts || 0);
+                if (age < 7 * 24 * 60 * 60 * 1000) { // less than 7 days old
+                    var banner = document.createElement('div');
+                    banner.className = 'editor-restore-banner';
+                    banner.innerHTML = '<span>Unsaved draft found</span> <button type="button" class="btn btn-glossy btn-sm" id="restore-draft-btn">Restore</button> <button type="button" class="btn btn-sm" id="dismiss-draft-btn">Dismiss</button>';
+                    ta.parentNode.insertBefore(banner, ta);
+                    document.getElementById('restore-draft-btn').addEventListener('click', function() {
+                        if (saved.title && titleInput) titleInput.value = saved.title;
+                        ta.value = saved.content;
+                        if (saved.summary && summaryInput) summaryInput.value = saved.summary;
+                        growTextArea(ta);
+                        updateCharCount();
+                        banner.remove();
+                    });
+                    document.getElementById('dismiss-draft-btn').addEventListener('click', function() {
+                        localStorage.removeItem(storageKey);
+                        banner.remove();
+                    });
+                }
+            }
+        }
+    } catch(e) {}
+
+    // Clear draft on form submit (publish, save draft, preview)
+    document.querySelector('.editor-form').addEventListener('submit', function() {
+        localStorage.removeItem(storageKey);
     });
 })();
 </script>
