@@ -18,6 +18,7 @@ const FOLLOWING_ROUTE = new URLPattern({ pathname: "/users/following" });
 const MUTED_ROUTE = new URLPattern({ pathname: "/users/muted" });
 const BLOCKED_ROUTE = new URLPattern({ pathname: "/users/blocked" });
 const MENTIONS_ROUTE = new URLPattern({ pathname: "/mentions" });
+const MENTIONS_LATEST_API = new URLPattern({ pathname: "/api/mentions-latest" });
 const REPLIES_ROUTE = new URLPattern({ pathname: "/replies" });
 const DISCOVER_ROUTE = new URLPattern({ pathname: "/discover" });
 const DISCOVERTAG_ROUTE = new URLPattern({ pathname: "/discover/:id" });
@@ -87,6 +88,23 @@ export async function tryHandle(req, ctx) {
                 headers: { "content-type": "text/html" },
             }
         );
+    }
+
+    if (MENTIONS_LATEST_API.exec(req.url) && user) {
+        try {
+            const res = await fetch('https://micro.blog/posts/mentions', {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + accessTokenValue }
+            });
+            const data = await res.json();
+            const latest = data?.items?.[0]?.date_published || null;
+            return new Response(JSON.stringify({ latest }), {
+                status: 200,
+                headers: { 'content-type': 'application/json' }
+            });
+        } catch {
+            return new Response('{"latest":null}', { status: 200, headers: { 'content-type': 'application/json' } });
+        }
     }
 
     if (MENTIONS_ROUTE.exec(req.url) && user) {

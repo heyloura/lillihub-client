@@ -5,6 +5,7 @@ import { BlogTemplate } from "../layouts/blog.js";
 import { MediaTemplate } from "../layouts/media.js";
 import { HTMLPage } from "../layouts/templates.js";
 
+const SHARE_ROUTE = new URLPattern({ pathname: "/share" });
 const POST_ROUTE = new URLPattern({ pathname: "/post" });
 const PREVIEW_POST = new URLPattern({ pathname: "/post/preview" });
 const POSTS_ROUTE = new URLPattern({ pathname: "/posts" });
@@ -18,6 +19,52 @@ const CHECK_ALT_ROUTE = new URLPattern({ pathname: "/media/check-alt" });
 
 export async function tryHandle(req, ctx) {
     const { user, accessTokenValue } = ctx;
+
+    // --- Share target: receive shared content from the OS share sheet ---
+    if (SHARE_ROUTE.exec(req.url) && user) {
+        const value = await req.formData();
+        const title = value.get('name') || '';
+        const text = value.get('description') || '';
+        const url = value.get('link') || '';
+
+        // Upload any shared images
+        const imageFiles = [...(value.getAll('photos') || []), ...(value.getAll('screenshot') || [])];
+        const imageMarkdown = [];
+
+        for (const file of imageFiles) {
+            if (!(file instanceof File) || !file.size) continue;
+            try {
+                let fetching = await fetch(`https://micro.blog/micropub?q=config`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } });
+                const config = await fetching.json();
+                const mediaEndpoint = config["media-endpoint"];
+                if (!mediaEndpoint) continue;
+
+                const fd = new FormData();
+                fd.append('file', file, file.name);
+                fetching = await fetch(mediaEndpoint, { method: "POST", headers: { "Authorization": "Bearer " + accessTokenValue }, body: fd });
+                const uploaded = await fetching.json();
+                if (uploaded?.url) {
+                    imageMarkdown.push(`![](${uploaded.url})`);
+                }
+            } catch (err) {
+                console.log(`share: image upload failed for ${file.name}: ${err?.message || err}`);
+            }
+        }
+
+        // Build content for the editor
+        const parts = [];
+        if (imageMarkdown.length) parts.push(imageMarkdown.join('\n\n'));
+        if (text) parts.push(text);
+        if (url) parts.push(title ? `[${title}](${url})` : url);
+        else if (title) parts.push(title);
+        const content = parts.join('\n\n');
+
+        const escaped = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return new Response(
+            `<!DOCTYPE html><html><body><form id="f" method="POST" action="/post"><textarea name="content" hidden>${escaped}</textarea></form><script>document.getElementById('f').submit()</script></body></html>`,
+            { status: 200, headers: { 'content-type': 'text/html' } }
+        );
+    }
 
     if (POST_ROUTE.exec(req.url) && user) {
         // POST = returning from preview with form data; GET = normal editor load

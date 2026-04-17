@@ -59,7 +59,7 @@ function PageNavContent(user, area, title, navContent, context) {
         <a href="/" class="${title == 'Timeline' ? 'active' : ''}"><i class="bi bi-card-list"></i> Timeline</a>
         ${ user && !user.error ? `
         <a href="/discover" class="${discoverActive ? 'active' : ''}"><i class="bi bi-search"></i> Discover</a>
-        <a href="/mentions" class="${title == 'Mentions' ? 'active' : ''}"><i class="bi bi-at"></i> Mentions</a>
+        <a href="/mentions" class="${title == 'Mentions' ? 'active' : ''}"><i class="bi bi-at"></i> Mentions<span class="mentions-badge" style="display:none;"></span></a>
         <a href="/replies" class="${title == 'Replies' ? 'active' : ''}"><i class="bi bi-reply"></i> Replies</a>
         <a href="/users/following" class="${title == 'following' || title == 'muted' || title == 'blocked' ? 'active' : ''}"><i class="bi bi-people"></i> Following</a>` : '' }`;
 }
@@ -111,7 +111,7 @@ function BottomNavContent(user, title, area, context) {
             <label for="sidebar-toggle"><i class="bi bi-list"></i></label>
             <a href="/" class="${title == 'Timeline' ? 'active' : ''}"><i class="bi bi-card-list"></i> Timeline</a>
             <a href="/discover" class="${discoverActive ? 'active' : ''}"><i class="bi bi-search"></i> Discover</a>
-            <a href="/mentions" class="${title == 'Mentions' ? 'active' : ''}"><i class="bi bi-at"></i> Mentions</a>
+            <a href="/mentions" class="${title == 'Mentions' ? 'active' : ''}"><i class="bi bi-at"></i> Mentions<span class="mentions-badge" style="display:none;"></span></a>
             <a href="/replies" class="${title == 'Replies' ? 'active' : ''}"><i class="bi bi-reply"></i> Replies</a>
             <a href="/users/following" class="${title == 'following' || title == 'muted' || title == 'blocked' ? 'active' : ''}"><i class="bi bi-people"></i> Following</a>
         </div>`;

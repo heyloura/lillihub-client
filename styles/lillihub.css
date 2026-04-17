@@ -385,6 +385,17 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 .sidebar-nav-notes,
 .sidebar-nav-item.sidebar-nav-notes:hover { border-left-color: var(--purplered); color: var(--purplered); }
 
+/* Mentions badge dot */
+.mentions-badge {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--red);
+    margin-left: 0.3rem;
+    vertical-align: middle;
+}
+
 /* Active nav item — colored background glow */
 .sidebar-nav-item.active {
     font-weight: 600;
@@ -576,6 +587,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 .content {
     max-width: calc(100vw - 190px - 20em);
     margin: 0px auto;
+    padding: 0 1rem;
 }
 
 /* --- Decorative right area --- */
@@ -613,7 +625,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 .card {
     border: 0;
     border-bottom: 1px solid var(--mantle);
-    padding: 1rem 0;
+    padding: 1rem 1em;
 }
 .card:first-child { padding-top: 0.5rem; }
 .card-header {
@@ -1437,6 +1449,8 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 }
 .card-body p { margin: 0.6rem 0; max-width: 60ch; }
 .card-body p:first-child { margin-top: 0; }
+.card-body ul, .card-body ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+.card-body li { margin: 0.25rem 0; }
 .card-footer {
     margin-top: 0.5rem;
     font-size: 1rem;
@@ -1813,7 +1827,7 @@ span.badge::after {
     outline: 2px solid var(--area-accent);
     outline-offset: 4px;
     border-radius: 0.5rem;
-    scroll-margin-top: 3.5rem;
+    scroll-margin-top: 4rem !important;
 }
 
 /* Keyboard shortcuts help dialog */
@@ -2673,6 +2687,7 @@ p { margin: 0.6rem 0; }
     }
 
     .note-slideout { width: 100%; max-width: none; }
+    .card { padding: 1rem 0; }
     .todo-slideout { width: 100%; max-width: none; }
     .todo-item { overflow-x: auto; }
     .todo-text { word-break: normal; white-space: nowrap; }
@@ -3082,6 +3097,7 @@ hr {
     border: 0;
     border-bottom: 0.05rem solid var(--mantle);
     background: var(--base);
+    padding: 1rem 1em;
 }
 .card pre {
     width: 100%;

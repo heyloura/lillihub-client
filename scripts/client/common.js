@@ -166,6 +166,54 @@ document.addEventListener('change', function(e) {
     }
 });
 
+// ---------------------------------------------------------------------------
+// Mentions badge — poll for new mentions, badge nav link + PWA icon
+// ---------------------------------------------------------------------------
+(function() {
+    var onMentionsPage = location.pathname === '/mentions';
+
+    // Clear last-seen when visiting mentions
+    if (onMentionsPage) {
+        localStorage.setItem('lh-mentions-last-seen', new Date().toISOString());
+        if ('clearAppBadge' in navigator) navigator.clearAppBadge();
+        // Clear badge dots immediately
+        document.querySelectorAll('.mentions-badge').forEach(function(b) { b.style.display = 'none'; });
+    }
+
+    function checkMentions() {
+        fetch('/api/mentions-latest')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.latest) return;
+                var lastSeen = localStorage.getItem('lh-mentions-last-seen') || '1970-01-01T00:00:00Z';
+                var hasNew = new Date(data.latest) > new Date(lastSeen);
+                document.querySelectorAll('.mentions-badge').forEach(function(b) {
+                    b.style.display = hasNew ? '' : 'none';
+                });
+                if ('setAppBadge' in navigator) {
+                    if (hasNew) navigator.setAppBadge();
+                    else navigator.clearAppBadge();
+                }
+            })
+            .catch(function() {});
+    }
+
+    // Only poll if logged in (sidebar exists)
+    if (!document.querySelector('.sidebar')) return;
+
+    // Don't poll on the mentions page itself
+    if (!onMentionsPage) checkMentions();
+
+    // Poll every 5 minutes, stop after 1 hour
+    var pollCount = 0;
+    var maxPolls = 12; // 12 * 5min = 60min
+    var pollTimer = setInterval(function() {
+        pollCount++;
+        if (pollCount >= maxPolls) { clearInterval(pollTimer); return; }
+        if (!onMentionsPage) checkMentions();
+    }, 5 * 60 * 1000);
+})();
+
 // Highlights search — client-side filter over content and title
 document.addEventListener('input', function(e) {
     if (e.target.id !== 'highlight-search') return;
