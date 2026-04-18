@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="mt-2" style="display:flex;justify-content:flex-end;">
+        {{filterToggle}}
+    </div>
+    {{feed}}
+    {{paging}}
+</div>
+<script>
+    // Intercept mark-read/unread form submissions to avoid page reload
+    document.addEventListener('submit', function(e) {
+        var form = e.target;
+        if (!form.action) return;
+        var isMarkRead = form.action.includes('/feed/mark-read');
+        var isMarkUnread = form.action.includes('/feed/mark-unread');
+        if (!isMarkRead && !isMarkUnread) return;
+        e.preventDefault();
+
+        var card = form.closest('.entry-card');
+        var entryId = form.querySelector('input[name="entry_id"]').value;
+
+        fetch(form.action, {
+            method: 'POST',
+            body: new URLSearchParams(new FormData(form)).toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+        });
+
+        // Remove from the filtered list with a fade
+        card.style.transition = 'opacity 0.25s ease';
+        card.style.opacity = '0';
+        setTimeout(function() { card.remove(); }, 250);
+    });
+</script>

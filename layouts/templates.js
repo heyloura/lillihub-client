@@ -4,6 +4,7 @@ const _commonjs = await Deno.readTextFile("scripts/client/common.js");
 function getArea(title) {
     if(title == 'Bookmarks' || title == 'Highlights') return 'bookmarks';
     if(title == 'Posts' || title == 'Draft' || title == 'Media' || title == 'Post' || title == 'Editor' || title == 'Collections' || title == 'Collection') return 'blog';
+    if(title == 'Feeds' || title == 'Feed' || title == 'Feed Entry' || title == 'Starred' || title == 'Recap') return 'feeds';
     if(title == 'Bookshelves' || title == 'Books' || title == 'Bookshelf' || title == 'Edit book' || title == 'Add Book' || title == 'Search Books') return 'bookshelves';
     if(title == 'Notebooks' || title == 'Notes' || title == 'Note') return 'notes';
     return 'social';
@@ -14,6 +15,7 @@ function PrimaryAction(area, title, context) {
     if(area == 'notes' && context?.notebookId) return `<div class="sidebar-action sidebar-action"><a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}"><i class="bi bi-pencil-square"></i> New Note</a></div>`;
     if(area == 'notes') return `<div class="sidebar-action sidebar-action"><a href="/notebook/new"><i class="bi bi-journal-plus"></i> New Notebook</a></div>`;
     if(area == 'bookmarks') return `<div class="sidebar-action sidebar-action"><a href="/bookmark/new"><i class="bi bi-bookmark-plus"></i> New Bookmark</a></div>`;
+    if(area == 'feeds') return `<div class="sidebar-action sidebar-action"><a href="/feed/new"><i class="bi bi-rss"></i> Add Feed</a></div>`;
     if(area == 'bookshelves') return `<div class="sidebar-action sidebar-action"><a href="/book/new"><i class="bi bi-journal-plus"></i> Add Book</a></div>`;
     return `<div class="sidebar-action"><a href="/post"><i class="bi bi-pencil-square"></i> New Post</a></div>`;
 }
@@ -23,6 +25,7 @@ function FabAction(area, title, context) {
     if(area == 'notes' && context?.notebookId) return `<a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}" class="fab"><i class="bi bi-pencil-square"></i></a>`;
     if(area == 'notes') return `<a href="/notebook/new" class="fab"><i class="bi bi-journal-plus"></i></a>`;
     if(area == 'bookmarks') return `<a href="/bookmark/new" class="fab"><i class="bi bi-bookmark-plus"></i></a>`;
+    if(area == 'feeds') return `<a href="/feed/new" class="fab"><i class="bi bi-rss"></i></a>`;
     if(area == 'bookshelves') return `<a href="/book/new" class="fab"><i class="bi bi-journal-plus"></i></a>`;
     return `<a href="/post" class="fab"><i class="bi bi-pencil-square"></i></a>`;
 }
@@ -41,6 +44,9 @@ function PageNavContent(user, area, title, navContent, context) {
         return `
             <a href="/bookmarks" class="${title == 'Bookmarks' ? 'active' : ''}"><i class="bi bi-bookmark"></i> Bookmarks</a>
             <a href="/highlights" class="${title == 'Highlights' ? 'active' : ''}"><i class="bi bi-highlighter"></i> Highlights</a>`;
+    }
+    if(area == 'feeds') {
+        return `<a href="/feeds" class="${title == 'Feeds' ? 'active' : ''}"><i class="bi bi-rss"></i> Feeds</a><a href="/feeds/entries" class="${title == 'Feed' || title == 'Feed Entry' ? 'active' : ''}"><i class="bi bi-card-list"></i> All</a><a href="/feeds/starred" class="${title == 'Starred' ? 'active' : ''}"><i class="bi bi-star"></i> Starred</a><a href="/feeds/recap" class="${title == 'Recap' ? 'active' : ''}"><i class="bi bi-journal-richtext"></i> Recap</a>${context?.feedName ? `<a href="/feeds/${context.feedId}" class="active"><i class="bi bi-rss"></i> ${context.feedName}</a>` : ''}`;
     }
     if(area == 'bookshelves') {
         return `<a href="/bookshelves" class="${title == 'Bookshelves' ? 'active' : ''}"><i class="bi bi-book"></i> Bookshelves</a><a href="/books" class="${title == 'Books' ? 'active' : ''}"><i class="bi bi-search-heart"></i> Discover</a>${context?.shelfName ? `<a href="/bookshelves/shelf/${context.shelfId}" class="active"><i class="bi bi-bookshelf"></i> ${context.shelfName}</a>` : ''}`;
@@ -83,6 +89,17 @@ function BottomNavContent(user, title, area, context) {
             <label for="sidebar-toggle"><i class="bi bi-list"></i></label>
             <a href="/bookmarks" class="${title == 'Bookmarks' ? 'active' : ''}"><i class="bi bi-bookmark"></i> Bookmarks</a>
             <a href="/highlights" class="${title == 'Highlights' ? 'active' : ''}"><i class="bi bi-highlighter"></i> Highlights</a>
+        </div>`;
+    }
+    if(area == 'feeds') {
+        return `
+        <div class="bottom-nav-links">
+            <label for="sidebar-toggle"><i class="bi bi-list"></i></label>
+            <a href="/feeds" class="${title == 'Feeds' ? 'active' : ''}"><i class="bi bi-rss"></i> Feeds</a>
+            <a href="/feeds/entries" class="${title == 'Feed' || title == 'Feed Entry' ? 'active' : ''}"><i class="bi bi-card-list"></i> All</a>
+            <a href="/feeds/starred" class="${title == 'Starred' ? 'active' : ''}"><i class="bi bi-star"></i> Starred</a>
+            <a href="/feeds/recap" class="${title == 'Recap' ? 'active' : ''}"><i class="bi bi-journal-richtext"></i> Recap</a>
+            ${context?.feedName ? `<a href="/feeds/${context.feedId}" class="active"><i class="bi bi-rss"></i> ${context.feedName}</a>` : ''}
         </div>`;
     }
     if(area == 'notes') {
@@ -201,6 +218,9 @@ ${FabAction(area, title, context)}
             <a href="/bookmarks" class="sidebar-nav-item sidebar-nav-bookmarks${area == 'bookmarks' ? ' active' : ''}">
                 <i class="bi bi-bookmark"></i> Bookmarks
             </a>
+            <a href="/feeds/entries" class="sidebar-nav-item sidebar-nav-feeds${area == 'feeds' ? ' active' : ''}">
+                <i class="bi bi-rss"></i> Feeds
+            </a>
             <a href="/bookshelves" class="sidebar-nav-item sidebar-nav-bookshelves${area == 'bookshelves' ? ' active' : ''}">
                 <i class="bi bi-book"></i> Bookshelves
             </a>
@@ -273,6 +293,11 @@ function _pageShellEnd(user) {
             <dt><kbd>k</kbd></dt><dd>Previous post</dd>
             <dt><kbd>o</kbd></dt><dd>Open post</dd>
             <dt><kbd>r</kbd></dt><dd>Reply to post</dd>
+        </dl>
+        <h3>Feeds</h3>
+        <dl>
+            <dt><kbd>s</kbd></dt><dd>Open entry (to star)</dd>
+            <dt><kbd>m</kbd></dt><dd>Toggle read/unread</dd>
         </dl>
         <h3>Paging</h3>
         <dl>

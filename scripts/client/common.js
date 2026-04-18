@@ -125,14 +125,38 @@ document.addEventListener('keydown', function(e) {
                 }
             }
             break;
+        // Feed entry shortcuts
+        case 's':
+            if (_kbIdx >= 0 && cards[_kbIdx] && cards[_kbIdx].classList.contains('entry-card')) {
+                e.preventDefault();
+                var entryLink = cards[_kbIdx].querySelector('.card-footer a[href*="/feeds/entry/"]');
+                if (entryLink) entryLink.click();
+            }
+            break;
+        case 'm':
+            if (_kbIdx >= 0 && cards[_kbIdx] && cards[_kbIdx].classList.contains('entry-card')) {
+                e.preventDefault();
+                var markBtn = cards[_kbIdx].querySelector('.card-header-actions form button');
+                if (markBtn) markBtn.click();
+            }
+            break;
         // Paging
         case 'n': {
-            var next = document.querySelector('.paging a[href*="last="]');
+            var next = document.querySelector('.paging a[href*="last="]') ||
+                       document.querySelector('.paging span a');
             if (next && !next.classList.contains('hide')) { e.preventDefault(); next.click(); }
             break;
         }
         case 'p': {
             var prev = document.querySelector('.paging a[href*="before="]');
+            if (!prev) {
+                // Feed-style paging: prev link is a direct child of .paging, not inside <span>
+                var pagingEl = document.querySelector('.paging');
+                if (pagingEl) {
+                    var firstLink = pagingEl.querySelector(':scope > a');
+                    if (firstLink) prev = firstLink;
+                }
+            }
             if (prev && !prev.classList.contains('hide')) { e.preventDefault(); prev.click(); }
             break;
         }

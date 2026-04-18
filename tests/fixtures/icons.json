@@ -1,0 +1,4 @@
+[
+    { "host": "example.com", "url": "https://example.com/favicon.png" },
+    { "host": "another.com", "url": "https://another.com/icon.png" }
+]

@@ -1,0 +1,25 @@
+<div class="card mt-2 entry-card {{unreadClass}}" data-entry-id="{{id}}">
+    <div class="card-header">
+        <div class="card-header-scroll">
+            <div class="card-header-main">
+                <div class="tile">
+                    {{feedIcon}}
+                    <div class="tile-content">
+                        <p class="tile-title entry-title">{{feedName}}</p>
+                        <small class="tile-subtitle">{{date}}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-header-actions btn-group">
+                {{actions}}
+            </div>
+        </div>
+    </div>
+    <div class="card-body feed-entry-content">
+        {{entryTitle}}
+        {{content}}
+    </div>
+    <div class="card-footer">
+        <small><a href="{{url}}" target="_blank" rel="noopener">{{date}}</a></small>
+    </div>
+</div>

@@ -1,0 +1,4 @@
+[
+    { "id": 1, "feed_id": 101, "title": "Example Blog", "feed_url": "https://example.com/feed.xml", "site_url": "https://example.com" },
+    { "id": 2, "feed_id": 102, "title": "Another Feed", "feed_url": "https://another.com/rss", "site_url": "https://another.com" }
+]

@@ -1,0 +1,98 @@
+<div class="container mt-2">
+    {{errorBanner}}
+    {{emptyState}}
+    {{feeds}}
+</div>
+
+<dialog id="feed-dialog" class="bookshelf-dialog hide-if-user-has-no-javascript">
+    <div class="bookshelf-dialog-header">
+        <h3 id="feed-dialog-title"></h3>
+        <button type="button" id="feed-dialog-close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="bookshelf-dialog-body">
+        <label class="bookshelf-dialog-label">Rename</label>
+        <div class="input-group">
+            <input type="text" id="feed-dialog-name" class="form-input" required />
+            <button type="button" class="btn btn-glossy btn-sm" id="feed-dialog-rename-btn">Save</button>
+        </div>
+        <details class="mt-2" id="feed-dialog-unsub-details">
+            <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Unsubscribe</summary>
+            <div class="mt-2">
+                <p style="font-size:0.85rem;color:var(--overlay-1);">You will no longer receive entries from this feed.</p>
+                <button type="button" class="btn btn-glossy btn-sm" id="feed-dialog-unsub-btn">Confirm</button>
+            </div>
+        </details>
+    </div>
+</dialog>
+
+<script>
+    // --- Feed manage dialog ---
+    const dialog = document.getElementById('feed-dialog');
+    const dialogTitle = document.getElementById('feed-dialog-title');
+    const dialogName = document.getElementById('feed-dialog-name');
+    const unsubDetails = document.getElementById('feed-dialog-unsub-details');
+    let activeFeedId = null;
+    let activeCard = null;
+
+    // Replace dropdown contents with a single button that opens the dialog
+    document.querySelectorAll('.feed-card').forEach(card => {
+        const actions = card.querySelector('.card-header-actions');
+        if (!actions) return;
+        actions.innerHTML = '';
+        const manageBtn = document.createElement('button');
+        manageBtn.type = 'button';
+        manageBtn.className = 'btn btn-glossy btn-sm';
+        manageBtn.innerHTML = '<i class="bi bi-three-dots-vertical"></i>';
+        manageBtn.addEventListener('click', () => openDialog(card));
+        actions.appendChild(manageBtn);
+    });
+
+    function openDialog(card) {
+        activeCard = card;
+        activeFeedId = card.dataset.feedId;
+        const title = card.querySelector('.tile-title').textContent;
+        dialogTitle.textContent = title;
+        dialogName.value = title;
+        unsubDetails.open = false;
+        dialog.showModal();
+    }
+
+    document.getElementById('feed-dialog-close').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+    document.getElementById('feed-dialog-rename-btn').addEventListener('click', async () => {
+        const title = dialogName.value.trim();
+        if (!title) return;
+        const form = new URLSearchParams();
+        form.append('subscription_id', activeFeedId);
+        form.append('title', title);
+        const res = await fetch('/feed/rename', {
+            method: 'POST',
+            body: form.toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+        });
+        if (res.url?.includes('error=')) {
+            alert('Could not rename feed. Please try again.');
+            return;
+        }
+        activeCard.querySelector('.tile-title').textContent = title;
+        dialog.close();
+    });
+
+    document.getElementById('feed-dialog-unsub-btn').addEventListener('click', async () => {
+        if (!confirm('Unsubscribe from this feed?')) return;
+        const form = new URLSearchParams();
+        form.append('subscription_id', activeFeedId);
+        const res = await fetch('/feed/unsubscribe', {
+            method: 'POST',
+            body: form.toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+        });
+        if (res.url?.includes('error=')) {
+            alert('Could not unsubscribe. Please try again.');
+            return;
+        }
+        activeCard.remove();
+        dialog.close();
+    });
+</script>

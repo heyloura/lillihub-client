@@ -42,6 +42,13 @@ const DEFAULT_ROUTES = [
     [/\/notes\/notebooks\/\d+/, "notebook.json"],
     [/\/notes\/notebooks/, "notebooks.json"],
     [/\/books\/bookshelves/, "bookshelves.json"],
+    [/\/feeds\/v2\/entries\/\d+/, "entry.json"],
+    [/\/feeds\/v2\/entries/, "entries.json"],
+    [/\/feeds\/v2\/feeds\/\d+\/entries/, "entries.json"],
+    [/\/feeds\/v2\/unread_entries/, "empty_array.json"],
+    [/\/feeds\/v2\/starred_entries/, "empty_array.json"],
+    [/\/feeds\/v2\/icons/, "icons.json"],
+    [/\/feeds\/v2\/subscriptions/, "subscriptions.json"],
     [/\/micropub\?q=config/, "micropub_config.json"],
 ];
 
@@ -191,6 +198,39 @@ Deno.test("books: renders the books discover feed", async () => {
     const { BooksTemplate } = await import("../layouts/books.js");
     const html = await BooksTemplate(testUser, "fake-token");
     assertRenders(html, "books");
+});
+
+Deno.test("feeds: renders the subscriptions list", async () => {
+    const { FeedsTemplate } = await import("../layouts/feeds.js");
+    const html = await FeedsTemplate(
+        testUser,
+        "fake-token",
+        mockReq("/feeds")
+    );
+    assertRenders(html, "feeds");
+});
+
+Deno.test("feeds: renders the entries timeline", async () => {
+    const { FeedEntriesTemplate } = await import("../layouts/feed-entries.js");
+    const html = await FeedEntriesTemplate(
+        testUser,
+        "fake-token",
+        null,
+        mockReq("/feeds/entries")
+    );
+    assertRenders(html, "feed-entries");
+});
+
+Deno.test("feeds: renders a single entry", async () => {
+    const { FeedEntryTemplate } = await import("../layouts/feed-entry.js");
+    const html = await FeedEntryTemplate(testUser, "fake-token", "1001");
+    assertRenders(html, "feed-entry");
+});
+
+Deno.test("feeds: renders starred entries", async () => {
+    const { FeedStarredTemplate } = await import("../layouts/feed-starred.js");
+    const html = await FeedStarredTemplate(testUser, "fake-token");
+    assertRenders(html, "feed-starred");
 });
 
 Deno.test("notebooks: renders the notebooks list", async () => {

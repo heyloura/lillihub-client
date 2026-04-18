@@ -1,0 +1,55 @@
+<div class="container mt-2">
+    <h5><i class="bi bi-journal-richtext"></i> Reading Recap</h5>
+    <p class="tile-subtitle">A summary of your recent reading.</p>
+
+    <div class="mt-2" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <a href="/feeds/recap?source=starred" class="btn btn-glossy btn-sm recap-source-btn" data-source="starred" {{starredActive}}><i class="bi bi-star"></i> Starred</a>
+        <a href="/feeds/recap?source=read" class="btn btn-glossy btn-sm recap-source-btn" data-source="read" {{readActive}}><i class="bi bi-check2"></i> Read</a>
+        <a href="/feeds/recap?source=unread" class="btn btn-glossy btn-sm recap-source-btn" data-source="unread" {{unreadActive}}><i class="bi bi-circle"></i> Unread</a>
+    </div>
+
+    <div id="recap-content" class="mt-2">
+        {{recapContent}}
+    </div>
+</div>
+<script>
+    // JS-enhanced recap: poll the server and show a loading indicator
+    document.querySelectorAll('.recap-source-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var source = btn.dataset.source;
+            var contentEl = document.getElementById('recap-content');
+
+            // Update active state
+            document.querySelectorAll('.recap-source-btn').forEach(function(b) {
+                b.style.opacity = '';
+                b.style.fontWeight = '';
+            });
+            btn.style.opacity = '1';
+            btn.style.fontWeight = '600';
+
+            // Show loading indicator
+            contentEl.innerHTML = '<div style="display:flex;align-items:center;gap:0.75rem;color:var(--overlay-1);"><span class="loading"></span> Generating recap\u2026</div>';
+
+            // Poll the server
+            var attempt = 0;
+            var maxAttempts = 24;
+            function poll() {
+                fetch('/feeds/recap?source=' + source + '&ajax=1')
+                    .then(function(res) { return res.text(); })
+                    .then(function(html) {
+                        if (html.includes('hourglass') && attempt < maxAttempts) {
+                            attempt++;
+                            setTimeout(poll, 5000);
+                        } else {
+                            contentEl.innerHTML = html;
+                        }
+                    })
+                    .catch(function() {
+                        contentEl.innerHTML = '<p style="color:var(--overlay-1);">Something went wrong. Please try again.</p>';
+                    });
+            }
+            poll();
+        });
+    });
+</script>

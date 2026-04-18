@@ -1,0 +1,4 @@
+[
+    { "id": 1001, "feed_id": 101, "title": "First Post", "url": "https://example.com/first", "content": "<p>Hello world</p>", "published": "2026-04-15T12:00:00Z", "created_at": "2026-04-15T12:00:00Z" },
+    { "id": 1002, "feed_id": 102, "title": "Second Post", "url": "https://another.com/second", "content": "<p>Another post</p>", "published": "2026-04-16T08:30:00Z", "created_at": "2026-04-16T08:30:00Z" }
+]
