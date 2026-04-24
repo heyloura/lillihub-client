@@ -318,7 +318,7 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
         const dest = select.value;
         if (!dest) return;
         const destName = select.options[select.selectedIndex].text;
-        if (!confirm(`Move this note to "${destName}"?`)) return;
+        if (!confirm(`Move this note to "${destName}"?\n\nThis copies the note to the new notebook and then deletes the original. If the delete step fails, you may end up with duplicates.`)) return;
 
         const form = new URLSearchParams();
         form.append('id', currentNoteId);

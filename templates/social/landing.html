@@ -9,11 +9,11 @@
             as possible.
         </p>
 
-        <form action="https://micro.blog/indieauth/auth" method="get" class="landing-form">
+        <form action="https://micro.blog/indieauth/auth" method="get" class="landing-form" onsubmit="addLoading(this)">
             <label class="landing-label" for="loginMe">Sign in with your Micro.blog URL</label>
             <div class="landing-input-row">
                 <input id="loginMe" class="form-input" type="url" placeholder="https://username.micro.blog" name="me" required>
-                <button onclick="addLoading(this)" type="submit" class="btn-glossy">Sign In</button>
+                <button type="submit" class="btn-glossy">Sign In</button>
             </div>
             <input type="hidden" name="client_id" value="{{appURL}}"/>
             <input type="hidden" name="redirect_uri" value="{{appURL}}/auth"/>
@@ -24,10 +24,10 @@
 
         <details class="landing-details">
             <summary>Use an app token instead</summary>
-            <form action="/login" method="post" class="landing-form landing-form-secondary">
+            <form action="/login" method="post" class="landing-form landing-form-secondary" onsubmit="addLoading(this)">
                 <div class="landing-input-row">
                     <input class="form-input" type="password" placeholder="app token" name="token" required>
-                    <button onclick="addLoading(this)" type="submit" class="btn-glossy">Sign In</button>
+                    <button type="submit" class="btn-glossy">Sign In</button>
                 </div>
             </form>
         </details>

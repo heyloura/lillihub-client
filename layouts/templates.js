@@ -304,6 +304,24 @@ function _pageShellEnd(user) {
             <dt><kbd>s</kbd></dt><dd>Open entry (to star)</dd>
             <dt><kbd>m</kbd></dt><dd>Toggle read/unread</dd>
         </dl>
+        <h3>Notes</h3>
+        <dl>
+            <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous note</dd>
+            <dt><kbd>Enter</kbd> / <kbd>o</kbd></dt><dd>Open focused note</dd>
+            <dt><kbd>x</kbd></dt><dd>Toggle selection on focused note</dd>
+            <dt><kbd>n</kbd></dt><dd>New note (or new todo list on todos tab)</dd>
+            <dt><kbd>/</kbd></dt><dd>Focus search</dd>
+        </dl>
+        <h3>Todos</h3>
+        <dl>
+            <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous task</dd>
+            <dt><kbd>Enter</kbd> / <kbd>Space</kbd></dt><dd>Toggle focused task</dd>
+            <dt><kbd>e</kbd></dt><dd>Edit focused task</dd>
+            <dt><kbd>n</kbd></dt><dd>Add task</dd>
+            <dt><kbd>r</kbd></dt><dd>Start round</dd>
+            <dt><kbd>c</kbd></dt><dd>Toggle show completed</dd>
+            <dt><kbd>/</kbd></dt><dd>Focus search</dd>
+        </dl>
         <h3>Paging</h3>
         <dl>
             <dt><kbd>n</kbd></dt><dd>Next page</dd>

@@ -25,18 +25,20 @@
             <button type="button" class="btn btn-sm" id="todo-save-retry">Retry</button>
         </div>
 
-        <div id="todo-undo-toast" class="toast mb-2" style="display:none;align-items:center;gap:0.5rem;">
+        <div id="todo-undo-toast" class="toast-floating" style="display:none;">
             <i class="bi bi-check2-circle"></i>
-            <span style="flex:1;">Task completed</span>
+            <span>Task completed</span>
             <button type="button" class="btn btn-sm" id="todo-undo-btn">Undo</button>
+            <button type="button" class="toast-floating-close" id="todo-undo-dismiss" aria-label="Dismiss"><i class="bi bi-x-lg"></i></button>
         </div>
 
         <div class="blog-toolbar mb-2">
             <div class="input-group">
-                <input type="search" id="todo-search" class="form-input" placeholder="Search todos..." />
+                <input list="todo-suggestions" type="search" id="todo-search" class="form-input" placeholder="Search todos..." />
                 <button type="button" class="btn btn-glossy"><i class="bi bi-search"></i></button>
             </div>
         </div>
+        <datalist id="todo-suggestions"></datalist>
 
         <div class="mb-2" style="display:flex;align-items:center;gap:0.5rem;">
             <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.85rem;">

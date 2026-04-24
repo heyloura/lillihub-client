@@ -8,9 +8,10 @@ function growTextArea(el) {
     el.style.height = el.scrollHeight + 'px';
 }
 
-// Show a full-screen loading overlay. Used as `onclick="addLoading(this)"` on
-// links/buttons that trigger a navigation, so the user gets feedback while the
-// next page loads.
+// Show a full-screen loading overlay. Use `onsubmit="addLoading(this)"` on
+// forms (fires only after HTML5 validation passes — a button-level onclick
+// would strand the overlay when validation blocks submission) and
+// `onclick="addLoading(this)"` on plain navigation links.
 function addLoading(elem) {
     document.body.insertAdjacentHTML('afterbegin', `<div id="loader" class="overlay"><span class="loading d-block p-centered"></span></div>`);
 }

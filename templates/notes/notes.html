@@ -33,8 +33,24 @@
             </label>
             <span class="blog-toolbar-spacer"></span>
             <button type="button" class="btn btn-glossy btn-sm" id="post-selected-btn" style="display:none;"><i class="bi bi-pencil-square"></i> Create post</button>
+            <button type="button" class="btn btn-glossy btn-sm" id="tags-selected-btn" style="display:none;"><i class="bi bi-tags"></i> Edit tags</button>
+            <button type="button" class="btn btn-glossy btn-sm" id="delete-selected-btn" style="display:none;"><i class="bi bi-trash"></i> Delete</button>
         </div>
         <form id="notes-post-form" method="POST" action="/notes/post-selected" style="display:none;"></form>
+
+        <dialog id="bulk-tags-dialog" class="hide-if-user-has-no-javascript" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid var(--border);border-radius:6px;padding:1rem;max-width:480px;width:90%;background:var(--base);color:var(--text);">
+            <form id="bulk-tags-form">
+                <h5 style="margin-top:0;">Replace tags</h5>
+                <p style="font-size:0.85rem;color:var(--overlay-1);" id="bulk-tags-message">
+                    The tags below will become the complete tag list for each selected note. Anything not listed here will be removed.
+                </p>
+                <input id="bulk-tags-input" class="form-input" type="text" placeholder="Tags (comma separated)">
+                <div class="mt-2" style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                    <button type="button" class="btn btn-sm" id="bulk-tags-cancel">Cancel</button>
+                    <button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-check-lg"></i> Apply</button>
+                </div>
+            </form>
+        </dialog>
         <div style="margin-top:2em;">
         {{notes}}
         </div>
@@ -212,6 +228,62 @@
             });
         });
 
+        // --- Keyboard shortcuts (notes page only) ---
+        // The global handler in common.js keys off .content > .card; note-cards
+        // live deeper so we own navigation here without clashing.
+        let _noteKbIdx = -1;
+        function _visibleNoteCards() {
+            return [...document.querySelectorAll('.note-card')].filter(c => c.style.display !== 'none');
+        }
+        function _focusNoteCard(idx) {
+            const cards = _visibleNoteCards();
+            if (!cards.length) return;
+            document.querySelectorAll('.note-card.kb-focus').forEach(c => c.classList.remove('kb-focus'));
+            if (idx < 0) idx = 0;
+            if (idx >= cards.length) idx = cards.length - 1;
+            _noteKbIdx = idx;
+            cards[idx].classList.add('kb-focus');
+            cards[idx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.target.matches('input, textarea, select, [contenteditable]')) return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            const cards = _visibleNoteCards();
+            switch (e.key) {
+                case 'j': if (cards.length) { e.preventDefault(); _focusNoteCard(_noteKbIdx + 1); } break;
+                case 'k': if (cards.length) { e.preventDefault(); _focusNoteCard(_noteKbIdx - 1); } break;
+                case 'o':
+                case 'Enter': {
+                    if (_noteKbIdx >= 0 && cards[_noteKbIdx]) {
+                        e.preventDefault();
+                        const link = cards[_noteKbIdx].querySelector('.noteLink');
+                        if (link) link.click();
+                    }
+                    break;
+                }
+                case 'x': {
+                    if (_noteKbIdx >= 0 && cards[_noteKbIdx]) {
+                        e.preventDefault();
+                        const cb = cards[_noteKbIdx].querySelector('.note-select-cb');
+                        if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }
+                    }
+                    break;
+                }
+                case '/': {
+                    e.preventDefault();
+                    document.getElementById('searchbox')?.focus();
+                    break;
+                }
+                case 'n': {
+                    // Context-sensitive: notes tab -> new note, todos tab -> new todo list modal.
+                    e.preventDefault();
+                    if (activeTab === 'todos') openNewTodoDialog();
+                    else window.location.href = '/notes/{{notebookId}}/new';
+                    break;
+                }
+            }
+        });
+
         // Clicking a tag chip (e.g. "#work") on a card fills the search box
         // and filters. Other chips (like the "shared" indicator) keep their
         // default link/click behavior.
@@ -235,10 +307,148 @@
             document.getElementById('notes-select-toolbar').style.display = '';
 
             const postSelectedBtn = document.getElementById('post-selected-btn');
+            const tagsSelectedBtn = document.getElementById('tags-selected-btn');
+            const deleteSelectedBtn = document.getElementById('delete-selected-btn');
             function updatePostBtnVisibility() {
                 const anyChecked = !!document.querySelector('.note-card:not([style*="display: none"]) .note-select-cb:checked');
-                postSelectedBtn.style.display = anyChecked ? '' : 'none';
+                const display = anyChecked ? '' : 'none';
+                postSelectedBtn.style.display = display;
+                tagsSelectedBtn.style.display = display;
+                deleteSelectedBtn.style.display = display;
             }
+
+            function getSelectedCards() {
+                return [...document.querySelectorAll('.note-card')].filter(card => {
+                    if (card.style.display === 'none') return false;
+                    const cb = card.querySelector('.note-select-cb');
+                    return cb && cb.checked;
+                });
+            }
+
+            deleteSelectedBtn.addEventListener('click', async () => {
+                const cards = getSelectedCards();
+                if (!cards.length) return;
+                if (!confirm(`Delete ${cards.length} note${cards.length > 1 ? 's' : ''}? This cannot be undone.`)) return;
+                deleteSelectedBtn.disabled = true;
+                try {
+                    const results = await Promise.all(cards.map(card => {
+                        const noteEl = card.querySelector('.note');
+                        const id = noteEl?.getAttribute('data-note-id');
+                        if (!id) return Promise.resolve({ ok: false, card });
+                        const form = new URLSearchParams();
+                        form.append('id', id);
+                        form.append('notebookId', '{{notebookId}}');
+                        return fetch('/note/delete', {
+                            method: 'POST',
+                            body: form.toString(),
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+                        }).then(res => ({ ok: !res.url?.includes('error='), card }), () => ({ ok: false, card }));
+                    }));
+                    let failed = 0;
+                    for (const r of results) {
+                        if (r.ok) r.card.remove();
+                        else failed++;
+                    }
+                    document.getElementById('note-select-all-cb').checked = false;
+                    updatePostBtnVisibility();
+                    if (failed) alert(`${failed} note${failed > 1 ? 's' : ''} could not be deleted.`);
+                } finally {
+                    deleteSelectedBtn.disabled = false;
+                }
+            });
+
+            // --- Bulk tag replace ---
+            const bulkTagsDialog = document.getElementById('bulk-tags-dialog');
+            const bulkTagsInput = document.getElementById('bulk-tags-input');
+            const bulkTagsMessage = document.getElementById('bulk-tags-message');
+            const bulkTagsForm = document.getElementById('bulk-tags-form');
+
+            function parseTagsAttr(md) {
+                const fmMatch = md.match(/^---\n([\s\S]*?)\n---\n?/);
+                if (!fmMatch) return [];
+                const tagsMatch = fmMatch[1].match(/^tags:\s*\[?(.*?)\]?\s*$/m);
+                if (!tagsMatch) return [];
+                return tagsMatch[1].split(',').map(t => t.trim()).filter(Boolean);
+            }
+
+            function writeTagsIntoMarkdown(md, tagsCsv) {
+                const fmMatch = md.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+                if (fmMatch) {
+                    let fm = fmMatch[1];
+                    if (/^tags:/m.test(fm)) {
+                        fm = fm.replace(/^tags:.*$/m, tagsCsv ? `tags: [${tagsCsv}]` : '').replace(/\n\n+/g, '\n').replace(/\n$/, '');
+                    } else if (tagsCsv) {
+                        fm = fm + `\ntags: [${tagsCsv}]`;
+                    }
+                    fm = fm.trim();
+                    return fm ? `---\n${fm}\n---\n${fmMatch[2]}` : fmMatch[2];
+                }
+                if (!tagsCsv) return md;
+                return `---\ntags: [${tagsCsv}]\n---\n` + md;
+            }
+
+            tagsSelectedBtn.addEventListener('click', () => {
+                if (!key) { alert('Enter your secret key first.'); return; }
+                const cards = getSelectedCards();
+                if (!cards.length) return;
+                const union = new Set();
+                for (const card of cards) {
+                    const md = card.querySelector('.note')?.getAttribute('data-markdown') || '';
+                    for (const t of parseTagsAttr(md)) union.add(t);
+                }
+                bulkTagsInput.value = [...union].join(', ');
+                bulkTagsMessage.textContent = `The tags below will become the complete tag list for each of the ${cards.length} selected note${cards.length > 1 ? 's' : ''}. Anything not listed here will be removed.`;
+                bulkTagsDialog.showModal();
+                setTimeout(() => bulkTagsInput.focus(), 50);
+            });
+
+            document.getElementById('bulk-tags-cancel').addEventListener('click', () => bulkTagsDialog.close());
+            bulkTagsDialog.addEventListener('click', (e) => { if (e.target === bulkTagsDialog) bulkTagsDialog.close(); });
+
+            bulkTagsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!key) return;
+                const submitBtn = bulkTagsForm.querySelector('button[type="submit"]');
+                const cards = getSelectedCards();
+                if (!cards.length) { bulkTagsDialog.close(); return; }
+                const csv = bulkTagsInput.value.split(',').map(t => t.trim()).filter(Boolean).join(',');
+
+                submitBtn.disabled = true;
+                try {
+                    const results = await Promise.all(cards.map(async (card) => {
+                        try {
+                            const noteEl = card.querySelector('.note');
+                            const id = noteEl?.getAttribute('data-note-id');
+                            const md = noteEl?.getAttribute('data-markdown') || '';
+                            if (!id) return { ok: false };
+                            const updated = writeTagsIntoMarkdown(md, csv);
+                            const encrypted = await encryptWithKey(key, updated);
+                            const form = new URLSearchParams();
+                            form.append('text', encrypted);
+                            form.append('notebook_id', '{{notebookId}}');
+                            form.append('id', id);
+                            const res = await fetch('/note/update', {
+                                method: 'POST',
+                                body: form.toString(),
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+                            });
+                            if (!res.ok) return { ok: false };
+                            // Update DOM + data-markdown so further bulk ops see the new state.
+                            noteEl.setAttribute('data-markdown', updated);
+                            const tags = csv ? csv.split(',').map(t => t.trim()).filter(Boolean) : [];
+                            card.querySelector('.tags').innerHTML = tags.map(t => `<span class="chip">#${t}</span>`).join('');
+                            return { ok: true };
+                        } catch {
+                            return { ok: false };
+                        }
+                    }));
+                    const failed = results.filter(r => !r.ok).length;
+                    bulkTagsDialog.close();
+                    if (failed) alert(`Tags updated on ${results.length - failed} of ${results.length} notes. ${failed} failed.`);
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
 
             document.getElementById('note-select-all-cb').addEventListener('change', function() {
                 const checked = this.checked;

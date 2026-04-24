@@ -1812,6 +1812,7 @@ span.badge::after {
     /* Long task text scrolls horizontally within the row so the checkbox stays
        visible. Inside FV mode we override this to let text wrap. */
     overflow-x: auto;
+    scrollbar-width: thin;
 }
 .todo-item input[type="checkbox"] {
     margin-top: 0.2rem;
@@ -1838,8 +1839,42 @@ span.badge::after {
 .todo-project { color: var(--green); }
 .todo-searchable { cursor: pointer; }
 .todo-searchable:hover { text-decoration: underline; }
+/* Floating toast — fixed to bottom-right, doesn't shift page content when it
+   appears. Used for transient confirmations like the "Task completed · Undo"
+   feedback when a task disappears from view. */
+.toast-floating {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: min(22rem, calc(100vw - 2rem));
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--text);
+    background: color-mix(in srgb, var(--base) 80%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+.toast-floating-close {
+    border: none;
+    background: transparent;
+    color: var(--overlay-1);
+    cursor: pointer;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+.toast-floating-close:hover { color: var(--text); }
+
 /* Keyboard-focused post card highlight (j/k navigation) */
-.card.kb-focus {
+.card.kb-focus,
+.todo-item.kb-focus {
     outline: 2px solid var(--area-accent);
     outline-offset: 4px;
     border-radius: 0.5rem;
@@ -1972,6 +2007,17 @@ kbd {
     color: var(--subtext-1);
     font-style: italic;
     padding-top: 0.75rem;
+}
+.fv-scope {
+    font-size: 0.8rem;
+    color: var(--overlay-1);
+    margin: 0.25rem 0 0.5rem;
+}
+.fv-scope code {
+    font-size: 0.85rem;
+    padding: 0 0.25rem;
+    background: color-mix(in srgb, var(--area-accent) 12%, transparent);
+    border-radius: 0.2rem;
 }
 .fv-task-line {
     padding: 0.25rem 0 0.5rem;
@@ -2151,6 +2197,14 @@ kbd {
 
 /* --- Note multi-select --- */
 .note-card { position: relative; padding: 0; padding-left: 1.75rem; border-bottom: 1px solid var(--border) !important; }
+/* Keep long titles + tag chips on a single swipeable row. The select checkbox
+   is a sibling of .card-header, so it stays put while the header scrolls. */
+.note-card .card-header {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.note-card .card-header .tile-title { display: inline; }
+.note-card .card-header .tags { display: inline; }
 .note-select {
     position: absolute;
     left: 0.35rem;
@@ -3556,4 +3610,7 @@ previewbox-link {
 }
 .container {
     max-width: 80ch;
+}
+.note-card:first-child {
+    padding-top: 0rem;
 }

@@ -106,6 +106,20 @@ export function initTodo(markdown, key, notebookId, noteId) {
 
     let tasks = parseTasksFromHtml(html);
 
+    // Populate the search datalist with unique +projects and @contexts parsed
+    // from all tasks. Rebuilt on every task mutation so suggestions stay fresh.
+    function refreshSuggestions() {
+        const suggestions = document.getElementById('todo-suggestions');
+        if (!suggestions) return;
+        const tokens = new Set();
+        for (const t of tasks) {
+            const matches = t.match(/(?:^|\s)([+@]\S+)/g);
+            if (!matches) continue;
+            for (const m of matches) tokens.add(m.trim());
+        }
+        suggestions.innerHTML = [...tokens].sort().map(v => `<option value="${v}">`).join('');
+    }
+
     // --- FV Mode State (ephemeral) ---
     let fvState = 'NORMAL';        // 'NORMAL' | 'DOT_SCAN' | 'FOCUS'
     let dottedIndices = new Set();
@@ -114,6 +128,11 @@ export function initTodo(markdown, key, notebookId, noteId) {
     let benchmarkIdx = -1;
     let focusQueue = [];
     let focusPosition = 0;
+    // Snapshot of the search filter at the moment Start Round was clicked,
+    // lowercased for matching. Empty string means "no filter" (all open tasks).
+    // Frozen for the session so changing the search box mid-round doesn't
+    // change the scope.
+    let scanScope = '';
 
     function extractDateTimeId(text) {
         if (PRIORITY_RE.test(text)) {
@@ -125,9 +144,11 @@ export function initTodo(markdown, key, notebookId, noteId) {
     }
 
     function buildScanOrder() {
+        const q = scanScope;
         return tasks
             .map((text, idx) => ({ text, idx }))
             .filter(t => !/^x\s/.test(t.text))
+            .filter(t => !q || t.text.toLowerCase().includes(q))
             .sort((a, b) => {
                 const aId = extractDateTimeId(a.text);
                 const bId = extractDateTimeId(b.text);
@@ -176,6 +197,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
             const li = document.createElement('li');
             li.classList.add('todo-item');
             if (isDone) li.classList.add('done');
+            li.dataset.taskIdx = idx;
 
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
@@ -242,6 +264,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
     // an Undo button to make that state change easy to reverse.
     const undoToast = document.getElementById('todo-undo-toast');
     const undoBtn = document.getElementById('todo-undo-btn');
+    const undoDismissBtn = document.getElementById('todo-undo-dismiss');
     let undoTimer = null;
     let undoIdx = -1;
 
@@ -254,7 +277,9 @@ export function initTodo(markdown, key, notebookId, noteId) {
     function showUndoToast(idx) {
         if (!undoToast) return;
         undoIdx = idx;
-        undoToast.style.display = 'flex';
+        // The floating toast uses `display:flex` from CSS; setting any
+        // non-none value triggers it. Use empty string to defer to the class.
+        undoToast.style.display = '';
         if (undoTimer) clearTimeout(undoTimer);
         undoTimer = setTimeout(hideUndoToast, 5000);
     }
@@ -263,6 +288,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
         if (undoIdx >= 0 && undoIdx < tasks.length) uncheckTask(undoIdx);
         hideUndoToast();
     });
+    if (undoDismissBtn) undoDismissBtn.addEventListener('click', hideUndoToast);
 
     function checkTask(idx) {
         let text = tasks[idx];
@@ -405,6 +431,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
 
         saveTodos();
         renderTasks();
+        refreshSuggestions();
         closeSlideout();
     }
 
@@ -423,6 +450,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
             tasks.splice(idx, 1);
             saveTodos();
             renderTasks();
+            refreshSuggestions();
         }
         closeSlideout();
     }
@@ -444,6 +472,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
         hideUndoToast();
         saveTodos();
         renderTasks();
+        refreshSuggestions();
     }
 
     function exportTodoTxt() {
@@ -487,10 +516,16 @@ export function initTodo(markdown, key, notebookId, noteId) {
 
     function startFvRound() {
         dottedIndices.clear();
+        // Freeze the search scope at click time — round operates on this
+        // filtered slice even if the user later changes/clears the search.
+        scanScope = (searchBox.value || '').toLowerCase().trim();
         scanOrder = buildScanOrder();
 
         if (scanOrder.length < 2) {
-            alert('Need at least 2 open tasks to start a round.');
+            alert(scanScope
+                ? `Need at least 2 open tasks matching "${searchBox.value.trim()}" to start a round.`
+                : 'Need at least 2 open tasks to start a round.');
+            scanScope = '';
             return;
         }
 
@@ -518,6 +553,13 @@ export function initTodo(markdown, key, notebookId, noteId) {
             <div class="fv-progress-bar"><div class="fv-progress-fill" style="width:${Math.round((scanPosition / total) * 100)}%"></div></div>
             <span class="fv-progress-text">${scanPosition} of ${total} scanned &middot; ${dottedIndices.size} dotted</span>`;
         wrap.appendChild(progress);
+
+        if (scanScope) {
+            const scopeLine = document.createElement('p');
+            scopeLine.className = 'fv-scope';
+            scopeLine.innerHTML = `<i class="bi bi-funnel"></i> Round scoped to <code>${escapeHtml(scanScope)}</code> &middot; ${total} task${total !== 1 ? 's' : ''}`;
+            wrap.appendChild(scopeLine);
+        }
 
         if (scanPosition < scanOrder.length) {
             const currentIdx = scanOrder[scanPosition];
@@ -587,6 +629,13 @@ export function initTodo(markdown, key, notebookId, noteId) {
             <span class="fv-progress-text">Focus: ${remaining} task${remaining !== 1 ? 's' : ''} remaining</span>`;
         wrap.appendChild(progress);
 
+        if (scanScope) {
+            const scopeLine = document.createElement('p');
+            scopeLine.className = 'fv-scope';
+            scopeLine.innerHTML = `<i class="bi bi-funnel"></i> Round scoped to <code>${escapeHtml(scanScope)}</code>`;
+            wrap.appendChild(scopeLine);
+        }
+
         wrap.insertAdjacentHTML('beforeend', `
             <p class="fv-prompt">Work on</p>
             <div class="fv-task-line">${formatTaskMarkup(tasks[currentIdx])}</div>`);
@@ -596,8 +645,9 @@ export function initTodo(markdown, key, notebookId, noteId) {
         btnRow.className = 'fv-actions fv-focus-actions';
         btnRow.innerHTML = `
             <button class="btn btn-glossy btn-sm fv-complete-btn"><i class="bi bi-check-lg"></i> Complete</button>
-            <button class="btn btn-glossy btn-sm fv-reenter-btn"><i class="bi bi-arrow-down-circle"></i> Re-enter</button>
-            <button class="btn btn-sm fv-skip-btn">Skip</button>`;
+            <button class="btn btn-sm fv-skip-btn">Skip</button>
+            <button class="btn btn-sm fv-reenter-btn"><i class="bi bi-arrow-down-circle"></i> Skip and move to bottom of list</button>
+            `;
         wrap.appendChild(btnRow);
         btnRow.querySelector('.fv-complete-btn').addEventListener('click', () => {
             checkTask(currentIdx);
@@ -641,6 +691,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
         dottedIndices.clear();
         scanOrder = [];
         focusQueue = [];
+        scanScope = '';
         updateFvToolbar();
         renderTasks();
     }
@@ -661,13 +712,77 @@ export function initTodo(markdown, key, notebookId, noteId) {
     });
 
     // When editing an existing task, Enter saves (no newline). Add mode keeps
-    // multi-line behavior so bulk paste/add still works.
+    // multi-line behavior so bulk paste/add still works. Ctrl/Cmd+Enter always
+    // saves (useful when adding a single task without leaving the keyboard).
     contentInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            saveFromDialog();
+            return;
+        }
         if (e.key !== 'Enter' || e.shiftKey) return;
         const idx = parseInt(lineIdInput.value);
         if (idx >= 0) {
             e.preventDefault();
             saveFromDialog();
+        }
+    });
+
+    // --- Keyboard navigation (normal todo mode) ---
+    // `.kb-focus` highlights the current task. Enter/Space toggle; e edits;
+    // n/r/c/ are page-level shortcuts matching the help dialog entries.
+    let _todoKbIdx = -1;
+    function _visibleTodoItems() {
+        return [...taskList.querySelectorAll('.todo-item')];
+    }
+    function _focusTodoItem(idx) {
+        const items = _visibleTodoItems();
+        if (!items.length) { _todoKbIdx = -1; return; }
+        items.forEach(li => li.classList.remove('kb-focus'));
+        if (idx < 0) idx = 0;
+        if (idx >= items.length) idx = items.length - 1;
+        _todoKbIdx = idx;
+        items[idx].classList.add('kb-focus');
+        items[idx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.target.matches('input, textarea, select, [contenteditable]')) return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        // Don't compete with FV or slideout flows.
+        if (fvState !== 'NORMAL') return;
+        if (slideout.classList.contains('open')) return;
+
+        const items = _visibleTodoItems();
+        switch (e.key) {
+            case 'j': if (items.length) { e.preventDefault(); _focusTodoItem(_todoKbIdx + 1); } break;
+            case 'k': if (items.length) { e.preventDefault(); _focusTodoItem(_todoKbIdx - 1); } break;
+            case 'Enter':
+            case ' ': {
+                if (_todoKbIdx >= 0 && items[_todoKbIdx]) {
+                    e.preventDefault();
+                    const cb = items[_todoKbIdx].querySelector('input[type="checkbox"]');
+                    if (cb) cb.click();
+                }
+                break;
+            }
+            case 'e': {
+                if (_todoKbIdx >= 0 && items[_todoKbIdx]) {
+                    e.preventDefault();
+                    const idx = parseInt(items[_todoKbIdx].dataset.taskIdx);
+                    if (!isNaN(idx)) openEditDialog(idx);
+                }
+                break;
+            }
+            case '/': e.preventDefault(); searchBox.focus(); break;
+            case 'n': e.preventDefault(); openAddDialog(); break;
+            case 'c': {
+                e.preventDefault();
+                showCompletedCheckbox.checked = !showCompletedCheckbox.checked;
+                showCompletedCheckbox.dispatchEvent(new Event('change'));
+                break;
+            }
+            case 'r': e.preventDefault(); startFvRound(); break;
         }
     });
 
@@ -682,4 +797,5 @@ export function initTodo(markdown, key, notebookId, noteId) {
 
     // Initial render
     renderTasks();
+    refreshSuggestions();
 }
