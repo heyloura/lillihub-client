@@ -15,6 +15,7 @@
         </div>
     </div>
     <div id="notebooks_content" style="display:none;">
+        <h1>My Notebooks</h1>
         {{notebooks}}
     </div>
 </div>
@@ -30,18 +31,12 @@
             <input type="text" id="notebook-dialog-name" class="form-input" required />
             <button type="button" class="btn btn-glossy btn-sm" id="notebook-dialog-rename-btn">Save</button>
         </div>
-        <details class="mt-2" id="notebook-dialog-delete-details">
-            <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete notebook</summary>
-            <div class="mt-2">
-                <p style="font-size:0.85rem;color:var(--overlay-1);">This will delete all notes in this notebook.</p>
-                <button type="button" class="btn btn-glossy btn-sm" id="notebook-dialog-delete-btn">Confirm Delete</button>
-            </div>
-        </details>
+        <button type="button" class="btn btn-glossy btn-sm mt-2" id="notebook-dialog-delete-btn"><i class="bi bi-trash"></i> Delete notebook</button>
     </div>
 </dialog>
 
 <script type="module">
-    import { importNotesKey } from '/scripts/crypto.js';
+    import { importNotesKey, validateNotesKey } from '/scripts/crypto.js';
     const key = await importNotesKey();
     if (key) {
         document.getElementById('enter_notes_key').style.display = 'none';
@@ -51,7 +46,10 @@
         document.getElementById('enter_notes_key').style.display = 'block';
     }
     document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
-        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        const value = document.getElementById('notes_key').value.trim();
+        const err = validateNotesKey(value);
+        if (err) { alert(err); return; }
+        localStorage.setItem('notes_key', value);
         window.location.href = '/notes';
     });
     document.getElementById('clearKeyBtn')?.addEventListener('click', () => {
@@ -63,7 +61,6 @@
     const dialog = document.getElementById('notebook-dialog');
     const dialogTitle = document.getElementById('notebook-dialog-title');
     const dialogName = document.getElementById('notebook-dialog-name');
-    const deleteDetails = document.getElementById('notebook-dialog-delete-details');
     let activeNotebookId = null;
     let activeCard = null;
 
@@ -86,46 +83,66 @@
         const title = card.querySelector('.tile-title').textContent;
         dialogTitle.textContent = title;
         dialogName.value = title;
-        deleteDetails.open = false;
         dialog.showModal();
     }
 
     document.getElementById('notebook-dialog-close').addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
 
-    document.getElementById('notebook-dialog-rename-btn').addEventListener('click', async () => {
+    const renameBtn = document.getElementById('notebook-dialog-rename-btn');
+    const deleteBtn = document.getElementById('notebook-dialog-delete-btn');
+
+    renameBtn.addEventListener('click', async () => {
+        if (renameBtn.disabled) return;
         const name = dialogName.value.trim();
         if (!name) return;
         const form = new URLSearchParams();
         form.append('notebook_id', activeNotebookId);
         form.append('name', name);
-        const res = await fetch('/notebook/rename', {
-            method: 'POST',
-            body: form.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
-        });
-        if (res.url?.includes('error=')) {
+        renameBtn.disabled = true;
+        try {
+            const res = await fetch('/notebook/rename', {
+                method: 'POST',
+                body: form.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+            });
+            if (res.url?.includes('error=')) {
+                alert('Could not rename notebook. Please try again.');
+                return;
+            }
+            activeCard.querySelector('.tile-title').textContent = name;
+            dialog.close();
+        } catch (err) {
+            console.error('notebook rename failed', err);
             alert('Could not rename notebook. Please try again.');
-            return;
+        } finally {
+            renameBtn.disabled = false;
         }
-        activeCard.querySelector('.tile-title').textContent = name;
-        dialog.close();
     });
 
-    document.getElementById('notebook-dialog-delete-btn').addEventListener('click', async () => {
+    deleteBtn.addEventListener('click', async () => {
+        if (deleteBtn.disabled) return;
         if (!confirm('Delete this notebook and all its notes?')) return;
         const form = new URLSearchParams();
         form.append('notebook_id', activeNotebookId);
-        const res = await fetch('/notebook/delete', {
-            method: 'POST',
-            body: form.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
-        });
-        if (res.url?.includes('error=')) {
+        deleteBtn.disabled = true;
+        try {
+            const res = await fetch('/notebook/delete', {
+                method: 'POST',
+                body: form.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+            });
+            if (res.url?.includes('error=')) {
+                alert('Could not delete notebook. Please try again.');
+                return;
+            }
+            activeCard.remove();
+            dialog.close();
+        } catch (err) {
+            console.error('notebook delete failed', err);
             alert('Could not delete notebook. Please try again.');
-            return;
+        } finally {
+            deleteBtn.disabled = false;
         }
-        activeCard.remove();
-        dialog.close();
     });
 </script>

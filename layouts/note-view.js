@@ -1,4 +1,4 @@
-import { formatDate, fetchNotebooksList } from "../scripts/server/utilities.js";
+import { formatDate, fetchNotebooksList, sanitizeHTML } from "../scripts/server/utilities.js";
 import { HTMLPage } from "./templates.js";
 
 const _noteViewTemplate = new TextDecoder().decode(await Deno.readFile("templates/notes/note-view.html"));
@@ -35,8 +35,8 @@ export async function NoteViewTemplate(user, token, notebookId, noteId, isTodo) 
         versionsButton = `<details style="display:inline;">
             <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-clock-history"></i> Versions</summary>
             <div class="mt-2 mb-2">
-                ${versions.items.reverse().map((v, i) => `<p>
-                    <a href="/notes/${notebookId}/update?id=${noteId}&vid=${v.id}">${formatDate(v.date_published)}</a>${i === 0 ? ' (current)' : ''}
+                ${versions.items.reverse().map((v, i, arr) => `<p>
+                    <a href="/notes/${notebookId}/update?id=${noteId}&vid=${v.id}">${formatDate(v.date_published)}</a>${i === arr.length - 1 ? ' (current)' : ''}
                 </p>`).join('')}
             </div>
         </details>`;
@@ -49,7 +49,7 @@ export async function NoteViewTemplate(user, token, notebookId, noteId, isTodo) 
         .replaceAll('{{noteId}}', noteId)
         .replaceAll('{{notebookName}}', notebook._microblog?.notebook?.name || 'Notebook')
         .replaceAll('{{formattedDate}}', formatDate(note.date_modified))
-        .replaceAll('{{content}}', isShared ? note.content_html : note.content_text)
+        .replaceAll('{{content}}', isShared ? sanitizeHTML(note.content_html || '') : note.content_text)
         .replaceAll('{{decryptClass}}', isShared ? '' : 'decryptMe')
         .replaceAll('{{is_shared}}', isShared ? 'true' : 'false')
         .replaceAll('{{sharedChip}}', sharedChip)
@@ -57,5 +57,5 @@ export async function NoteViewTemplate(user, token, notebookId, noteId, isTodo) 
         .replaceAll('{{versionsPanel}}', '');
 
     const notebookName = notebook._microblog?.notebook?.name || 'Notebook';
-    return HTMLPage(token, 'Note', content, user, '', undefined, { notebookId, notebookName, notebooks });
+    return HTMLPage(token, 'Note', content, user, '', undefined, { notebookId, notebookName, notebooks, isTodo });
 }

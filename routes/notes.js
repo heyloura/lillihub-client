@@ -4,9 +4,10 @@ import { NotebooksTemplate } from "../layouts/notebooks.js";
 import { NotesTemplate } from "../layouts/notes.js";
 import { NoteTemplate } from "../layouts/note.js";
 import { NoteViewTemplate } from "../layouts/note-view.js";
-import { NoteNewTemplate } from "../layouts/note-new.js";
 import { HTMLPage } from "../layouts/templates.js";
 import { fetchNotebooksList } from "../scripts/server/utilities.js";
+
+const _noteEditTemplate = new TextDecoder().decode(await Deno.readFile("templates/notes/note-edit.html"));
 
 const NOTEBOOKS_ROUTE = new URLPattern({ pathname: "/notes" });
 const NOTEBOOK_NEW_ROUTE = new URLPattern({ pathname: "/notebook/new" });
@@ -91,13 +92,28 @@ export async function tryHandle(req, ctx) {
 
     if (NEW_NOTE_ROUTE.exec(req.url) && user) {
         const id = NEW_NOTE_ROUTE.exec(req.url).pathname.groups.id;
-        const searchParams = new URLSearchParams(req.url.split('?')[1]);
-        const tab = searchParams.get('tab') || 'notes';
+        const [notebookRes, notebooks] = await Promise.all([
+            fetch(`https://micro.blog/notes/notebooks/${id}`, {
+                method: "GET",
+                headers: { "Authorization": "Bearer " + accessTokenValue }
+            }),
+            fetchNotebooksList(accessTokenValue)
+        ]);
+        const notebook = await notebookRes.json();
+        const notebookName = notebook._microblog?.notebook?.name || 'Notebook';
 
-        return new Response(await NoteNewTemplate(user, accessTokenValue, id, tab), {
-            status: 200,
-            headers: { "content-type": "text/html" },
-        });
+        const content = _noteEditTemplate
+            .replaceAll('{{notebookId}}', id)
+            .replaceAll('{{is_shared}}', 'false')
+            .replaceAll('{{originalValue}}', '')
+            .replaceAll('{{editAppend}}', '')
+            .replaceAll('{{vid}}', '')
+            .replaceAll('{{viewVersion}}', '');
+
+        return new Response(
+            await HTMLPage(accessTokenValue, 'Note', content, user, '', undefined, { notebookId: id, notebookName, notebooks }),
+            { status: 200, headers: { "content-type": "text/html" } }
+        );
     }
 
     // Move/copy must be checked before VIEW_NOTE_ROUTE because
@@ -241,6 +257,8 @@ export async function tryHandle(req, ctx) {
         const text = value.get('text');
         const notebook_id = value.get('notebook_id');
         const id = value.get('id');
+        const wantsJson = new URL(req.url).searchParams.get('json') === '1'
+            || (req.headers.get('accept') || '').includes('application/json');
 
         const form = new URLSearchParams();
         form.append("text", text);
@@ -251,6 +269,7 @@ export async function tryHandle(req, ctx) {
         }
 
         let writeFailed = false;
+        let newId = null;
         try {
             const posting = await fetch('https://micro.blog/notes', {
                 method: "POST",
@@ -263,10 +282,22 @@ export async function tryHandle(req, ctx) {
             if (!posting.ok) {
                 writeFailed = true;
                 console.log(`${user.username} tried to ${id ? 'update' : 'add'} a note in notebook ${notebook_id} and ${await posting.text()}`);
+            } else if (wantsJson && !id) {
+                try {
+                    const body = await posting.json();
+                    newId = body?.id ?? body?.items?.[0]?.id ?? null;
+                } catch { /* ignore — fall through to redirect */ }
             }
         } catch (err) {
             writeFailed = true;
             console.log(`${user.username} tried to ${id ? 'update' : 'add'} a note in notebook ${notebook_id} and fetch failed: ${err?.message || err}`);
+        }
+
+        if (wantsJson) {
+            return new Response(JSON.stringify({ ok: !writeFailed, id: newId }), {
+                status: writeFailed ? 500 : 200,
+                headers: { "content-type": "application/json" }
+            });
         }
 
         const dest = `/notes/${notebook_id}${writeFailed ? '?error=failed' : ''}`;

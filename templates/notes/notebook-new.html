@@ -20,7 +20,7 @@
     </div>
 </div>
 <script type="module">
-    import { importNotesKey } from '/scripts/crypto.js';
+    import { importNotesKey, validateNotesKey } from '/scripts/crypto.js';
     const key = await importNotesKey();
     if (key) {
         document.getElementById('notebook_form').style.display = 'block';
@@ -28,7 +28,10 @@
         document.getElementById('enter_notes_key').style.display = 'block';
     }
     document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
-        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        const value = document.getElementById('notes_key').value.trim();
+        const err = validateNotesKey(value);
+        if (err) { alert(err); return; }
+        localStorage.setItem('notes_key', value);
         window.location.reload();
     });
 </script>

@@ -1809,6 +1809,9 @@ span.badge::after {
     gap: 0.5rem;
     padding: 0.6rem 0;
     border-bottom: 1px solid var(--border);
+    /* Long task text scrolls horizontally within the row so the checkbox stays
+       visible. Inside FV mode we override this to let text wrap. */
+    overflow-x: auto;
 }
 .todo-item input[type="checkbox"] {
     margin-top: 0.2rem;
@@ -1825,7 +1828,8 @@ span.badge::after {
 .todo-text {
     cursor: pointer;
     flex: 1;
-    word-break: break-word;
+    white-space: nowrap;
+    word-break: normal;
 }
 .todo-priority-a { color: var(--red); font-weight: 600; }
 .todo-priority-b { color: var(--orange); font-weight: 600; }
@@ -1956,6 +1960,28 @@ kbd {
 }
 
 /* --- FV Mode --- */
+.fv-session-wrap {
+    max-width: 75ch;
+    margin: 0 auto;
+    text-align: left;
+}
+.fv-session-wrap .fv-actions { justify-content: flex-start; }
+.fv-session-wrap .fv-up-next-item { justify-content: flex-start; }
+.fv-prompt {
+    font-size: 0.85rem;
+    color: var(--subtext-1);
+    font-style: italic;
+    padding-top: 0.75rem;
+}
+.fv-task-line {
+    padding: 0.25rem 0 0.5rem;
+    font-weight: 500;
+    /* In FV mode tasks are read like paragraphs — wrap long text instead of
+       the horizontal-scroll behavior used in the normal todo view. */
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: anywhere;
+}
 .fv-progress {
     padding: 0.75rem 0;
     display: flex;
@@ -2124,11 +2150,11 @@ kbd {
 }
 
 /* --- Note multi-select --- */
-.note-card { position: relative; padding-left: 1.75rem; }
+.note-card { position: relative; padding: 0; padding-left: 1.75rem; border-bottom: 1px solid var(--border) !important; }
 .note-select {
     position: absolute;
     left: 0.35rem;
-    top: 1.2rem;
+    top: 0.2rem;
     cursor: pointer;
     z-index: 1;
 }
@@ -2242,7 +2268,14 @@ kbd {
     align-items: flex-start;
     flex-shrink: 0;
 }
-
+.notebook-card {
+    border-bottom: 1px solid var(--border) !important;
+    padding: 0 !important;
+}
+.bookshelf-card {
+    border-bottom: 1px solid var(--border) !important;
+    padding: 0 !important;
+}
 /* --- Manage dialogs (notebooks, bookshelves) --- */
 .notebook-dialog,
 .bookshelf-dialog {
@@ -2801,10 +2834,10 @@ p { margin: 0.6rem 0; }
 
     .note-slideout { width: 100%; max-width: none; }
     .card { padding: 1rem 0 !important; }
-    .note-card { padding-left: 1.8rem !important; }
+    .notebook-card { padding: 0 !important; }
+    .bookshelf-card { padding: 0 !important; }
+    .note-card { padding: 0 !important; padding-left: 1.8rem !important; }
     .todo-slideout { width: 100%; max-width: none; }
-    .todo-item { overflow-x: auto; }
-    .todo-text { word-break: normal; white-space: nowrap; }
 
     /* Page nav hidden on mobile (shown in top bar) */
     .page-nav {
@@ -3520,4 +3553,7 @@ previewbox-link {
 }
 #recap-content > div > div {
     margin-top: 3em;
+}
+.container {
+    max-width: 80ch;
 }

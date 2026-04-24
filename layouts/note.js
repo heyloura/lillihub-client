@@ -40,8 +40,6 @@ export async function NoteTemplate(user, token, id, req) {
         .replaceAll('{{is_shared}}', isShared ? 'true' : 'false')
         .replaceAll('{{originalValue}}', originalValue)
         .replaceAll('{{editAppend}}', editId ? `form.append("id", ${editId});` : '')
-        .replaceAll('{{noteType}}', '')
-        .replaceAll('{{todoSelected}}', '')
         .replaceAll('{{vid}}', vid ? vid : '')
         .replaceAll('{{viewVersion}}', viewVersion);
 

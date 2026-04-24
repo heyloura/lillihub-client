@@ -1,9 +1,12 @@
-import { encryptWithKey, decryptWithKey } from '/scripts/crypto.js';
+import { encryptWithKey } from '/scripts/crypto.js';
 
 export function initNoteSlideout(notebookId, key, notebooks = []) {
     let currentCard = null;
     let currentNoteId = null;
     let isShared = false;
+    // Caches the last-loaded versions HTML for a single note so toggling the
+    // panel closed/open doesn't re-hit the API. Invalidated on save.
+    let versionsCache = { noteId: null, html: null };
     const otherNotebooks = notebooks.filter(nb => String(nb.id) !== String(notebookId));
 
     const converter = new showdown.Converter({
@@ -63,15 +66,10 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
                 <div id="slideout-versions-list" style="display:none;width:100%;margin-top:0.5rem;"></div>
             </details>
         </div>
-        <div id="slideout-footer-edit" class="note-slideout-footer" style="display:none;">
-            <details id="slideout-delete-details">
-                <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete</summary>
-                <div class="mt-2">
-                    <p style="font-size:0.85rem;color:var(--overlay-1);">Permanently delete this note.</p>
-                    <button class="btn btn-glossy btn-sm" id="slideout-confirm-delete">Confirm Delete</button>
-                </div>
-            </details>
-            <div style="margin-left:auto;display:flex;gap:0.5rem;">
+        <div id="slideout-footer-edit" class="note-slideout-footer" style="display:none;flex-wrap:wrap;">
+            <button class="btn btn-glossy btn-sm" id="slideout-delete-btn"><i class="bi bi-trash"></i> Delete</button>
+            <div style="margin-left:auto;display:flex;gap:0.5rem;align-items:center;">
+                <span id="slideout-save-error" style="display:none;color:var(--red);font-size:0.85rem;"><i class="bi bi-exclamation-triangle"></i> Save failed</span>
                 <button class="btn btn-sm" id="slideout-cancel-btn">Cancel</button>
                 <button class="btn btn-glossy btn-sm" id="slideout-save-btn"><i class="bi bi-check-lg"></i> Save</button>
             </div>
@@ -94,14 +92,13 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
     const editContentArea = panel.querySelector('#slideout-edit-content');
     const versionsBtn = panel.querySelector('#slideout-versions-btn');
     const versionsList = panel.querySelector('#slideout-versions-list');
-    const deleteDetails = panel.querySelector('#slideout-delete-details');
 
     // --- Event listeners ---
     panel.querySelector('#slideout-close-btn').addEventListener('click', closeSlideout);
     panel.querySelector('#slideout-edit-btn').addEventListener('click', enterEditMode);
     panel.querySelector('#slideout-cancel-btn').addEventListener('click', exitEditMode);
     panel.querySelector('#slideout-save-btn').addEventListener('click', saveNote);
-    panel.querySelector('#slideout-confirm-delete').addEventListener('click', deleteNote);
+    panel.querySelector('#slideout-delete-btn').addEventListener('click', deleteNote);
     versionsBtn.addEventListener('click', loadVersions);
     scrim.addEventListener('click', closeSlideout);
 
@@ -149,7 +146,7 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
     function openNote(card) {
         currentCard = card;
         const noteEl = card.querySelector('.note');
-        currentNoteId = noteEl.id;
+        currentNoteId = noteEl.getAttribute('data-note-id');
         isShared = !noteEl.classList.contains('decryptMe');
 
         // Populate view mode
@@ -165,7 +162,6 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
         footerEdit.style.display = 'none';
         versionsList.style.display = 'none';
         versionsList.innerHTML = '';
-        deleteDetails.open = false;
         const moveSelect = panel.querySelector('#slideout-move-select');
         const copySelect = panel.querySelector('#slideout-copy-select');
         if (moveSelect) moveSelect.value = '';
@@ -212,6 +208,9 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
             editContentArea.value = markdown;
         }
 
+        const errorEl = panel.querySelector('#slideout-save-error');
+        if (errorEl) errorEl.style.display = 'none';
+
         viewBody.style.display = 'none';
         editBody.style.display = 'flex';
         editBody.style.flexDirection = 'column';
@@ -227,10 +226,13 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
         viewBody.style.display = '';
         footerEdit.style.display = 'none';
         footerView.style.display = '';
-        deleteDetails.open = false;
     }
 
     async function saveNote() {
+        const saveBtn = panel.querySelector('#slideout-save-btn');
+        const errorEl = panel.querySelector('#slideout-save-error');
+        if (errorEl) errorEl.style.display = 'none';
+
         const content = editContentArea.value;
         const title = editTitleInput.value.trim();
         const tags = editTagsInput.value.trim();
@@ -246,49 +248,72 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
 
         const fullNote = yaml + content;
 
-        let encrypted;
-        if (isShared) {
-            encrypted = fullNote;
-        } else {
-            encrypted = await encryptWithKey(key, fullNote);
+        if (saveBtn) saveBtn.disabled = true;
+        try {
+            let encrypted;
+            if (isShared) {
+                encrypted = fullNote;
+            } else {
+                encrypted = await encryptWithKey(key, fullNote);
+            }
+
+            const form = new URLSearchParams();
+            form.append('text', encrypted);
+            form.append('notebook_id', notebookId);
+            form.append('id', currentNoteId);
+
+            const res = await fetch('/note/update', {
+                method: 'POST',
+                body: form.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+            });
+
+            if (!res.ok) throw new Error('save failed: ' + res.status);
+
+            // Saving creates a new version on the server — drop any cached
+            // versions list so the next toggle refetches.
+            versionsCache = { noteId: null, html: null };
+
+            // Update the card in the list
+            updateCardInList(fullNote);
+            exitEditMode();
+        } catch (err) {
+            console.error('note save failed', err);
+            if (errorEl) errorEl.style.display = '';
+        } finally {
+            if (saveBtn) saveBtn.disabled = false;
         }
-
-        const form = new URLSearchParams();
-        form.append('text', encrypted);
-        form.append('notebook_id', notebookId);
-        form.append('id', currentNoteId);
-
-        const res = await fetch('/note/update', {
-            method: 'POST',
-            body: form.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
-        });
-
-        if (!res.ok) return;
-
-        // Update the card in the list
-        updateCardInList(fullNote);
-        exitEditMode();
     }
 
     async function deleteNote() {
+        const btn = panel.querySelector('#slideout-delete-btn');
+        if (btn?.disabled) return;
+        if (!confirm('Permanently delete this note?')) return;
+
         const form = new URLSearchParams();
         form.append('id', currentNoteId);
         form.append('notebookId', notebookId);
 
-        const res = await fetch('/note/delete', {
-            method: 'POST',
-            body: form.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
-        });
-
-        if (!res.ok) return;
-
-        currentCard.remove();
-        closeSlideout();
+        if (btn) btn.disabled = true;
+        try {
+            const res = await fetch('/note/delete', {
+                method: 'POST',
+                body: form.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+            });
+            if (!res.ok) throw new Error('delete failed: ' + res.status);
+            currentCard.remove();
+            closeSlideout();
+        } catch (err) {
+            console.error('note delete failed', err);
+            alert('Could not delete this note. Please try again.');
+            if (btn) btn.disabled = false;
+        }
     }
 
     async function moveNote() {
+        const moveBtn = panel.querySelector('#slideout-move-btn');
+        if (moveBtn?.disabled) return;
         const select = panel.querySelector('#slideout-move-select');
         const dest = select.value;
         if (!dest) return;
@@ -299,23 +324,33 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
         form.append('id', currentNoteId);
         form.append('notebook[]', dest);
 
-        const res = await fetch('/notes/notebook/move', {
-            method: 'POST',
-            body: form.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
-        });
+        if (moveBtn) moveBtn.disabled = true;
+        try {
+            const res = await fetch('/notes/notebook/move', {
+                method: 'POST',
+                body: form.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+            });
 
-        if (res.url?.includes('error=')) {
-            alert(res.url.includes('move_duplicate')
-                ? 'Note was copied but removing the original failed. You may have duplicates.'
-                : 'Something went wrong moving the note. Please try again.');
-            return;
+            if (res.url?.includes('error=')) {
+                alert(res.url.includes('move_duplicate')
+                    ? 'Note was copied but removing the original failed. You may have duplicates.'
+                    : 'Something went wrong moving the note. Please try again.');
+                return;
+            }
+            currentCard.remove();
+            closeSlideout();
+        } catch (err) {
+            console.error('note move failed', err);
+            alert('Could not move this note. Please try again.');
+        } finally {
+            if (moveBtn) moveBtn.disabled = false;
         }
-        currentCard.remove();
-        closeSlideout();
     }
 
     async function copyNote() {
+        const copyBtn = panel.querySelector('#slideout-copy-btn');
+        if (copyBtn?.disabled) return;
         const select = panel.querySelector('#slideout-copy-select');
         const dest = select.value;
         if (!dest) return;
@@ -326,22 +361,37 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
         form.append('id', currentNoteId);
         form.append('notebook', dest);
 
-        const res = await fetch('/notes/notebook/copy', {
-            method: 'POST',
-            body: form.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
-        });
+        if (copyBtn) copyBtn.disabled = true;
+        try {
+            const res = await fetch('/notes/notebook/copy', {
+                method: 'POST',
+                body: form.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+            });
 
-        if (res.url?.includes('error=')) {
-            alert('Something went wrong copying the note. Please try again.');
-            return;
+            if (res.url?.includes('error=')) {
+                alert('Something went wrong copying the note. Please try again.');
+                return;
+            }
+            select.value = '';
+        } catch (err) {
+            console.error('note copy failed', err);
+            alert('Could not copy this note. Please try again.');
+        } finally {
+            if (copyBtn) copyBtn.disabled = false;
         }
-        select.value = '';
     }
 
     async function loadVersions() {
         if (versionsList.style.display !== 'none') {
             versionsList.style.display = 'none';
+            return;
+        }
+
+        // Serve from cache when the user is still looking at the same note.
+        if (versionsCache.noteId === currentNoteId && versionsCache.html !== null) {
+            versionsList.innerHTML = versionsCache.html;
+            versionsList.style.display = '';
             return;
         }
 
@@ -353,38 +403,18 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
             const data = await res.json();
             const items = data.items || [];
 
+            let html;
             if (items.length === 0) {
-                versionsList.innerHTML = '<p style="color:var(--overlay-1);font-size:0.85rem;">No previous versions.</p>';
-                return;
+                html = '<p style="color:var(--overlay-1);font-size:0.85rem;">No previous versions.</p>';
+            } else {
+                html = items.reverse().map((v, i, arr) => {
+                    const date = formatVersionDate(v.date_published);
+                    const href = `/notes/${notebookId}/update?id=${currentNoteId}&vid=${v.id}`;
+                    return `<p><a href="${href}">${date}</a>${i === arr.length - 1 ? ' (current)' : ''}</p>`;
+                }).join('');
             }
-
-            versionsList.innerHTML = items.reverse().map((v, i) => {
-                const date = formatVersionDate(v.date_published);
-                return `<p><a href="#" class="version-link" data-content="${escapeAttr(v.content_text)}">${date}</a>${i === 0 ? ' (current)' : ''}</p>`;
-            }).join('');
-
-            // Click a version to view it
-            versionsList.querySelectorAll('.version-link').forEach(link => {
-                link.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    const encrypted = link.getAttribute('data-content');
-                    let markdown;
-                    if (isShared) {
-                        markdown = encrypted;
-                    } else {
-                        markdown = await decryptWithKey(key, encrypted);
-                    }
-
-                    // Render and show in content area
-                    const html = converter.makeHtml(markdown);
-                    const metadata = converter.getMetadata();
-                    contentEl.innerHTML = html;
-                    if (metadata?.title) titleEl.textContent = decodeEntities(metadata.title);
-                    if (typeof hljs !== 'undefined') {
-                        contentEl.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
-                    }
-                });
-            });
+            versionsList.innerHTML = html;
+            versionsCache = { noteId: currentNoteId, html };
         } catch {
             versionsList.innerHTML = '<p style="color:var(--overlay-1);font-size:0.85rem;">Could not load versions.</p>';
         }
@@ -439,10 +469,6 @@ export function initNoteSlideout(notebookId, key, notebooks = []) {
         } catch {
             return dateStr;
         }
-    }
-
-    function escapeAttr(str) {
-        return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     function decodeEntities(str) {

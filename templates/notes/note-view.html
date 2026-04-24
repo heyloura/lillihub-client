@@ -24,22 +24,18 @@
             </div>
         </div>
 
-        <div class="mt-2 pt-2" style="border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <div class="mt-2 pt-2" style="border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;align-items:flex-start;">
             {{versionsButton}}
-            <details style="display:inline;">
-                <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete</summary>
-                <form method="POST" action="/note/delete" class="mt-2" onsubmit="return confirm('Permanently delete this note?')">
-                    <input type="hidden" name="id" value="{{noteId}}" />
-                    <input type="hidden" name="notebookId" value="{{notebookId}}" />
-                    <p style="font-size:0.85rem;color:var(--overlay-1);">This will permanently delete this note.</p>
-                    <button type="submit" class="btn btn-glossy btn-sm">Confirm Delete</button>
-                </form>
-            </details>
+            <form method="POST" action="/note/delete" style="display:inline;" onsubmit="return confirm('Permanently delete this note?')">
+                <input type="hidden" name="id" value="{{noteId}}" />
+                <input type="hidden" name="notebookId" value="{{notebookId}}" />
+                <button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-trash"></i> Delete</button>
+            </form>
         </div>
     </div>
 </div>
 <script type="module">
-    import { importNotesKey, decryptWithKey } from '/scripts/crypto.js';
+    import { importNotesKey, decryptWithKey, validateNotesKey } from '/scripts/crypto.js';
 
     const key = await importNotesKey();
     if (key || {{is_shared}}) {
@@ -49,7 +45,10 @@
     }
 
     document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
-        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        const value = document.getElementById('notes_key').value.trim();
+        const err = validateNotesKey(value);
+        if (err) { alert(err); return; }
+        localStorage.setItem('notes_key', value);
         window.location.reload();
     });
 

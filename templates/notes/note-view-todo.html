@@ -1,4 +1,3 @@
-<style>.fab { display: none; }</style>
 <script src="https://cdn.jsdelivr.net/npm/showdown@2.0.3/dist/showdown.min.js" defer></script>
 <div class="container">
     <div id="enter_notes_key" class="mt-2 mb-2" style="display:none;">
@@ -12,11 +11,24 @@
          data-notebook-id="{{notebookId}}"
          data-note-id="{{noteId}}">
 
+         
         <div class="mt-2 mb-2" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
             <button class="btn btn-glossy btn-sm" id="addTodoBtn"><i class="bi bi-plus-lg"></i> Add</button>
             <button class="btn btn-glossy btn-sm" id="startFvBtn"><i class="bi bi-bullseye"></i> Start Round</button>
             <button class="btn btn-glossy btn-sm" id="clearCompletedBtn"><i class="bi bi-trash"></i> Clear Done</button>
             {{sharedChip}}
+        </div>
+
+        <div id="todo-save-error" class="toast toast-error mb-2" style="display:none;align-items:center;gap:0.5rem;">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span style="flex:1;">Could not save changes. Check your connection and retry.</span>
+            <button type="button" class="btn btn-sm" id="todo-save-retry">Retry</button>
+        </div>
+
+        <div id="todo-undo-toast" class="toast mb-2" style="display:none;align-items:center;gap:0.5rem;">
+            <i class="bi bi-check2-circle"></i>
+            <span style="flex:1;">Task completed</span>
+            <button type="button" class="btn btn-sm" id="todo-undo-btn">Undo</button>
         </div>
 
         <div class="blog-toolbar mb-2">
@@ -32,24 +44,20 @@
             </label>
         </div>
 
-        <ul id="tasks" class="todo-list">
+        <ul id="tasks" class="todo-list" style="border-top:1px solid var(--border);margin-top:2em;">
             <li style="text-align:center;padding:1rem;"><i class="bi bi-arrow-repeat"></i> Decrypting...</li>
         </ul>
 
-        <details class="mt-2 pt-2" style="border-top:1px solid var(--border);">
+        <details class="mt-2 pt-2" id="advancedActions" style="margin-top:2em;">
             <summary style="cursor:pointer;font-size:0.85rem;color:var(--overlay-1);list-style:none;"><i class="bi bi-three-dots"></i> Advanced actions</summary>
-            <div class="mt-2" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <div class="mt-2" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:flex-start;">
                 {{versionsButton}}
                 <button class="btn btn-glossy btn-sm" id="exportTodoBtn"><i class="bi bi-download"></i> Export</button>
-                <details style="display:inline;">
-                    <summary class="btn btn-glossy btn-sm" style="list-style:none;"><i class="bi bi-trash"></i> Delete todo list</summary>
-                    <form method="POST" action="/note/delete" class="mt-2" onsubmit="return confirm('Permanently delete this todo list and all its tasks?')">
-                        <input type="hidden" name="id" value="{{noteId}}" />
-                        <input type="hidden" name="notebookId" value="{{notebookId}}" />
-                        <p style="font-size:0.85rem;color:var(--overlay-1);">This will permanently delete this todo list and all its tasks.</p>
-                        <button type="submit" class="btn btn-glossy btn-sm">Confirm Delete</button>
-                    </form>
-                </details>
+                <form method="POST" action="/note/delete" style="display:inline;" onsubmit="return confirm('Permanently delete this todo list and all its tasks?')">
+                    <input type="hidden" name="id" value="{{noteId}}" />
+                    <input type="hidden" name="notebookId" value="{{notebookId}}" />
+                    <button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-trash"></i> Delete todo list</button>
+                </form>
             </div>
         </details>
     </div>
@@ -61,13 +69,15 @@
             <button id="closeTodoDialog" class="btn btn-sm" style="border:none;background:none;font-size:1.2rem;cursor:pointer;"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="todo-slideout-body">
-            <textarea id="todo-content" class="form-input" placeholder="Write a task..." style="min-height:150px;"></textarea>
-            <p class="todo-slideout-hint">Each line becomes a separate task.</p>
+            <textarea id="todo-content" class="form-input" placeholder="Write a task..." style="min-height:150px;height:50vh"></textarea>
+            <p class="todo-slideout-hint" id="todo-hint-multiline">Each line becomes a separate task.</p>
+            <p class="todo-slideout-hint">Use "+" or "@" before a word in a task to denote a project or context.</p>
+            <p class="todo-slideout-hint">Use "(A)", "(B)", or "(C)" at the front to indicate priority</p>
         </div>
         <div class="todo-slideout-footer">
             <div style="display:flex;gap:0.5rem;">
                 <button id="deleteTodoBtn" class="btn btn-sm" style="color:var(--red);display:none;"><i class="bi bi-trash"></i></button>
-                <button id="moveBottomBtn" class="btn btn-sm" style="display:none;" title="Move to bottom"><i class="bi bi-arrow-down-circle"></i></button>
+                <button id="moveBottomBtn" class="btn btn-sm" style="display:none;" title="Move to bottom"><i class="bi bi-arrow-down-circle"></i> Move to bottom of list</button>
             </div>
             <button id="saveTodoBtn" class="btn btn-glossy btn-sm"><i class="bi bi-check-lg"></i> Save</button>
         </div>
@@ -75,7 +85,7 @@
 </div>
 
 <script type="module">
-    import { importNotesKey, decryptWithKey, encryptWithKey } from '/scripts/crypto.js';
+    import { importNotesKey, decryptWithKey, encryptWithKey, validateNotesKey } from '/scripts/crypto.js';
     import { initTodo } from '/scripts/todo.js';
 
     const key = await importNotesKey();
@@ -86,7 +96,10 @@
     }
 
     document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
-        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        const value = document.getElementById('notes_key').value.trim();
+        const err = validateNotesKey(value);
+        if (err) { alert(err); return; }
+        localStorage.setItem('notes_key', value);
         window.location.reload();
     });
 

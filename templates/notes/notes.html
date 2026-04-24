@@ -18,7 +18,7 @@
     <div id="notes_content" style="display:none;">
         <ul class="tab tab-block mt-2 mb-2">
             <li class="tab-item {{notesActive}}"><a href="/notes/{{notebookId}}"><i class="bi bi-journal-text"></i> Notes</a></li>
-            <li class="tab-item {{todosActive}}"><a href="/notes/{{notebookId}}?tab=todos"><i class="bi bi-check2-square"></i> Todos</a></li>
+            <li class="tab-item {{todosActive}}"><a href="/notes/{{notebookId}}?tab=todos"><i class="bi bi-check2-square"></i> Todo lists</a></li>
         </ul>
         <div class="blog-toolbar mb-2">
             <div class="input-group">
@@ -32,12 +32,25 @@
                 <input type="checkbox" id="note-select-all-cb" /> <small>Select all</small>
             </label>
             <span class="blog-toolbar-spacer"></span>
-            <button type="button" class="btn btn-glossy btn-sm" id="post-selected-btn"><i class="bi bi-pencil-square"></i> Create post</button>
+            <button type="button" class="btn btn-glossy btn-sm" id="post-selected-btn" style="display:none;"><i class="bi bi-pencil-square"></i> Create post</button>
         </div>
         <form id="notes-post-form" method="POST" action="/notes/post-selected" style="display:none;"></form>
+        <div style="margin-top:2em;">
         {{notes}}
+        </div>
 
-        <details class="mt-2 pt-2" style="border-top:1px solid var(--border);">
+        <dialog id="new-todo-dialog" class="hide-if-user-has-no-javascript" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid var(--border);border-radius:6px;padding:1rem;max-width:420px;width:90%;background:var(--base);color:var(--text);">
+            <form id="new-todo-form">
+                <h5 style="margin-top:0;">New Todo List</h5>
+                <input id="new-todo-title" class="form-input" type="text" placeholder="Title" required maxlength="200">
+                <div class="mt-2" style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                    <button type="button" class="btn btn-sm" id="new-todo-cancel">Cancel</button>
+                    <button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-check-lg"></i> Create</button>
+                </div>
+            </form>
+        </dialog>
+
+        <details class="mt-2 pt-2" style="margin: 2em 0">
             <summary style="cursor:pointer;font-size:0.85rem;color:var(--overlay-1);list-style:none;"><i class="bi bi-three-dots"></i> Advanced actions</summary>
             <div class="mt-2" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <button class="btn btn-glossy btn-sm" id="exportNotesBtn"><i class="bi bi-download"></i> Export notes as zip</button>
@@ -46,7 +59,7 @@
     </div>
 
     <script type="module">
-        import { importNotesKey, decryptWithKey } from '/scripts/crypto.js';
+        import { importNotesKey, decryptWithKey, encryptWithKey, validateNotesKey } from '/scripts/crypto.js';
         import { initNoteSlideout } from '/scripts/note-slideout.js';
 
         const key = await importNotesKey();
@@ -59,7 +72,10 @@
         }
 
         document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
-            localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+            const value = document.getElementById('notes_key').value.trim();
+            const err = validateNotesKey(value);
+            if (err) { alert(err); return; }
+            localStorage.setItem('notes_key', value);
             window.location.reload();
         });
         document.getElementById('clearKeyBtn')?.addEventListener('click', () => {
@@ -101,6 +117,14 @@
                     titleEl.textContent = plainText.length > 60
                         ? plainText.substring(0, 60) + '...'
                         : plainText;
+                    // Store an export-friendly markdown that keeps the shared
+                    // URL alongside the visible text. Without this, shared
+                    // notes would be dropped from the export zip.
+                    const sharedAnchor = card.querySelector('a.chip[href]');
+                    const sharedUrl = sharedAnchor ? sharedAnchor.getAttribute('href') : '';
+                    const body = plainText;
+                    const md = sharedUrl ? `[Shared on Micro.blog](${sharedUrl})\n\n${body}` : body;
+                    el.setAttribute('data-markdown', md);
                     continue;
                 }
 
@@ -175,11 +199,46 @@
             await processNotes();
         }
 
+        // Clicking anywhere in a card activates the title link. For notes that
+        // runs through the slideout intercept in note-slideout.js; for todos it
+        // falls through to a normal navigation. Interactive children (checkbox,
+        // chips, advanced-actions details) keep their own behavior.
+        document.querySelectorAll('.note-card').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a, button, input, label, .chip, details')) return;
+                const link = card.querySelector('.noteLink');
+                if (link) link.click();
+            });
+        });
+
+        // Clicking a tag chip (e.g. "#work") on a card fills the search box
+        // and filters. Other chips (like the "shared" indicator) keep their
+        // default link/click behavior.
+        document.addEventListener('click', (e) => {
+            const chip = e.target.closest('.note-card .chip');
+            if (!chip) return;
+            const text = chip.textContent.trim();
+            if (!text.startsWith('#')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const searchbox = document.getElementById('searchbox');
+            if (!searchbox) return;
+            searchbox.value = text;
+            searchbox.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+
         if (key) initNoteSlideout('{{notebookId}}', key, JSON.parse('{{notebooksJson}}'));
 
         // --- Multi-select: create post from notes ---
         if (activeTab === 'notes') {
             document.getElementById('notes-select-toolbar').style.display = '';
+
+            const postSelectedBtn = document.getElementById('post-selected-btn');
+            function updatePostBtnVisibility() {
+                const anyChecked = !!document.querySelector('.note-card:not([style*="display: none"]) .note-select-cb:checked');
+                postSelectedBtn.style.display = anyChecked ? '' : 'none';
+            }
 
             document.getElementById('note-select-all-cb').addEventListener('change', function() {
                 const checked = this.checked;
@@ -188,9 +247,16 @@
                     const cb = card.querySelector('.note-select-cb');
                     if (cb) cb.checked = checked;
                 });
+                updatePostBtnVisibility();
             });
 
-            document.getElementById('post-selected-btn').addEventListener('click', function() {
+            document.addEventListener('change', function(e) {
+                if (e.target && e.target.classList && e.target.classList.contains('note-select-cb')) {
+                    updatePostBtnVisibility();
+                }
+            });
+
+            postSelectedBtn.addEventListener('click', function() {
                 const form = document.getElementById('notes-post-form');
                 form.innerHTML = '';
                 let count = 0;
@@ -240,6 +306,70 @@
             a.download = 'notes-export.zip';
             a.click();
             URL.revokeObjectURL(url);
+        });
+
+        // --- New Todo List modal ---
+        const newTodoDialog = document.getElementById('new-todo-dialog');
+        const newTodoTitle = document.getElementById('new-todo-title');
+        const newTodoForm = document.getElementById('new-todo-form');
+
+        function openNewTodoDialog() {
+            if (!key) { alert('Enter your secret key first.'); return; }
+            newTodoTitle.value = '';
+            if (typeof newTodoDialog.showModal === 'function') {
+                newTodoDialog.showModal();
+            } else {
+                newTodoDialog.setAttribute('open', '');
+            }
+            setTimeout(() => newTodoTitle.focus(), 50);
+        }
+
+        document.addEventListener('click', function(e) {
+            const trigger = e.target.closest('[data-new-todo-list]');
+            if (trigger) {
+                e.preventDefault();
+                openNewTodoDialog();
+            }
+        });
+
+        document.getElementById('new-todo-cancel')?.addEventListener('click', () => newTodoDialog.close());
+        newTodoDialog?.addEventListener('click', (e) => { if (e.target === newTodoDialog) newTodoDialog.close(); });
+
+        newTodoForm?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const title = newTodoTitle.value.trim();
+            if (!title || !key) return;
+
+            const note = `---\ntype: todo.txt\ntitle: ${title}\n---\n`;
+            const encrypted = await encryptWithKey(key, note);
+
+            const form = new URLSearchParams();
+            form.append('text', encrypted);
+            form.append('notebook_id', '{{notebookId}}');
+
+            const submitBtn = newTodoForm.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            try {
+                const res = await fetch('/note/update?json=1', {
+                    method: 'POST',
+                    body: form.toString(),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await res.json().catch(() => ({}));
+                newTodoDialog.close();
+                if (data && data.id) {
+                    window.location.href = `/notes/{{notebookId}}/${data.id}?type=todo`;
+                } else {
+                    window.location.href = `/notes/{{notebookId}}?tab=todos`;
+                }
+            } catch (err) {
+                alert('Could not create todo list. Please try again.');
+                if (submitBtn) submitBtn.disabled = false;
+            }
         });
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

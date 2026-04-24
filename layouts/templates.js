@@ -12,7 +12,10 @@ function getArea(title) {
 
 function PrimaryAction(area, title, context) {
     if(title == 'Editor' || title == 'Post') return '<div class="sidebar-action"></div>';
-    if(area == 'notes' && context?.notebookId) return `<div class="sidebar-action sidebar-action"><a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}"><i class="bi bi-pencil-square"></i> New Note</a></div>`;
+    // Reserve layout space without rendering an action when viewing a todo list.
+    if(area == 'notes' && context?.isTodo) return '<div class="sidebar-action" aria-hidden="true"><a href="#" tabindex="-1" style="visibility:hidden;"><i class="bi bi-pencil-square"></i> &nbsp;</a></div>';
+    if(area == 'notes' && context?.notebookId && context.tab === 'todos') return `<div class="sidebar-action sidebar-action"><a href="#new-todo-list" data-new-todo-list><i class="bi bi-plus-square"></i> New Todo List</a></div>`;
+    if(area == 'notes' && context?.notebookId) return `<div class="sidebar-action sidebar-action"><a href="/notes/${context.notebookId}/new"><i class="bi bi-pencil-square"></i> New Note</a></div>`;
     if(area == 'notes') return `<div class="sidebar-action sidebar-action"><a href="/notebook/new"><i class="bi bi-journal-plus"></i> New Notebook</a></div>`;
     if(area == 'bookmarks') return `<div class="sidebar-action sidebar-action"><a href="/bookmark/new"><i class="bi bi-bookmark-plus"></i> New Bookmark</a></div>`;
     if(area == 'feeds') return `<div class="sidebar-action sidebar-action"><a href="/feed/new"><i class="bi bi-rss"></i> Add Feed</a></div>`;
@@ -22,7 +25,9 @@ function PrimaryAction(area, title, context) {
 
 function FabAction(area, title, context) {
     if(title == 'Editor' || title == 'Post') return '';
-    if(area == 'notes' && context?.notebookId) return `<a href="/notes/${context.notebookId}/new${context.tab === 'todos' ? '?tab=todos' : ''}" class="fab"><i class="bi bi-pencil-square"></i></a>`;
+    if(area == 'notes' && context?.isTodo) return '';
+    if(area == 'notes' && context?.notebookId && context.tab === 'todos') return `<a href="#new-todo-list" data-new-todo-list class="fab"><i class="bi bi-plus-lg"></i></a>`;
+    if(area == 'notes' && context?.notebookId) return `<a href="/notes/${context.notebookId}/new" class="fab"><i class="bi bi-pencil-square"></i></a>`;
     if(area == 'notes') return `<a href="/notebook/new" class="fab"><i class="bi bi-journal-plus"></i></a>`;
     if(area == 'bookmarks') return `<a href="/bookmark/new" class="fab"><i class="bi bi-bookmark-plus"></i></a>`;
     if(area == 'feeds') return `<a href="/feed/new" class="fab"><i class="bi bi-rss"></i></a>`;

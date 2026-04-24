@@ -106,6 +106,19 @@ export function createLimit(concurrency) {
     };
 }
 
+// Escape a string for safe interpolation into HTML text or attribute values.
+// Use for server-controlled strings that originate from user input (e.g.
+// notebook titles) before putting them in a template literal. For arbitrary
+// user-authored markup use sanitizeHTML/cleanFormatHTML instead.
+export function escapeHtml(str) {
+    return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 export function formatDate(dateStr, style = 'long') {
     try {
         const d = new Date(dateStr);

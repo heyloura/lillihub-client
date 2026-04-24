@@ -1,4 +1,4 @@
-import { formatDate, errorBanner, fetchNotebooksList } from "../scripts/server/utilities.js";
+import { formatDate, errorBanner, fetchNotebooksList, sanitizeHTML } from "../scripts/server/utilities.js";
 import { HTMLPage } from "./templates.js";
 
 const _noteTemplate = new TextDecoder().decode(await Deno.readFile("templates/notes/_note.html"));
@@ -24,10 +24,15 @@ export async function NotesTemplate(user, token, id, req) {
 
     const items = Array.isArray(eNotes?.items) ? eNotes.items : [];
     const notes = items.map(item => {
+        // Shared notes carry HTML rendered by Micro.blog; ammonia-sanitize as
+        // defense in depth before embedding (blocks <script>, <style>, event
+        // handlers, javascript: URLs). Encrypted notes are base64 ciphertext so
+        // they're inert on the page regardless.
+        const body = item._microblog.is_shared
+            ? `<div data-title="${item.date_published}" data-note-id="${item.id}" class="note clearfix">${sanitizeHTML(item.content_html || '')}</div>`
+            : `<div data-title="${item.date_published}" data-note-id="${item.id}" class="note clearfix decryptMe">${item.content_text}</div>`;
         return _noteTemplate
-            .replaceAll('{{content}}', item._microblog.is_shared
-                ? `<div data-title="${item.date_published}" id="${item.id}" class="note clearfix">${item.content_html}</div>`
-                : `<div data-title="${item.date_published}" id="${item.id}" class="note clearfix decryptMe">${item.content_text}</div>`)
+            .replaceAll('{{content}}', body)
             .replaceAll('{{formattedDate}}', formatDate(item.date_modified))
             .replaceAll('{{notebookId}}', id)
             .replaceAll('{{id}}', item.id)

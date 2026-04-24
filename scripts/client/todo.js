@@ -1,6 +1,9 @@
 import { encryptWithKey } from '/scripts/crypto.js';
 
 const TIME_ID_LEN = 23;
+// Matches a valid todo.txt priority prefix like "(A) ". Plain parentheses in
+// task text (e.g. "(note) follow up") must not be treated as a priority.
+const PRIORITY_RE = /^\([A-Z]\)\s/;
 
 function getDateTimeId() {
     const d = new Date();
@@ -15,9 +18,47 @@ function isDateTimeId(str) {
         && str.includes('.') && str.includes(' ');
 }
 
-function stripHtml(html) {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    return doc.body.textContent || '';
+// Pull a todo.txt line apart into its structural pieces. Canonical order is:
+//   [x ][(P) ][COMPLETION_DATE ][DATETIMEID ]body
+// Priority comes before the completion date on checked tasks (see checkTask).
+function parseTaskLine(raw) {
+    let rest = raw;
+    let done = false;
+    let priority = '';
+    let completionDate = '';
+    let dateTimeId = '';
+
+    if (/^x\s/.test(rest)) {
+        done = true;
+        rest = rest.replace(/^x\s+/, '');
+    }
+    const prioMatch = rest.match(/^\(([A-Z])\)\s+/);
+    if (prioMatch) {
+        priority = `(${prioMatch[1]})`;
+        rest = rest.substring(prioMatch[0].length);
+    }
+    if (done) {
+        const m = rest.match(/^(\d{4}-\d{2}-\d{2})\s+/);
+        if (m) {
+            completionDate = m[1];
+            rest = rest.substring(m[0].length);
+        }
+    }
+    if (isDateTimeId(rest.substring(0, TIME_ID_LEN))) {
+        dateTimeId = rest.substring(0, TIME_ID_LEN);
+        rest = rest.substring(TIME_ID_LEN + 1);
+    }
+    return { done, priority, completionDate, dateTimeId, body: rest };
+}
+
+function buildTaskLine({ done, priority, completionDate, dateTimeId, body }) {
+    let out = '';
+    if (done) out += 'x ';
+    if (priority) out += priority + ' ';
+    if (done && completionDate) out += completionDate + ' ';
+    if (dateTimeId) out += dateTimeId + ' ';
+    out += body;
+    return out;
 }
 
 export function initTodo(markdown, key, notebookId, noteId) {
@@ -35,6 +76,13 @@ export function initTodo(markdown, key, notebookId, noteId) {
     const taskList = document.getElementById('tasks');
     const searchBox = document.getElementById('todo-search');
     const showCompletedCheckbox = document.getElementById('showCompleted');
+
+    // Per-list UI state: show-completed persists across sessions (it's a
+    // preference), search persists only within the session (it's navigation).
+    const SHOW_COMPLETED_KEY = `lh-todo-show-completed:${noteId}`;
+    const SEARCH_KEY = `lh-todo-search:${noteId}`;
+    try { showCompletedCheckbox.checked = localStorage.getItem(SHOW_COMPLETED_KEY) === '1'; } catch { /* ignore */ }
+    try { searchBox.value = sessionStorage.getItem(SEARCH_KEY) || ''; } catch { /* ignore */ }
     const slideout = document.getElementById('todo-slideout');
     const slideoutScrim = document.getElementById('todo-slideout-scrim');
     const slideoutTitle = document.getElementById('todo-slideout-title');
@@ -68,7 +116,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
     let focusPosition = 0;
 
     function extractDateTimeId(text) {
-        if (text.startsWith('(') && text.length > 4) {
+        if (PRIORITY_RE.test(text)) {
             const after = text.substring(4);
             if (isDateTimeId(after.substring(0, TIME_ID_LEN))) return after.substring(0, TIME_ID_LEN);
         }
@@ -90,7 +138,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
 
     function refreshDateTimeId(idx) {
         let text = tasks[idx];
-        if (text.startsWith('(') && text.length > 4) {
+        if (PRIORITY_RE.test(text)) {
             const afterPriority = text.substring(4);
             if (isDateTimeId(afterPriority.substring(0, TIME_ID_LEN))) {
                 text = text.substring(0, 4) + getDateTimeId() + ' ' + afterPriority.substring(TIME_ID_LEN + 1);
@@ -164,37 +212,23 @@ export function initTodo(markdown, key, notebookId, noteId) {
     }
 
     function formatTaskMarkup(text) {
-        let markup = escapeHtml(text);
-
-        // Strip datetime ID from display
-        if (markup.startsWith('(') && markup.length > 4) {
-            const afterPriority = markup.substring(4);
-            if (isDateTimeId(afterPriority.substring(0, TIME_ID_LEN))) {
-                markup = markup.substring(0, 4) + afterPriority.substring(TIME_ID_LEN + 1);
-            }
-        } else if (isDateTimeId(markup.substring(0, TIME_ID_LEN))) {
-            markup = markup.substring(TIME_ID_LEN + 1);
-        }
-
-        // Strip "x " prefix and completion date for display
-        if (/^x\s/.test(text)) {
-            // Remove "x " and optional priority + date
-            markup = markup.replace(/^x\s+/, '');
-            // Remove completion date (YYYY-MM-DD) if present at start
-            markup = markup.replace(/^\(\w\)\s*/, (m) => `<span class="todo-priority">${m.trim()}</span> `);
-            markup = markup.replace(/^\d{4}-\d{2}-\d{2}\s*/, '');
-        }
-
-        // Priorities (clickable to filter)
-        markup = markup.replace(/\(A\)/g, '<span class="todo-priority-a todo-searchable" data-search="(A)">(A)</span>');
-        markup = markup.replace(/\(B\)/g, '<span class="todo-priority-b todo-searchable" data-search="(B)">(B)</span>');
-        markup = markup.replace(/\(C\)/g, '<span class="todo-priority-c todo-searchable" data-search="(C)">(C)</span>');
+        const parsed = parseTaskLine(text);
+        let body = escapeHtml(parsed.body);
 
         // Contexts and projects (clickable to search)
-        markup = markup.replace(/(^|\s)(@\S+)/g, '$1<span class="todo-context todo-searchable" data-search="$2">$2</span>');
-        markup = markup.replace(/(^|\s)(\+\S+)/g, '$1<span class="todo-project todo-searchable" data-search="$2">$2</span>');
+        body = body.replace(/(^|\s)(@\S+)/g, '$1<span class="todo-context todo-searchable" data-search="$2">$2</span>');
+        body = body.replace(/(^|\s)(\+\S+)/g, '$1<span class="todo-project todo-searchable" data-search="$2">$2</span>');
 
-        return markup;
+        let prefix = '';
+        if (parsed.priority) {
+            const letter = parsed.priority.charAt(1);
+            const cls = letter === 'A' ? 'todo-priority-a'
+                : letter === 'B' ? 'todo-priority-b'
+                : letter === 'C' ? 'todo-priority-c'
+                : 'todo-priority';
+            prefix = `<span class="${cls} todo-searchable" data-search="${parsed.priority}">${parsed.priority}</span> `;
+        }
+        return prefix + body;
     }
 
     function escapeHtml(str) {
@@ -203,9 +237,36 @@ export function initTodo(markdown, key, notebookId, noteId) {
         return div.innerHTML;
     }
 
+    // Undo toast plumbing: when a task is checked while "Show completed" is
+    // off, it disappears from the list — so we show a transient toast with
+    // an Undo button to make that state change easy to reverse.
+    const undoToast = document.getElementById('todo-undo-toast');
+    const undoBtn = document.getElementById('todo-undo-btn');
+    let undoTimer = null;
+    let undoIdx = -1;
+
+    function hideUndoToast() {
+        if (undoToast) undoToast.style.display = 'none';
+        if (undoTimer) { clearTimeout(undoTimer); undoTimer = null; }
+        undoIdx = -1;
+    }
+
+    function showUndoToast(idx) {
+        if (!undoToast) return;
+        undoIdx = idx;
+        undoToast.style.display = 'flex';
+        if (undoTimer) clearTimeout(undoTimer);
+        undoTimer = setTimeout(hideUndoToast, 5000);
+    }
+
+    if (undoBtn) undoBtn.addEventListener('click', () => {
+        if (undoIdx >= 0 && undoIdx < tasks.length) uncheckTask(undoIdx);
+        hideUndoToast();
+    });
+
     function checkTask(idx) {
         let text = tasks[idx];
-        if (text.startsWith('(')) {
+        if (PRIORITY_RE.test(text)) {
             const priority = text.substring(0, 3);
             text = 'x ' + priority + ' ' + new Date().toISOString().split('T')[0] + ' ' + text.slice(4);
         } else {
@@ -214,6 +275,9 @@ export function initTodo(markdown, key, notebookId, noteId) {
         tasks[idx] = text;
         saveTodos();
         renderTasks();
+        // If Show completed is off, the task just disappeared. Give the user
+        // a visible way to undo that change.
+        if (!showCompletedCheckbox.checked) showUndoToast(idx);
     }
 
     function uncheckTask(idx) {
@@ -229,6 +293,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
         tasks[idx] = text;
         saveTodos();
         renderTasks();
+        hideUndoToast();
     }
 
     function openSlideout() {
@@ -247,11 +312,14 @@ export function initTodo(markdown, key, notebookId, noteId) {
     }
 
     function openEditDialog(idx) {
+        const parsed = parseTaskLine(tasks[idx]);
         lineIdInput.value = idx;
-        contentInput.value = tasks[idx];
+        contentInput.value = (parsed.priority ? parsed.priority + ' ' : '') + parsed.body;
         deleteBtn.style.display = '';
         moveBottomBtn.style.display = '';
         slideoutTitle.textContent = 'Edit Task';
+        const hint = document.getElementById('todo-hint-multiline');
+        if (hint) hint.style.display = 'none';
         openSlideout();
     }
 
@@ -261,10 +329,18 @@ export function initTodo(markdown, key, notebookId, noteId) {
         deleteBtn.style.display = 'none';
         moveBottomBtn.style.display = 'none';
         slideoutTitle.textContent = 'Add Task';
+        const hint = document.getElementById('todo-hint-multiline');
+        if (hint) hint.style.display = '';
         openSlideout();
     }
 
-    async function saveTodos() {
+    // Saves are serialized via this chain so concurrent edits never produce
+    // out-of-order writes (each save sees the latest `tasks` array at fire time).
+    let savePromise = Promise.resolve();
+    const saveErrorEl = document.getElementById('todo-save-error');
+    const saveRetryBtn = document.getElementById('todo-save-retry');
+
+    async function doSaveTodos() {
         let note = '---\ntype: todo.txt\n' + (todoTitle ? `title: ${todoTitle}\n` : '') + '---\n';
         for (const task of tasks) {
             note += task + '\n\n';
@@ -276,29 +352,52 @@ export function initTodo(markdown, key, notebookId, noteId) {
         form.append('notebook_id', notebookId);
         form.append('id', noteId);
 
-        fetch('/note/update', {
+        const res = await fetch('/note/update', {
             method: 'POST',
             body: form.toString(),
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
         });
+        if (!res.ok) throw new Error('save failed: ' + res.status);
     }
 
-    function saveFromDialog() {
-        const text = contentInput.value.trim();
-        if (!text) return;
+    function saveTodos() {
+        savePromise = savePromise
+            .catch(() => {})  // a prior failure shouldn't block a retry
+            .then(doSaveTodos)
+            .then(() => { if (saveErrorEl) saveErrorEl.style.display = 'none'; })
+            .catch((err) => {
+                console.error('todo save failed', err);
+                if (saveErrorEl) saveErrorEl.style.display = 'flex';
+                throw err;
+            });
+        return savePromise;
+    }
 
-        const lines = text.split('\n').filter(l => l.trim());
+    if (saveRetryBtn) saveRetryBtn.addEventListener('click', () => saveTodos());
+
+    function saveFromDialog() {
+        const raw = contentInput.value;
         const idx = parseInt(lineIdInput.value);
 
         if (idx >= 0 && idx < tasks.length) {
-            // Editing existing task — update first line
-            tasks[idx] = lines[0];
-            // Additional lines become new tasks
-            for (let i = 1; i < lines.length; i++) {
-                tasks.push(addDateTimeId(lines[i]));
-            }
+            // Edit mode: single-line only. Collapse any stray newlines (paste, etc.).
+            const editText = raw.replace(/\s*\n+\s*/g, ' ').trim();
+            if (!editText) return;
+
+            const original = parseTaskLine(tasks[idx]);
+            // Re-parse edited text to pick up any priority change the user made.
+            const edited = parseTaskLine(editText);
+            tasks[idx] = buildTaskLine({
+                done: original.done,
+                priority: edited.priority,
+                completionDate: original.completionDate,
+                dateTimeId: original.dateTimeId,
+                body: edited.body,
+            });
         } else {
-            // Adding new tasks
+            // Add mode: multi-line allowed; each line becomes a new task.
+            const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+            if (lines.length === 0) return;
             for (const line of lines) {
                 tasks.push(addDateTimeId(line));
             }
@@ -310,7 +409,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
     }
 
     function addDateTimeId(text) {
-        if (text.startsWith('(') && text.length > 3) {
+        if (PRIORITY_RE.test(text)) {
             const priority = text.substring(0, 3);
             return priority + ' ' + getDateTimeId() + ' ' + text.slice(4);
         }
@@ -342,14 +441,25 @@ export function initTodo(markdown, key, notebookId, noteId) {
         if (count === 0) return;
         if (!confirm(`Remove ${count} completed task${count > 1 ? 's' : ''}?`)) return;
         tasks = tasks.filter(t => !/^x\s/.test(t));
+        hideUndoToast();
         saveTodos();
         renderTasks();
     }
 
     function exportTodoTxt() {
+        // Convert Lillihub's datetime id (YYYY-MM-DD HH:MM:SS.mmm) down to the
+        // standard todo.txt creation-date (YYYY-MM-DD) so the file is portable
+        // across todo.txt tools.
         let content = '';
         for (const task of tasks) {
-            content += task + '\n';
+            const p = parseTaskLine(task);
+            content += buildTaskLine({
+                done: p.done,
+                priority: p.priority,
+                completionDate: p.completionDate,
+                dateTimeId: p.dateTimeId ? p.dateTimeId.substring(0, 10) : '',
+                body: p.body,
+            }) + '\n';
         }
         const blob = new Blob([content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
@@ -369,6 +479,10 @@ export function initTodo(markdown, key, notebookId, noteId) {
         document.getElementById('clearCompletedBtn').style.display = inFv ? 'none' : '';
         searchBox.closest('.blog-toolbar').style.display = inFv ? 'none' : '';
         showCompletedCheckbox.closest('div').style.display = inFv ? 'none' : '';
+        const advanced = document.getElementById('advancedActions');
+        if (advanced) advanced.style.display = inFv ? 'none' : '';
+        // Remove the list's top border during an FV session for a cleaner view.
+        taskList.style.borderTop = inFv ? 'none' : '';
     }
 
     function startFvRound() {
@@ -380,6 +494,7 @@ export function initTodo(markdown, key, notebookId, noteId) {
             return;
         }
 
+        hideUndoToast();
         fvState = 'DOT_SCAN';
         benchmarkIdx = scanOrder[0];
         dottedIndices.add(benchmarkIdx);
@@ -392,44 +507,33 @@ export function initTodo(markdown, key, notebookId, noteId) {
         taskList.innerHTML = '';
         const total = scanOrder.length;
 
+        const wrap = document.createElement('div');
+        wrap.className = 'fv-session-wrap';
+        taskList.appendChild(wrap);
+
         // Progress
         const progress = document.createElement('div');
         progress.className = 'fv-progress';
         progress.innerHTML = `
             <div class="fv-progress-bar"><div class="fv-progress-fill" style="width:${Math.round((scanPosition / total) * 100)}%"></div></div>
             <span class="fv-progress-text">${scanPosition} of ${total} scanned &middot; ${dottedIndices.size} dotted</span>`;
-        taskList.appendChild(progress);
-
-        // Benchmark
-        const benchmarkLi = document.createElement('li');
-        benchmarkLi.className = 'todo-item fv-benchmark';
-        benchmarkLi.innerHTML = `
-            <span class="fv-dot">&#x25CF;</span>
-            <span class="todo-text">${formatTaskMarkup(tasks[benchmarkIdx])}</span>
-            <span class="fv-label">benchmark</span>`;
-        taskList.appendChild(benchmarkLi);
+        wrap.appendChild(progress);
 
         if (scanPosition < scanOrder.length) {
             const currentIdx = scanOrder[scanPosition];
 
-            const vsLi = document.createElement('li');
-            vsLi.className = 'fv-vs';
-            vsLi.textContent = 'Do you want to do this before the benchmark?';
-            taskList.appendChild(vsLi);
+            wrap.insertAdjacentHTML('beforeend', `
+                <p class="fv-prompt">Do you want to do</p>
+                <div class="fv-task-line">${formatTaskMarkup(tasks[currentIdx])}</div>
+                <p class="fv-prompt">before the benchmark</p>
+                <div class="fv-task-line">${formatTaskMarkup(tasks[benchmarkIdx])}</div>`);
 
-            const assessLi = document.createElement('li');
-            assessLi.className = 'todo-item fv-assess';
-            assessLi.innerHTML = `
-                <span class="fv-dot fv-dot-empty">&#x25CB;</span>
-                <span class="todo-text">${formatTaskMarkup(tasks[currentIdx])}</span>`;
-            taskList.appendChild(assessLi);
-
-            const btnRow = document.createElement('li');
+            const btnRow = document.createElement('div');
             btnRow.className = 'fv-actions';
             btnRow.innerHTML = `
                 <button class="btn btn-glossy btn-sm fv-yes-btn"><i class="bi bi-check-lg"></i> Yes</button>
                 <button class="btn btn-glossy btn-sm fv-no-btn"><i class="bi bi-x-lg"></i> No</button>`;
-            taskList.appendChild(btnRow);
+            wrap.appendChild(btnRow);
             btnRow.querySelector('.fv-yes-btn').addEventListener('click', () => {
                 dottedIndices.add(currentIdx);
                 benchmarkIdx = currentIdx;
@@ -441,19 +545,19 @@ export function initTodo(markdown, key, notebookId, noteId) {
                 renderFvScan();
             });
         } else {
-            const doneLi = document.createElement('li');
+            const doneLi = document.createElement('div');
             doneLi.className = 'fv-scan-done';
             doneLi.innerHTML = `
                 <p>Scan complete. ${dottedIndices.size} task${dottedIndices.size !== 1 ? 's' : ''} dotted.</p>
                 <button class="btn btn-glossy btn-sm"><i class="bi bi-play-fill"></i> Start Focus</button>`;
-            taskList.appendChild(doneLi);
+            wrap.appendChild(doneLi);
             doneLi.querySelector('button').addEventListener('click', startFvFocus);
         }
 
-        const endLi = document.createElement('li');
+        const endLi = document.createElement('div');
         endLi.className = 'fv-end-session';
         endLi.innerHTML = `<button class="btn btn-sm">End Session</button>`;
-        taskList.appendChild(endLi);
+        wrap.appendChild(endLi);
         endLi.querySelector('button').addEventListener('click', endFvSession);
     }
 
@@ -471,30 +575,30 @@ export function initTodo(markdown, key, notebookId, noteId) {
         const remaining = focusQueue.length - focusPosition;
         const currentIdx = focusQueue[focusPosition];
 
+        const wrap = document.createElement('div');
+        wrap.className = 'fv-session-wrap';
+        taskList.appendChild(wrap);
+
         // Progress
         const progress = document.createElement('div');
         progress.className = 'fv-progress';
         progress.innerHTML = `
             <div class="fv-progress-bar"><div class="fv-progress-fill" style="width:${Math.round((focusPosition / focusQueue.length) * 100)}%"></div></div>
             <span class="fv-progress-text">Focus: ${remaining} task${remaining !== 1 ? 's' : ''} remaining</span>`;
-        taskList.appendChild(progress);
+        wrap.appendChild(progress);
 
-        // Current task
-        const li = document.createElement('li');
-        li.className = 'todo-item fv-focus-task';
-        li.innerHTML = `
-            <span class="fv-dot">&#x25CF;</span>
-            <span class="todo-text">${formatTaskMarkup(tasks[currentIdx])}</span>`;
-        taskList.appendChild(li);
+        wrap.insertAdjacentHTML('beforeend', `
+            <p class="fv-prompt">Work on</p>
+            <div class="fv-task-line">${formatTaskMarkup(tasks[currentIdx])}</div>`);
 
         // Actions
-        const btnRow = document.createElement('li');
+        const btnRow = document.createElement('div');
         btnRow.className = 'fv-actions fv-focus-actions';
         btnRow.innerHTML = `
             <button class="btn btn-glossy btn-sm fv-complete-btn"><i class="bi bi-check-lg"></i> Complete</button>
             <button class="btn btn-glossy btn-sm fv-reenter-btn"><i class="bi bi-arrow-down-circle"></i> Re-enter</button>
             <button class="btn btn-sm fv-skip-btn">Skip</button>`;
-        taskList.appendChild(btnRow);
+        wrap.appendChild(btnRow);
         btnRow.querySelector('.fv-complete-btn').addEventListener('click', () => {
             checkTask(currentIdx);
             focusPosition++;
@@ -513,22 +617,22 @@ export function initTodo(markdown, key, notebookId, noteId) {
 
         // Up next preview
         if (focusPosition + 1 < focusQueue.length) {
-            const upNext = document.createElement('li');
+            const upNext = document.createElement('div');
             upNext.className = 'fv-up-next';
             upNext.innerHTML = '<span class="fv-label">Up next</span>';
             for (let i = focusPosition + 1; i < focusQueue.length; i++) {
                 const preview = document.createElement('div');
                 preview.className = 'fv-up-next-item';
-                preview.innerHTML = `<span class="fv-dot" style="font-size:0.8rem;">&#x25CF;</span> <span style="font-size:0.85rem;">${formatTaskMarkup(tasks[focusQueue[i]])}</span>`;
+                preview.innerHTML = `<span style="font-size:0.85rem;">${formatTaskMarkup(tasks[focusQueue[i]])}</span>`;
                 upNext.appendChild(preview);
             }
-            taskList.appendChild(upNext);
+            wrap.appendChild(upNext);
         }
 
-        const endLi = document.createElement('li');
+        const endLi = document.createElement('div');
         endLi.className = 'fv-end-session';
         endLi.innerHTML = `<button class="btn btn-sm">End Session</button>`;
-        taskList.appendChild(endLi);
+        wrap.appendChild(endLi);
         endLi.querySelector('button').addEventListener('click', endFvSession);
     }
 
@@ -556,8 +660,25 @@ export function initTodo(markdown, key, notebookId, noteId) {
         if (e.key === 'Escape' && slideout.classList.contains('open')) closeSlideout();
     });
 
-    searchBox.addEventListener('input', renderTasks);
-    showCompletedCheckbox.addEventListener('change', renderTasks);
+    // When editing an existing task, Enter saves (no newline). Add mode keeps
+    // multi-line behavior so bulk paste/add still works.
+    contentInput.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' || e.shiftKey) return;
+        const idx = parseInt(lineIdInput.value);
+        if (idx >= 0) {
+            e.preventDefault();
+            saveFromDialog();
+        }
+    });
+
+    searchBox.addEventListener('input', () => {
+        try { sessionStorage.setItem(SEARCH_KEY, searchBox.value); } catch { /* ignore */ }
+        renderTasks();
+    });
+    showCompletedCheckbox.addEventListener('change', () => {
+        try { localStorage.setItem(SHOW_COMPLETED_KEY, showCompletedCheckbox.checked ? '1' : '0'); } catch { /* ignore */ }
+        renderTasks();
+    });
 
     // Initial render
     renderTasks();

@@ -7,26 +7,22 @@
         </div>
     </div>
     <div id="note_editor" style="display:none;">
+        <h1 style="margin-top: 2em;">Create or edit a note</h1>
         {{viewVersion}}
         <input class="form-input mt-2" id="note-title" type="text" placeholder="Title (optional)">
-        <div class="mt-2" style="display:flex;gap:0.5rem;">
-            <input class="form-input" id="note-tags" type="text" placeholder="Tags (comma separated, optional)" style="flex:1;">
-            <select class="form-select" id="note-type" style="width:auto;" onchange="document.getElementById('note-content').style.display=this.value==='todo.txt'?'none':''">
-                <option value="">Note</option>
-                <option value="todo.txt" {{todoSelected}}>Todo</option>
-            </select>
-        </div>
+        <input class="form-input mt-2" id="note-tags" type="text" placeholder="Tags (comma separated, optional)">
+        <input type="hidden" id="note-type" value="">
         <input type="hidden" id="original" value="{{originalValue}}">
-
         <textarea id="note-content" class="form-input mt-2" placeholder="Write here..." style="min-height:200px;"></textarea>
 
-        <div class="mt-2" style="display:flex;justify-content:flex-end;">
+        <div class="mt-2" style="display:flex;justify-content:flex-end;align-items:center;gap:0.75rem;">
+            <span id="saveNoteError" style="display:none;color:var(--red);font-size:0.85rem;"><i class="bi bi-exclamation-triangle"></i> Save failed</span>
             <button class="btn btn-glossy" id="saveNoteBtn">Save Note</button>
         </div>
     </div>
 </div>
 <script type="module">
-    import { importNotesKey, decryptWithKey, encryptWithKey } from '/scripts/crypto.js';
+    import { importNotesKey, decryptWithKey, encryptWithKey, validateNotesKey } from '/scripts/crypto.js';
 
     const key = await importNotesKey();
     const isShared = {{is_shared}};
@@ -38,7 +34,10 @@
     }
 
     document.getElementById('saveKeyBtn')?.addEventListener('click', () => {
-        localStorage.setItem('notes_key', document.getElementById('notes_key').value);
+        const value = document.getElementById('notes_key').value.trim();
+        const err = validateNotesKey(value);
+        if (err) { alert(err); return; }
+        localStorage.setItem('notes_key', value);
         window.location.reload();
     });
 
@@ -65,10 +64,7 @@
 
                 if (titleMatch) document.getElementById('note-title').value = titleMatch[1].trim();
                 if (tagsMatch) document.getElementById('note-tags').value = tagsMatch[1].trim();
-                if (typeMatch) {
-                    document.getElementById('note-type').value = typeMatch[1].trim();
-                    if (typeMatch[1].trim() === 'todo.txt') document.getElementById('note-content').style.display = 'none';
-                }
+                if (typeMatch) document.getElementById('note-type').value = typeMatch[1].trim();
 
                 document.getElementById('note-content').value = body;
             } else {
@@ -98,6 +94,10 @@
     });
 
     document.getElementById('saveNoteBtn').onclick = async function() {
+        const saveBtn = this;
+        const errorEl = document.getElementById('saveNoteError');
+        errorEl.style.display = 'none';
+
         const content = ta.value;
         const type = document.getElementById('note-type').value;
         if (!content && !type) return;
@@ -117,23 +117,42 @@
 
         const fullNote = yaml + content;
 
-        let encrypted;
-        if (isShared) {
-            encrypted = fullNote;
-        } else {
-            encrypted = await encryptWithKey(key, fullNote);
+        saveBtn.disabled = true;
+        try {
+            let encrypted;
+            if (isShared) {
+                encrypted = fullNote;
+            } else {
+                encrypted = await encryptWithKey(key, fullNote);
+            }
+
+            const form = new URLSearchParams();
+            form.append('text', encrypted);
+            form.append('notebook_id', '{{notebookId}}');
+            {{editAppend}}
+
+            const res = await fetch('/note/update', {
+                method: 'POST',
+                body: form.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+            });
+            if (!res.ok) throw new Error('save failed: ' + res.status);
+
+            // Land back on the right surface based on the note's type. Todo
+            // notes go to the todo view when we have an id, otherwise the todos
+            // tab; plain notes return to the notes list.
+            const savedId = form.get('id');
+            let dest = '/notes/{{notebookId}}';
+            if (type === 'todo.txt' && savedId) {
+                dest = `/notes/{{notebookId}}/${savedId}?type=todo`;
+            } else if (type === 'todo.txt') {
+                dest = '/notes/{{notebookId}}?tab=todos';
+            }
+            window.location.href = dest;
+        } catch (err) {
+            console.error('note save failed', err);
+            errorEl.style.display = '';
+            saveBtn.disabled = false;
         }
-
-        const form = new URLSearchParams();
-        form.append('text', encrypted);
-        form.append('notebook_id', '{{notebookId}}');
-        {{editAppend}}
-
-        await fetch('/note/update', {
-            method: 'POST',
-            body: form.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
-        });
-        window.location.href = '/notes/{{notebookId}}';
     };
 </script>
