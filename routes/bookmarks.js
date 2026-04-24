@@ -12,6 +12,8 @@ const BOOKMARKS_ADD_TAG = new URLPattern({ pathname: "/bookmarks/add-tag" });
 const BOOKMARKS_REMOVE_TAG = new URLPattern({ pathname: "/bookmarks/remove-tag" });
 const BOOKMARKS_NEW = new URLPattern({ pathname: "/bookmarks/new" });
 const BOOKMARKS_UNBOOKMARK = new URLPattern({ pathname: "/bookmarks/unbookmark" });
+const BOOKMARKS_POST_SELECTED = new URLPattern({ pathname: "/bookmarks/post-selected" });
+const BOOKMARKS_SET_TAGS = new URLPattern({ pathname: "/bookmarks/set-tags" });
 
 export async function tryHandle(req, ctx) {
     const { user, accessTokenValue } = ctx;
@@ -24,7 +26,7 @@ export async function tryHandle(req, ctx) {
     }
 
     if (HIGHLIGHTS_ROUTE.exec(req.url) && user) {
-        return new Response(await HighlightsTemplate(user, accessTokenValue), {
+        return new Response(await HighlightsTemplate(user, accessTokenValue, req), {
             status: 200,
             headers: { "content-type": "text/html" },
         });
@@ -156,16 +158,77 @@ export async function tryHandle(req, ctx) {
     if (BOOKMARKS_UNBOOKMARK.exec(req.url) && user) {
         const value = await req.formData();
         const id = value.get('id');
+        const wantsJson = new URL(req.url).searchParams.get('json') === '1'
+            || (req.headers.get('accept') || '').includes('application/json');
 
-        const posting = await fetch(`https://micro.blog/posts/bookmarks/${id}`, {
-            method: "DELETE",
-            headers: { "Authorization": "Bearer " + accessTokenValue }
-        });
-        if (!posting.ok) {
-            console.log(`${user.username} tried to unbookmark and ${await posting.text()}`);
+        let ok = true;
+        try {
+            const posting = await fetch(`https://micro.blog/posts/bookmarks/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": "Bearer " + accessTokenValue }
+            });
+            if (!posting.ok) {
+                ok = false;
+                console.log(`${user.username} tried to unbookmark ${id} and ${await posting.text()}`);
+            }
+        } catch (err) {
+            ok = false;
+            console.log(`${user.username} unbookmark ${id} fetch failed: ${err?.message || err}`);
+        }
+
+        if (wantsJson) {
+            return new Response(JSON.stringify({ ok }), {
+                status: ok ? 200 : 500,
+                headers: { 'content-type': 'application/json' }
+            });
         }
 
         return Response.redirect(new URL('/bookmarks', req.url).href, 303);
+    }
+
+    // Combine selected bookmark quotebacks into a post body, then auto-submit
+    // to /post — mirrors /notes/post-selected. Client sends selected[] as the
+    // already-quoteback-formatted HTML per bookmark.
+    if (BOOKMARKS_POST_SELECTED.exec(req.url) && user) {
+        const value = await req.formData();
+        const selected = value.getAll('selected[]');
+        const combined = selected.join('\n\n');
+        const escaped = combined.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return new Response(
+            `<!DOCTYPE html><html><body><form id="f" method="POST" action="/post"><textarea name="content" hidden>${escaped}</textarea></form><script>document.getElementById('f').submit()</script></body></html>`,
+            { status: 200, headers: { 'content-type': 'text/html' } }
+        );
+    }
+
+    // Replace the full tag list on a single bookmark. Called in parallel from
+    // the bulk "replace tags" modal; each invocation is one bookmark. Returns
+    // JSON so the client can report partial failures.
+    if (BOOKMARKS_SET_TAGS.exec(req.url) && user && user.plan == 'premium') {
+        const value = await req.formData();
+        const id = value.get('id');
+        const tags = value.get('tags') || '';
+
+        let ok = true;
+        try {
+            const formBody = new URLSearchParams();
+            formBody.append('tags', tags);
+            const posting = await fetch(`https://micro.blog/posts/bookmarks/${id}`, {
+                method: 'POST',
+                body: formBody.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Authorization': 'Bearer ' + accessTokenValue }
+            });
+            if (!posting.ok) {
+                ok = false;
+                console.log(`${user.username} set-tags on ${id} failed: ${await posting.text()}`);
+            }
+        } catch (err) {
+            ok = false;
+            console.log(`${user.username} set-tags on ${id} fetch failed: ${err?.message || err}`);
+        }
+        return new Response(JSON.stringify({ ok }), {
+            status: ok ? 200 : 500,
+            headers: { 'content-type': 'application/json' }
+        });
     }
 
     if (BOOKMARKS_UPDATE_TAGS.exec(req.url) && user) {

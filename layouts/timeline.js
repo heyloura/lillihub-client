@@ -104,8 +104,12 @@ export async function TimelineTemplate(user, token, req) {
                 // Send the page shell immediately — user sees nav + layout instantly
                 controller.enqueue(encoder.encode(HTMLPageStart(token, 'Timeline', user)));
 
-                // Stream each post in order as it resolves
+                // Stream each post in order as it resolves. A `.stream-dots`
+                // div is flushed before each await so it's visible during the
+                // gap; CSS (`:not(:last-child)`) auto-hides it the instant the
+                // next post appends after it. Pure HTML + CSS, no JS.
                 for (const promise of postPromises) {
+                    controller.enqueue(encoder.encode('<div class="stream-dots"></div>'));
                     let postHTML = await promise;
                     if (postHTML) {
                         // Apply replied highlight if needed

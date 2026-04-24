@@ -1,7 +1,7 @@
 // Auth flow routes — indieauth callback, password login, logout, and the
 // "already logged in" redirect for /login when there's already a session.
 import { HTMLPage } from "../layouts/templates.js";
-import { encryptMe, getCookieValue, parsePrefsCookie, buildPrefsCookie, prefsCookieExpiry } from "../scripts/server/utilities.js";
+import { encryptMe, getCookieValue, buildPrefsCookie, prefsCookieExpiry } from "../scripts/server/utilities.js";
 import { getMicroBlogLoggedInUser } from "../scripts/server/mb.js";
 import { SESSION } from "../scripts/server/session.js";
 
@@ -10,7 +10,7 @@ const LOGIN_ROUTE = new URLPattern({ pathname: "/login" });
 const LOGOUT_ROUTE = new URLPattern({ pathname: "/logout" });
 
 export async function tryHandle(req, ctx) {
-    const { user, accessToken, accessTokenValue } = ctx;
+    const { user, accessToken } = ctx;
 
     // Already-logged-in users hitting /login go straight to home.
     if (LOGIN_ROUTE.exec(req.url) && user) {
@@ -56,20 +56,16 @@ export async function tryHandle(req, ctx) {
                 const mbUser = await getMicroBlogLoggedInUser(response.access_token);
 
                 if (mbUser?.username && !mbUser.error) {
-                    const identity = { username: mbUser.username, name: mbUser.name, avatar: mbUser.avatar, plan: mbUser.plan };
-                    SESSION[encryptedToken] = identity;
-                    const authUser = { ...identity, lillihub: parsePrefsCookie(req) };
+                    SESSION[encryptedToken] = { username: mbUser.username, name: mbUser.name, avatar: mbUser.avatar, plan: mbUser.plan };
 
                     const expiresOn = prefsCookieExpiry();
-                    const headers = new Headers({ "content-type": "text/html" });
+                    const redirectTo = req.url.split('?')[0].replaceAll('/auth', '') || '/';
+                    const headers = new Headers({ "Location": redirectTo });
                     headers.append("set-cookie", `atoken=${encryptedToken};SameSite=Lax;Secure;HttpOnly;Expires=${expiresOn.toUTCString()};Path=/`);
                     if (!getCookieValue(req, 'lh_prefs')) {
                         headers.append("set-cookie", buildPrefsCookie({}, expiresOn));
                     }
-                    return new Response(
-                        await HTMLPage(response.access_token, `Redirect`, `<h3 style="text-align:center;" class="container mt-2">You have been logged in. Redirecting to your timeline</h3>`, authUser, req.url.split('?')[0].replaceAll('/auth', '')),
-                        { status: 200, headers }
-                    );
+                    return new Response(null, { status: 303, headers });
                 }
             }
         }
@@ -89,20 +85,16 @@ export async function tryHandle(req, ctx) {
         const mbUser = await getMicroBlogLoggedInUser(token);
 
         if (mbUser?.username && !mbUser.error) {
-            const identity = { username: mbUser.username, name: mbUser.name, avatar: mbUser.avatar, plan: mbUser.plan };
-            SESSION[encryptedToken] = identity;
-            const loginUser = { ...identity, lillihub: parsePrefsCookie(req) };
+            SESSION[encryptedToken] = { username: mbUser.username, name: mbUser.name, avatar: mbUser.avatar, plan: mbUser.plan };
 
             const expiresOn = prefsCookieExpiry();
-            const headers = new Headers({ "content-type": "text/html" });
+            const redirectTo = req.url.split('?')[0].replaceAll('/login', '') || '/';
+            const headers = new Headers({ "Location": redirectTo });
             headers.append("set-cookie", `atoken=${encryptedToken};SameSite=Lax;Secure;HttpOnly;Expires=${expiresOn.toUTCString()};Path=/`);
             if (!getCookieValue(req, 'lh_prefs')) {
                 headers.append("set-cookie", buildPrefsCookie({}, expiresOn));
             }
-            return new Response(
-                await HTMLPage(token, `Redirect`, `<h3 style="text-align:center;" class="container mt-2">You have been logged in. Redirecting to your timeline</h3>`, loginUser, req.url.split('?')[0].replaceAll('/login', '')),
-                { status: 200, headers }
-            );
+            return new Response(null, { status: 303, headers });
         }
 
         return new Response(await HTMLPage(null, `login`, `<h1>Login Error. Please try again.</h1>`), {
@@ -118,16 +110,16 @@ export async function tryHandle(req, ctx) {
         if (accessToken && SESSION[accessToken]) {
             delete SESSION[accessToken];
         }
-        return new Response(
-            await HTMLPage(null, `Logout`, `<h2>You have been logged out. Redirecting to homepage</h2>`, user, req.url.split('?')[0].replaceAll('/logout', '')),
-            {
-                status: 200,
-                headers: {
-                    "content-type": "text/html",
-                    "set-cookie": `atoken=undefined;SameSite=Lax;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT`
-                },
+        const redirectTo = req.url.split('?')[0].replaceAll('/logout', '') || '/';
+        return new Response(null, {
+            status: 303,
+            headers: {
+                "Location": redirectTo,
+                // Path=/ must match the original Set-Cookie Path so the browser
+                // actually overwrites (and therefore deletes) the cookie.
+                "set-cookie": `atoken=undefined;SameSite=Lax;Secure;HttpOnly;Expires=Thu, 01 Jan 1970 00:00:00 GMT;Path=/`
             }
-        );
+        });
     }
 
     return null;

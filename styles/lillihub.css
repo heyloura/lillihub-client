@@ -728,9 +728,9 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
 /* --- Bookmark cards --- */
 .bookmark-card {
     position: relative;
-    border: 1px solid var(--crust);
+    border-bottom: 1px solid var(--crust);
     border-radius: 0.5rem;
-    background: var(--bg-dark);
+    background: var(--bg-secondary);
     padding: 1rem 1.25rem;
     margin-top: 0.75rem;
 }
@@ -738,6 +738,20 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     position: absolute;
     top: 0.4rem;
     right: 0.4rem;
+}
+/* Multi-select checkbox on each bookmark card — mirrors .note-select. */
+.bookmark-select {
+    position: absolute;
+    left: 0.4rem;
+    top: 0.4rem;
+    cursor: pointer;
+    z-index: 1;
+}
+.bookmark-select-cb {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--area-accent);
+    cursor: pointer;
 }
 .bookmark-card-header {
     display: flex;
@@ -862,7 +876,7 @@ a[href^="http"]:not([href^="/"]) { text-decoration: underline; }
     top: 0.4rem;
     right: 0.4rem;
 }
-.highlight-text {
+.highlight-text, blockquote {
     border-left: 3px solid var(--area-accent);
     padding-left: 1rem;
     color: var(--text);
@@ -1872,9 +1886,36 @@ span.badge::after {
 }
 .toast-floating-close:hover { color: var(--text); }
 
+/* Streaming gap indicator — emitted between posts in the timeline stream
+   while the next post is fetched. `:not(:last-child)` auto-hides every
+   earlier instance the instant a real post appends after it, so the dots
+   only animate during an actual wait. Pure HTML + CSS, no JS. */
+.stream-dots {
+    padding: 0.6rem 0;
+    color: var(--overlay-1);
+    font-size: 1rem;
+    text-align: center;
+    line-height: 1;
+    letter-spacing: 0.3em;
+}
+.stream-dots:not(:last-child) { display: none; }
+.stream-dots::after {
+    content: "·";
+    /* Short initial delay reduces flashing when the next post resolves fast. */
+    animation: stream-dots 1.2s steps(4, end) 200ms infinite;
+}
+@keyframes stream-dots {
+    0%   { content: "·"; }
+    25%  { content: "· ·"; }
+    50%  { content: "· · ·"; }
+    75%  { content: "· ·"; }
+    100% { content: "·"; }
+}
+
 /* Keyboard-focused post card highlight (j/k navigation) */
 .card.kb-focus,
-.todo-item.kb-focus {
+.todo-item.kb-focus,
+.bookmark-card.kb-focus {
     outline: 2px solid var(--area-accent);
     outline-offset: 4px;
     border-radius: 0.5rem;
@@ -1903,8 +1944,33 @@ span.badge::after {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
+/* Tab strip at the top of the shortcuts dialog. Panels are shown one at a
+   time; the active one gets `data-active` via common.js. */
+.kb-help-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.25rem;
+}
+.kb-help-tabs button {
+    border: 0;
+    background: transparent;
+    color: var(--subtext-1);
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.kb-help-tabs button:hover { color: var(--text); }
+.kb-help-tabs button[data-active] {
+    background: color-mix(in srgb, var(--area-accent) 15%, transparent);
+    color: var(--text);
+}
+.kb-help-body section[data-kb-panel]:not([data-active]) { display: none; }
 .kb-help-header button {
     background: none;
     border: none;
@@ -2772,7 +2838,6 @@ pre {
     max-width: 100%;
 }
 blockquote {
-    border-left: 3px solid var(--mantle);
     padding-left: 1rem;
     color: var(--overlay-2);
     margin: 0.5rem 0;

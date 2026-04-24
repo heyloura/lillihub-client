@@ -165,10 +165,47 @@ document.addEventListener('keydown', function(e) {
         case '?': {
             e.preventDefault();
             var dlg = document.getElementById('kb-help');
-            if (dlg) dlg.open ? dlg.close() : dlg.showModal();
+            if (!dlg) break;
+            if (dlg.open) { dlg.close(); break; }
+            _kbHelpActivateTab(_kbHelpDefaultTab());
+            dlg.showModal();
             break;
         }
     }
+});
+
+// ---------------------------------------------------------------------------
+// Keyboard help dialog — tab strip wiring
+// ---------------------------------------------------------------------------
+function _kbHelpDefaultTab() {
+    var p = location.pathname;
+    var s = location.search || '';
+    if (s.indexOf('type=todo') !== -1) return 'todos';
+    if (p === '/feeds' || p.indexOf('/feeds/') === 0) return 'feeds';
+    if (p === '/bookmarks' || p === '/highlights' || p.indexOf('/bookmark') === 0) return 'bookmarks';
+    if (p === '/notes' || p.indexOf('/notes/') === 0 || p.indexOf('/notebook') === 0) return 'notes';
+    return 'timeline';
+}
+function _kbHelpActivateTab(name) {
+    var dlg = document.getElementById('kb-help');
+    if (!dlg) return;
+    var buttons = dlg.querySelectorAll('.kb-help-tabs button[data-kb-tab]');
+    var panels = dlg.querySelectorAll('.kb-help-body section[data-kb-panel]');
+    if (!buttons.length || !panels.length) return;
+    // Fall back to the first tab if the requested one isn't present.
+    var valid = [].some.call(buttons, function(b) { return b.dataset.kbTab === name; });
+    if (!valid) name = buttons[0].dataset.kbTab;
+    buttons.forEach(function(b) {
+        if (b.dataset.kbTab === name) b.setAttribute('data-active', ''); else b.removeAttribute('data-active');
+    });
+    panels.forEach(function(pnl) {
+        if (pnl.dataset.kbPanel === name) pnl.setAttribute('data-active', ''); else pnl.removeAttribute('data-active');
+    });
+}
+document.addEventListener('click', function(e) {
+    var tabBtn = e.target.closest && e.target.closest('.kb-help-tabs button[data-kb-tab]');
+    if (!tabBtn) return;
+    _kbHelpActivateTab(tabBtn.dataset.kbTab);
 });
 
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { formatDate } from "../scripts/server/utilities.js";
+import { formatDate, escapeHtml } from "../scripts/server/utilities.js";
 import { HTMLPage } from "./templates.js";
 
 const _bookmarkTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookmarks/_bookmark.html"));
@@ -94,7 +94,7 @@ export async function BookmarksTemplate(user, token, req) {
 
         const highlightCount = highlightMap.get(item.url) || 0;
         const contentHtml = highlightCount > 0
-            ? item.content_html.replace('Reader:', `<span class="chip bookmark-highlight-chip">${highlightCount} highlight${highlightCount > 1 ? 's' : ''}</span> Reader:`)
+            ? item.content_html.replace('Reader:', `<a class="chip bookmark-highlight-chip" href="/highlights?url=${encodeURIComponent(item.url)}" title="View highlights for this bookmark">${highlightCount} highlight${highlightCount > 1 ? 's' : ''}</a> Reader:`)
             : item.content_html;
 
         const quoteback = `<blockquote class="quoteback" data-author="${item.author.name}" data-avatar="${item.author.avatar}" cite="${item.url}">` +
@@ -109,6 +109,9 @@ export async function BookmarksTemplate(user, token, req) {
             .replaceAll('{{tagPills}}', tagPills)
             .replaceAll('{{tagAddDropdown}}', tagAddDropdown)
             .replaceAll('{{id}}', item.id)
+            .replaceAll('{{currentTagsCSV}}', escapeHtml(currentTagsCSV))
+            .replaceAll('{{bookmarkUrl}}', escapeHtml(item.url || ''))
+            .replaceAll('{{postContent}}', escapeHtml(quoteback))
             .replaceAll('{{postHref}}', `/post?content=${encodeURIComponent(quoteback)}`)
             .replaceAll('{{summary}}', item.summary ? _summaryTemplate.replaceAll('{{summary}}', item.summary) : '')
             .replaceAll('{{highlightCount}}', contentHtml);
@@ -129,6 +132,7 @@ export async function BookmarksTemplate(user, token, req) {
     const content = _bookmarksTemplate
         .replaceAll('{{tagChips}}', tagChips ? `<div class="bookmark-tags mt-2">${tagChips}</div>` : '')
         .replaceAll('{{q}}', q || '')
+        .replaceAll('{{isPremium}}', user.plan == 'premium' ? 'true' : 'false')
         .replaceAll('{{feed}}', feed)
         .replaceAll('{{loadAllLink}}', loadAllLink);
 
@@ -136,8 +140,61 @@ export async function BookmarksTemplate(user, token, req) {
 }
 
 // --- Highlights page ---
-export async function HighlightsTemplate(user, token) {
-    const highlights = await fetchAllHighlights(token);
+export async function HighlightsTemplate(user, token, req) {
+    const searchParams = req ? new URLSearchParams(req.url.split('?')[1]) : new URLSearchParams();
+    const urlFilter = searchParams.get('url') || '';
+    const tagFilter = searchParams.get('tag') || '';
+    const isPremium = user.plan === 'premium';
+    // URL filter is the more specific intent — if both are set, URL wins and
+    // the tag filter is ignored for this render.
+    const tagActive = !urlFilter && !!tagFilter && isPremium;
+
+    // Parallel: highlights + (premium) tag list + (filtering by tag) bookmarks-for-tag.
+    // Each conditional fetch resolves to a safe default so the destructuring
+    // below never trips on a missing value.
+    const highlightsPromise = fetchAllHighlights(token);
+    const tagsPromise = isPremium
+        ? fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + token } })
+            .then(r => r.json()).catch(() => [])
+        : Promise.resolve([]);
+    const bookmarksForTagPromise = tagActive
+        ? fetchBookmarks(token, tagFilter, true, user.username).catch(() => ({ items: [] }))
+        : Promise.resolve({ items: [] });
+
+    const [allHighlights, tagsJson, bookmarksForTag] = await Promise.all([
+        highlightsPromise, tagsPromise, bookmarksForTagPromise,
+    ]);
+    let highlights = allHighlights;
+    const allTags = Array.isArray(tagsJson) ? [...tagsJson].sort() : [];
+
+    // Tag chips toolbar — premium-only, hidden when there are no tags.
+    // `tagActive` (not just `tagFilter`) drives the "active" styling so the
+    // chips don't show a mismatched active pill when a URL filter is winning.
+    const tagChips = isPremium && allTags.length > 0
+        ? allTags.map(tag => {
+            const isActive = tagActive && tagFilter === tag;
+            return `<a class="chip ${isActive ? 'active' : ''}" href="/highlights${isActive ? '' : '?tag=' + encodeURIComponent(tag)}">${tag}${isActive ? ' <i class="bi bi-x-lg"></i>' : ''}</a>`;
+        }).join('')
+        : '';
+
+    // Filter banner: show which filter is active. URL filter wins over tag.
+    let filterBanner = '';
+    if (urlFilter) {
+        const filtered = highlights.filter(h => h.url === urlFilter);
+        const filterTitle = filtered[0]?.title || urlFilter;
+        filterBanner = `<p class="mt-2 mb-2" style="color:var(--overlay-1);font-size:0.9rem;">
+            <i class="bi bi-funnel"></i> Filtered to highlights from <strong>${escapeHtml(filterTitle)}</strong>
+            &middot; <a href="/highlights">clear</a>
+        </p>`;
+        highlights = filtered;
+    } else if (tagActive) {
+        const urlSet = new Set(bookmarksForTag.items.map(b => b.url));
+        highlights = highlights.filter(h => urlSet.has(h.url));
+        filterBanner = `<p class="mt-2 mb-2" style="color:var(--overlay-1);font-size:0.9rem;">
+            <i class="bi bi-funnel"></i> Filtered to tag <strong>${escapeHtml(tagFilter)}</strong>
+            &middot; <a href="/highlights">clear</a>
+        </p>`;
+    }
 
     const feed = highlights.map(h => {
         const blockquote = `> ${h.content_text}\n>\n> — [${h.title}]`;
@@ -151,7 +208,14 @@ export async function HighlightsTemplate(user, token) {
     }).join('');
 
     const hasItems = highlights.length > 0;
+    const isFiltered = !!(urlFilter || tagActive);
+    const emptyMessage = isFiltered
+        ? `<p class="mt-2" style="color:var(--overlay-1)">No highlights match this filter. <a href="/highlights">Clear</a> to see all.</p>`
+        : `<p class="mt-2" style="color:var(--overlay-1)">No highlights yet. Highlights are created in Micro.blog's Reader.</p>`;
     const content = _highlightsTemplate
+        .replaceAll('{{tagChips}}', tagChips ? `<div class="bookmark-tags mt-2">${tagChips}</div>` : '')
+        .replaceAll('{{filterBanner}}', filterBanner)
+        .replaceAll('{{emptyMessage}}', emptyMessage)
         .replaceAll('{{feed}}', feed)
         .replaceAll('{{count}}', String(highlights.length))
         .replaceAll('{{countPlural}}', highlights.length === 1 ? '' : 's')

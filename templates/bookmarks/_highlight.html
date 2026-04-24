@@ -1,7 +1,7 @@
 <div class="highlight-card">
     <a href="#" class="highlight-delete-js hide-if-user-has-no-javascript collection-photo-action" title="Delete" data-highlight-id="{{id}}" onclick="event.preventDefault();if(confirm('Delete this highlight?')){var f=document.createElement('form');f.method='POST';f.action='/highlights/delete';var i=document.createElement('input');i.type='hidden';i.name='id';i.value=this.dataset.highlightId;f.appendChild(i);document.body.appendChild(f);f.submit();}">&times;</a>
     <label class="highlight-select">
-        <input type="checkbox" name="selected[]" value="{{blockquoteRaw}}" class="highlight-checkbox" />
+        <input type="checkbox" name="selected[]" value="{{blockquoteRaw}}" class="highlight-checkbox" data-highlight-id="{{id}}" />
     </label>
     <blockquote class="highlight-text">{{contentText}}</blockquote>
     <div class="highlight-footer">

@@ -251,7 +251,7 @@ ${FabAction(area, title, context)}
                             <button type="button" class="theme-picker-btn" data-theme-choice="light"><i class="bi bi-sun"></i> Light</button>
                             <button type="button" class="theme-picker-btn" data-theme-choice="dark"><i class="bi bi-moon-stars"></i> Dark</button>
                         </li>
-                        <li class="hide-if-user-has-no-javascript"><a href="#" onclick="event.preventDefault();document.getElementById('kb-help').showModal()"><i class="bi bi-keyboard"></i> Keyboard shortcuts</a></li>
+                        <li class="hide-if-user-has-no-javascript"><a href="#" onclick="event.preventDefault();if(typeof _kbHelpActivateTab==='function')_kbHelpActivateTab(_kbHelpDefaultTab());document.getElementById('kb-help').showModal()"><i class="bi bi-keyboard"></i> Keyboard shortcuts</a></li>
                         <li><small>v2.0</small></li>
                         <li><small>Built with ♥ by <a href="https://heyloura.com">Loura</a></small></li>
                     </ul>
@@ -291,46 +291,67 @@ function _pageShellEnd(user) {
         <strong>Keyboard shortcuts</strong>
         <button type="button" onclick="this.closest('dialog').close()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
     </div>
+    <nav class="kb-help-tabs" role="tablist">
+        <button type="button" role="tab" data-kb-tab="timeline">Timeline</button>
+        <button type="button" role="tab" data-kb-tab="feeds">Feeds</button>
+        <button type="button" role="tab" data-kb-tab="bookmarks">Bookmarks</button>
+        <button type="button" role="tab" data-kb-tab="notes">Notes</button>
+        <button type="button" role="tab" data-kb-tab="todos">Todos</button>
+        <button type="button" role="tab" data-kb-tab="common">Common</button>
+    </nav>
     <div class="kb-help-body">
-        <h3>Navigation</h3>
-        <dl>
-            <dt><kbd>j</kbd></dt><dd>Next post</dd>
-            <dt><kbd>k</kbd></dt><dd>Previous post</dd>
-            <dt><kbd>o</kbd></dt><dd>Open post</dd>
-            <dt><kbd>r</kbd></dt><dd>Reply to post</dd>
-        </dl>
-        <h3>Feeds</h3>
-        <dl>
-            <dt><kbd>s</kbd></dt><dd>Open entry (to star)</dd>
-            <dt><kbd>m</kbd></dt><dd>Toggle read/unread</dd>
-        </dl>
-        <h3>Notes</h3>
-        <dl>
-            <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous note</dd>
-            <dt><kbd>Enter</kbd> / <kbd>o</kbd></dt><dd>Open focused note</dd>
-            <dt><kbd>x</kbd></dt><dd>Toggle selection on focused note</dd>
-            <dt><kbd>n</kbd></dt><dd>New note (or new todo list on todos tab)</dd>
-            <dt><kbd>/</kbd></dt><dd>Focus search</dd>
-        </dl>
-        <h3>Todos</h3>
-        <dl>
-            <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous task</dd>
-            <dt><kbd>Enter</kbd> / <kbd>Space</kbd></dt><dd>Toggle focused task</dd>
-            <dt><kbd>e</kbd></dt><dd>Edit focused task</dd>
-            <dt><kbd>n</kbd></dt><dd>Add task</dd>
-            <dt><kbd>r</kbd></dt><dd>Start round</dd>
-            <dt><kbd>c</kbd></dt><dd>Toggle show completed</dd>
-            <dt><kbd>/</kbd></dt><dd>Focus search</dd>
-        </dl>
-        <h3>Paging</h3>
-        <dl>
-            <dt><kbd>n</kbd></dt><dd>Next page</dd>
-            <dt><kbd>p</kbd></dt><dd>Previous page</dd>
-        </dl>
-        <h3>Other</h3>
-        <dl>
-            <dt><kbd>?</kbd></dt><dd>Toggle this help</dd>
-        </dl>
+        <section data-kb-panel="timeline">
+            <dl>
+                <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous post</dd>
+                <dt><kbd>Enter</kbd> / <kbd>o</kbd></dt><dd>Open focused post</dd>
+                <dt><kbd>r</kbd></dt><dd>Reply to focused post</dd>
+            </dl>
+        </section>
+        <section data-kb-panel="feeds">
+            <dl>
+                <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous entry</dd>
+                <dt><kbd>s</kbd></dt><dd>Open entry (to star)</dd>
+                <dt><kbd>m</kbd></dt><dd>Toggle read / unread</dd>
+            </dl>
+        </section>
+        <section data-kb-panel="bookmarks">
+            <dl>
+                <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous bookmark</dd>
+                <dt><kbd>Enter</kbd> / <kbd>o</kbd></dt><dd>Open bookmarked URL in a new tab</dd>
+                <dt><kbd>p</kbd></dt><dd>Post focused bookmark (quoteback)</dd>
+                <dt><kbd>x</kbd></dt><dd>Toggle selection on focused bookmark</dd>
+                <dt><kbd>d</kbd></dt><dd>Delete focused bookmark</dd>
+                <dt><kbd>n</kbd></dt><dd>New bookmark</dd>
+                <dt><kbd>/</kbd></dt><dd>Focus search</dd>
+            </dl>
+        </section>
+        <section data-kb-panel="notes">
+            <dl>
+                <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous note</dd>
+                <dt><kbd>Enter</kbd> / <kbd>o</kbd></dt><dd>Open focused note</dd>
+                <dt><kbd>x</kbd></dt><dd>Toggle selection on focused note</dd>
+                <dt><kbd>n</kbd></dt><dd>New note (or new todo list on todos tab)</dd>
+                <dt><kbd>/</kbd></dt><dd>Focus search</dd>
+            </dl>
+        </section>
+        <section data-kb-panel="todos">
+            <dl>
+                <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>Next / previous task</dd>
+                <dt><kbd>Enter</kbd> / <kbd>Space</kbd></dt><dd>Toggle focused task</dd>
+                <dt><kbd>e</kbd></dt><dd>Edit focused task</dd>
+                <dt><kbd>n</kbd></dt><dd>Add task</dd>
+                <dt><kbd>r</kbd></dt><dd>Start round</dd>
+                <dt><kbd>c</kbd></dt><dd>Toggle show completed</dd>
+                <dt><kbd>/</kbd></dt><dd>Focus search</dd>
+            </dl>
+        </section>
+        <section data-kb-panel="common">
+            <dl>
+                <dt><kbd>?</kbd></dt><dd>Toggle this help</dd>
+                <dt><kbd>n</kbd></dt><dd>Next page (on paged lists)</dd>
+                <dt><kbd>p</kbd></dt><dd>Previous page (on paged lists)</dd>
+            </dl>
+        </section>
     </div>
 </dialog>
 

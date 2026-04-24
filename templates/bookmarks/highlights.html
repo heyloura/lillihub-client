@@ -1,4 +1,6 @@
 <div class="container">
+    {{tagChips}}
+    {{filterBanner}}
     {{#hasItems}}
     <div class="blog-toolbar mt-2 mb-2">
         <div class="input-group hide-if-user-has-no-javascript">
@@ -14,6 +16,7 @@
             </label>
             <span class="blog-toolbar-spacer"></span>
             <small class="highlight-count hide-if-user-has-no-javascript">{{count}} highlight{{countPlural}}</small>
+            <button type="button" class="btn btn-glossy btn-sm hide-if-user-has-no-javascript" id="delete-selected-highlights"><i class="bi bi-trash"></i> Delete</button>
             <button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-pencil-square"></i> Post selected</button>
         </div>
 
@@ -22,6 +25,45 @@
     {{/hasItems}}
 
     {{#empty}}
-    <p class="mt-2" style="color:var(--overlay-1)">No highlights yet. Highlights are created in Micro.blog's Reader.</p>
+    {{emptyMessage}}
     {{/empty}}
 </div>
+
+<script>
+(function() {
+    const btn = document.getElementById('delete-selected-highlights');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+        const checked = document.querySelectorAll('.highlight-checkbox:checked');
+        if (!checked.length) return;
+        if (!confirm(`Delete ${checked.length} highlight${checked.length > 1 ? 's' : ''}?`)) return;
+        btn.disabled = true;
+        try {
+            const results = await Promise.all([...checked].map(cb => {
+                const id = cb.dataset.highlightId;
+                if (!id) return Promise.resolve({ ok: false, cb });
+                const form = new URLSearchParams();
+                form.append('id', id);
+                return fetch('/highlights/delete', {
+                    method: 'POST',
+                    body: form.toString(),
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
+                }).then(res => ({ ok: res.ok && !res.url?.includes('error='), cb }), () => ({ ok: false, cb }));
+            }));
+            let failed = 0;
+            for (const r of results) {
+                if (r.ok) r.cb.closest('.highlight-card')?.remove();
+                else failed++;
+            }
+            const selectAll = document.getElementById('highlight-select-all-cb');
+            if (selectAll) selectAll.checked = false;
+            const remaining = document.querySelectorAll('.highlight-card').length;
+            const countEl = document.querySelector('.highlight-count');
+            if (countEl) countEl.textContent = `${remaining} highlight${remaining !== 1 ? 's' : ''}`;
+            if (failed) alert(`${failed} highlight${failed > 1 ? 's' : ''} could not be deleted.`);
+        } finally {
+            btn.disabled = false;
+        }
+    });
+})();
+</script>

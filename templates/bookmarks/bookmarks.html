@@ -1,14 +1,274 @@
 <div class="container bookmarks">
     <div class="blog-toolbar mb-2 mt-2">
+        {{tagChips}}
+    </div>
+    <div class="blog-toolbar mb-2 mt-2">
         <form method="GET" action="/bookmarks">
             <div class="input-group">
                 <input autocomplete="off" type="search" name="q" value="{{q}}" class="form-input" placeholder="Search bookmarks..." />
                 <button type="submit" class="btn btn-glossy"><i class="bi bi-search"></i></button>
             </div>
         </form>
-        {{tagChips}}
     </div>
+
+    <div class="notes-select-toolbar mb-2 hide-if-user-has-no-javascript" id="bookmarks-select-toolbar" style="display:none;">
+        <label class="highlight-select-all">
+            <input type="checkbox" id="bookmark-select-all-cb" /> <small>Select all</small>
+        </label>
+        <span class="blog-toolbar-spacer"></span>
+        <button type="button" class="btn btn-glossy btn-sm" id="bookmarks-post-selected-btn" style="display:none;"><i class="bi bi-pencil-square"></i> Post</button>
+        <button type="button" class="btn btn-glossy btn-sm" id="bookmarks-tags-selected-btn" style="display:none;"><i class="bi bi-tags"></i> Edit tags</button>
+        <button type="button" class="btn btn-glossy btn-sm" id="bookmarks-delete-selected-btn" style="display:none;"><i class="bi bi-trash"></i> Delete</button>
+    </div>
+    <form id="bookmarks-post-form" method="POST" action="/bookmarks/post-selected" style="display:none;"></form>
+
+    <dialog id="bookmark-bulk-tags-dialog" class="hide-if-user-has-no-javascript" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid var(--border);border-radius:6px;padding:1rem;max-width:480px;width:90%;background:var(--base);color:var(--text);">
+        <form id="bookmark-bulk-tags-form">
+            <h5 style="margin-top:0;">Replace tags</h5>
+            <p style="font-size:0.85rem;color:var(--overlay-1);" id="bookmark-bulk-tags-message">
+                The tags below will become the complete tag list for each selected bookmark. Anything not listed here will be removed.
+            </p>
+            <input id="bookmark-bulk-tags-input" class="form-input" type="text" placeholder="Tags (comma separated)">
+            <div class="mt-2" style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                <button type="button" class="btn btn-sm" id="bookmark-bulk-tags-cancel">Cancel</button>
+                <button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-check-lg"></i> Apply</button>
+            </div>
+        </form>
+    </dialog>
 
     {{feed}}
     {{loadAllLink}}
 </div>
+
+<script>
+(function() {
+    const isPremium = '{{isPremium}}' === 'true';
+    const toolbar = document.getElementById('bookmarks-select-toolbar');
+    if (!toolbar) return;
+    toolbar.style.display = '';
+
+    const selectAll = document.getElementById('bookmark-select-all-cb');
+    const postBtn = document.getElementById('bookmarks-post-selected-btn');
+    const tagsBtn = document.getElementById('bookmarks-tags-selected-btn');
+    const deleteBtn = document.getElementById('bookmarks-delete-selected-btn');
+
+    function getSelectedCards() {
+        return [...document.querySelectorAll('.bookmark-card')].filter(card => {
+            if (card.style.display === 'none') return false;
+            const cb = card.querySelector('.bookmark-select-cb');
+            return cb && cb.checked;
+        });
+    }
+
+    function updateVisibility() {
+        const any = !!document.querySelector('.bookmark-card:not([style*="display: none"]) .bookmark-select-cb:checked');
+        const d = any ? '' : 'none';
+        postBtn.style.display = d;
+        deleteBtn.style.display = d;
+        // Tag editing is premium-only; hide the button entirely for free users
+        // so they don't see an inert control.
+        tagsBtn.style.display = (any && isPremium) ? '' : 'none';
+    }
+
+    selectAll.addEventListener('change', () => {
+        document.querySelectorAll('.bookmark-card').forEach(card => {
+            if (card.style.display === 'none') return;
+            const cb = card.querySelector('.bookmark-select-cb');
+            if (cb) cb.checked = selectAll.checked;
+        });
+        updateVisibility();
+    });
+
+    document.addEventListener('change', (e) => {
+        if (e.target?.classList?.contains('bookmark-select-cb')) updateVisibility();
+    });
+
+    // --- Multi-post: collect each card's pre-rendered quoteback and submit
+    // through /bookmarks/post-selected (server joins them + auto-submits to /post).
+    postBtn.addEventListener('click', () => {
+        const cards = getSelectedCards();
+        if (!cards.length) return;
+        const form = document.getElementById('bookmarks-post-form');
+        form.innerHTML = '';
+        for (const card of cards) {
+            const content = card.getAttribute('data-post-content') || '';
+            if (!content) continue;
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'selected[]';
+            input.value = content;
+            form.appendChild(input);
+        }
+        form.submit();
+    });
+
+    // --- Multi-delete: Promise.all of /bookmarks/unbookmark?json=1 calls.
+    deleteBtn.addEventListener('click', async () => {
+        const cards = getSelectedCards();
+        if (!cards.length) return;
+        if (!confirm(`Delete ${cards.length} bookmark${cards.length > 1 ? 's' : ''}?`)) return;
+        deleteBtn.disabled = true;
+        try {
+            const results = await Promise.all(cards.map(card => {
+                const id = card.getAttribute('data-bookmark-id');
+                if (!id) return Promise.resolve({ ok: false, card });
+                const form = new URLSearchParams();
+                form.append('id', id);
+                return fetch('/bookmarks/unbookmark?json=1', {
+                    method: 'POST',
+                    body: form.toString(),
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Accept': 'application/json' }
+                }).then(res => res.json().then(j => ({ ok: !!j.ok, card })), () => ({ ok: false, card }));
+            }));
+            let failed = 0;
+            for (const r of results) {
+                if (r.ok) r.card.remove();
+                else failed++;
+            }
+            selectAll.checked = false;
+            updateVisibility();
+            if (failed) alert(`${failed} bookmark${failed > 1 ? 's' : ''} could not be deleted.`);
+        } finally {
+            deleteBtn.disabled = false;
+        }
+    });
+
+    // --- Multi-tag replace ---
+    if (isPremium) {
+        const dialog = document.getElementById('bookmark-bulk-tags-dialog');
+        const input = document.getElementById('bookmark-bulk-tags-input');
+        const message = document.getElementById('bookmark-bulk-tags-message');
+        const form = document.getElementById('bookmark-bulk-tags-form');
+
+        tagsBtn.addEventListener('click', () => {
+            const cards = getSelectedCards();
+            if (!cards.length) return;
+            const union = new Set();
+            for (const card of cards) {
+                const csv = card.getAttribute('data-tags') || '';
+                for (const t of csv.split(',').map(t => t.trim()).filter(Boolean)) union.add(t);
+            }
+            input.value = [...union].join(', ');
+            message.textContent = `The tags below will become the complete tag list for each of the ${cards.length} selected bookmark${cards.length > 1 ? 's' : ''}. Anything not listed here will be removed.`;
+            dialog.showModal();
+            setTimeout(() => input.focus(), 50);
+        });
+
+        document.getElementById('bookmark-bulk-tags-cancel').addEventListener('click', () => dialog.close());
+        dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const cards = getSelectedCards();
+            if (!cards.length) { dialog.close(); return; }
+            const csv = input.value.split(',').map(t => t.trim()).filter(Boolean).join(',');
+
+            submitBtn.disabled = true;
+            try {
+                const results = await Promise.all(cards.map(async (card) => {
+                    const id = card.getAttribute('data-bookmark-id');
+                    if (!id) return { ok: false, card };
+                    const body = new URLSearchParams();
+                    body.append('id', id);
+                    body.append('tags', csv);
+                    try {
+                        const res = await fetch('/bookmarks/set-tags', {
+                            method: 'POST',
+                            body: body.toString(),
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Accept': 'application/json' }
+                        });
+                        const j = await res.json().catch(() => ({}));
+                        return { ok: !!j.ok, card, csv };
+                    } catch {
+                        return { ok: false, card };
+                    }
+                }));
+
+                // Update the DOM for successfully-updated cards so the next bulk
+                // op sees the new state and the visible chip pills refresh.
+                const tagList = csv ? csv.split(',') : [];
+                const pillsHtml = tagList.map(t => `<span class="chip bookmark-tag-chip">${t}</span>`).join('');
+                for (const r of results) {
+                    if (!r.ok) continue;
+                    r.card.setAttribute('data-tags', csv);
+                    const container = r.card.querySelector('.bookmark-card-tags');
+                    if (container) {
+                        // Preserve the add-tag dropdown (last child); replace pill chips.
+                        const addForm = container.querySelector('.bookmark-add-tag-form');
+                        container.innerHTML = pillsHtml;
+                        if (addForm) container.appendChild(addForm);
+                    }
+                }
+                const failed = results.filter(r => !r.ok).length;
+                dialog.close();
+                if (failed) alert(`Tags updated on ${results.length - failed} of ${results.length} bookmarks. ${failed} failed.`);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    // --- Keyboard shortcuts (bookmarks page only) ---
+    // j/k focus, Enter/o open URL, p post, x select, d delete, n new, / search.
+    // The global common.js j/k handler keys off `.content > .card`; bookmark
+    // cards live deeper, so we own navigation here.
+    let _bkKbIdx = -1;
+    function _visibleBookmarkCards() {
+        return [...document.querySelectorAll('.bookmark-card')].filter(c => c.style.display !== 'none');
+    }
+    function _focusBookmarkCard(idx) {
+        const cards = _visibleBookmarkCards();
+        if (!cards.length) return;
+        document.querySelectorAll('.bookmark-card.kb-focus').forEach(c => c.classList.remove('kb-focus'));
+        if (idx < 0) idx = 0;
+        if (idx >= cards.length) idx = cards.length - 1;
+        _bkKbIdx = idx;
+        cards[idx].classList.add('kb-focus');
+        cards[idx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.target.matches('input, textarea, select, [contenteditable]')) return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const cards = _visibleBookmarkCards();
+        const current = _bkKbIdx >= 0 ? cards[_bkKbIdx] : null;
+        switch (e.key) {
+            case 'j': if (cards.length) { e.preventDefault(); _focusBookmarkCard(_bkKbIdx + 1); } break;
+            case 'k': if (cards.length) { e.preventDefault(); _focusBookmarkCard(_bkKbIdx - 1); } break;
+            case 'o':
+            case 'Enter': {
+                if (current) {
+                    const url = current.getAttribute('data-bookmark-url');
+                    if (url) { e.preventDefault(); window.open(url, '_blank', 'noopener,noreferrer'); }
+                }
+                break;
+            }
+            case 'p': {
+                if (current) {
+                    const content = current.getAttribute('data-post-content');
+                    if (content) { e.preventDefault(); window.location.href = '/post?content=' + encodeURIComponent(content); }
+                }
+                break;
+            }
+            case 'x': {
+                if (current) {
+                    e.preventDefault();
+                    const cb = current.querySelector('.bookmark-select-cb');
+                    if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); }
+                }
+                break;
+            }
+            case 'd': {
+                if (current) {
+                    e.preventDefault();
+                    const delLink = current.querySelector('.bookmark-delete-js');
+                    if (delLink) delLink.click();
+                }
+                break;
+            }
+            case 'n': e.preventDefault(); window.location.href = '/bookmark/new'; break;
+            case '/': e.preventDefault(); document.querySelector('input[name="q"]')?.focus(); break;
+        }
+    });
+})();
+</script>

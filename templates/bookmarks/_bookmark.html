@@ -1,4 +1,5 @@
-<div class="bookmark-card">
+<div class="bookmark-card" data-bookmark-id="{{id}}" data-bookmark-url="{{bookmarkUrl}}" data-tags="{{currentTagsCSV}}" data-post-content="{{postContent}}">
+    <label class="bookmark-select hide-if-user-has-no-javascript"><input type="checkbox" class="bookmark-select-cb" /></label>
     <a href="#" class="bookmark-delete-js hide-if-user-has-no-javascript collection-photo-action" title="Delete" data-bookmark-id="{{id}}" onclick="event.preventDefault();if(confirm('Remove this bookmark?')){var f=document.createElement('form');f.method='POST';f.action='/bookmarks/unbookmark';var i=document.createElement('input');i.type='hidden';i.name='id';i.value=this.dataset.bookmarkId;f.appendChild(i);document.body.appendChild(f);f.submit();}">&times;</a>
     <div class="bookmark-card-header">
         <figure class="avatar avatar-sm"><img loading="lazy" src="{{avatar}}" alt="Avatar" height="32" width="32"></figure>
