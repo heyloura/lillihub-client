@@ -1,4 +1,4 @@
-import { formatDate, escapeHtml } from "../scripts/server/utilities.js";
+import { formatDate, escapeHtml, safeUrl, errorBanner } from "../scripts/server/utilities.js";
 import { HTMLPage } from "./templates.js";
 
 const _bookmarkTemplate = new TextDecoder().decode(await Deno.readFile("templates/bookmarks/_bookmark.html"));
@@ -65,55 +65,74 @@ export async function BookmarksTemplate(user, token, req) {
         const itemTags = item.tags ? item.tags.split(',').filter(t => t) : [];
         const currentTagsCSV = itemTags.join(',');
 
-        // Removable tag pills
+        const currentTagsCSVAttr = escapeHtml(currentTagsCSV);
+
+        // Removable tag pills. Tags are user-authored — escape every
+        // interpolation into text + attribute context, and move confirm()
+        // from inline onclick (where the tag would be concatenated into a
+        // JS string literal — classic XSS) to an onsubmit on the form.
         const tagPills = user.plan == 'premium' && itemTags.length > 0
-            ? itemTags.map(tag =>
-                `<span class="chip bookmark-tag-chip">${tag}<form method="POST" action="/bookmarks/remove-tag" style="display:inline">` +
-                `<input type="hidden" name="id" value="${item.id}" />` +
-                `<input type="hidden" name="tag" value="${tag}" />` +
-                `<input type="hidden" name="currentTags" value="${currentTagsCSV}" />` +
-                `<button type="submit" class="bookmark-tag-remove" title="Remove tag" onclick="return confirm('Remove tag: ${tag}?')"><i class="bi bi-x"></i></button>` +
-                `</form></span>`
-            ).join('')
-            : itemTags.map(tag => `<span class="chip bookmark-tag-chip">${tag}</span>`).join('');
+            ? itemTags.map(tag => {
+                const eTag = escapeHtml(tag);
+                return `<span class="chip bookmark-tag-chip">${eTag}<form method="POST" action="/bookmarks/remove-tag" style="display:inline" onsubmit="return confirm('Remove this tag?')">` +
+                    `<input type="hidden" name="id" value="${item.id}" />` +
+                    `<input type="hidden" name="tag" value="${eTag}" />` +
+                    `<input type="hidden" name="currentTags" value="${currentTagsCSVAttr}" />` +
+                    `<button type="submit" class="bookmark-tag-remove" title="Remove tag"><i class="bi bi-x"></i></button>` +
+                    `</form></span>`;
+            }).join('')
+            : itemTags.map(tag => `<span class="chip bookmark-tag-chip">${escapeHtml(tag)}</span>`).join('');
 
         // Add-tag dropdown — shows tags not already on this bookmark
         let tagAddDropdown = '';
         if (user.plan == 'premium') {
             const availableTags = allTags.filter(t => !itemTags.includes(t));
             const datalistId = `tags-${item.id}`;
-            const opts = availableTags.map(t => `<option value="${t}">`).join('');
+            const opts = availableTags.map(t => `<option value="${escapeHtml(t)}">`).join('');
             tagAddDropdown = `<form method="POST" action="/bookmarks/add-tag" class="bookmark-add-tag-form">` +
                 `<input type="hidden" name="id" value="${item.id}" />` +
-                `<input type="hidden" name="currentTags" value="${currentTagsCSV}" />` +
+                `<input type="hidden" name="currentTags" value="${currentTagsCSVAttr}" />` +
                 `<input type="text" name="tag" list="${datalistId}" class="form-input bookmark-add-tag-input" placeholder="Add tag\u2026" required />` +
                 `<datalist id="${datalistId}">${opts}</datalist>` +
                 `<button type="submit" class="btn btn-glossy btn-sm"><i class="bi bi-plus"></i></button>` +
                 `</form>`;
         }
 
+        // Validate URL scheme so a crafted bookmark can't smuggle
+        // `javascript:...` into href / cite / other executable attribute
+        // contexts. safeUrl returns '' for anything non-http(s).
+        const url = safeUrl(item.url);
+        const eUrl = escapeHtml(url);
+        const eHost = escapeHtml(url.replace(/^https?:\/\//, '').split('/')[0]);
+        const eName = escapeHtml(item.author?.name || '');
+        const eAvatar = escapeHtml(safeUrl(item.author?.avatar));
+
         const highlightCount = highlightMap.get(item.url) || 0;
+        // `content_html` is already sanitized via sanitizeHTML upstream.
         const contentHtml = highlightCount > 0
-            ? item.content_html.replace('Reader:', `<a class="chip bookmark-highlight-chip" href="/highlights?url=${encodeURIComponent(item.url)}" title="View highlights for this bookmark">${highlightCount} highlight${highlightCount > 1 ? 's' : ''}</a> Reader:`)
+            ? item.content_html.replace('Reader:', `<a class="chip bookmark-highlight-chip" href="/highlights?url=${encodeURIComponent(url)}" title="View highlights for this bookmark">${highlightCount} highlight${highlightCount > 1 ? 's' : ''}</a> Reader:`)
             : item.content_html;
 
-        const quoteback = `<blockquote class="quoteback" data-author="${item.author.name}" data-avatar="${item.author.avatar}" cite="${item.url}">` +
-            `<p>${item.author.name} <a href="${item.url}">${item.url.replace(/^https?:\/\//, '').split('/')[0]}</a></p>` +
-            `<footer>${item.author.name} <cite><a href="${item.url}" class="u-in-reply-to">${item.url}</a></cite></footer>` +
+        // Quoteback is embedded in the post editor via postHref and surfaces
+        // into the user's own blog posts via multi-post — XSS here has real
+        // downstream blast radius. Escape every user-controlled field.
+        const quoteback = `<blockquote class="quoteback" data-author="${eName}" data-avatar="${eAvatar}" cite="${eUrl}">` +
+            `<p>${eName} <a href="${eUrl}">${eHost}</a></p>` +
+            `<footer>${eName} <cite><a href="${eUrl}" class="u-in-reply-to">${eUrl}</a></cite></footer>` +
             `</blockquote>`;
 
         return _bookmarkTemplate
-            .replaceAll('{{avatar}}', item.author.avatar)
-            .replaceAll('{{name}}', item.author.name)
+            .replaceAll('{{avatar}}', eAvatar)
+            .replaceAll('{{name}}', eName)
             .replaceAll('{{formattedDate}}', formatDate(item.date_published))
             .replaceAll('{{tagPills}}', tagPills)
             .replaceAll('{{tagAddDropdown}}', tagAddDropdown)
             .replaceAll('{{id}}', item.id)
-            .replaceAll('{{currentTagsCSV}}', escapeHtml(currentTagsCSV))
-            .replaceAll('{{bookmarkUrl}}', escapeHtml(item.url || ''))
+            .replaceAll('{{currentTagsCSV}}', currentTagsCSVAttr)
+            .replaceAll('{{bookmarkUrl}}', eUrl)
             .replaceAll('{{postContent}}', escapeHtml(quoteback))
             .replaceAll('{{postHref}}', `/post?content=${encodeURIComponent(quoteback)}`)
-            .replaceAll('{{summary}}', item.summary ? _summaryTemplate.replaceAll('{{summary}}', item.summary) : '')
+            .replaceAll('{{summary}}', item.summary ? _summaryTemplate.replaceAll('{{summary}}', escapeHtml(item.summary)) : '')
             .replaceAll('{{highlightCount}}', contentHtml);
     }).join('');
 
@@ -129,7 +148,9 @@ export async function BookmarksTemplate(user, token, req) {
         loadAllLink = `<div class="paging mt-2"><small>No more bookmarks found.</small></div>`;
     }
 
+    const banner = errorBanner(searchParams.get('error'), '/bookmarks');
     const content = _bookmarksTemplate
+        .replaceAll('{{errorBanner}}', banner)
         .replaceAll('{{tagChips}}', tagChips ? `<div class="bookmark-tags mt-2">${tagChips}</div>` : '')
         .replaceAll('{{q}}', q || '')
         .replaceAll('{{isPremium}}', user.plan == 'premium' ? 'true' : 'false')
@@ -197,14 +218,16 @@ export async function HighlightsTemplate(user, token, req) {
     }
 
     const feed = highlights.map(h => {
+        // Raw markdown form (used as-is in the post-selected flow and as
+        // the value of data-md for the copy-to-clipboard button).
         const blockquote = `> ${h.content_text}\n>\n> — [${h.title}]`;
         return _highlightTemplate
             .replaceAll('{{id}}', h.id)
-            .replaceAll('{{contentText}}', h.content_text)
-            .replaceAll('{{title}}', h.title || 'Untitled')
+            .replaceAll('{{contentText}}', escapeHtml(h.content_text))
+            .replaceAll('{{title}}', escapeHtml(h.title || 'Untitled'))
             .replaceAll('{{formattedDate}}', formatDate(h.date_published, 'short'))
             .replaceAll('{{blockquoteEncoded}}', encodeURIComponent(blockquote))
-            .replaceAll('{{blockquoteRaw}}', blockquote.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+            .replaceAll('{{blockquoteRaw}}', escapeHtml(blockquote));
     }).join('');
 
     const hasItems = highlights.length > 0;
@@ -237,13 +260,14 @@ async function fetchBookmarks(token, tagParam, fetchAll, username) {
     let newBookmarkId = -1;
     let i = 0;
 
+    const encTag = tagParam ? encodeURIComponent(tagParam) : '';
     while(bookmarkId != newBookmarkId && i < 1000) {
         let params = '';
         if(bookmarkId == 0) {
-            if(tagParam) params = `?tag=${tagParam}`;
+            if(tagParam) params = `?tag=${encTag}`;
         } else {
             params = `?before_id=${items[items.length - 1].id}`;
-            if(tagParam) params += `&tag=${tagParam}`;
+            if(tagParam) params += `&tag=${encTag}`;
         }
         let results;
         try {

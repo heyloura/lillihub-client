@@ -345,13 +345,23 @@
                         }).then(res => ({ ok: !res.url?.includes('error='), card }), () => ({ ok: false, card }));
                     }));
                     let failed = 0;
+                    const failedCards = [];
                     for (const r of results) {
                         if (r.ok) r.card.remove();
-                        else failed++;
+                        else {
+                            failed++;
+                            r.card.classList.add('op-failed');
+                            failedCards.push(r.card);
+                        }
                     }
                     document.getElementById('note-select-all-cb').checked = false;
                     updatePostBtnVisibility();
-                    if (failed) alert(`${failed} note${failed > 1 ? 's' : ''} could not be deleted.`);
+                    // Removing cards shifts indices — reset keyboard focus.
+                    _noteKbIdx = -1;
+                    if (failedCards.length) {
+                        setTimeout(() => failedCards.forEach(c => c.classList.remove('op-failed')), 6000);
+                    }
+                    if (failed) alert(`${failed} note${failed > 1 ? 's' : ''} could not be deleted. The failed item${failed > 1 ? 's are' : ' is'} highlighted.`);
                 } finally {
                     deleteSelectedBtn.disabled = false;
                 }
@@ -414,13 +424,15 @@
                 const csv = bulkTagsInput.value.split(',').map(t => t.trim()).filter(Boolean).join(',');
 
                 submitBtn.disabled = true;
+                const originalMessage = bulkTagsMessage.textContent;
+                bulkTagsMessage.textContent = `Applying tags to ${cards.length} note${cards.length > 1 ? 's' : ''}…`;
                 try {
                     const results = await Promise.all(cards.map(async (card) => {
                         try {
                             const noteEl = card.querySelector('.note');
                             const id = noteEl?.getAttribute('data-note-id');
                             const md = noteEl?.getAttribute('data-markdown') || '';
-                            if (!id) return { ok: false };
+                            if (!id) return { ok: false, card };
                             const updated = writeTagsIntoMarkdown(md, csv);
                             const encrypted = await encryptWithKey(key, updated);
                             const form = new URLSearchParams();
@@ -432,19 +444,25 @@
                                 body: form.toString(),
                                 headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
                             });
-                            if (!res.ok) return { ok: false };
+                            if (!res.ok) return { ok: false, card };
                             // Update DOM + data-markdown so further bulk ops see the new state.
                             noteEl.setAttribute('data-markdown', updated);
                             const tags = csv ? csv.split(',').map(t => t.trim()).filter(Boolean) : [];
                             card.querySelector('.tags').innerHTML = tags.map(t => `<span class="chip">#${t}</span>`).join('');
-                            return { ok: true };
+                            return { ok: true, card };
                         } catch {
-                            return { ok: false };
+                            return { ok: false, card };
                         }
                     }));
-                    const failed = results.filter(r => !r.ok).length;
+                    const failedCards = results.filter(r => !r.ok).map(r => r.card).filter(Boolean);
+                    for (const c of failedCards) c.classList.add('op-failed');
+                    if (failedCards.length) {
+                        setTimeout(() => failedCards.forEach(c => c.classList.remove('op-failed')), 6000);
+                    }
+                    const failed = failedCards.length;
                     bulkTagsDialog.close();
-                    if (failed) alert(`Tags updated on ${results.length - failed} of ${results.length} notes. ${failed} failed.`);
+                    bulkTagsMessage.textContent = originalMessage;
+                    if (failed) alert(`Tags updated on ${results.length - failed} of ${results.length} notes. ${failed} failed and ${failed > 1 ? 'are' : 'is'} highlighted.`);
                 } finally {
                     submitBtn.disabled = false;
                 }

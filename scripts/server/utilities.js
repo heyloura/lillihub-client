@@ -119,6 +119,16 @@ export function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
+// Return the URL if it's a safe http(s) absolute URL, otherwise an empty
+// string. Use before dropping user-influenced URLs into href/src/cite so
+// `javascript:` / `data:` / etc. can't sneak into executable attribute
+// contexts even if upstream sanitization slips. Caller still needs to
+// escapeHtml the result for the attribute quote.
+export function safeUrl(url) {
+    const s = String(url ?? '').trim();
+    return /^https?:\/\//i.test(s) ? s : '';
+}
+
 export function formatDate(dateStr, style = 'long') {
     try {
         const d = new Date(dateStr);

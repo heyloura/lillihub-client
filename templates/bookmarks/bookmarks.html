@@ -1,4 +1,5 @@
 <div class="container bookmarks">
+    {{errorBanner}}
     <div class="blog-toolbar mb-2 mt-2">
         {{tagChips}}
     </div>
@@ -46,6 +47,17 @@
     const toolbar = document.getElementById('bookmarks-select-toolbar');
     if (!toolbar) return;
     toolbar.style.display = '';
+
+    // Client-side HTML escape — used when rebuilding tag-pill markup from
+    // user input after a bulk tag replace. Mirrors server-side escapeHtml.
+    function escapeHtmlJs(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
     const selectAll = document.getElementById('bookmark-select-all-cb');
     const postBtn = document.getElementById('bookmarks-post-selected-btn');
@@ -109,25 +121,45 @@
         if (!confirm(`Delete ${cards.length} bookmark${cards.length > 1 ? 's' : ''}?`)) return;
         deleteBtn.disabled = true;
         try {
-            const results = await Promise.all(cards.map(card => {
+            const results = await Promise.all(cards.map(async (card) => {
                 const id = card.getAttribute('data-bookmark-id');
-                if (!id) return Promise.resolve({ ok: false, card });
+                if (!id) return { ok: false, card };
                 const form = new URLSearchParams();
                 form.append('id', id);
-                return fetch('/bookmarks/unbookmark?json=1', {
-                    method: 'POST',
-                    body: form.toString(),
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Accept': 'application/json' }
-                }).then(res => res.json().then(j => ({ ok: !!j.ok, card })), () => ({ ok: false, card }));
+                try {
+                    const res = await fetch('/bookmarks/unbookmark?json=1', {
+                        method: 'POST',
+                        body: form.toString(),
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Accept': 'application/json' }
+                    });
+                    const j = await res.json().catch(() => ({}));
+                    return { ok: !!j.ok, card };
+                } catch {
+                    return { ok: false, card };
+                }
             }));
             let failed = 0;
+            const failedCards = [];
             for (const r of results) {
                 if (r.ok) r.card.remove();
-                else failed++;
+                else {
+                    failed++;
+                    r.card.classList.add('op-failed');
+                    failedCards.push(r.card);
+                }
             }
             selectAll.checked = false;
             updateVisibility();
-            if (failed) alert(`${failed} bookmark${failed > 1 ? 's' : ''} could not be deleted.`);
+            // Removing cards shifts all indices — reset keyboard focus so the
+            // next j/k press starts from the top instead of landing on the
+            // wrong card (or past the end).
+            _bkKbIdx = -1;
+            // Clear the failed marker after a few seconds so it fades back
+            // into the normal list once the user has seen it.
+            if (failedCards.length) {
+                setTimeout(() => failedCards.forEach(c => c.classList.remove('op-failed')), 6000);
+            }
+            if (failed) alert(`${failed} bookmark${failed > 1 ? 's' : ''} could not be deleted. The failed item${failed > 1 ? 's are' : ' is'} highlighted.`);
         } finally {
             deleteBtn.disabled = false;
         }
@@ -165,6 +197,8 @@
             const csv = input.value.split(',').map(t => t.trim()).filter(Boolean).join(',');
 
             submitBtn.disabled = true;
+            const originalMessage = message.textContent;
+            message.textContent = `Applying tags to ${cards.length} bookmark${cards.length > 1 ? 's' : ''}…`;
             try {
                 const results = await Promise.all(cards.map(async (card) => {
                     const id = card.getAttribute('data-bookmark-id');
@@ -187,22 +221,42 @@
 
                 // Update the DOM for successfully-updated cards so the next bulk
                 // op sees the new state and the visible chip pills refresh.
+                // Pills must include the per-tag remove-× form to match what
+                // the server renders — a plain <span> would strand users with
+                // no way to remove a single tag until they reload.
                 const tagList = csv ? csv.split(',') : [];
-                const pillsHtml = tagList.map(t => `<span class="chip bookmark-tag-chip">${t}</span>`).join('');
+                const eCsv = escapeHtmlJs(csv);
+                function buildPillsHtml(bookmarkId) {
+                    return tagList.map(t => {
+                        const eTag = escapeHtmlJs(t);
+                        return `<span class="chip bookmark-tag-chip">${eTag}<form method="POST" action="/bookmarks/remove-tag" style="display:inline" onsubmit="return confirm('Remove this tag?')">` +
+                            `<input type="hidden" name="id" value="${bookmarkId}" />` +
+                            `<input type="hidden" name="tag" value="${eTag}" />` +
+                            `<input type="hidden" name="currentTags" value="${eCsv}" />` +
+                            `<button type="submit" class="bookmark-tag-remove" title="Remove tag"><i class="bi bi-x"></i></button>` +
+                            `</form></span>`;
+                    }).join('');
+                }
+                const failedCards = [];
                 for (const r of results) {
-                    if (!r.ok) continue;
+                    if (!r.ok) { failedCards.push(r.card); r.card.classList.add('op-failed'); continue; }
                     r.card.setAttribute('data-tags', csv);
                     const container = r.card.querySelector('.bookmark-card-tags');
                     if (container) {
                         // Preserve the add-tag dropdown (last child); replace pill chips.
                         const addForm = container.querySelector('.bookmark-add-tag-form');
-                        container.innerHTML = pillsHtml;
+                        const id = r.card.getAttribute('data-bookmark-id') || '';
+                        container.innerHTML = buildPillsHtml(id);
                         if (addForm) container.appendChild(addForm);
                     }
                 }
-                const failed = results.filter(r => !r.ok).length;
+                if (failedCards.length) {
+                    setTimeout(() => failedCards.forEach(c => c.classList.remove('op-failed')), 6000);
+                }
+                const failed = failedCards.length;
                 dialog.close();
-                if (failed) alert(`Tags updated on ${results.length - failed} of ${results.length} bookmarks. ${failed} failed.`);
+                message.textContent = originalMessage;
+                if (failed) alert(`Tags updated on ${results.length - failed} of ${results.length} bookmarks. ${failed} failed and ${failed > 1 ? 'are' : 'is'} highlighted.`);
             } finally {
                 submitBtn.disabled = false;
             }
@@ -238,8 +292,14 @@
             case 'o':
             case 'Enter': {
                 if (current) {
-                    const url = current.getAttribute('data-bookmark-url');
-                    if (url) { e.preventDefault(); window.open(url, '_blank', 'noopener,noreferrer'); }
+                    const url = current.getAttribute('data-bookmark-url') || '';
+                    // Server already runs safeUrl() before embedding in
+                    // data-bookmark-url — re-check here as defense in depth
+                    // so a `javascript:` URL can never reach window.open().
+                    if (/^https?:\/\//i.test(url)) {
+                        e.preventDefault();
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                    }
                 }
                 break;
             }

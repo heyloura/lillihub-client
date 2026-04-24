@@ -1,13 +1,13 @@
 // Bookmark routes — list, highlights, new bookmark form, and create/update/delete actions.
 import { BookmarksTemplate, HighlightsTemplate } from "../layouts/bookmarks.js";
 import { HTMLPage } from "../layouts/templates.js";
+import { escapeHtml } from "../scripts/server/utilities.js";
 
 const BOOKMARKS_ROUTE = new URLPattern({ pathname: "/bookmarks" });
 const HIGHLIGHTS_ROUTE = new URLPattern({ pathname: "/highlights" });
 const HIGHLIGHTS_DELETE = new URLPattern({ pathname: "/highlights/delete" });
 const HIGHLIGHTS_POST = new URLPattern({ pathname: "/highlights/post" });
 const BOOKMARK_NEW_ROUTE = new URLPattern({ pathname: "/bookmark/new" });
-const BOOKMARKS_UPDATE_TAGS = new URLPattern({ pathname: "/bookmarks/update" });
 const BOOKMARKS_ADD_TAG = new URLPattern({ pathname: "/bookmarks/add-tag" });
 const BOOKMARKS_REMOVE_TAG = new URLPattern({ pathname: "/bookmarks/remove-tag" });
 const BOOKMARKS_NEW = new URLPattern({ pathname: "/bookmarks/new" });
@@ -35,14 +35,29 @@ export async function tryHandle(req, ctx) {
     if (HIGHLIGHTS_DELETE.exec(req.url) && user) {
         const value = await req.formData();
         const id = value.get('id');
+        const wantsJson = new URL(req.url).searchParams.get('json') === '1'
+            || (req.headers.get('accept') || '').includes('application/json');
 
+        let ok = true;
         try {
-            await fetch(`https://micro.blog/posts/bookmarks/highlights/${id}`, {
+            const posting = await fetch(`https://micro.blog/posts/bookmarks/highlights/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + accessTokenValue }
             });
+            if (!posting.ok) {
+                ok = false;
+                console.log(`${user.username} tried to delete highlight ${id} and ${await posting.text()}`);
+            }
         } catch (err) {
-            console.log(`${user.username} tried to delete highlight ${id}: ${err?.message || err}`);
+            ok = false;
+            console.log(`${user.username} delete highlight ${id} fetch failed: ${err?.message || err}`);
+        }
+
+        if (wantsJson) {
+            return new Response(JSON.stringify({ ok }), {
+                status: ok ? 200 : 500,
+                headers: { 'content-type': 'application/json' }
+            });
         }
 
         return Response.redirect(new URL('/highlights', req.url).href, 303);
@@ -65,8 +80,8 @@ export async function tryHandle(req, ctx) {
             const tagRes = await fetch(`https://micro.blog/posts/bookmarks/tags`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } });
             const allTags = await tagRes.json();
             allTags.sort();
-            const datalist = allTags.map(tag => `<option value="${tag}"></option>`).join('');
-            tagField = `<label class="mt-2">Tags</label><input class="form-input mt-2" list="tags-list" type="text" name="tags" placeholder="Tags..." /><datalist id="tags-list">${datalist}</datalist>`;
+            const datalist = allTags.map(tag => `<option value="${escapeHtml(tag)}"></option>`).join('');
+            tagField = `<label class="mt-2">Tags</label><input class="form-input mt-2" list="tags-list" type="text" name="tags" placeholder="Comma separated tags…" /><datalist id="tags-list">${datalist}</datalist><small style="color:var(--overlay-1);font-size:0.8rem;">Separate multiple tags with commas.</small>`;
         }
         const content = new TextDecoder().decode(await Deno.readFile("templates/bookmarks/bookmark-new.html"));
         return new Response(
@@ -88,37 +103,53 @@ export async function tryHandle(req, ctx) {
         formBody.append("h", "entry");
         formBody.append("bookmark-of", url);
 
-        const posting = await fetch(`https://micro.blog/micropub`, {
-            method: "POST",
-            body: formBody.toString(),
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                "Authorization": "Bearer " + accessTokenValue
+        let posting;
+        try {
+            posting = await fetch(`https://micro.blog/micropub`, {
+                method: "POST",
+                body: formBody.toString(),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                    "Authorization": "Bearer " + accessTokenValue
+                }
+            });
+        } catch (err) {
+            console.log(`${user.username} add bookmark ${url} fetch failed: ${err?.message || err}`);
+            return Response.redirect(new URL('/bookmarks?error=failed', req.url).href, 303);
+        }
+        if (!posting.ok) {
+            console.log(`${user.username} add bookmark ${url} failed: ${await posting.text()}`);
+            return Response.redirect(new URL('/bookmarks?error=failed', req.url).href, 303);
+        }
+
+        // Resolve the new bookmark id so we can attach tags. Micropub MUST
+        // return a Location header pointing at the created entry — use that
+        // first. Fall back to the recent-bookmarks list matched by url (not
+        // by position, which races with other clients adding bookmarks).
+        async function resolveNewBookmarkId() {
+            const loc = posting.headers.get('Location') || '';
+            const idMatch = loc.match(/\/(?:bookmarks|posts)\/(\d+)/);
+            if (idMatch) return idMatch[1];
+            try {
+                const r = await fetch(`https://micro.blog/posts/bookmarks`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } });
+                const d = await r.json();
+                const match = d?.items?.find(b => b.url === url);
+                return match ? match.id : null;
+            } catch {
+                return null;
             }
-        });
-        // if (!posting.ok) {
-        //     console.log(`${user.username} tried to add a bookmark ${url} and ${await posting.text()}`);
-        //     return new Response(`<p>Error :-(</p>`, {
-        //         status: 200,
-        //         headers: {
-        //             "content-type": "text/html",
-        //         },
-        //     });
-        // }
+        }
 
         if (user.plan == 'premium' && tags) {
-            // The bookmark POST above already succeeded — don't fail the whole request
-            // if the follow-up tag attach hits a network error; just log and move on.
+            // Bookmark creation already succeeded — log and continue on
+            // tag-attach failure rather than failing the whole request.
             try {
-                const fetchingBookmarks = await fetch(`https://micro.blog/posts/bookmarks`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } });
-                const bookmarksData = await fetchingBookmarks.json();
-                const bookmark = bookmarksData?.items?.length > 0 ? bookmarksData.items[0] : null;
-
-                if (bookmark) {
+                const bookmarkId = await resolveNewBookmarkId();
+                if (bookmarkId) {
                     const formBodyTags = new URLSearchParams();
                     formBodyTags.append("tags", tags);
 
-                    const postingTags = await fetch(`https://micro.blog/posts/bookmarks/${bookmark.id}`, {
+                    const postingTags = await fetch(`https://micro.blog/posts/bookmarks/${bookmarkId}`, {
                         method: "POST",
                         body: formBodyTags.toString(),
                         headers: {
@@ -127,20 +158,25 @@ export async function tryHandle(req, ctx) {
                         }
                     });
                     if (!postingTags.ok) {
-                        console.log(`${user.username} tried to add tags to a new bookmark and ${await postingTags.text()}`);
-                        return new Response(`<p>Error :-(</p>`, {
-                            status: 200,
-                            headers: {
-                                "content-type": "text/html",
-                            },
-                        });
+                        console.log(`${user.username} add tags to new bookmark ${bookmarkId} failed: ${await postingTags.text()}`);
                     }
+                } else {
+                    console.log(`${user.username} add tags to new bookmark (url=${url}) failed: could not resolve new bookmark id`);
                 }
             } catch (err) {
-                console.log(`${user.username} tried to add tags to a new bookmark and fetch failed: ${err?.message || err}`);
+                console.log(`${user.username} add tags to new bookmark fetch failed: ${err?.message || err}`);
             }
         }
 
+        // Form-response routing. Three shapes are supported:
+        //   - redirect=true  → normal form submission from bookmark-new.html;
+        //     land back on /bookmarks.
+        //   - redirect=<url> → caller-specified destination. Used by external
+        //     callers (bookmarklets / extensions) that want to return the
+        //     user to the page they were on when they bookmarked it.
+        //   - redirect=false or missing → return an empty page with no
+        //     navigation. For iframe/XHR bookmarklets that consume the form
+        //     response programmatically and don't want a page change.
         if (redirect && redirect == 'true') {
             return Response.redirect(new URL('/bookmarks', req.url).href, 303);
         }
@@ -229,45 +265,6 @@ export async function tryHandle(req, ctx) {
             status: ok ? 200 : 500,
             headers: { 'content-type': 'application/json' }
         });
-    }
-
-    if (BOOKMARKS_UPDATE_TAGS.exec(req.url) && user) {
-        const value = await req.formData();
-        const tags = value.getAll('tags[]') ? value.getAll('tags[]') : [];
-        const newTag = value.get('newTag');
-        const id = value.get('id');
-
-        if (newTag) {
-            tags.push(newTag);
-        }
-
-        if (user.plan == 'premium') {
-            try {
-                const fetching = await fetch(`https://micro.blog/posts/bookmarks/${id}`, { method: "GET", headers: { "Authorization": "Bearer " + accessTokenValue } });
-                const bookmark = await fetching.json();
-
-                if (bookmark.items && bookmark.items.length > 0) {
-                    const formBody = new URLSearchParams();
-                    formBody.append("tags", tags ? tags.join('') : '');
-
-                    const posting = await fetch(`https://micro.blog/posts/bookmarks/${id}`, {
-                        method: "POST",
-                        body: formBody.toString(),
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-                            "Authorization": "Bearer " + accessTokenValue
-                        }
-                    });
-                    if (!posting.ok) {
-                        console.log(`${user.username} tried to change tags and ${await posting.text()}`);
-                    }
-                }
-            } catch (err) {
-                console.log(`${user.username} tried to change tags and fetch failed: ${err?.message || err}`);
-            }
-        }
-
-        return Response.redirect(new URL('/bookmarks', req.url).href, 303);
     }
 
     // Add a single tag to a bookmark (appends to existing tags)

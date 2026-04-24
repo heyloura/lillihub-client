@@ -1912,6 +1912,15 @@ span.badge::after {
     100% { content: "·"; }
 }
 
+/* Transient visual marker added to a card/row when a bulk operation (delete,
+   tag update, etc.) fails for that specific item — so the user can see
+   which ones failed and retry them directly. */
+.op-failed {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+    border-radius: 0.3rem;
+}
+
 /* Keyboard-focused post card highlight (j/k navigation) */
 .card.kb-focus,
 .todo-item.kb-focus,

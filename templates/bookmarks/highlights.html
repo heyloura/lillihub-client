@@ -39,28 +39,42 @@
         if (!confirm(`Delete ${checked.length} highlight${checked.length > 1 ? 's' : ''}?`)) return;
         btn.disabled = true;
         try {
-            const results = await Promise.all([...checked].map(cb => {
+            const results = await Promise.all([...checked].map(async (cb) => {
                 const id = cb.dataset.highlightId;
-                if (!id) return Promise.resolve({ ok: false, cb });
+                if (!id) return { ok: false, cb };
                 const form = new URLSearchParams();
                 form.append('id', id);
-                return fetch('/highlights/delete', {
-                    method: 'POST',
-                    body: form.toString(),
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' }
-                }).then(res => ({ ok: res.ok && !res.url?.includes('error='), cb }), () => ({ ok: false, cb }));
+                try {
+                    const res = await fetch('/highlights/delete?json=1', {
+                        method: 'POST',
+                        body: form.toString(),
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'Accept': 'application/json' }
+                    });
+                    const j = await res.json().catch(() => ({}));
+                    return { ok: !!j.ok, cb };
+                } catch {
+                    return { ok: false, cb };
+                }
             }));
             let failed = 0;
+            const failedCards = [];
             for (const r of results) {
-                if (r.ok) r.cb.closest('.highlight-card')?.remove();
-                else failed++;
+                if (r.ok) { r.cb.closest('.highlight-card')?.remove(); }
+                else {
+                    failed++;
+                    const card = r.cb.closest('.highlight-card');
+                    if (card) { card.classList.add('op-failed'); failedCards.push(card); }
+                }
             }
             const selectAll = document.getElementById('highlight-select-all-cb');
             if (selectAll) selectAll.checked = false;
             const remaining = document.querySelectorAll('.highlight-card').length;
             const countEl = document.querySelector('.highlight-count');
             if (countEl) countEl.textContent = `${remaining} highlight${remaining !== 1 ? 's' : ''}`;
-            if (failed) alert(`${failed} highlight${failed > 1 ? 's' : ''} could not be deleted.`);
+            if (failedCards.length) {
+                setTimeout(() => failedCards.forEach(c => c.classList.remove('op-failed')), 6000);
+            }
+            if (failed) alert(`${failed} highlight${failed > 1 ? 's' : ''} could not be deleted. The failed item${failed > 1 ? 's are' : ' is'} highlighted.`);
         } finally {
             btn.disabled = false;
         }
