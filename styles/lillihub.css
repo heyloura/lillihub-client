@@ -2962,6 +2962,7 @@ p { margin: 0.6rem 0; }
 
     .note-slideout { width: 100%; max-width: none; }
     .card { padding: 1rem 0 !important; }
+    .comments > details > .card { padding: 1rem !important; }
     .notebook-card { padding: 0 !important; }
     .bookshelf-card { padding: 0 !important; }
     .note-card { padding: 0 !important; padding-left: 1.8rem !important; }

@@ -33,6 +33,26 @@
 (function() {
     const btn = document.getElementById('delete-selected-highlights');
     if (!btn) return;
+
+    // --- Hide action buttons until something is selected ---
+    // Mirrors the notes/bookmarks select-toolbar pattern. The Post-selected
+    // submit button has no `hide-if-user-has-no-javascript` class so the
+    // noscript path still shows it; we only toggle here from JS.
+    const postBtn = document.querySelector('#highlights-form button[type="submit"]');
+    function updateActionsVisibility() {
+        const any = !!document.querySelector('.highlight-card:not([style*="display: none"]) .highlight-checkbox:checked');
+        const d = any ? '' : 'none';
+        btn.style.display = d;
+        if (postBtn) postBtn.style.display = d;
+    }
+    updateActionsVisibility();
+    document.addEventListener('change', (e) => {
+        const t = e.target;
+        if (!t) return;
+        if ((t.classList && t.classList.contains('highlight-checkbox')) || t.id === 'highlight-select-all-cb') {
+            updateActionsVisibility();
+        }
+    });
     btn.addEventListener('click', async () => {
         const checked = document.querySelectorAll('.highlight-checkbox:checked');
         if (!checked.length) return;
