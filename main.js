@@ -15,8 +15,6 @@
 *   - Route handlers live in routes/*.js, each exporting `tryHandle(req, ctx)`.
 ******************************************************************************************************************/
 
-import { serve } from "https://deno.land/std@0.214.0/http/server.ts";
-
 import { tryPreFilter } from "./scripts/server/pre-filters.js";
 import { buildRequestContext } from "./scripts/server/request-context.js";
 
@@ -73,4 +71,4 @@ async function handler(req) {
     return new Response('', { status: 404 });
 }
 
-serve(handler);
+Deno.serve(handler);
