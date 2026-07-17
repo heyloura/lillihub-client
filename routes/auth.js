@@ -46,6 +46,7 @@ export async function tryHandle(req, ctx) {
                     }
                 });
                 const rawText = await fetching.text();
+                console.log(rawText);
                 try {
                     response = JSON.parse(rawText);
                 } catch {
