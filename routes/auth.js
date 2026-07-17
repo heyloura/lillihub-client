@@ -45,7 +45,13 @@ export async function tryHandle(req, ctx) {
                         "Accept": "application/json"
                     }
                 });
-                response = await fetching.json();
+                const rawText = await fetching.text();
+                try {
+                    response = JSON.parse(rawText);
+                } catch {
+                    console.log(`indieauth token exchange failed: non-JSON response (status ${fetching.status}) for client_id=${formBody.get('client_id')} redirect_uri=${formBody.get('redirect_uri')}: ${rawText.slice(0, 300)}`);
+                    response = { error: 'token_exchange_failed' };
+                }
             } catch (err) {
                 console.log(`indieauth token exchange failed: ${err?.message || err}`);
                 response = { error: 'token_exchange_failed' };
